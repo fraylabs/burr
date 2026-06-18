@@ -31,8 +31,8 @@ runPython(["examples/build123d-actuator/bad/design.py"])
 runPython(["examples/build123d-actuator/good/design.py"])
 
 const bad = run(
-  "node",
-  ["bin/burr.mjs", "check", "examples/build123d-actuator/bad", "--no-write-receipt"],
+  "cargo",
+  ["run", "--quiet", "--", "check", "examples/build123d-actuator/bad", "--no-write-receipt"],
   { expectFailure: true },
 )
 if (!bad.output.includes("Short by: 2.2 mm")) {
@@ -40,8 +40,8 @@ if (!bad.output.includes("Short by: 2.2 mm")) {
 }
 
 const good = run(
-  "node",
-  ["bin/burr.mjs", "check", "examples/build123d-actuator/good", "--no-write-receipt"],
+  "cargo",
+  ["run", "--quiet", "--", "check", "examples/build123d-actuator/good", "--no-write-receipt"],
 )
 if (!good.output.includes("PASS examples/build123d-actuator/good/burr-design-data.json")) {
   throw new Error(`Good build123d fixture did not pass as expected.\n${good.output}`)

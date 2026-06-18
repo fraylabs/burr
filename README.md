@@ -35,24 +35,24 @@ See [INSTALL.md](INSTALL.md) for current GitHub and uv install paths.
 For local development:
 
 ```bash
-npm install
+cargo test
 uv sync --all-packages
 npm run check
 ```
 
-Install the CLI from GitHub:
+Install the Rust CLI from GitHub:
 
 ```bash
-npm install -g github:fraylabs/burr
+cargo install --git https://github.com/fraylabs/burr burr
 burr --version
 ```
 
 Run the CLI from a local checkout:
 
 ```bash
-node bin/burr.mjs --version
-node bin/burr.mjs check examples/linear-actuator-bad
-node bin/burr.mjs check examples/linear-actuator-good
+cargo run -- --version
+cargo run -- check examples/linear-actuator-bad
+cargo run -- check examples/linear-actuator-good
 ```
 
 Run the build123d adapter examples:
@@ -213,7 +213,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.4.1",
+  "burr_version": "0.5.0",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.1.0",
   "compatibility": {

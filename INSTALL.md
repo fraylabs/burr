@@ -3,19 +3,18 @@
 Burr has two pieces:
 
 ```txt
-@fraylabs/burr   Node CLI and linter
+burr             Rust CLI and linter
 burr-build123d   Python helper that emits burr-design-data.json from build123d
 ```
 
-Neither package is published to npm or PyPI yet. Install from GitHub or a local
-checkout for now.
+The CLI is Rust-first. The Python helper is managed with uv.
 
-## CLI From GitHub
+## Rust CLI From GitHub
 
-Install the Burr CLI globally:
+Install the Burr CLI with Cargo:
 
 ```bash
-npm install -g github:fraylabs/burr
+cargo install --git https://github.com/fraylabs/burr burr
 ```
 
 Check it:
@@ -39,6 +38,7 @@ git clone https://github.com/fraylabs/burr.git
 cd burr
 npm install
 uv sync --all-packages
+cargo test
 ```
 
 Run checks:
@@ -51,14 +51,14 @@ npm run check:build123d
 Use the local CLI without global install:
 
 ```bash
-node bin/burr.mjs --version
-node bin/burr.mjs check examples/linear-actuator-good
+cargo run -- --version
+cargo run -- check examples/linear-actuator-good
 ```
 
-Or link the CLI while developing:
+Or install the local Rust CLI while developing:
 
 ```bash
-npm link
+cargo install --path .
 burr --version
 ```
 
@@ -71,7 +71,7 @@ Run the example design files through uv:
 ```bash
 uv sync --all-packages
 uv run --package burr-build123d python examples/build123d-actuator/good/design.py
-node bin/burr.mjs check examples/build123d-actuator/good
+cargo run -- check examples/build123d-actuator/good
 ```
 
 For your own local script in the same checkout:
@@ -97,15 +97,14 @@ from burr_build123d import BurrDesignData, m3_clearance_hole
 ## Current Publish Status
 
 ```txt
-npm package: not published
+Rust CLI: installable from GitHub with cargo
 PyPI package: not published
-GitHub source install: supported
 uv local workspace install: supported
 ```
 
 Planned package names:
 
 ```txt
-npm:  @fraylabs/burr
+crates.io: burr
 PyPI: burr-build123d
 ```
