@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Design-rule checks for CAD-as-code workflows.",
   "type": "module",
   "bin": {
@@ -9,13 +9,18 @@
   "files": [
     "bin",
     "src",
+    "python",
     "rules",
+    "scripts",
+    "examples",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
     "test": "node test/burr.test.mjs",
-    "check": "npm test && node --check bin/burr.mjs && node --check src/index.mjs"
+    "test:python": "python -m unittest discover -s test -p 'test_*.py'",
+    "check:build123d": "node scripts/check-build123d-examples.mjs",
+    "check": "npm test && npm run test:python && node --check bin/burr.mjs && node --check src/index.mjs"
   },
   "keywords": [
     "cad",

@@ -45,6 +45,21 @@ node bin/burr.mjs check examples/linear-actuator-bad
 node bin/burr.mjs check examples/linear-actuator-good
 ```
 
+Run the build123d adapter examples after installing build123d:
+
+```bash
+uv venv .venv-build123d
+source .venv-build123d/bin/activate
+uv pip install build123d
+npm run check:build123d
+```
+
+For local scripts that import the helper directly, run with:
+
+```bash
+PYTHONPATH=python python your_design.py
+```
+
 ## Commands
 
 ```bash
@@ -58,6 +73,45 @@ checks, then writes `burr-receipt.json` beside each design data file.
 
 `stamp` computes `sha256` and `size_bytes` for declared source and generated
 artifact files.
+
+## Build123d Helper
+
+Burr does not replace build123d. The optional helper records design data while
+your normal build123d file creates geometry.
+
+```python
+from build123d import Box, BuildPart, Locations, export_step
+from burr_build123d import BurrDesignData, DESIGN_DATA_FILE, m3_clearance_hole
+
+design = BurrDesignData(
+    artifact_id="my-actuator",
+    artifact_type="actuator_mount",
+    process={"kind": "FDM", "material": "PETG", "nozzle_mm": 0.4},
+)
+design.source("design.py")
+design.artifact("actuator.step")
+design.part("housing", bbox_min=(-42, -16, 0), bbox_max=(42, 16, 26))
+
+with BuildPart() as housing:
+    with Locations((0, 0, 13)):
+        Box(84, 32, 26)
+
+    m3_clearance_hole(
+        design,
+        feature_id="m3_lower_left",
+        part="housing",
+        center=(39.5, -8, 8),
+        axis=(1, 0, 0),
+        role="loaded_mount",
+    )
+
+export_step(housing.part, "actuator.step")
+design.write(DESIGN_DATA_FILE)
+```
+
+That one helper call cuts the hole in build123d and records the feature Burr
+checks. Burr core still reads only `burr-design-data.json`, so other CAD tools
+can use the same contract.
 
 ## Design Data
 
@@ -148,7 +202,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.2.0",
+  "burr_version": "0.3.0",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.1.0",
   "compatibility": {
@@ -168,20 +222,15 @@ for transition, but new integrations should emit `burr-design-data.json`.
 
 Bad actuator:
 
-```json
-{
-  "status": "fail",
-  "reason": "insufficient_edge_distance",
-  "measured": {
-    "center_to_edge_mm": 8,
-    "wall_to_edge_mm": 6.3
-  },
-  "required": {
-    "center_to_edge_mm": 10.2,
-    "wall_to_edge_mm": 8.5
-  },
-  "margin_mm": -2.2
-}
+```txt
+FAIL examples/build123d-actuator/bad/burr-design-data.json -> <not written>
+
+1 problem:
+1. M3 loaded hole m3_lower_left is too close to the edge.
+   Measured center-to-edge: 8 mm
+   Required center-to-edge: 10.2 mm
+   Short by: 2.2 mm
+   Try moving the hole inward or increasing the surrounding part size.
 ```
 
 Fixed actuator:

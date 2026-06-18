@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url"
 import {
   burrVersion,
   designDataFileName,
+  formatReceiptDiagnostics,
   legacyDesignDataFileNames,
   lintDesignDataFile,
   receiptSchemaVersion,
@@ -45,6 +46,12 @@ try {
         check.reason === "insufficient_edge_distance" &&
         check.measured.center_to_edge_mm === 8 &&
         check.required.center_to_edge_mm === 10.2,
+    ),
+  )
+  const badDiagnostics = formatReceiptDiagnostics(bad.receipt)
+  assert.ok(
+    badDiagnostics.some((diagnostic) =>
+      diagnostic.lines.some((line) => line.includes("Short by: 2.2 mm")),
     ),
   )
 

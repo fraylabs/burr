@@ -6,6 +6,7 @@ import {
   designDataFileName,
   defaultRulepackPath,
   findDesignDataPaths,
+  formatReceiptDiagnostics,
   lintTargets,
   stampTargets,
 } from "../src/index.mjs"
@@ -76,6 +77,18 @@ try {
       console.log(
         `${result.receipt.status.toUpperCase()} ${path.relative(process.cwd(), result.designDataPath)} -> ${receiptLabel}`,
       )
+      const diagnostics = formatReceiptDiagnostics(result.receipt)
+      if (diagnostics.length > 0) {
+        console.log("")
+        console.log(`${diagnostics.length} problem${diagnostics.length === 1 ? "" : "s"}:`)
+        for (const [index, diagnostic] of diagnostics.entries()) {
+          console.log(`${index + 1}. ${diagnostic.lines[0]}`)
+          for (const line of diagnostic.lines.slice(1)) {
+            console.log(`   ${line}`)
+          }
+        }
+        console.log("")
+      }
     }
     process.exit(failures.length === 0 ? 0 : 1)
   }

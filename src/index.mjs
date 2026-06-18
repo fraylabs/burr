@@ -449,6 +449,56 @@ export function lintDesignData(manifest, rulepack, options = {}) {
   }
 }
 
+export function formatCheckDiagnostic(check) {
+  if (check.status !== "fail") return null
+
+  if (check.reason === "insufficient_edge_distance") {
+    const featureLabel = check.feature_id ? ` ${check.feature_id}` : ""
+    const measured = check.measured?.center_to_edge_mm
+    const required = check.required?.center_to_edge_mm
+    const shortBy = isFiniteNumber(check.margin_mm) ? round(Math.abs(check.margin_mm)) : null
+    const lines = [
+      `M3 loaded hole${featureLabel} is too close to the edge.`,
+    ]
+    if (isFiniteNumber(measured)) lines.push(`Measured center-to-edge: ${measured} mm`)
+    if (isFiniteNumber(required)) lines.push(`Required center-to-edge: ${required} mm`)
+    if (isFiniteNumber(shortBy)) lines.push(`Short by: ${shortBy} mm`)
+    lines.push("Try moving the hole inward or increasing the surrounding part size.")
+    return lines
+  }
+
+  if (check.reason === "source_hash_mismatch" || check.reason === "artifact_hash_mismatch") {
+    return [
+      `Stale ${check.file_ref ?? "file"} hash for ${check.path ?? "<unknown>"}.`,
+      "Run burr stamp after regenerating design data and artifacts.",
+    ]
+  }
+
+  if (check.reason === "unsupported_design_data_schema") {
+    return [
+      "Design data schema is not supported by this Burr version.",
+      `Found: ${check.measured?.schema_version ?? "<missing>"}`,
+    ]
+  }
+
+  return [check.message ?? `${check.rule_id} failed.`]
+}
+
+export function formatReceiptDiagnostics(receipt) {
+  const diagnostics = []
+  for (const check of receipt.checks ?? []) {
+    const lines = formatCheckDiagnostic(check)
+    if (!lines) continue
+    diagnostics.push({
+      rule_id: check.rule_id,
+      reason: check.reason,
+      feature_id: check.feature_id ?? null,
+      lines,
+    })
+  }
+  return diagnostics
+}
+
 export function findManifestPaths(inputs, options = {}) {
   const cwd = options.cwd ?? process.cwd()
   const results = []

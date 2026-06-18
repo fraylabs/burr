@@ -1,4 +1,7 @@
 node_modules/
+.venv/
+.venv-*/
+__pycache__/
 *.log
 burr-receipt.json
 .DS_Store

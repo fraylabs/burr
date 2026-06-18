@@ -1,0 +1,71 @@
+{
+  "schema_version": "burr.design-data.v1",
+  "artifact_id": "build123d-actuator-good",
+  "artifact_version": "0.1.0",
+  "artifact_type": "actuator_mount",
+  "units": "mm",
+  "sources": [
+    {
+      "kind": "design_file",
+      "path": "design.py",
+      "sha256": "c5eaa7b74670915b8e36c3c742e1b5b6af34d81a4538c5e7d499b6261ce522fc",
+      "size_bytes": 1422
+    }
+  ],
+  "artifacts": [
+    {
+      "kind": "step",
+      "path": "actuator.step",
+      "sha256": "863296f60e5ef0da1ff88038c11018abb511bd10a7983d5e674ebcc45fe850c1",
+      "size_bytes": 19395
+    }
+  ],
+  "parts": [
+    {
+      "id": "housing",
+      "bbox_mm": {
+        "min": [
+          -43.0,
+          -24.0,
+          0.0
+        ],
+        "max": [
+          43.0,
+          24.0,
+          40.0
+        ]
+      }
+    }
+  ],
+  "features": [
+    {
+      "id": "m3_lower_left",
+      "part": "housing",
+      "kind": "clearance_hole",
+      "fastener": "M3",
+      "diameter_mm": 3.4,
+      "center_mm": [
+        40.0,
+        -12.0,
+        12.0
+      ],
+      "axis": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "role": "loaded_mount"
+    }
+  ],
+  "source": {
+    "kind": "design_file",
+    "path": "design.py",
+    "sha256": "c5eaa7b74670915b8e36c3c742e1b5b6af34d81a4538c5e7d499b6261ce522fc",
+    "size_bytes": 1422
+  },
+  "process": {
+    "kind": "FDM",
+    "material": "PETG",
+    "nozzle_mm": 0.4
+  }
+}
