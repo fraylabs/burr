@@ -24,11 +24,25 @@ Workflow: publish-python.yml
 Environment: pypi
 ```
 
+PyPI must match these GitHub trusted-publishing claims:
+
+```txt
+sub: repo:fraylabs/burr:environment:pypi
+repository: fraylabs/burr
+repository_owner: fraylabs
+job_workflow_ref: fraylabs/burr/.github/workflows/publish-python.yml@refs/heads/main
+ref: refs/heads/main
+environment: pypi
+```
+
 Then run the `Publish Python` GitHub Actions workflow with:
 
 ```txt
 ref: burr-build123d-v0.5.0
 ```
+
+If publish fails with `invalid-publisher`, the PyPI pending publisher does not
+match the claims above.
 
 Local token fallback:
 
