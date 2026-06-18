@@ -1,0 +1,63 @@
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: Core
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install
+        run: npm install
+
+      - name: Check
+        run: npm run check
+
+  build123d:
+    name: Build123d Examples
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Setup Python
+        run: uv python install 3.11
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Create Python environment
+        run: uv venv .venv-build123d --python 3.11
+
+      - name: Install build123d
+        run: uv pip install --python .venv-build123d/bin/python build123d
+
+      - name: Check build123d examples
+        run: PYTHON=.venv-build123d/bin/python npm run check:build123d
+
+      - name: Confirm generated artifacts are untracked
+        run: |
+          test -z "$(git status --short --untracked-files=no)"
