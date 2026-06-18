@@ -30,15 +30,24 @@ result = fail by 2.2 mm
 
 ## Install
 
+See [INSTALL.md](INSTALL.md) for current GitHub and uv install paths.
+
 For local development:
 
 ```bash
 npm install
 uv sync --all-packages
-npm test
+npm run check
 ```
 
-Run the CLI directly:
+Install the CLI from GitHub:
+
+```bash
+npm install -g github:fraylabs/burr
+burr --version
+```
+
+Run the CLI from a local checkout:
 
 ```bash
 node bin/burr.mjs --version
@@ -204,7 +213,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.4.0",
+  "burr_version": "0.4.1",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.1.0",
   "compatibility": {

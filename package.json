@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Design-rule checks for CAD-as-code workflows.",
   "type": "module",
   "bin": {
@@ -20,6 +20,7 @@
     "examples/linear-actuator-bad",
     "examples/linear-actuator-good",
     "README.md",
+    "INSTALL.md",
     "LICENSE"
   ],
   "scripts": {
