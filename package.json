@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Design-rule checks for CAD-as-code workflows.",
   "type": "module",
   "files": [
@@ -15,6 +15,8 @@
     "scripts",
     "examples/build123d-actuator/bad/design.py",
     "examples/build123d-actuator/good/design.py",
+    "examples/build123d-wall-thickness/bad/design.py",
+    "examples/build123d-wall-thickness/good/design.py",
     "examples/linear-actuator-bad",
     "examples/linear-actuator-good",
     "README.md",

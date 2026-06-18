@@ -210,16 +210,6 @@ pub fn lint_design_data(
             .into_iter()
             .flatten()
         {
-            if string_field(rule, "kind") != Some("hole_edge_distance") {
-                warnings.push(json!({
-                    "rule_id": format!("{}:{}", string_field(rulepack, "id").unwrap_or("<missing>"), string_field(rule, "id").unwrap_or("<missing>")),
-                    "status": "warn",
-                    "reason": "unsupported_rule_kind",
-                    "message": format!("Unsupported rule kind {}.", string_field(rule, "kind").unwrap_or("<missing>"))
-                }));
-                continue;
-            }
-
             let features: Vec<&Value> = manifest
                 .get("features")
                 .and_then(Value::as_array)
@@ -227,11 +217,25 @@ pub fn lint_design_data(
                 .flatten()
                 .filter(|feature| feature_applies(feature, rule.get("applies_to")))
                 .collect();
+            let rule_kind = string_field(rule, "kind");
+
+            if !matches!(
+                rule_kind,
+                Some("hole_edge_distance") | Some("minimum_wall_thickness")
+            ) {
+                warnings.push(json!({
+                    "rule_id": format!("{}:{}", string_field(rulepack, "id").unwrap_or("<missing>"), string_field(rule, "id").unwrap_or("<missing>")),
+                    "status": "warn",
+                    "reason": "unsupported_rule_kind",
+                    "message": format!("Unsupported rule kind {}.", rule_kind.unwrap_or("<missing>"))
+                }));
+                continue;
+            }
 
             if features.is_empty() {
-                checks.push(json!({
+                warnings.push(json!({
                     "rule_id": format!("{}:{}", string_field(rulepack, "id").unwrap_or("<missing>"), string_field(rule, "id").unwrap_or("<missing>")),
-                    "status": "fail",
+                    "status": "warn",
                     "reason": "no_applicable_features",
                     "message": "No applicable features were found for this rule."
                 }));
@@ -239,7 +243,17 @@ pub fn lint_design_data(
             }
 
             for feature in features {
-                checks.push(check_hole_edge_distance(manifest, rulepack, rule, feature));
+                match rule_kind {
+                    Some("hole_edge_distance") => {
+                        checks.push(check_hole_edge_distance(manifest, rulepack, rule, feature));
+                    }
+                    Some("minimum_wall_thickness") => {
+                        checks.push(check_minimum_wall_thickness(
+                            manifest, rulepack, rule, feature,
+                        ));
+                    }
+                    _ => unreachable!(),
+                }
             }
         }
     }
@@ -359,6 +373,32 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
             lines.push(
                 "Try moving the hole inward or increasing the surrounding part size.".to_string(),
             );
+            Some(lines)
+        }
+        Some("insufficient_wall_thickness") => {
+            let feature_label = string_field(check, "feature_id")
+                .map(|id| format!(" {id}"))
+                .unwrap_or_default();
+            let measured = check
+                .pointer("/measured/wall_thickness_mm")
+                .and_then(Value::as_f64);
+            let required = check
+                .pointer("/required/wall_thickness_mm")
+                .and_then(Value::as_f64);
+            let short_by = number_field(check, "margin_mm").map(|value| round(value.abs()));
+            let mut lines = vec![format!(
+                "M3 clearance hole{feature_label} leaves too little wall."
+            )];
+            if let Some(value) = measured {
+                lines.push(format!("Measured wall thickness: {} mm", trim_float(value)));
+            }
+            if let Some(value) = required {
+                lines.push(format!("Required wall thickness: {} mm", trim_float(value)));
+            }
+            if let Some(value) = short_by {
+                lines.push(format!("Short by: {} mm", trim_float(value)));
+            }
+            lines.push("Try moving the hole inward or increasing part width.".to_string());
             Some(lines)
         }
         Some("source_hash_mismatch") | Some("artifact_hash_mismatch") => Some(vec![
@@ -609,6 +649,83 @@ fn check_hole_edge_distance(
             "Hole edge distance passes rule.".to_string()
         } else {
             format!("Hole edge distance is short by {} mm.", trim_float(round(margin.abs())))
+        }
+    })
+}
+
+fn check_minimum_wall_thickness(
+    manifest: &Value,
+    rulepack: &Value,
+    rule: &Value,
+    feature: &Value,
+) -> Value {
+    let full_rule_id = format!(
+        "{}:{}",
+        string_field(rulepack, "id").unwrap_or("<missing>"),
+        string_field(rule, "id").unwrap_or("<missing>")
+    );
+    let diameter = number_field(feature, "diameter_mm");
+    if !diameter.is_some_and(|value| value > 0.0) {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_hole_diameter",
+            "feature_id": feature.get("id").cloned().unwrap_or(Value::Null),
+            "message": "Hole diameter is required for wall-thickness linting."
+        });
+    }
+    let diameter = diameter.unwrap();
+
+    let required_wall_thickness = number_field(rule, "min_wall_thickness_mm");
+    if !required_wall_thickness.is_some_and(|value| value > 0.0) {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "invalid_rule_min_wall_thickness",
+            "feature_id": feature.get("id").cloned().unwrap_or(Value::Null),
+            "message": "Rule min_wall_thickness_mm must be a positive number."
+        });
+    }
+    let required_wall_thickness = required_wall_thickness.unwrap();
+
+    let center_to_edge = derive_center_to_edge_mm(manifest, feature);
+    let Some(center_to_edge_value) = center_to_edge.value else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_wall_thickness_measurement",
+            "feature_id": feature.get("id").cloned().unwrap_or(Value::Null),
+            "measured": { "wall_thickness_mm": Value::Null, "source": center_to_edge.source },
+            "required": {
+                "wall_thickness_mm": round(required_wall_thickness)
+            },
+            "message": "Nearest free-edge distance cannot be derived."
+        });
+    };
+
+    let wall_thickness = center_to_edge_value - diameter / 2.0;
+    let margin = wall_thickness - required_wall_thickness;
+    let pass = margin >= 0.0;
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "insufficient_wall_thickness" },
+        "feature_id": feature.get("id").cloned().unwrap_or(Value::Null),
+        "measured": {
+            "hole_diameter_mm": diameter,
+            "center_to_edge_mm": round(center_to_edge_value),
+            "wall_thickness_mm": round(wall_thickness),
+            "source": center_to_edge.source
+        },
+        "required": {
+            "wall_thickness_mm": round(required_wall_thickness)
+        },
+        "margin_mm": round(margin),
+        "message": if pass {
+            "Hole wall thickness passes rule.".to_string()
+        } else {
+            format!("Hole wall thickness is short by {} mm.", trim_float(round(margin.abs())))
         }
     })
 }
@@ -1130,6 +1247,15 @@ mod tests {
                         .and_then(Value::as_f64)
                         == Some(10.2)
             }));
+        assert!(bad.receipt["checks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|check| {
+                string_field(check, "rule_id")
+                    == Some("actuator_mount:m3_clearance_hole_wall_thickness")
+                    && string_field(check, "reason") == Some("ok")
+            }));
         assert!(format_receipt_diagnostics(&bad.receipt)
             .iter()
             .flatten()
@@ -1151,7 +1277,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.1.0")
+            Some("0.2.0")
         );
     }
 

@@ -4,6 +4,8 @@ __pycache__/
 .venv-*/
 examples/build123d-actuator/*/actuator.step
 examples/build123d-actuator/*/burr-design-data.json
+examples/build123d-wall-thickness/*/wall.step
+examples/build123d-wall-thickness/*/burr-design-data.json
 test/
 coverage/
 target/

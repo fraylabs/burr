@@ -1,7 +1,7 @@
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "artifact_type": "actuator_mount",
   "process_kind": "FDM",
   "rules": [
@@ -15,6 +15,16 @@
         "role_any": ["loaded_mount", "mount", "housing_mount"]
       },
       "min_center_to_edge_diameter_multiple": 3.0
+    },
+    {
+      "id": "m3_clearance_hole_wall_thickness",
+      "kind": "minimum_wall_thickness",
+      "description": "M3 clearance holes in printed actuator mounts need printable wall material around the hole.",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3"
+      },
+      "min_wall_thickness_mm": 2.0
     }
   ]
 }

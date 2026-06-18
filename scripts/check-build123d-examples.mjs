@@ -29,6 +29,8 @@ function runPython(args) {
 
 runPython(["examples/build123d-actuator/bad/design.py"])
 runPython(["examples/build123d-actuator/good/design.py"])
+runPython(["examples/build123d-wall-thickness/bad/design.py"])
+runPython(["examples/build123d-wall-thickness/good/design.py"])
 
 const bad = run(
   "cargo",
@@ -45,6 +47,26 @@ const good = run(
 )
 if (!good.output.includes("PASS examples/build123d-actuator/good/burr-design-data.json")) {
   throw new Error(`Good build123d fixture did not pass as expected.\n${good.output}`)
+}
+
+const wallBad = run(
+  "cargo",
+  ["run", "--quiet", "--", "check", "examples/build123d-wall-thickness/bad", "--no-write-receipt"],
+  { expectFailure: true },
+)
+if (!wallBad.output.includes("Measured wall thickness: 1.2 mm")) {
+  throw new Error(`Bad wall-thickness fixture did not print measured wall thickness.\n${wallBad.output}`)
+}
+if (!wallBad.output.includes("Short by: 0.8 mm")) {
+  throw new Error(`Bad wall-thickness fixture did not print expected shortage.\n${wallBad.output}`)
+}
+
+const wallGood = run(
+  "cargo",
+  ["run", "--quiet", "--", "check", "examples/build123d-wall-thickness/good", "--no-write-receipt"],
+)
+if (!wallGood.output.includes("PASS examples/build123d-wall-thickness/good/burr-design-data.json")) {
+  throw new Error(`Good wall-thickness fixture did not pass as expected.\n${wallGood.output}`)
 }
 
 console.log("build123d examples passed")

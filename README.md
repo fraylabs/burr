@@ -185,13 +185,14 @@ can write JSON.
 
 ## Rulepacks
 
-The included actuator mount rule checks loaded M3 clearance holes:
+The included actuator mount rulepack checks loaded M3 clearance-hole edge
+distance and minimum wall thickness around M3 clearance holes:
 
 ```json
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -202,6 +203,15 @@ The included actuator mount rule checks loaded M3 clearance holes:
         "role_any": ["loaded_mount", "mount", "housing_mount"]
       },
       "min_center_to_edge_diameter_multiple": 3.0
+    },
+    {
+      "id": "m3_clearance_hole_wall_thickness",
+      "kind": "minimum_wall_thickness",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3"
+      },
+      "min_wall_thickness_mm": 2.0
     }
   ]
 }
@@ -222,9 +232,9 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.6.0",
+  "burr_version": "0.7.0",
   "artifact_version": "0.1.0",
-  "rulepack_version": "0.1.0",
+  "rulepack_version": "0.2.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"
@@ -268,6 +278,19 @@ Fixed actuator:
   },
   "margin_mm": 1.8
 }
+```
+
+Thin wall fixture:
+
+```txt
+FAIL examples/build123d-wall-thickness/bad/burr-design-data.json -> <not written>
+
+1 problem:
+1. M3 clearance hole m3_alignment leaves too little wall.
+   Measured wall thickness: 1.2 mm
+   Required wall thickness: 2 mm
+   Short by: 0.8 mm
+   Try moving the hole inward or increasing part width.
 ```
 
 ## Status
