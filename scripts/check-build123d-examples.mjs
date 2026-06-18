@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process"
 
-const python = process.env.PYTHON ?? "python"
+const python = splitCommand(process.env.PYTHON ?? "python")
+
+function splitCommand(command) {
+  return command.trim().split(/\s+/).filter(Boolean)
+}
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -19,8 +23,12 @@ function run(command, args, options = {}) {
   return { ...result, output }
 }
 
-run(python, ["examples/build123d-actuator/bad/design.py"])
-run(python, ["examples/build123d-actuator/good/design.py"])
+function runPython(args) {
+  return run(python[0], [...python.slice(1), ...args])
+}
+
+runPython(["examples/build123d-actuator/bad/design.py"])
+runPython(["examples/build123d-actuator/good/design.py"])
 
 const bad = run(
   "node",

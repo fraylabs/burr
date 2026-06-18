@@ -1,0 +1,18 @@
+[project]
+name = "burr-build123d"
+version = "0.4.0"
+description = "build123d helpers that emit Burr design data."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "build123d>=0.11.0",
+]
+license = "MIT"
+keywords = ["build123d", "cad", "cad-as-code", "dfm", "mechanical-design"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/burr_build123d"]

@@ -1,11 +1,6 @@
 from pathlib import Path
-import sys
 
 from build123d import Box, BuildPart, Locations, export_step
-
-REPO_ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO_ROOT / "python"))
-
 from burr_build123d import BurrDesignData, DESIGN_DATA_FILE, m3_clearance_hole
 
 

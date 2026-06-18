@@ -1,12 +1,7 @@
 from pathlib import Path
 import json
-import sys
 import tempfile
 import unittest
-
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT / "python"))
 
 from burr_build123d import BurrDesignData, DESIGN_DATA_FILE, m3_clearance_hole
 

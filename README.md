@@ -34,6 +34,7 @@ For local development:
 
 ```bash
 npm install
+uv sync --all-packages
 npm test
 ```
 
@@ -45,12 +46,10 @@ node bin/burr.mjs check examples/linear-actuator-bad
 node bin/burr.mjs check examples/linear-actuator-good
 ```
 
-Run the build123d adapter examples after installing build123d:
+Run the build123d adapter examples:
 
 ```bash
-uv venv .venv-build123d
-source .venv-build123d/bin/activate
-uv pip install build123d
+uv sync --all-packages
 npm run check:build123d
 ```
 
@@ -60,7 +59,7 @@ The build123d examples commit only `design.py`. `actuator.step` and
 For local scripts that import the helper directly, run with:
 
 ```bash
-PYTHONPATH=python python your_design.py
+uv run --package burr-build123d python your_design.py
 ```
 
 ## Commands
@@ -205,7 +204,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.3.1",
+  "burr_version": "0.4.0",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.1.0",
   "compatibility": {
