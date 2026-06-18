@@ -11,6 +11,7 @@ pub const SUPPORTED_DESIGN_DATA_SCHEMA_VERSIONS: [&str; 1] = ["burr.design-data.
 pub const SUPPORTED_LEGACY_DESIGN_DATA_SCHEMA_VERSIONS: [&str; 1] = ["fray.cad.artifact.v1"];
 pub const SUPPORTED_RULEPACK_SCHEMA_VERSIONS: [&str; 1] = ["burr.rulepack.v1"];
 pub const RECEIPT_SCHEMA_VERSION: &str = "burr.receipt.v1";
+pub const BURR_BUILD123D_GIT_DEPENDENCY: &str = "burr-build123d @ git+https://github.com/fraylabs/burr.git@burr-build123d-v0.5.0#subdirectory=packages/burr-build123d";
 
 const DEFAULT_RULEPACK: &str = include_str!("../rules/actuator_mount.rulepack.json");
 const SKIP_DIRS: [&str; 7] = [
@@ -45,6 +46,46 @@ pub struct LintResult {
     pub receipt: Value,
     pub receipt_path: PathBuf,
     pub design_data_path: PathBuf,
+}
+
+pub fn init_project(project_dir: &Path) -> Result<Vec<PathBuf>, String> {
+    if project_dir.exists() && !project_dir.is_dir() {
+        return Err(format!(
+            "Init target exists and is not a directory: {}",
+            project_dir.display()
+        ));
+    }
+
+    fs::create_dir_all(project_dir)
+        .map_err(|error| format!("Failed to create {}: {error}", project_dir.display()))?;
+
+    let project_name = project_name_from_dir(project_dir);
+    let files = [
+        (
+            project_dir.join("pyproject.toml"),
+            starter_pyproject(&project_name),
+        ),
+        (project_dir.join("design.py"), starter_design(&project_name)),
+        (project_dir.join(".gitignore"), starter_gitignore()),
+    ];
+
+    for (path, _) in &files {
+        if path.exists() {
+            return Err(format!(
+                "Refusing to overwrite existing file: {}",
+                path.display()
+            ));
+        }
+    }
+
+    let mut written = Vec::new();
+    for (path, contents) in files {
+        fs::write(&path, contents)
+            .map_err(|error| format!("Failed to write {}: {error}", path.display()))?;
+        written.push(path);
+    }
+
+    Ok(written)
 }
 
 pub fn default_rulepack() -> Result<Value, String> {
@@ -794,6 +835,107 @@ fn read_json_file(path: &Path) -> Result<Value, String> {
     read_json_str(&text).map_err(|error| format!("Failed to parse {}: {error}", path.display()))
 }
 
+fn project_name_from_dir(project_dir: &Path) -> String {
+    let raw_name = project_dir
+        .file_name()
+        .and_then(|name| name.to_str())
+        .unwrap_or("burr-project");
+    let mut name = String::new();
+    let mut previous_dash = false;
+    for character in raw_name.chars() {
+        let normalized = character.to_ascii_lowercase();
+        if normalized.is_ascii_alphanumeric() {
+            name.push(normalized);
+            previous_dash = false;
+        } else if !previous_dash && !name.is_empty() {
+            name.push('-');
+            previous_dash = true;
+        }
+    }
+    while name.ends_with('-') {
+        name.pop();
+    }
+    if name.is_empty() {
+        "burr-project".to_string()
+    } else {
+        name
+    }
+}
+
+fn starter_pyproject(project_name: &str) -> String {
+    format!(
+        r#"[project]
+name = "{project_name}"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "build123d>=0.11.0",
+  "{BURR_BUILD123D_GIT_DEPENDENCY}",
+]
+"#
+    )
+}
+
+fn starter_design(project_name: &str) -> String {
+    format!(
+        r#"from pathlib import Path
+
+from build123d import Box, BuildPart, Locations, export_step
+from burr_build123d import BurrDesignData, DESIGN_DATA_FILE, m3_clearance_hole
+
+
+BASE_DIR = Path(__file__).resolve().parent
+STEP_FILE = "actuator.step"
+
+housing_length = 86.0
+housing_width = 48.0
+housing_height = 40.0
+m3_hole_y = 12.0
+m3_hole_z = 12.0
+m3_diameter = 3.4
+
+design = BurrDesignData(
+    artifact_id="{project_name}",
+    artifact_type="actuator_mount",
+    process={{"kind": "FDM", "material": "PETG", "nozzle_mm": 0.4}},
+)
+design.source("design.py")
+design.artifact(STEP_FILE)
+design.part(
+    "housing",
+    bbox_min=(-housing_length / 2.0, -housing_width / 2.0, 0),
+    bbox_max=(housing_length / 2.0, housing_width / 2.0, housing_height),
+)
+
+with BuildPart() as housing:
+    with Locations((0, 0, housing_height / 2.0)):
+        Box(housing_length, housing_width, housing_height)
+
+    m3_clearance_hole(
+        design,
+        feature_id="m3_lower_left",
+        part="housing",
+        center=(housing_length / 2.0 - 3.0, -m3_hole_y, m3_hole_z),
+        axis=(1, 0, 0),
+        role="loaded_mount",
+        diameter_mm=m3_diameter,
+        cut_depth_mm=8.0,
+    )
+
+export_step(housing.part, BASE_DIR / STEP_FILE)
+design.write(BASE_DIR / DESIGN_DATA_FILE)
+
+print(f"wrote {{BASE_DIR / STEP_FILE}}")
+print(f"wrote {{BASE_DIR / DESIGN_DATA_FILE}}")
+"#
+    )
+}
+
+fn starter_gitignore() -> String {
+    ".venv/\n__pycache__/\n*.pyc\nactuator.step\nburr-design-data.json\nburr-receipt.json\n"
+        .to_string()
+}
+
 fn read_json_str(text: &str) -> Result<Value, String> {
     serde_json::from_str(text).map_err(|error| error.to_string())
 }
@@ -1011,6 +1153,52 @@ mod tests {
             string_field(&good.receipt, "rulepack_version"),
             Some("0.1.0")
         );
+    }
+
+    #[test]
+    fn init_project_writes_starter_files_without_overwrite() {
+        let temp = tempfile::tempdir().unwrap();
+        let project = temp.path().join("My Starter Part");
+
+        let written = init_project(&project).unwrap();
+        assert_eq!(written.len(), 3);
+        assert!(project.join("pyproject.toml").exists());
+        assert!(project.join("design.py").exists());
+        assert!(project.join(".gitignore").exists());
+
+        let pyproject = fs::read_to_string(project.join("pyproject.toml")).unwrap();
+        assert!(pyproject.contains("name = \"my-starter-part\""));
+        assert!(pyproject.contains(BURR_BUILD123D_GIT_DEPENDENCY));
+
+        let design = fs::read_to_string(project.join("design.py")).unwrap();
+        assert!(design.contains("artifact_id=\"my-starter-part\""));
+        assert!(design.contains("m3_clearance_hole"));
+
+        let error = init_project(&project).unwrap_err();
+        assert!(error.contains("Refusing to overwrite existing file"));
+    }
+
+    #[test]
+    fn init_project_refuses_file_target() {
+        let temp = tempfile::tempdir().unwrap();
+        let target = temp.path().join("not-a-dir");
+        fs::write(&target, "").unwrap();
+
+        let error = init_project(&target).unwrap_err();
+        assert!(error.contains("exists and is not a directory"));
+    }
+
+    #[test]
+    fn init_project_normalizes_project_names() {
+        let temp = tempfile::tempdir().unwrap();
+        let project = temp.path().join("My_Starter Part!!");
+
+        init_project(&project).unwrap();
+        let pyproject = fs::read_to_string(project.join("pyproject.toml")).unwrap();
+        let design = fs::read_to_string(project.join("design.py")).unwrap();
+
+        assert!(pyproject.contains("name = \"my-starter-part\""));
+        assert!(design.contains("artifact_id=\"my-starter-part\""));
     }
 
     fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result<()> {

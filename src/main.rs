@@ -1,6 +1,6 @@
 use burr::{
-    find_design_data_paths, format_receipt_diagnostics, lint_targets, stamp_targets, LintOptions,
-    BURR_VERSION, DESIGN_DATA_FILE_NAME,
+    find_design_data_paths, format_receipt_diagnostics, init_project, lint_targets, stamp_targets,
+    LintOptions, BURR_VERSION, DESIGN_DATA_FILE_NAME,
 };
 use std::path::PathBuf;
 
@@ -30,8 +30,34 @@ fn run() -> Result<(), String> {
         }
         Some("check") => run_check(args.collect()),
         Some("stamp") => run_stamp(args.collect()),
+        Some("init") => run_init(args.collect()),
         Some(command) => Err(format!("Unknown command: {command}")),
     }
+}
+
+fn run_init(args: Vec<String>) -> Result<(), String> {
+    if args.len() != 1 || args.iter().any(|arg| arg == "--help" || arg == "-h") {
+        print_help();
+        std::process::exit(if args.iter().any(|arg| arg == "--help" || arg == "-h") {
+            0
+        } else {
+            2
+        });
+    }
+
+    let cwd = std::env::current_dir().map_err(|error| error.to_string())?;
+    let project_dir = PathBuf::from(&args[0]);
+    let written = init_project(&project_dir)?;
+    println!("INIT {}", relative_label(&cwd, &project_dir));
+    for path in written {
+        println!("WRITE {}", relative_label(&cwd, &path));
+    }
+    println!();
+    println!("Next:");
+    println!("  cd {}", relative_label(&cwd, &project_dir));
+    println!("  uv run python design.py");
+    println!("  burr check .");
+    Ok(())
 }
 
 fn run_check(args: Vec<String>) -> Result<(), String> {
@@ -159,7 +185,7 @@ fn parse_check_args(args: Vec<String>) -> Result<ParsedCheckArgs, String> {
 
 fn print_help() {
     println!(
-        "Usage:\n  burr check [--rulepack <file>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n"
+        "Usage:\n  burr init <folder>\n  burr check [--rulepack <file>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n"
     );
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Design-rule checks for CAD-as-code workflows.",
   "type": "module",
   "files": [
@@ -24,8 +24,9 @@
   "scripts": {
     "test": "cargo test",
     "test:python": "uv run --package burr-build123d python -m unittest discover -s packages/burr-build123d/tests -p 'test_*.py'",
+    "check:init": "node scripts/check-init-starter.mjs",
     "check:build123d": "PYTHON=\"uv run --package burr-build123d python\" node scripts/check-build123d-examples.mjs",
-    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python"
+    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init"
   },
   "keywords": [
     "cad",

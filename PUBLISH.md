@@ -60,3 +60,10 @@ cd /tmp/burr-pypi-install-check
 uv add burr-build123d
 uv run python -c "import burr_build123d; print(burr_build123d.__version__)"
 ```
+
+Then update `burr init` to generate a PyPI dependency instead of the temporary
+Git dependency:
+
+```toml
+"burr-build123d==0.5.0"
+```

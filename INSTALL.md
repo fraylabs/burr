@@ -29,6 +29,18 @@ Run it on a folder containing `burr-design-data.json`:
 burr check path/to/design-folder
 ```
 
+Start a build123d part:
+
+```bash
+burr init my-part
+cd my-part
+uv run python design.py
+burr check .
+```
+
+The generated project currently installs `burr-build123d` from the
+`burr-build123d-v0.5.0` Git tag because the PyPI package is still pending.
+
 ## Local Development Checkout
 
 Clone and install:
