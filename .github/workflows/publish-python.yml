@@ -1,0 +1,36 @@
+name: Publish Python
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to publish, usually burr-build123d-v0.5.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish burr-build123d
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Setup Python
+        run: uv python install 3.11
+
+      - name: Build
+        run: uv build --package burr-build123d
+
+      - name: Publish
+        run: uv publish --trusted-publishing always dist/burr_build123d-*
