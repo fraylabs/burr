@@ -1,6 +1,6 @@
 [project]
 name = "burr-build123d"
-version = "0.4.0"
+version = "0.5.0"
 description = "build123d helpers that emit Burr design data."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -8,7 +8,14 @@ dependencies = [
   "build123d>=0.11.0",
 ]
 license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Fray Labs" }]
 keywords = ["build123d", "cad", "cad-as-code", "dfm", "mechanical-design"]
+
+[project.urls]
+Homepage = "https://github.com/fraylabs/burr"
+Repository = "https://github.com/fraylabs/burr"
+Issues = "https://github.com/fraylabs/burr/issues"
 
 [build-system]
 requires = ["hatchling"]

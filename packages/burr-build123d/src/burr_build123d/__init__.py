@@ -15,6 +15,7 @@ from typing import Any
 
 DESIGN_DATA_FILE = "burr-design-data.json"
 DESIGN_DATA_SCHEMA = "burr.design-data.v1"
+__version__ = "0.5.0"
 
 
 def _round_vector(values: tuple[float, float, float] | list[float]) -> list[float]:
@@ -193,5 +194,6 @@ __all__ = [
     "BurrDesignData",
     "DESIGN_DATA_FILE",
     "DESIGN_DATA_SCHEMA",
+    "__version__",
     "m3_clearance_hole",
 ]
