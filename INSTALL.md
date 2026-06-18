@@ -9,12 +9,12 @@ burr-build123d   Python helper that emits burr-design-data.json from build123d
 
 The CLI is Rust-first. The Python helper is managed with uv.
 
-## Rust CLI From GitHub
+## Rust CLI From crates.io
 
 Install the Burr CLI with Cargo:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr burr
+cargo install burr
 ```
 
 Check it:
@@ -97,7 +97,7 @@ from burr_build123d import BurrDesignData, m3_clearance_hole
 ## Current Publish Status
 
 ```txt
-Rust CLI: installable from GitHub with cargo
+Rust CLI: published to crates.io as burr
 PyPI package: not published
 uv local workspace install: supported
 ```
@@ -105,6 +105,5 @@ uv local workspace install: supported
 Planned package names:
 
 ```txt
-crates.io: burr
 PyPI: burr-build123d
 ```

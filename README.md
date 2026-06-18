@@ -30,7 +30,7 @@ result = fail by 2.2 mm
 
 ## Install
 
-See [INSTALL.md](INSTALL.md) for current GitHub and uv install paths.
+See [INSTALL.md](INSTALL.md) for current crates.io and uv install paths.
 
 For local development:
 
@@ -40,10 +40,10 @@ uv sync --all-packages
 npm run check
 ```
 
-Install the Rust CLI from GitHub:
+Install the Rust CLI from crates.io:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr burr
+cargo install burr
 burr --version
 ```
 
