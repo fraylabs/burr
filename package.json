@@ -1,0 +1,31 @@
+{
+  "name": "@fraylabs/burr",
+  "version": "0.1.0",
+  "description": "Design-rule checks for CAD-as-code workflows.",
+  "type": "module",
+  "bin": {
+    "burr": "./bin/burr.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "rules",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node test/burr.test.mjs",
+    "check": "npm test && node --check bin/burr.mjs && node --check src/index.mjs"
+  },
+  "keywords": [
+    "cad",
+    "cad-as-code",
+    "dfm",
+    "lint",
+    "mechanical-design"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}

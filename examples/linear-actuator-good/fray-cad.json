@@ -1,0 +1,61 @@
+{
+  "schema_version": "fray.cad.artifact.v1",
+  "artifact_id": "linear-actuator-good",
+  "artifact_type": "actuator_mount",
+  "units": "mm",
+  "source": {
+    "path": "source.py",
+    "sha256": "1cabcb4a8ba9c469891558a8878e17695405fe4f008576ed0ea30aa6563eecf4",
+    "size_bytes": 38
+  },
+  "artifacts": [
+    {
+      "kind": "step",
+      "path": "actuator.step",
+      "sha256": "51c7524d5bec9aea49cc5144a9ef115325a3aa40493fd4b79b55c57a9d34ce72",
+      "size_bytes": 118
+    }
+  ],
+  "process": {
+    "kind": "FDM",
+    "material": "PETG",
+    "nozzle_mm": 0.4
+  },
+  "parts": [
+    {
+      "id": "housing",
+      "bbox_mm": {
+        "min": [
+          -43,
+          -24,
+          0
+        ],
+        "max": [
+          43,
+          24,
+          40
+        ]
+      }
+    }
+  ],
+  "features": [
+    {
+      "id": "m3_lower_left",
+      "part": "housing",
+      "kind": "clearance_hole",
+      "fastener": "M3",
+      "diameter_mm": 3.4,
+      "center_mm": [
+        40,
+        -12,
+        12
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "role": "loaded_mount"
+    }
+  ]
+}

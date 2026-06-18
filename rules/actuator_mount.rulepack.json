@@ -1,0 +1,19 @@
+{
+  "schema_version": "burr.rulepack.v1",
+  "id": "actuator_mount",
+  "artifact_type": "actuator_mount",
+  "process_kind": "FDM",
+  "rules": [
+    {
+      "id": "m3_loaded_hole_edge_distance",
+      "kind": "hole_edge_distance",
+      "description": "Loaded M3 clearance holes in printed actuator mounts need enough edge material.",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3",
+        "role_any": ["loaded_mount", "mount", "housing_mount"]
+      },
+      "min_center_to_edge_diameter_multiple": 3.0
+    }
+  ]
+}
