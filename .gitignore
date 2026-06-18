@@ -2,6 +2,8 @@ node_modules/
 .venv/
 .venv-*/
 __pycache__/
+examples/build123d-actuator/*/actuator.step
+examples/build123d-actuator/*/burr-design-data.json
 *.log
 burr-receipt.json
 .DS_Store

@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Design-rule checks for CAD-as-code workflows.",
   "type": "module",
   "bin": {
@@ -9,10 +9,13 @@
   "files": [
     "bin",
     "src",
-    "python",
+    "python/burr_build123d/__init__.py",
     "rules",
     "scripts",
-    "examples",
+    "examples/build123d-actuator/bad/design.py",
+    "examples/build123d-actuator/good/design.py",
+    "examples/linear-actuator-bad",
+    "examples/linear-actuator-good",
     "README.md",
     "LICENSE"
   ],

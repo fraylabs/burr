@@ -2,5 +2,7 @@ __pycache__/
 *.pyc
 .venv/
 .venv-*/
+examples/build123d-actuator/*/actuator.step
+examples/build123d-actuator/*/burr-design-data.json
 test/
 coverage/
