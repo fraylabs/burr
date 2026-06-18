@@ -8,6 +8,10 @@ const __filename = fileURLToPath(import.meta.url)
 const packageRoot = path.resolve(path.dirname(__filename), "..")
 
 export const defaultRulepackPath = path.join(packageRoot, "rules/actuator_mount.rulepack.json")
+export const burrVersion = readJson(path.join(packageRoot, "package.json")).version
+export const supportedManifestSchemaVersions = ["fray.cad.artifact.v1"]
+export const supportedRulepackSchemaVersions = ["burr.rulepack.v1"]
+export const receiptSchemaVersion = "burr.receipt.v1"
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"))
@@ -306,11 +310,55 @@ function checkFileHashes(manifest, manifestDir) {
   return checks
 }
 
+function checkSchemaVersions(manifest, rulepack) {
+  const checks = []
+  if (!supportedManifestSchemaVersions.includes(manifest.schema_version)) {
+    checks.push({
+      rule_id: "burr_manifest:schema_version_supported",
+      status: "fail",
+      reason: manifest.schema_version ? "unsupported_manifest_schema" : "missing_manifest_schema",
+      measured: { schema_version: manifest.schema_version ?? null },
+      required: { schema_versions: supportedManifestSchemaVersions },
+      message: "Manifest schema version is not supported by this Burr version.",
+    })
+  } else {
+    checks.push({
+      rule_id: "burr_manifest:schema_version_supported",
+      status: "pass",
+      reason: "ok",
+      measured: { schema_version: manifest.schema_version },
+      message: "Manifest schema version is supported.",
+    })
+  }
+
+  if (!supportedRulepackSchemaVersions.includes(rulepack.schema_version)) {
+    checks.push({
+      rule_id: "burr_rulepack:schema_version_supported",
+      status: "fail",
+      reason: rulepack.schema_version ? "unsupported_rulepack_schema" : "missing_rulepack_schema",
+      measured: { schema_version: rulepack.schema_version ?? null },
+      required: { schema_versions: supportedRulepackSchemaVersions },
+      message: "Rulepack schema version is not supported by this Burr version.",
+    })
+  } else {
+    checks.push({
+      rule_id: "burr_rulepack:schema_version_supported",
+      status: "pass",
+      reason: "ok",
+      measured: { schema_version: rulepack.schema_version },
+      message: "Rulepack schema version is supported.",
+    })
+  }
+
+  return checks
+}
+
 export function lintManifest(manifest, rulepack, options = {}) {
   const checks = []
   const warnings = []
   const manifestDir = options.manifestDir ?? process.cwd()
 
+  checks.push(...checkSchemaVersions(manifest, rulepack))
   checks.push(...checkFileHashes(manifest, manifestDir))
 
   if (manifest.units && manifest.units !== "mm") {
@@ -365,11 +413,20 @@ export function lintManifest(manifest, rulepack, options = {}) {
 
   const failures = checks.filter((check) => check.status === "fail")
   return {
-    schema_version: "burr.receipt.v1",
+    schema_version: receiptSchemaVersion,
+    burr_version: burrVersion,
     status: failures.length === 0 ? "pass" : "fail",
     artifact_id: manifest.artifact_id ?? null,
+    artifact_version: manifest.artifact_version ?? null,
     artifact_type: manifest.artifact_type ?? null,
     rulepack_id: rulepack.id,
+    rulepack_version: rulepack.version ?? null,
+    compatibility: {
+      manifest_schema_version: manifest.schema_version ?? null,
+      supported_manifest_schema_versions: supportedManifestSchemaVersions,
+      rulepack_schema_version: rulepack.schema_version ?? null,
+      supported_rulepack_schema_versions: supportedRulepackSchemaVersions,
+    },
     source_manifest: options.sourceManifest ?? null,
     checks,
     warnings,

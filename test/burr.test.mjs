@@ -5,9 +5,13 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 
 import {
+  burrVersion,
   lintManifestFile,
+  receiptSchemaVersion,
   sha256File,
   stampTargets,
+  supportedManifestSchemaVersions,
+  supportedRulepackSchemaVersions,
 } from "../src/index.mjs"
 
 const __filename = fileURLToPath(import.meta.url)
@@ -42,6 +46,18 @@ try {
     rulepackPath,
   })
   assert.equal(good.receipt.status, "pass")
+  assert.equal(good.receipt.schema_version, receiptSchemaVersion)
+  assert.equal(good.receipt.burr_version, burrVersion)
+  assert.equal(good.receipt.artifact_version, "0.1.0")
+  assert.equal(good.receipt.rulepack_version, "0.1.0")
+  assert.deepEqual(
+    good.receipt.compatibility.supported_manifest_schema_versions,
+    supportedManifestSchemaVersions,
+  )
+  assert.deepEqual(
+    good.receipt.compatibility.supported_rulepack_schema_versions,
+    supportedRulepackSchemaVersions,
+  )
   assert.ok(
     good.receipt.checks.some(
       (check) =>
@@ -49,6 +65,32 @@ try {
         check.measured.center_to_edge_mm === 12 &&
         check.margin_mm === 1.8,
     ),
+  )
+
+  const unsupportedSchemaManifest = JSON.parse(
+    fs.readFileSync(path.join(goodDir, "fray-cad.json"), "utf8"),
+  )
+  unsupportedSchemaManifest.schema_version = "fray.cad.artifact.v99"
+  fs.writeFileSync(
+    path.join(goodDir, "fray-cad.json"),
+    `${JSON.stringify(unsupportedSchemaManifest, null, 2)}\n`,
+  )
+  const unsupported = lintManifestFile(path.join(goodDir, "fray-cad.json"), {
+    rulepackPath,
+  })
+  assert.equal(unsupported.receipt.status, "fail")
+  assert.ok(
+    unsupported.receipt.checks.some(
+      (check) =>
+        check.rule_id === "burr_manifest:schema_version_supported" &&
+        check.reason === "unsupported_manifest_schema",
+    ),
+  )
+
+  unsupportedSchemaManifest.schema_version = "fray.cad.artifact.v1"
+  fs.writeFileSync(
+    path.join(goodDir, "fray-cad.json"),
+    `${JSON.stringify(unsupportedSchemaManifest, null, 2)}\n`,
   )
 
   fs.appendFileSync(path.join(goodDir, "source.py"), "\n# stale\n")

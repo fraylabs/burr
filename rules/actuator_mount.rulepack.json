@@ -1,6 +1,7 @@
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
+  "version": "0.1.0",
   "artifact_type": "actuator_mount",
   "process_kind": "FDM",
   "rules": [

@@ -1,6 +1,7 @@
 {
   "schema_version": "fray.cad.artifact.v1",
   "artifact_id": "linear-actuator-good",
+  "artifact_version": "0.1.0",
   "artifact_type": "actuator_mount",
   "units": "mm",
   "source": {

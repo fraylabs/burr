@@ -2,6 +2,7 @@
 import path from "node:path"
 
 import {
+  burrVersion,
   defaultRulepackPath,
   findManifestPaths,
   lintTargets,
@@ -43,6 +44,11 @@ function parseCheckArgs(argv) {
 
 try {
   const [command, ...args] = process.argv.slice(2)
+  if (command === "--version" || command === "-v" || command === "version") {
+    console.log(burrVersion)
+    process.exit(0)
+  }
+
   if (!command || command === "--help" || command === "-h") {
     printHelp()
     process.exit(command ? 0 : 2)

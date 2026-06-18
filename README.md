@@ -40,6 +40,7 @@ npm test
 Run the CLI directly:
 
 ```bash
+node bin/burr.mjs --version
 node bin/burr.mjs check examples/linear-actuator-bad
 node bin/burr.mjs check examples/linear-actuator-good
 ```
@@ -47,6 +48,7 @@ node bin/burr.mjs check examples/linear-actuator-good
 ## Commands
 
 ```bash
+burr --version
 burr check <folder|fray-cad.json>...
 burr stamp <folder|fray-cad.json>...
 ```
@@ -65,6 +67,7 @@ A lintable CAD artifact folder contains `fray-cad.json`:
 {
   "schema_version": "fray.cad.artifact.v1",
   "artifact_id": "linear-actuator-bad",
+  "artifact_version": "0.1.0",
   "artifact_type": "actuator_mount",
   "units": "mm",
   "source": {
@@ -108,16 +111,51 @@ The included actuator mount rule checks loaded M3 clearance holes:
 
 ```json
 {
-  "id": "m3_loaded_hole_edge_distance",
-  "kind": "hole_edge_distance",
-  "applies_to": {
-    "kind": "clearance_hole",
-    "fastener": "M3",
-    "role_any": ["loaded_mount", "mount", "housing_mount"]
-  },
-  "min_center_to_edge_diameter_multiple": 3.0
+  "schema_version": "burr.rulepack.v1",
+  "id": "actuator_mount",
+  "version": "0.1.0",
+  "rules": [
+    {
+      "id": "m3_loaded_hole_edge_distance",
+      "kind": "hole_edge_distance",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3",
+        "role_any": ["loaded_mount", "mount", "housing_mount"]
+      },
+      "min_center_to_edge_diameter_multiple": 3.0
+    }
+  ]
 }
 ```
+
+## Versioning
+
+Burr has three versioned surfaces:
+
+```txt
+Burr package version       -> CLI/library behavior
+Manifest schema version   -> metadata shape Burr can read
+Rulepack schema version   -> rule syntax Burr can execute
+```
+
+Receipts include all three:
+
+```json
+{
+  "schema_version": "burr.receipt.v1",
+  "burr_version": "0.1.1",
+  "artifact_version": "0.1.0",
+  "rulepack_version": "0.1.0",
+  "compatibility": {
+    "manifest_schema_version": "fray.cad.artifact.v1",
+    "rulepack_schema_version": "burr.rulepack.v1"
+  }
+}
+```
+
+Unsupported manifest or rulepack schemas fail lint instead of silently producing
+untrustworthy receipts.
 
 ## Example Result
 
@@ -160,4 +198,3 @@ Fixed actuator:
 
 Early prototype. Current checks are metadata-based. Future versions may derive
 more facts directly from STEP topology.
-
