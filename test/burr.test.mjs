@@ -6,10 +6,14 @@ import { fileURLToPath } from "node:url"
 
 import {
   burrVersion,
-  lintManifestFile,
+  designDataFileName,
+  legacyDesignDataFileNames,
+  lintDesignDataFile,
   receiptSchemaVersion,
   sha256File,
   stampTargets,
+  supportedDesignDataSchemaVersions,
+  supportedLegacyDesignDataSchemaVersions,
   supportedManifestSchemaVersions,
   supportedRulepackSchemaVersions,
 } from "../src/index.mjs"
@@ -26,9 +30,11 @@ try {
 
   const badDir = path.join(tempRoot, "examples/linear-actuator-bad")
   const goodDir = path.join(tempRoot, "examples/linear-actuator-good")
+  const badDesignDataPath = path.join(badDir, designDataFileName)
+  const goodDesignDataPath = path.join(goodDir, designDataFileName)
   stampTargets([badDir, goodDir])
 
-  const bad = lintManifestFile(path.join(badDir, "fray-cad.json"), {
+  const bad = lintDesignDataFile(badDesignDataPath, {
     rulepackPath,
   })
   assert.equal(bad.receipt.status, "fail")
@@ -42,7 +48,7 @@ try {
     ),
   )
 
-  const good = lintManifestFile(path.join(goodDir, "fray-cad.json"), {
+  const good = lintDesignDataFile(goodDesignDataPath, {
     rulepackPath,
   })
   assert.equal(good.receipt.status, "pass")
@@ -55,9 +61,15 @@ try {
     supportedManifestSchemaVersions,
   )
   assert.deepEqual(
+    good.receipt.compatibility.supported_design_data_schema_versions,
+    supportedManifestSchemaVersions,
+  )
+  assert.deepEqual(
     good.receipt.compatibility.supported_rulepack_schema_versions,
     supportedRulepackSchemaVersions,
   )
+  assert.deepEqual(supportedDesignDataSchemaVersions, ["burr.design-data.v1"])
+  assert.deepEqual(supportedLegacyDesignDataSchemaVersions, ["fray.cad.artifact.v1"])
   assert.ok(
     good.receipt.checks.some(
       (check) =>
@@ -67,57 +79,64 @@ try {
     ),
   )
 
-  const unsupportedSchemaManifest = JSON.parse(
-    fs.readFileSync(path.join(goodDir, "fray-cad.json"), "utf8"),
+  const unsupportedDesignData = JSON.parse(
+    fs.readFileSync(goodDesignDataPath, "utf8"),
   )
-  unsupportedSchemaManifest.schema_version = "fray.cad.artifact.v99"
+  unsupportedDesignData.schema_version = "burr.design-data.v99"
   fs.writeFileSync(
-    path.join(goodDir, "fray-cad.json"),
-    `${JSON.stringify(unsupportedSchemaManifest, null, 2)}\n`,
+    goodDesignDataPath,
+    `${JSON.stringify(unsupportedDesignData, null, 2)}\n`,
   )
-  const unsupported = lintManifestFile(path.join(goodDir, "fray-cad.json"), {
+  const unsupported = lintDesignDataFile(goodDesignDataPath, {
     rulepackPath,
   })
   assert.equal(unsupported.receipt.status, "fail")
   assert.ok(
     unsupported.receipt.checks.some(
       (check) =>
-        check.rule_id === "burr_manifest:schema_version_supported" &&
-        check.reason === "unsupported_manifest_schema",
+        check.rule_id === "burr_design_data:schema_version_supported" &&
+        check.reason === "unsupported_design_data_schema",
     ),
   )
 
-  unsupportedSchemaManifest.schema_version = "fray.cad.artifact.v1"
+  unsupportedDesignData.schema_version = "burr.design-data.v1"
   fs.writeFileSync(
-    path.join(goodDir, "fray-cad.json"),
-    `${JSON.stringify(unsupportedSchemaManifest, null, 2)}\n`,
+    goodDesignDataPath,
+    `${JSON.stringify(unsupportedDesignData, null, 2)}\n`,
   )
 
   fs.appendFileSync(path.join(goodDir, "source.py"), "\n# stale\n")
-  const stale = lintManifestFile(path.join(goodDir, "fray-cad.json"), {
+  const stale = lintDesignDataFile(goodDesignDataPath, {
     rulepackPath,
   })
   assert.equal(stale.receipt.status, "fail")
   assert.ok(
     stale.receipt.checks.some(
       (check) =>
-        check.rule_id === "burr_manifest:source_sha256_matches" &&
+        check.rule_id === "burr_design_data:source_sha256_matches" &&
         check.reason === "source_hash_mismatch",
     ),
   )
 
   const manifest = JSON.parse(
-    fs.readFileSync(path.join(goodDir, "fray-cad.json"), "utf8"),
+    fs.readFileSync(goodDesignDataPath, "utf8"),
   )
   manifest.source.sha256 = sha256File(path.join(goodDir, "source.py"))
   fs.writeFileSync(
-    path.join(goodDir, "fray-cad.json"),
+    goodDesignDataPath,
     `${JSON.stringify(manifest, null, 2)}\n`,
   )
-  const restored = lintManifestFile(path.join(goodDir, "fray-cad.json"), {
+  const restored = lintDesignDataFile(goodDesignDataPath, {
     rulepackPath,
   })
   assert.equal(restored.receipt.status, "pass")
+
+  const legacyPath = path.join(goodDir, legacyDesignDataFileNames[0])
+  const legacyDesignData = JSON.parse(fs.readFileSync(goodDesignDataPath, "utf8"))
+  legacyDesignData.schema_version = "fray.cad.artifact.v1"
+  fs.writeFileSync(legacyPath, `${JSON.stringify(legacyDesignData, null, 2)}\n`)
+  const legacy = lintDesignDataFile(legacyPath, { rulepackPath })
+  assert.equal(legacy.receipt.status, "pass")
 } finally {
   fs.rmSync(tempRoot, { recursive: true, force: true })
 }

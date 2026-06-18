@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Design-rule checks for CAD-as-code workflows.",
   "type": "module",
   "bin": {

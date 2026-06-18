@@ -3,16 +3,17 @@ import path from "node:path"
 
 import {
   burrVersion,
+  designDataFileName,
   defaultRulepackPath,
-  findManifestPaths,
+  findDesignDataPaths,
   lintTargets,
   stampTargets,
 } from "../src/index.mjs"
 
 function printHelp() {
   console.log(`Usage:
-  burr check [--rulepack <file>] [--no-write-receipt] <folder|fray-cad.json>...
-  burr stamp <folder|fray-cad.json>...
+  burr check [--rulepack <file>] [--no-write-receipt] <folder|${designDataFileName}>...
+  burr stamp <folder|${designDataFileName}>...
 `)
 }
 
@@ -73,7 +74,7 @@ try {
           ? "<not written>"
           : path.relative(process.cwd(), result.receiptPath)
       console.log(
-        `${result.receipt.status.toUpperCase()} ${path.relative(process.cwd(), result.manifestPath)} -> ${receiptLabel}`,
+        `${result.receipt.status.toUpperCase()} ${path.relative(process.cwd(), result.designDataPath)} -> ${receiptLabel}`,
       )
     }
     process.exit(failures.length === 0 ? 0 : 1)
@@ -84,10 +85,10 @@ try {
       printHelp()
       process.exit(args.length === 0 ? 2 : 0)
     }
-    const manifests = findManifestPaths(args)
-    if (manifests.length === 0) throw new Error("No fray-cad.json manifests found.")
-    for (const manifestPath of stampTargets(args)) {
-      console.log(`STAMP ${path.relative(process.cwd(), manifestPath)}`)
+    const designDataFiles = findDesignDataPaths(args)
+    if (designDataFiles.length === 0) throw new Error(`No ${designDataFileName} files found.`)
+    for (const designDataPath of stampTargets(args)) {
+      console.log(`STAMP ${path.relative(process.cwd(), designDataPath)}`)
     }
     process.exit(0)
   }

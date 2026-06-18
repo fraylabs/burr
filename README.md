@@ -2,11 +2,11 @@
 
 Burr is a design-rule linter for CAD-as-code workflows.
 
-It checks generated CAD metadata and artifacts for mechanical mistakes before
+It checks generated design data and artifacts for mechanical mistakes before
 they become prints, prototypes, or expensive debugging sessions.
 
 ```txt
-CAD source -> STEP artifact -> metadata -> Burr checks -> receipt
+design file -> generated part -> burr-design-data.json -> Burr checks -> receipt
 ```
 
 Burr is not a constraint solver, FEA engine, or universal CAD brain. It does not
@@ -19,7 +19,7 @@ Image review is useful, but not enough. A screenshot can show that something
 looks suspicious; it cannot reliably prove exact hole distances, hidden
 clearances, source/STEP freshness, or rule-specific pass/fail.
 
-Burr turns CAD metadata into measurable receipts:
+Burr turns design data into measurable receipts:
 
 ```txt
 M3 loaded mounting hole
@@ -49,23 +49,27 @@ node bin/burr.mjs check examples/linear-actuator-good
 
 ```bash
 burr --version
-burr check <folder|fray-cad.json>...
-burr stamp <folder|fray-cad.json>...
+burr check <folder|burr-design-data.json>...
+burr stamp <folder|burr-design-data.json>...
 ```
 
-`check` finds `fray-cad.json` manifests, runs freshness checks and rulepack
-checks, then writes `burr-receipt.json` beside each manifest.
+`check` finds `burr-design-data.json`, runs freshness checks and rulepack
+checks, then writes `burr-receipt.json` beside each design data file.
 
 `stamp` computes `sha256` and `size_bytes` for declared source and generated
 artifact files.
 
-## Metadata
+## Design Data
 
-A lintable CAD artifact folder contains `fray-cad.json`:
+A lintable CAD artifact folder contains `burr-design-data.json`.
+
+This file is the language-agnostic contract. It can be emitted by build123d,
+CadQuery, OpenSCAD, JavaScript CAD, Rust CAD, Fusion scripts, or any tool that
+can write JSON.
 
 ```json
 {
-  "schema_version": "fray.cad.artifact.v1",
+  "schema_version": "burr.design-data.v1",
   "artifact_id": "linear-actuator-bad",
   "artifact_version": "0.1.0",
   "artifact_type": "actuator_mount",
@@ -135,8 +139,8 @@ Burr has three versioned surfaces:
 
 ```txt
 Burr package version       -> CLI/library behavior
-Manifest schema version   -> metadata shape Burr can read
-Rulepack schema version   -> rule syntax Burr can execute
+Design data schema version -> JSON shape Burr can read
+Rulepack schema version    -> rule syntax Burr can execute
 ```
 
 Receipts include all three:
@@ -144,18 +148,21 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.1.1",
+  "burr_version": "0.2.0",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.1.0",
   "compatibility": {
-    "manifest_schema_version": "fray.cad.artifact.v1",
+    "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"
   }
 }
 ```
 
-Unsupported manifest or rulepack schemas fail lint instead of silently producing
+Unsupported design data or rulepack schemas fail lint instead of silently producing
 untrustworthy receipts.
+
+Legacy `fray-cad.json` files with schema `fray.cad.artifact.v1` are still read
+for transition, but new integrations should emit `burr-design-data.json`.
 
 ## Example Result
 
@@ -196,5 +203,5 @@ Fixed actuator:
 
 ## Status
 
-Early prototype. Current checks are metadata-based. Future versions may derive
+Early prototype. Current checks are design-data-based. Future versions may derive
 more facts directly from STEP topology.

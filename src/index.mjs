@@ -9,7 +9,15 @@ const packageRoot = path.resolve(path.dirname(__filename), "..")
 
 export const defaultRulepackPath = path.join(packageRoot, "rules/actuator_mount.rulepack.json")
 export const burrVersion = readJson(path.join(packageRoot, "package.json")).version
-export const supportedManifestSchemaVersions = ["fray.cad.artifact.v1"]
+export const designDataFileName = "burr-design-data.json"
+export const legacyDesignDataFileNames = ["fray-cad.json"]
+export const designDataFileNames = [designDataFileName, ...legacyDesignDataFileNames]
+export const supportedDesignDataSchemaVersions = ["burr.design-data.v1"]
+export const supportedLegacyDesignDataSchemaVersions = ["fray.cad.artifact.v1"]
+export const supportedManifestSchemaVersions = [
+  ...supportedDesignDataSchemaVersions,
+  ...supportedLegacyDesignDataSchemaVersions,
+]
 export const supportedRulepackSchemaVersions = ["burr.rulepack.v1"]
 export const receiptSchemaVersion = "burr.receipt.v1"
 
@@ -222,10 +230,10 @@ function checkFileHashes(manifest, manifestDir) {
   if (refs.length === 0) {
     return [
       {
-        rule_id: "burr_manifest:hash_metadata_complete",
+        rule_id: "burr_design_data:hash_metadata_complete",
         status: "fail",
         reason: "missing_file_refs",
-        message: "Manifest must list source/artifact file refs with sha256.",
+        message: "Design data must list source/artifact file refs with sha256.",
       },
     ]
   }
@@ -233,16 +241,16 @@ function checkFileHashes(manifest, manifestDir) {
   for (const { group, kind, index, ref } of refs) {
     const label = index == null ? group : `${group}[${index}]`
     const existsRule =
-      kind === "source" ? "burr_manifest:source_file_exists" : "burr_manifest:artifact_file_exists"
+      kind === "source" ? "burr_design_data:source_file_exists" : "burr_design_data:artifact_file_exists"
     const hashRule =
-      kind === "source" ? "burr_manifest:source_sha256_matches" : "burr_manifest:artifact_sha256_matches"
+      kind === "source" ? "burr_design_data:source_sha256_matches" : "burr_design_data:artifact_sha256_matches"
     const expectedSha = ref?.sha256
     const resolved = resolveFileRef(manifestDir, ref)
 
     if (resolved.error) {
       checks.push({
         rule_id: resolved.error === "missing_path" || resolved.error === "invalid_path"
-          ? "burr_manifest:hash_metadata_complete"
+          ? "burr_design_data:hash_metadata_complete"
           : existsRule,
         status: "fail",
         reason: resolved.error,
@@ -255,7 +263,7 @@ function checkFileHashes(manifest, manifestDir) {
 
     if (!isSha256(expectedSha)) {
       checks.push({
-        rule_id: "burr_manifest:hash_metadata_complete",
+        rule_id: "burr_design_data:hash_metadata_complete",
         status: "fail",
         reason: expectedSha ? "invalid_sha256" : "missing_sha256",
         file_ref: label,
@@ -302,8 +310,8 @@ function checkFileHashes(manifest, manifestDir) {
       required: { sha256: expectedSha },
       message:
         actualSha === expectedSha
-          ? "File hash matches manifest."
-          : "File hash does not match manifest; metadata is stale.",
+          ? "File hash matches design data."
+          : "File hash does not match design data; metadata is stale.",
     })
   }
 
@@ -314,20 +322,20 @@ function checkSchemaVersions(manifest, rulepack) {
   const checks = []
   if (!supportedManifestSchemaVersions.includes(manifest.schema_version)) {
     checks.push({
-      rule_id: "burr_manifest:schema_version_supported",
+      rule_id: "burr_design_data:schema_version_supported",
       status: "fail",
-      reason: manifest.schema_version ? "unsupported_manifest_schema" : "missing_manifest_schema",
+      reason: manifest.schema_version ? "unsupported_design_data_schema" : "missing_design_data_schema",
       measured: { schema_version: manifest.schema_version ?? null },
       required: { schema_versions: supportedManifestSchemaVersions },
-      message: "Manifest schema version is not supported by this Burr version.",
+      message: "Design data schema version is not supported by this Burr version.",
     })
   } else {
     checks.push({
-      rule_id: "burr_manifest:schema_version_supported",
+      rule_id: "burr_design_data:schema_version_supported",
       status: "pass",
       reason: "ok",
       measured: { schema_version: manifest.schema_version },
-      message: "Manifest schema version is supported.",
+      message: "Design data schema version is supported.",
     })
   }
 
@@ -353,7 +361,7 @@ function checkSchemaVersions(manifest, rulepack) {
   return checks
 }
 
-export function lintManifest(manifest, rulepack, options = {}) {
+export function lintDesignData(manifest, rulepack, options = {}) {
   const checks = []
   const warnings = []
   const manifestDir = options.manifestDir ?? process.cwd()
@@ -363,10 +371,10 @@ export function lintManifest(manifest, rulepack, options = {}) {
 
   if (manifest.units && manifest.units !== "mm") {
     checks.push({
-      rule_id: `${rulepack.id}:manifest_units_mm`,
+      rule_id: `${rulepack.id}:design_data_units_mm`,
       status: "fail",
       reason: "unsupported_units",
-      message: "Burr currently expects millimeter manifests.",
+      message: "Burr currently expects millimeter design data.",
       measured: { units: manifest.units },
       required: { units: "mm" },
     })
@@ -422,11 +430,14 @@ export function lintManifest(manifest, rulepack, options = {}) {
     rulepack_id: rulepack.id,
     rulepack_version: rulepack.version ?? null,
     compatibility: {
+      design_data_schema_version: manifest.schema_version ?? null,
+      supported_design_data_schema_versions: supportedManifestSchemaVersions,
       manifest_schema_version: manifest.schema_version ?? null,
       supported_manifest_schema_versions: supportedManifestSchemaVersions,
       rulepack_schema_version: rulepack.schema_version ?? null,
       supported_rulepack_schema_versions: supportedRulepackSchemaVersions,
     },
+    source_design_data: options.sourceManifest ?? null,
     source_manifest: options.sourceManifest ?? null,
     checks,
     warnings,
@@ -448,14 +459,16 @@ export function findManifestPaths(inputs, options = {}) {
     if (!fs.existsSync(resolved)) throw new Error(`Input does not exist: ${input}`)
     const stat = fs.statSync(resolved)
     if (stat.isFile()) {
-      if (path.basename(resolved) !== "fray-cad.json") {
-        throw new Error(`Input file is not fray-cad.json: ${input}`)
+      if (!designDataFileNames.includes(path.basename(resolved))) {
+        throw new Error(
+          `Input file is not ${designDataFileName}: ${input}`,
+        )
       }
       addManifest(results, seen, resolved)
       continue
     }
 
-    const directManifest = path.join(resolved, "fray-cad.json")
+    const directManifest = findDirectDesignDataFile(resolved)
     if (fs.existsSync(directManifest)) {
       addManifest(results, seen, directManifest)
     } else {
@@ -464,6 +477,16 @@ export function findManifestPaths(inputs, options = {}) {
   }
 
   return results
+}
+
+export const findDesignDataPaths = findManifestPaths
+
+function findDirectDesignDataFile(dir) {
+  for (const fileName of designDataFileNames) {
+    const filePath = path.join(dir, fileName)
+    if (fs.existsSync(filePath)) return filePath
+  }
+  return path.join(dir, designDataFileName)
 }
 
 function addManifest(results, seen, manifestPath) {
@@ -478,29 +501,32 @@ function walkForManifests(dir, results, seen) {
     if (!entry.isDirectory()) continue
     if (skipDirs.has(entry.name)) continue
     const child = path.join(dir, entry.name)
-    const manifest = path.join(child, "fray-cad.json")
+    const manifest = findDirectDesignDataFile(child)
     if (fs.existsSync(manifest)) addManifest(results, seen, manifest)
     else walkForManifests(child, results, seen)
   }
 }
 
-export function lintManifestFile(manifestPath, options = {}) {
+export function lintDesignDataFile(manifestPath, options = {}) {
   const rulepack = readJson(options.rulepackPath ?? defaultRulepackPath)
   const manifest = readJson(manifestPath)
-  const receipt = lintManifest(manifest, rulepack, {
+  const receipt = lintDesignData(manifest, rulepack, {
     sourceManifest: path.relative(process.cwd(), manifestPath),
     manifestDir: path.dirname(manifestPath),
   })
   const receiptPath =
     options.receiptPath ?? path.join(path.dirname(manifestPath), "burr-receipt.json")
   if (options.writeReceipt !== false) writeJson(receiptPath, receipt)
-  return { receipt, receiptPath, manifestPath }
+  return { receipt, receiptPath, designDataPath: manifestPath, manifestPath }
 }
+
+export const lintManifest = lintDesignData
+export const lintManifestFile = lintDesignDataFile
 
 export function lintTargets(inputs, options = {}) {
   const manifestPaths = findManifestPaths(inputs, { cwd: options.cwd })
-  if (manifestPaths.length === 0) throw new Error("No fray-cad.json manifests found.")
-  return manifestPaths.map((manifestPath) => lintManifestFile(manifestPath, options))
+  if (manifestPaths.length === 0) throw new Error(`No ${designDataFileName} files found.`)
+  return manifestPaths.map((manifestPath) => lintDesignDataFile(manifestPath, options))
 }
 
 function stampRef(manifestDir, ref) {
@@ -511,7 +537,7 @@ function stampRef(manifestDir, ref) {
   ref.size_bytes = fs.statSync(resolved.filePath).size
 }
 
-export function stampManifestFile(manifestPath) {
+export function stampDesignDataFile(manifestPath) {
   const manifest = readJson(manifestPath)
   const manifestDir = path.dirname(manifestPath)
   if (manifest.source) stampRef(manifestDir, manifest.source)
@@ -521,8 +547,10 @@ export function stampManifestFile(manifestPath) {
   return manifestPath
 }
 
+export const stampManifestFile = stampDesignDataFile
+
 export function stampTargets(inputs, options = {}) {
   const manifestPaths = findManifestPaths(inputs, { cwd: options.cwd })
-  if (manifestPaths.length === 0) throw new Error("No fray-cad.json manifests found.")
-  return manifestPaths.map(stampManifestFile)
+  if (manifestPaths.length === 0) throw new Error(`No ${designDataFileName} files found.`)
+  return manifestPaths.map(stampDesignDataFile)
 }

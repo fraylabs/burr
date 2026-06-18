@@ -1,20 +1,20 @@
 {
-  "schema_version": "fray.cad.artifact.v1",
-  "artifact_id": "linear-actuator-bad",
+  "schema_version": "burr.design-data.v1",
+  "artifact_id": "linear-actuator-good",
   "artifact_version": "0.1.0",
   "artifact_type": "actuator_mount",
   "units": "mm",
   "source": {
     "path": "source.py",
-    "sha256": "623df3935889d9af35f4ce478a36823de8bac8ba389596555cdfe8485bbdc9d8",
-    "size_bytes": 37
+    "sha256": "1cabcb4a8ba9c469891558a8878e17695405fe4f008576ed0ea30aa6563eecf4",
+    "size_bytes": 38
   },
   "artifacts": [
     {
       "kind": "step",
       "path": "actuator.step",
-      "sha256": "ac1d3d642dfa95a041165c5ecc6d5013c871f231644560b96d724ae53bf4f687",
-      "size_bytes": 117
+      "sha256": "51c7524d5bec9aea49cc5144a9ef115325a3aa40493fd4b79b55c57a9d34ce72",
+      "size_bytes": 118
     }
   ],
   "process": {
@@ -27,14 +27,14 @@
       "id": "housing",
       "bbox_mm": {
         "min": [
-          -42,
-          -16,
+          -43,
+          -24,
           0
         ],
         "max": [
-          42,
-          16,
-          26
+          43,
+          24,
+          40
         ]
       }
     }
@@ -47,9 +47,9 @@
       "fastener": "M3",
       "diameter_mm": 3.4,
       "center_mm": [
-        39.5,
-        -8,
-        8
+        40,
+        -12,
+        12
       ],
       "axis": [
         1,
