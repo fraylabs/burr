@@ -274,6 +274,7 @@ pub fn lint_design_data(
         .iter()
         .filter(|check| string_field(check, "status") == Some("fail"))
         .count();
+    let feature_summary = summarize_features(manifest, &checks);
 
     json!({
         "schema_version": RECEIPT_SCHEMA_VERSION,
@@ -299,7 +300,8 @@ pub fn lint_design_data(
         "summary": {
             "checks": checks.len(),
             "failures": failures,
-            "warnings": warnings.len()
+            "warnings": warnings.len(),
+            "features": feature_summary
         }
     })
 }
@@ -929,6 +931,58 @@ fn check_feature_presence(
             "centerline_tolerance_mm": centerline_tolerance
         },
         "message": "Design data declares a clearance hole, but no matching cylindrical STEP geometry was found."
+    })
+}
+
+fn summarize_features(manifest: &Value, checks: &[Value]) -> Value {
+    let declared_features: Vec<&Value> = manifest
+        .get("features")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .collect();
+    let checked_feature_ids: HashSet<String> = checks
+        .iter()
+        .filter_map(|check| string_field(check, "feature_id").map(ToString::to_string))
+        .collect();
+    let mut checked = Vec::new();
+    let mut unchecked = Vec::new();
+    let mut intent_counts: HashMap<String, usize> = HashMap::new();
+
+    for feature in declared_features {
+        for intent in feature_intents(feature) {
+            *intent_counts.entry(intent).or_insert(0) += 1;
+        }
+        let feature_id = string_field(feature, "id");
+        if feature_id.is_some_and(|id| checked_feature_ids.contains(id)) {
+            checked.push(Value::String(feature_id.unwrap().to_string()));
+        } else if let Some(id) = feature_id {
+            unchecked.push(Value::String(id.to_string()));
+        }
+    }
+
+    let candidate_cylinders_considered = checks
+        .iter()
+        .filter_map(|check| {
+            check
+                .pointer("/measured/candidate_cylinders")
+                .and_then(Value::as_u64)
+        })
+        .max()
+        .unwrap_or(0);
+    let mut intent_values = serde_json::Map::new();
+    for (intent, count) in intent_counts {
+        intent_values.insert(intent, json!(count));
+    }
+
+    json!({
+        "declared": checked.len() + unchecked.len(),
+        "checked": checked.len(),
+        "unchecked": unchecked.len(),
+        "checked_feature_ids": checked,
+        "unchecked_feature_ids": unchecked,
+        "intent_counts": intent_values,
+        "step_candidate_cylinders_considered": candidate_cylinders_considered
     })
 }
 

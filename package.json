@@ -25,6 +25,7 @@
     "examples/build123d-step-presence/README.md",
     "examples/build123d-step-presence/bad/design.py",
     "examples/build123d-step-presence/good/design.py",
+    "examples/build123d-mixed-intent/design.py",
     "examples/linear-actuator-bad",
     "examples/linear-actuator-good",
     "README.md",
@@ -37,6 +38,7 @@
     "check:init": "node scripts/check-init-starter.mjs",
     "check:build123d": "PYTHON=\"uv run --package burr-build123d python\" node scripts/check-build123d-examples.mjs",
     "check:ocp": "node scripts/check-ocp-step-cylinders.mjs",
+    "check:mixed-intent": "node scripts/check-mixed-intent.mjs",
     "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init"
   },
   "keywords": [

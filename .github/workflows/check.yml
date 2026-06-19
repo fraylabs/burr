@@ -73,6 +73,9 @@ jobs:
       - name: Check optional OCP STEP backend
         run: npm run check:ocp
 
+      - name: Check mixed-intent CAD proof
+        run: npm run check:mixed-intent
+
       - name: Confirm generated artifacts are untracked
         run: |
           test -z "$(git status --short --untracked-files=no)"

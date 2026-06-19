@@ -60,6 +60,7 @@ Run checks:
 npm run check
 npm run check:build123d
 npm run check:ocp
+npm run check:mixed-intent
 ```
 
 Use the local CLI without global install:
