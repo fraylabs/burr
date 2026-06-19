@@ -44,6 +44,42 @@ class BurrBuild123dTests(unittest.TestCase):
             self.assertIn("sha256", data["source"])
             self.assertEqual(data["features"][0]["fastener"], "M3")
             self.assertEqual(data["features"][0]["role"], "loaded_mount")
+            self.assertEqual(data["features"][0]["intent"], "mechanical_interface")
+
+    def test_records_non_mechanical_intent(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        m3_clearance_hole(
+            design,
+            feature_id="m3_lightening",
+            part="housing",
+            center=(0, 0, 0),
+            axis=(1, 0, 0),
+            role="lightening",
+            intent="weight_reduction",
+            create_geometry=False,
+        )
+
+        self.assertEqual(design.features[0]["intent"], "weight_reduction")
+
+    def test_rejects_empty_intent(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        with self.assertRaises(ValueError):
+            m3_clearance_hole(
+                design,
+                feature_id="m3_bad",
+                part="housing",
+                center=(0, 0, 0),
+                axis=(1, 0, 0),
+                role="mount",
+                intent="",
+                create_geometry=False,
+            )
 
 
 if __name__ == "__main__":

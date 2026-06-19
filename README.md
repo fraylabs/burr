@@ -180,6 +180,7 @@ can write JSON.
       "id": "m3_lower_left",
       "part": "housing",
       "kind": "clearance_hole",
+      "intent": "mechanical_interface",
       "fastener": "M3",
       "diameter_mm": 3.4,
       "center_mm": [39.5, -8, 8],
@@ -189,6 +190,28 @@ can write JSON.
   ]
 }
 ```
+
+### Declared Feature Intent
+
+Burr does not infer that every cylinder or hole in a STEP file is mechanically
+important. A STEP file may contain vents, lightening holes, fluid passages,
+cosmetic cuts, construction reliefs, bosses, fillets, and unrelated round faces.
+
+Burr judges only features that are declared in `burr-design-data.json` and
+selected by the active rulepack. Use `intent` to separate mechanical interfaces
+from incidental geometry:
+
+```txt
+mechanical_interface  -> judged by mechanical rulepacks
+weight_reduction      -> declared if useful, but not judged by actuator rules
+fluid_or_air_path     -> separate rules, not screw-mount rules
+manufacturing_feature -> process-specific rules only
+cosmetic              -> normally unjudged
+```
+
+For legacy design data, missing `intent` is treated as `mechanical_interface`.
+Set `intent` explicitly when a declared feature should not be judged by
+mechanical rulepacks.
 
 ## Rulepacks
 
@@ -200,7 +223,7 @@ M3 clearance holes exist as matching cylindrical geometry in the exported STEP:
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -208,6 +231,7 @@ M3 clearance holes exist as matching cylindrical geometry in the exported STEP:
       "applies_to": {
         "kind": "clearance_hole",
         "fastener": "M3",
+        "intent_any": ["mechanical_interface"],
         "role_any": ["loaded_mount", "mount", "housing_mount"]
       },
       "min_center_to_edge_diameter_multiple": 3.0
@@ -217,7 +241,8 @@ M3 clearance holes exist as matching cylindrical geometry in the exported STEP:
       "kind": "minimum_wall_thickness",
       "applies_to": {
         "kind": "clearance_hole",
-        "fastener": "M3"
+        "fastener": "M3",
+        "intent_any": ["mechanical_interface"]
       },
       "min_wall_thickness_mm": 2.0
     },
@@ -226,7 +251,8 @@ M3 clearance holes exist as matching cylindrical geometry in the exported STEP:
       "kind": "feature_presence",
       "applies_to": {
         "kind": "clearance_hole",
-        "fastener": "M3"
+        "fastener": "M3",
+        "intent_any": ["mechanical_interface"]
       },
       "artifact_kind": "step",
       "diameter_tolerance_mm": 0.05,
@@ -254,7 +280,7 @@ Receipts include all three:
   "schema_version": "burr.receipt.v1",
   "burr_version": "0.7.0",
   "artifact_version": "0.1.0",
-  "rulepack_version": "0.3.0",
+  "rulepack_version": "0.4.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"
@@ -325,10 +351,16 @@ FAIL examples/build123d-step-presence/bad/burr-design-data.json -> <not written>
    Regenerate the STEP from the same helper that emitted the design data.
 ```
 
+`Candidate cylinders found` is not a count of failed holes. It is the number of
+cylindrical STEP faces Burr considered while trying to prove one declared
+feature. Extra cylinders are ignored unless a rulepack selects matching declared
+intent and the geometry fits the declared tolerances.
+
 ## Status
 
 Early prototype. Current checks combine design-data rules with narrow STEP
 feature-presence verification for declared M3 clearance holes.
+Burr does not classify all holes in a model or decide which holes matter.
 
 By default, the Rust CLI reads simple analytic STEP cylinder entities directly.
 For stronger local verification, install the optional Python/OCP workspace and

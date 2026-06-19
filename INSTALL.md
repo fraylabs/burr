@@ -99,6 +99,10 @@ uv run --package burr-build123d python path/to/design.py
 The Rust CLI works without Python/OCP by default. For stronger local STEP
 cylinder extraction, use the optional `burr-ocp` workspace package:
 
+The OCP backend may find many cylindrical faces in a STEP file. Burr still
+applies rulepack intent first, then uses those cylinders only as evidence for
+declared features.
+
 ```bash
 uv sync --all-packages
 uv run --package burr-ocp burr-ocp-step-cylinders path/to/part.step

@@ -44,6 +44,7 @@
       "id": "m3_lower_left",
       "part": "housing",
       "kind": "clearance_hole",
+      "intent": "mechanical_interface",
       "fastener": "M3",
       "diameter_mm": 3.4,
       "center_mm": [

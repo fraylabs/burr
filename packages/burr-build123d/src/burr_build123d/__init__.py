@@ -92,12 +92,16 @@ class BurrDesignData:
         center: tuple[float, float, float] | list[float],
         axis: tuple[float, float, float] | list[float],
         role: str,
+        intent: str = "mechanical_interface",
     ) -> None:
+        if not intent:
+            raise ValueError("clearance_hole intent must be a non-empty string.")
         self.features.append(
             {
                 "id": feature_id,
                 "part": part,
                 "kind": "clearance_hole",
+                "intent": intent,
                 "fastener": fastener,
                 "diameter_mm": float(diameter_mm),
                 "center_mm": _round_vector(center),
@@ -154,6 +158,7 @@ def m3_clearance_hole(
     center: tuple[float, float, float] | list[float],
     axis: tuple[float, float, float] | list[float],
     role: str,
+    intent: str = "mechanical_interface",
     diameter_mm: float = 3.4,
     cut_depth_mm: float = 8.0,
     create_geometry: bool = True,
@@ -168,6 +173,7 @@ def m3_clearance_hole(
         center=center,
         axis=axis,
         role=role,
+        intent=intent,
     )
 
     if not create_geometry:

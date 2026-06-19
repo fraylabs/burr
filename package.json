@@ -22,6 +22,7 @@
     "examples/build123d-actuator/good/design.py",
     "examples/build123d-wall-thickness/bad/design.py",
     "examples/build123d-wall-thickness/good/design.py",
+    "examples/build123d-step-presence/README.md",
     "examples/build123d-step-presence/bad/design.py",
     "examples/build123d-step-presence/good/design.py",
     "examples/linear-actuator-bad",

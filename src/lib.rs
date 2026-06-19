@@ -1352,9 +1352,26 @@ fn feature_applies(feature: &Value, applies_to: Option<&Value>) -> bool {
             return false;
         }
     }
+    if let Some(intent) = string_field(applies_to, "intent") {
+        if !feature_intents(feature).iter().any(|value| value == intent) {
+            return false;
+        }
+    }
+    if let Some(intent_any) = applies_to.get("intent_any").and_then(Value::as_array) {
+        if !intent_any.is_empty() {
+            let intents = feature_intents(feature);
+            let allowed: HashSet<&str> = intent_any.iter().filter_map(Value::as_str).collect();
+            if !intents
+                .iter()
+                .any(|intent| allowed.contains(intent.as_str()))
+            {
+                return false;
+            }
+        }
+    }
     if let Some(role_any) = applies_to.get("role_any").and_then(Value::as_array) {
         if !role_any.is_empty() {
-            let roles = normalize_roles(feature.get("role"));
+            let roles = normalize_string_values(feature.get("role"));
             let allowed: HashSet<&str> = role_any.iter().filter_map(Value::as_str).collect();
             if !roles.iter().any(|role| allowed.contains(role.as_str())) {
                 return false;
@@ -1364,8 +1381,17 @@ fn feature_applies(feature: &Value, applies_to: Option<&Value>) -> bool {
     true
 }
 
-fn normalize_roles(role: Option<&Value>) -> Vec<String> {
-    match role {
+fn feature_intents(feature: &Value) -> Vec<String> {
+    let intents = normalize_string_values(feature.get("intent"));
+    if intents.is_empty() {
+        vec!["mechanical_interface".to_string()]
+    } else {
+        intents
+    }
+}
+
+fn normalize_string_values(value: Option<&Value>) -> Vec<String> {
+    match value {
         Some(Value::Array(values)) => values
             .iter()
             .filter_map(|value| value.as_str().map(ToString::to_string))
@@ -1801,7 +1827,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.3.0")
+            Some("0.4.0")
         );
     }
 
@@ -1932,20 +1958,153 @@ mod tests {
         );
     }
 
+    #[test]
+    fn non_mechanical_hole_intent_is_not_linted_by_actuator_rules() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        fs::write(
+            &step_path,
+            "ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+        )
+        .unwrap();
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let mut manifest = test_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+        );
+        manifest["features"][0]["intent"] = json!("weight_reduction");
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id")
+                .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
+        }));
+        assert!(receipt["warnings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|warning| { string_field(warning, "reason") == Some("no_applicable_features") }));
+    }
+
+    #[test]
+    fn undeclared_step_cylinders_are_not_lint_targets() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinders(
+            &step_path,
+            &[
+                ((0.0, 0.0, 8.0), (1.0, 0.0, 0.0), 1.7),
+                ((4.0, 3.0, 8.0), (0.0, 1.0, 0.0), 2.0),
+                ((-4.0, -3.0, 8.0), (0.0, 0.0, 1.0), 0.8),
+            ],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let mut manifest = test_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+        );
+        manifest["features"] = json!([]);
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id")
+                .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
+        }));
+    }
+
+    #[test]
+    fn feature_presence_ignores_extra_random_cylinders() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinders(
+            &step_path,
+            &[
+                ((0.0, 0.0, 8.0), (1.0, 0.0, 0.0), 1.7),
+                ((4.0, 3.0, 8.0), (0.0, 1.0, 0.0), 2.0),
+                ((-4.0, -3.0, 8.0), (0.0, 0.0, 1.0), 0.8),
+            ],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = test_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:m3_clearance_hole_step_presence")
+                && string_field(check, "reason") == Some("ok")
+                && check
+                    .pointer("/measured/candidate_cylinders")
+                    .and_then(Value::as_u64)
+                    == Some(3)
+        }));
+    }
+
+    #[test]
+    fn intent_array_can_target_mechanical_interface() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinder(&step_path, (0.0, 0.0, 8.0), (1.0, 0.0, 0.0), 1.7);
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let mut manifest = test_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+        );
+        manifest["features"][0]["intent"] = json!(["weight_reduction", "mechanical_interface"]);
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:m3_clearance_hole_step_presence")
+                && string_field(check, "reason") == Some("ok")
+        }));
+    }
+
     fn write_step_cylinder(
         path: &Path,
         point: (f64, f64, f64),
         axis: (f64, f64, f64),
         radius: f64,
     ) {
-        fs::write(
-            path,
-            format!(
-                "ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\n#1 = CARTESIAN_POINT('',({},{},{}));\n#2 = DIRECTION('',({},{},{}));\n#3 = DIRECTION('',(0.,0.,1.));\n#4 = AXIS2_PLACEMENT_3D('',#1,#2,#3);\n#5 = CYLINDRICAL_SURFACE('',#4,{});\nENDSEC;\nEND-ISO-10303-21;\n",
-                point.0, point.1, point.2, axis.0, axis.1, axis.2, radius,
-            ),
-        )
-        .unwrap();
+        write_step_cylinders(path, &[(point, axis, radius)]);
+    }
+
+    fn write_step_cylinders(path: &Path, cylinders: &[((f64, f64, f64), (f64, f64, f64), f64)]) {
+        let mut data = String::from("ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\n");
+        for (index, (point, axis, radius)) in cylinders.iter().enumerate() {
+            let base = index * 5 + 1;
+            data.push_str(&format!(
+                "#{base} = CARTESIAN_POINT('',({},{},{}));\n#{} = DIRECTION('',({},{},{}));\n#{} = DIRECTION('',(0.,0.,1.));\n#{} = AXIS2_PLACEMENT_3D('',#{base},#{},#{});\n#{} = CYLINDRICAL_SURFACE('',#{},{});\n",
+                point.0,
+                point.1,
+                point.2,
+                base + 1,
+                axis.0,
+                axis.1,
+                axis.2,
+                base + 2,
+                base + 3,
+                base + 1,
+                base + 2,
+                base + 4,
+                base + 3,
+                radius,
+            ));
+        }
+        data.push_str("ENDSEC;\nEND-ISO-10303-21;\n");
+        fs::write(path, data).unwrap();
     }
 
     fn test_manifest(source_sha: String, artifact_sha: String) -> Value {
@@ -1981,6 +2140,7 @@ mod tests {
                     "id": "m3_claimed",
                     "part": "housing",
                     "kind": "clearance_hole",
+                    "intent": "mechanical_interface",
                     "fastener": "M3",
                     "diameter_mm": 3.4,
                     "center_mm": [0.0, 0.0, 8.0],
