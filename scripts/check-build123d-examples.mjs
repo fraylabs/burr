@@ -31,6 +31,8 @@ runPython(["examples/build123d-actuator/bad/design.py"])
 runPython(["examples/build123d-actuator/good/design.py"])
 runPython(["examples/build123d-wall-thickness/bad/design.py"])
 runPython(["examples/build123d-wall-thickness/good/design.py"])
+runPython(["examples/build123d-step-presence/bad/design.py"])
+runPython(["examples/build123d-step-presence/good/design.py"])
 
 const bad = run(
   "cargo",
@@ -67,6 +69,26 @@ const wallGood = run(
 )
 if (!wallGood.output.includes("PASS examples/build123d-wall-thickness/good/burr-design-data.json")) {
   throw new Error(`Good wall-thickness fixture did not pass as expected.\n${wallGood.output}`)
+}
+
+const presenceBad = run(
+  "cargo",
+  ["run", "--quiet", "--", "check", "examples/build123d-step-presence/bad", "--no-write-receipt"],
+  { expectFailure: true },
+)
+if (!presenceBad.output.includes("Declared clearance hole m3_claimed is missing from the STEP artifact.")) {
+  throw new Error(`Bad STEP-presence fixture did not print missing feature diagnostic.\n${presenceBad.output}`)
+}
+if (!presenceBad.output.includes("Candidate cylinders found: 0")) {
+  throw new Error(`Bad STEP-presence fixture did not report zero candidate cylinders.\n${presenceBad.output}`)
+}
+
+const presenceGood = run(
+  "cargo",
+  ["run", "--quiet", "--", "check", "examples/build123d-step-presence/good", "--no-write-receipt"],
+)
+if (!presenceGood.output.includes("PASS examples/build123d-step-presence/good/burr-design-data.json")) {
+  throw new Error(`Good STEP-presence fixture did not pass as expected.\n${presenceGood.output}`)
 }
 
 console.log("build123d examples passed")

@@ -7,6 +7,8 @@ examples/build123d-actuator/*/actuator.step
 examples/build123d-actuator/*/burr-design-data.json
 examples/build123d-wall-thickness/*/wall.step
 examples/build123d-wall-thickness/*/burr-design-data.json
+examples/build123d-step-presence/*/presence.step
+examples/build123d-step-presence/*/burr-design-data.json
 *.log
 burr-receipt.json
 .DS_Store

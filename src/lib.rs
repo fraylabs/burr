@@ -1,6 +1,6 @@
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 
@@ -221,7 +221,9 @@ pub fn lint_design_data(
 
             if !matches!(
                 rule_kind,
-                Some("hole_edge_distance") | Some("minimum_wall_thickness")
+                Some("hole_edge_distance")
+                    | Some("minimum_wall_thickness")
+                    | Some("feature_presence")
             ) {
                 warnings.push(json!({
                     "rule_id": format!("{}:{}", string_field(rulepack, "id").unwrap_or("<missing>"), string_field(rule, "id").unwrap_or("<missing>")),
@@ -250,6 +252,15 @@ pub fn lint_design_data(
                     Some("minimum_wall_thickness") => {
                         checks.push(check_minimum_wall_thickness(
                             manifest, rulepack, rule, feature,
+                        ));
+                    }
+                    Some("feature_presence") => {
+                        checks.push(check_feature_presence(
+                            manifest,
+                            manifest_dir,
+                            rulepack,
+                            rule,
+                            feature,
                         ));
                     }
                     _ => unreachable!(),
@@ -399,6 +410,30 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
                 lines.push(format!("Short by: {} mm", trim_float(value)));
             }
             lines.push("Try moving the hole inward or increasing part width.".to_string());
+            Some(lines)
+        }
+        Some("missing_declared_feature") => {
+            let feature_label = string_field(check, "feature_id")
+                .map(|id| format!(" {id}"))
+                .unwrap_or_default();
+            let artifact = check
+                .pointer("/measured/artifact_path")
+                .and_then(Value::as_str)
+                .unwrap_or("<missing STEP>");
+            let candidates = check
+                .pointer("/measured/candidate_cylinders")
+                .and_then(Value::as_u64);
+            let mut lines = vec![format!(
+                "Declared clearance hole{feature_label} is missing from the STEP artifact."
+            )];
+            lines.push(format!("Checked artifact: {artifact}"));
+            if let Some(value) = candidates {
+                lines.push(format!("Candidate cylinders found: {value}"));
+            }
+            lines.push(
+                "Regenerate the STEP from the same helper that emitted the design data."
+                    .to_string(),
+            );
             Some(lines)
         }
         Some("source_hash_mismatch") | Some("artifact_hash_mismatch") => Some(vec![
@@ -730,6 +765,402 @@ fn check_minimum_wall_thickness(
     })
 }
 
+fn check_feature_presence(
+    manifest: &Value,
+    manifest_dir: &Path,
+    rulepack: &Value,
+    rule: &Value,
+    feature: &Value,
+) -> Value {
+    let full_rule_id = format!(
+        "{}:{}",
+        string_field(rulepack, "id").unwrap_or("<missing>"),
+        string_field(rule, "id").unwrap_or("<missing>")
+    );
+    let feature_id = feature.get("id").cloned().unwrap_or(Value::Null);
+    let artifact_kind = string_field(rule, "artifact_kind").unwrap_or("step");
+    let Some(artifact) = find_artifact(manifest, artifact_kind) else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_step_artifact_ref",
+            "feature_id": feature_id,
+            "message": "Design data must list a STEP artifact for feature-presence checking."
+        });
+    };
+    let resolved_artifact = match resolve_file_ref(manifest_dir, artifact) {
+        Ok(value) => value,
+        Err(reason) => {
+            return json!({
+                "rule_id": full_rule_id,
+                "status": "fail",
+                "reason": reason,
+                "feature_id": feature_id,
+                "path": artifact.get("path").and_then(Value::as_str),
+                "message": "STEP artifact path is invalid."
+            });
+        }
+    };
+
+    let Some(diameter) = number_field(feature, "diameter_mm").filter(|value| *value > 0.0) else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_hole_diameter",
+            "feature_id": feature_id,
+            "message": "Hole diameter is required for STEP feature-presence checking."
+        });
+    };
+    let Some(center) = feature
+        .get("center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_center",
+            "feature_id": feature_id,
+            "message": "Feature center_mm is required for STEP feature-presence checking."
+        });
+    };
+    let Some(axis) = feature
+        .get("axis")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .and_then(Vec3::normalized)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_axis",
+            "feature_id": feature_id,
+            "message": "Feature axis is required for STEP feature-presence checking."
+        });
+    };
+
+    let cylinders = match parse_step_cylinders(&resolved_artifact.file_path) {
+        Ok(cylinders) => cylinders,
+        Err(error) => {
+            return json!({
+                "rule_id": full_rule_id,
+                "status": "fail",
+                "reason": "step_geometry_unreadable",
+                "feature_id": feature_id,
+                "measured": {
+                    "artifact_path": resolved_artifact.label_path
+                },
+                "message": error
+            });
+        }
+    };
+
+    let diameter_tolerance = number_field(rule, "diameter_tolerance_mm")
+        .unwrap_or(0.05)
+        .max(0.0);
+    let centerline_tolerance = number_field(rule, "centerline_tolerance_mm")
+        .unwrap_or(0.25)
+        .max(0.0);
+    let axis_dot_min = number_field(rule, "axis_dot_min")
+        .unwrap_or(0.99)
+        .clamp(0.0, 1.0);
+    let mut best: Option<CylinderMatch> = None;
+
+    for cylinder in &cylinders {
+        let axis_dot = axis.dot(cylinder.axis).abs();
+        let diameter_delta = (cylinder.radius_mm * 2.0 - diameter).abs();
+        let centerline_distance = cylinder.point.distance_to_line(center, cylinder.axis);
+        let candidate = CylinderMatch {
+            axis_dot,
+            diameter_delta_mm: diameter_delta,
+            centerline_distance_mm: centerline_distance,
+        };
+        if best
+            .as_ref()
+            .is_none_or(|best| candidate.score() < best.score())
+        {
+            best = Some(candidate);
+        }
+        if diameter_delta <= diameter_tolerance
+            && axis_dot >= axis_dot_min
+            && centerline_distance <= centerline_tolerance
+        {
+            return json!({
+                "rule_id": full_rule_id,
+                "status": "pass",
+                "reason": "ok",
+                "feature_id": feature_id,
+                "measured": {
+                    "artifact_path": resolved_artifact.label_path,
+                    "candidate_cylinders": cylinders.len(),
+                    "diameter_delta_mm": round(diameter_delta),
+                    "axis_dot": round(axis_dot),
+                    "centerline_distance_mm": round(centerline_distance)
+                },
+                "required": {
+                    "diameter_tolerance_mm": diameter_tolerance,
+                    "axis_dot_min": axis_dot_min,
+                    "centerline_tolerance_mm": centerline_tolerance
+                },
+                "message": "Declared clearance-hole geometry exists in the STEP artifact."
+            });
+        }
+    }
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": "fail",
+        "reason": "missing_declared_feature",
+        "feature_id": feature_id,
+        "measured": {
+            "artifact_path": resolved_artifact.label_path,
+            "candidate_cylinders": cylinders.len(),
+            "best_diameter_delta_mm": best.as_ref().map(|value| round(value.diameter_delta_mm)),
+            "best_axis_dot": best.as_ref().map(|value| round(value.axis_dot)),
+            "best_centerline_distance_mm": best.as_ref().map(|value| round(value.centerline_distance_mm))
+        },
+        "required": {
+            "diameter_mm": diameter,
+            "center_mm": center.to_json(),
+            "axis": axis.to_json(),
+            "diameter_tolerance_mm": diameter_tolerance,
+            "axis_dot_min": axis_dot_min,
+            "centerline_tolerance_mm": centerline_tolerance
+        },
+        "message": "Design data declares a clearance hole, but no matching cylindrical STEP geometry was found."
+    })
+}
+
+#[derive(Debug, Clone, Copy)]
+struct Vec3 {
+    x: f64,
+    y: f64,
+    z: f64,
+}
+
+impl Vec3 {
+    fn from_values(values: Vec<f64>) -> Option<Self> {
+        if values.len() != 3 {
+            return None;
+        }
+        Some(Self {
+            x: values[0],
+            y: values[1],
+            z: values[2],
+        })
+    }
+
+    fn normalized(self) -> Option<Self> {
+        let length = self.length();
+        if !length.is_finite() || length <= f64::EPSILON {
+            return None;
+        }
+        Some(Self {
+            x: self.x / length,
+            y: self.y / length,
+            z: self.z / length,
+        })
+    }
+
+    fn dot(self, other: Self) -> f64 {
+        self.x * other.x + self.y * other.y + self.z * other.z
+    }
+
+    fn cross(self, other: Self) -> Self {
+        Self {
+            x: self.y * other.z - self.z * other.y,
+            y: self.z * other.x - self.x * other.z,
+            z: self.x * other.y - self.y * other.x,
+        }
+    }
+
+    fn length(self) -> f64 {
+        self.dot(self).sqrt()
+    }
+
+    fn sub(self, other: Self) -> Self {
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+        }
+    }
+
+    fn distance_to_line(self, line_point: Self, line_axis: Self) -> f64 {
+        self.sub(line_point).cross(line_axis).length()
+    }
+
+    fn to_json(self) -> Value {
+        json!([round(self.x), round(self.y), round(self.z)])
+    }
+}
+
+#[derive(Debug)]
+struct StepCylinder {
+    point: Vec3,
+    axis: Vec3,
+    radius_mm: f64,
+}
+
+#[derive(Debug)]
+struct CylinderMatch {
+    axis_dot: f64,
+    diameter_delta_mm: f64,
+    centerline_distance_mm: f64,
+}
+
+impl CylinderMatch {
+    fn score(&self) -> f64 {
+        self.diameter_delta_mm + (1.0 - self.axis_dot).abs() + self.centerline_distance_mm
+    }
+}
+
+fn parse_step_cylinders(path: &Path) -> Result<Vec<StepCylinder>, String> {
+    let text = fs::read_to_string(path)
+        .map_err(|error| format!("Failed to read STEP artifact {}: {error}", path.display()))?;
+    let entities = collect_step_entities(&text);
+    let mut points = HashMap::new();
+    let mut directions = HashMap::new();
+
+    for (id, entity) in &entities {
+        if entity.starts_with("CARTESIAN_POINT") {
+            if let Some(point) = parse_vector_entity(entity) {
+                points.insert(id.clone(), point);
+            }
+        } else if entity.starts_with("DIRECTION") {
+            if let Some(direction) = parse_vector_entity(entity).and_then(Vec3::normalized) {
+                directions.insert(id.clone(), direction);
+            }
+        }
+    }
+
+    let mut axes = HashMap::new();
+    for (id, entity) in &entities {
+        if !entity.starts_with("AXIS2_PLACEMENT_3D") {
+            continue;
+        }
+        let refs = step_refs(entity);
+        if refs.len() < 2 {
+            continue;
+        }
+        let Some(point) = points.get(&refs[0]).copied() else {
+            continue;
+        };
+        let Some(axis) = directions.get(&refs[1]).copied() else {
+            continue;
+        };
+        axes.insert(id.clone(), (point, axis));
+    }
+
+    let mut cylinders = Vec::new();
+    for entity in entities.values() {
+        if !entity.starts_with("CYLINDRICAL_SURFACE") {
+            continue;
+        }
+        let refs = step_refs(entity);
+        let Some(axis_ref) = refs.first() else {
+            continue;
+        };
+        let Some((point, axis)) = axes.get(axis_ref).copied() else {
+            continue;
+        };
+        let Some(radius) = parse_last_step_number(entity).filter(|value| *value > 0.0) else {
+            continue;
+        };
+        cylinders.push(StepCylinder {
+            point,
+            axis,
+            radius_mm: radius,
+        });
+    }
+
+    Ok(cylinders)
+}
+
+fn collect_step_entities(text: &str) -> HashMap<String, String> {
+    let mut entities = HashMap::new();
+    let mut current = String::new();
+
+    for line in text.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with('#') && current.is_empty() {
+            current.push_str(trimmed);
+        } else if !current.is_empty() {
+            current.push(' ');
+            current.push_str(trimmed);
+        }
+
+        if current.ends_with(';') {
+            if let Some((id, entity)) = parse_step_entity(&current) {
+                entities.insert(id, entity);
+            }
+            current.clear();
+        }
+    }
+
+    entities
+}
+
+fn parse_step_entity(text: &str) -> Option<(String, String)> {
+    let (id, entity) = text.split_once('=')?;
+    let id = id.trim();
+    if !id.starts_with('#') {
+        return None;
+    }
+    Some((
+        id.to_string(),
+        entity.trim().trim_end_matches(';').trim().to_string(),
+    ))
+}
+
+fn parse_vector_entity(entity: &str) -> Option<Vec3> {
+    let start = entity.find(",(")? + 2;
+    let rest = &entity[start..];
+    let end = rest.find(')')?;
+    parse_step_numbers(&rest[..end]).and_then(Vec3::from_values)
+}
+
+fn parse_last_step_number(entity: &str) -> Option<f64> {
+    let trimmed = entity.trim().trim_end_matches(')');
+    let (_, last) = trimmed.rsplit_once(',')?;
+    last.trim()
+        .parse::<f64>()
+        .ok()
+        .filter(|value| value.is_finite())
+}
+
+fn parse_step_numbers(text: &str) -> Option<Vec<f64>> {
+    text.split(',')
+        .map(|part| {
+            part.trim()
+                .parse::<f64>()
+                .ok()
+                .filter(|value| value.is_finite())
+        })
+        .collect()
+}
+
+fn step_refs(text: &str) -> Vec<String> {
+    let bytes = text.as_bytes();
+    let mut refs = Vec::new();
+    let mut index = 0;
+    while index < bytes.len() {
+        if bytes[index] != b'#' {
+            index += 1;
+            continue;
+        }
+        let start = index;
+        index += 1;
+        while index < bytes.len() && bytes[index].is_ascii_digit() {
+            index += 1;
+        }
+        if index > start + 1 {
+            refs.push(text[start..index].to_string());
+        }
+    }
+    refs
+}
+
 #[derive(Debug)]
 struct FileRef<'a> {
     kind: &'static str,
@@ -924,6 +1355,14 @@ fn find_part<'a>(manifest: &'a Value, part_id: &str) -> Option<&'a Value> {
         .as_array()?
         .iter()
         .find(|part| string_field(part, "id") == Some(part_id))
+}
+
+fn find_artifact<'a>(manifest: &'a Value, kind: &str) -> Option<&'a Value> {
+    manifest
+        .get("artifacts")?
+        .as_array()?
+        .iter()
+        .find(|artifact| string_field(artifact, "kind") == Some(kind))
 }
 
 fn axis_index_from_vector(axis: Vec<f64>) -> Option<usize> {
@@ -1277,7 +1716,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.2.0")
+            Some("0.3.0")
         );
     }
 

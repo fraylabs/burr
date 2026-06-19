@@ -186,13 +186,14 @@ can write JSON.
 ## Rulepacks
 
 The included actuator mount rulepack checks loaded M3 clearance-hole edge
-distance and minimum wall thickness around M3 clearance holes:
+distance, minimum wall thickness around M3 clearance holes, and whether declared
+M3 clearance holes exist as matching cylindrical geometry in the exported STEP:
 
 ```json
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -212,6 +213,18 @@ distance and minimum wall thickness around M3 clearance holes:
         "fastener": "M3"
       },
       "min_wall_thickness_mm": 2.0
+    },
+    {
+      "id": "m3_clearance_hole_step_presence",
+      "kind": "feature_presence",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3"
+      },
+      "artifact_kind": "step",
+      "diameter_tolerance_mm": 0.05,
+      "centerline_tolerance_mm": 0.25,
+      "axis_dot_min": 0.99
     }
   ]
 }
@@ -234,7 +247,7 @@ Receipts include all three:
   "schema_version": "burr.receipt.v1",
   "burr_version": "0.7.0",
   "artifact_version": "0.1.0",
-  "rulepack_version": "0.2.0",
+  "rulepack_version": "0.3.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"
@@ -293,7 +306,19 @@ FAIL examples/build123d-wall-thickness/bad/burr-design-data.json -> <not written
    Try moving the hole inward or increasing part width.
 ```
 
+Missing STEP feature fixture:
+
+```txt
+FAIL examples/build123d-step-presence/bad/burr-design-data.json -> <not written>
+
+1 problem:
+1. Declared clearance hole m3_claimed is missing from the STEP artifact.
+   Checked artifact: presence.step
+   Candidate cylinders found: 0
+   Regenerate the STEP from the same helper that emitted the design data.
+```
+
 ## Status
 
-Early prototype. Current checks are design-data-based. Future versions may derive
-more facts directly from STEP topology.
+Early prototype. Current checks combine design-data rules with narrow STEP
+feature-presence verification for declared M3 clearance holes.

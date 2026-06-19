@@ -13,8 +13,8 @@
     {
       "kind": "step",
       "path": "actuator.step",
-      "sha256": "51c7524d5bec9aea49cc5144a9ef115325a3aa40493fd4b79b55c57a9d34ce72",
-      "size_bytes": 118
+      "sha256": "65f910863ef2e52d1a34409b5d0053af79fdf0fb3a3a887202634e716fb717e3",
+      "size_bytes": 296
     }
   ],
   "process": {

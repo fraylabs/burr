@@ -1,7 +1,7 @@
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "artifact_type": "actuator_mount",
   "process_kind": "FDM",
   "rules": [
@@ -25,6 +25,19 @@
         "fastener": "M3"
       },
       "min_wall_thickness_mm": 2.0
+    },
+    {
+      "id": "m3_clearance_hole_step_presence",
+      "kind": "feature_presence",
+      "description": "Declared M3 clearance holes must exist as matching cylindrical geometry in the exported STEP artifact.",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3"
+      },
+      "artifact_kind": "step",
+      "diameter_tolerance_mm": 0.05,
+      "centerline_tolerance_mm": 0.25,
+      "axis_dot_min": 0.99
     }
   ]
 }
