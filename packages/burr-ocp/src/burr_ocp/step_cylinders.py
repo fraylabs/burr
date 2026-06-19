@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from OCP.BRepAdaptor import BRepAdaptor_Surface
-from OCP.GeomAbs import GeomAbs_Cylinder
+from OCP.GeomAbs import GeomAbs_Cylinder, GeomAbs_Plane
 from OCP.IFSelect import IFSelect_RetDone
 from OCP.STEPControl import STEPControl_Reader
 from OCP.TopAbs import TopAbs_FACE
@@ -33,6 +33,7 @@ def extract_step_cylinders(path: str | Path) -> dict[str, Any]:
     shape = reader.OneShape()
     explorer = TopExp_Explorer(shape, TopAbs_FACE)
     cylinders: list[dict[str, Any]] = []
+    planes: list[dict[str, Any]] = []
 
     while explorer.More():
         face = TopoDS.Face_s(explorer.Current())
@@ -48,12 +49,23 @@ def extract_step_cylinders(path: str | Path) -> dict[str, Any]:
                     "radius_mm": round(float(cylinder.Radius()), 9),
                 },
             )
+        elif surface.GetType() == GeomAbs_Plane:
+            plane = surface.Plane()
+            location = plane.Location()
+            direction = plane.Axis().Direction()
+            planes.append(
+                {
+                    "point_mm": _round_vector((location.X(), location.Y(), location.Z())),
+                    "normal": _round_vector((direction.X(), direction.Y(), direction.Z())),
+                },
+            )
         explorer.Next()
 
     return {
         "schema_version": SCHEMA_VERSION,
         "units": "mm",
         "cylinders": cylinders,
+        "planes": planes,
         "warnings": [],
     }
 

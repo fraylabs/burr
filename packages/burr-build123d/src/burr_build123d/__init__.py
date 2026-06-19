@@ -110,6 +110,40 @@ class BurrDesignData:
             },
         )
 
+    def straight_slot(
+        self,
+        *,
+        feature_id: str,
+        part: str,
+        width_mm: float,
+        length_mm: float,
+        center: tuple[float, float, float] | list[float],
+        axis: tuple[float, float, float] | list[float],
+        span_axis: tuple[float, float, float] | list[float],
+        role: str,
+        intent: str = "mechanical_interface",
+    ) -> None:
+        if not intent:
+            raise ValueError("straight_slot intent must be a non-empty string.")
+        if width_mm <= 0:
+            raise ValueError("straight_slot width_mm must be positive.")
+        if length_mm <= width_mm:
+            raise ValueError("straight_slot length_mm must be greater than width_mm.")
+        self.features.append(
+            {
+                "id": feature_id,
+                "part": part,
+                "kind": "straight_slot",
+                "intent": intent,
+                "width_mm": float(width_mm),
+                "length_mm": float(length_mm),
+                "center_mm": _round_vector(center),
+                "axis": _round_vector(axis),
+                "span_axis": _round_vector(span_axis),
+                "role": role,
+            },
+        )
+
     def to_dict(self) -> dict[str, Any]:
         data: dict[str, Any] = {
             "schema_version": DESIGN_DATA_SCHEMA,
@@ -196,10 +230,77 @@ def m3_clearance_hole(
         )
 
 
+def straight_slot(
+    design: BurrDesignData,
+    *,
+    feature_id: str,
+    part: str,
+    center: tuple[float, float, float] | list[float],
+    axis: tuple[float, float, float] | list[float],
+    span_axis: tuple[float, float, float] | list[float],
+    role: str,
+    width_mm: float,
+    length_mm: float,
+    cut_depth_mm: float,
+    intent: str = "mechanical_interface",
+    create_geometry: bool = True,
+) -> None:
+    """Create a narrow build123d straight slot cut and record slot intent.
+
+    V1 supports slots cut along X and spanning along Y. This keeps the helper
+    honest while Burr's verifier is still intentionally narrow.
+    """
+
+    design.straight_slot(
+        feature_id=feature_id,
+        part=part,
+        width_mm=width_mm,
+        length_mm=length_mm,
+        center=center,
+        axis=axis,
+        span_axis=span_axis,
+        role=role,
+        intent=intent,
+    )
+
+    if not create_geometry:
+        return
+
+    if _round_vector(axis) != [1.0, 0.0, 0.0]:
+        raise ValueError("straight_slot(create_geometry=True) currently requires axis=(1, 0, 0).")
+    if _round_vector(span_axis) != [0.0, 1.0, 0.0]:
+        raise ValueError(
+            "straight_slot(create_geometry=True) currently requires span_axis=(0, 1, 0).",
+        )
+
+    try:
+        from build123d import Box, Cylinder, Locations, Mode
+    except ImportError as error:
+        raise RuntimeError(
+            "straight_slot(create_geometry=True) requires build123d. "
+            "Install build123d or pass create_geometry=False.",
+        ) from error
+
+    straight_length = length_mm - width_mm
+    center_x, center_y, center_z = tuple(center)
+    endpoint_offset = straight_length / 2.0
+    with Locations((center_x, center_y, center_z)):
+        Box(cut_depth_mm, straight_length, width_mm, mode=Mode.SUBTRACT)
+    for endpoint_y in (center_y - endpoint_offset, center_y + endpoint_offset):
+        with Locations((center_x, endpoint_y, center_z)):
+            Cylinder(
+                radius=width_mm / 2.0,
+                height=cut_depth_mm,
+                rotation=(0, 90, 0),
+                mode=Mode.SUBTRACT,
+            )
+
+
 __all__ = [
     "BurrDesignData",
     "DESIGN_DATA_FILE",
     "DESIGN_DATA_SCHEMA",
     "__version__",
     "m3_clearance_hole",
+    "straight_slot",
 ]

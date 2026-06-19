@@ -11,6 +11,8 @@ examples/build123d-step-presence/*/presence.step
 examples/build123d-step-presence/*/burr-design-data.json
 examples/build123d-mixed-intent/mixed.step
 examples/build123d-mixed-intent/burr-design-data.json
+examples/build123d-straight-slot/*/slot.step
+examples/build123d-straight-slot/*/burr-design-data.json
 *.log
 burr-receipt.json
 .DS_Store

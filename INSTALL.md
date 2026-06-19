@@ -61,6 +61,7 @@ npm run check
 npm run check:build123d
 npm run check:ocp
 npm run check:mixed-intent
+npm run check:slots
 ```
 
 Use the local CLI without global install:
@@ -98,10 +99,10 @@ uv run --package burr-build123d python path/to/design.py
 ## Optional OpenCascade STEP Backend
 
 The Rust CLI works without Python/OCP by default. For stronger local STEP
-cylinder extraction, use the optional `burr-ocp` workspace package:
+cylinder and plane extraction, use the optional `burr-ocp` workspace package:
 
-The OCP backend may find many cylindrical faces in a STEP file. Burr still
-applies rulepack intent first, then uses those cylinders only as evidence for
+The OCP backend may find many cylindrical and planar faces in a STEP file. Burr
+still applies rulepack intent first, then uses those faces only as evidence for
 declared features.
 
 ```bash

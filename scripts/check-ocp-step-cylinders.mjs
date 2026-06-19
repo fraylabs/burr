@@ -35,6 +35,9 @@ if (data.schema_version !== "burr.ocp-step-cylinders.v1") {
 if (data.cylinders.length !== 1 || data.cylinders[0].radius_mm !== 1.7) {
   throw new Error(`Unexpected OCP cylinder extraction.\n${extractor.stdout}`)
 }
+if (!Array.isArray(data.planes) || data.planes.length < 2) {
+  throw new Error(`Unexpected OCP plane extraction.\n${extractor.stdout}`)
+}
 
 const env = {
   BURR_STEP_CYLINDER_BACKEND: "ocp",

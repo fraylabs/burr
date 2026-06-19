@@ -3,7 +3,7 @@ import json
 import tempfile
 import unittest
 
-from burr_build123d import BurrDesignData, DESIGN_DATA_FILE, m3_clearance_hole
+from burr_build123d import BurrDesignData, DESIGN_DATA_FILE, m3_clearance_hole, straight_slot
 
 
 class BurrBuild123dTests(unittest.TestCase):
@@ -78,6 +78,54 @@ class BurrBuild123dTests(unittest.TestCase):
                 axis=(1, 0, 0),
                 role="mount",
                 intent="",
+                create_geometry=False,
+            )
+
+    def test_records_straight_slot_without_build123d_geometry(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        straight_slot(
+            design,
+            feature_id="motor_adjust_slot",
+            part="housing",
+            center=(0, -8, 10),
+            axis=(1, 0, 0),
+            span_axis=(0, 1, 0),
+            role="loaded_mount",
+            width_mm=4.0,
+            length_mm=18.0,
+            cut_depth_mm=70.0,
+            create_geometry=False,
+        )
+
+        feature = design.features[0]
+        self.assertEqual(feature["kind"], "straight_slot")
+        self.assertEqual(feature["intent"], "mechanical_interface")
+        self.assertEqual(feature["width_mm"], 4.0)
+        self.assertEqual(feature["length_mm"], 18.0)
+        self.assertEqual(feature["center_mm"], [0.0, -8.0, 10.0])
+        self.assertEqual(feature["axis"], [1.0, 0.0, 0.0])
+        self.assertEqual(feature["span_axis"], [0.0, 1.0, 0.0])
+
+    def test_rejects_invalid_straight_slot(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        with self.assertRaises(ValueError):
+            straight_slot(
+                design,
+                feature_id="bad_slot",
+                part="housing",
+                center=(0, 0, 0),
+                axis=(1, 0, 0),
+                span_axis=(0, 1, 0),
+                role="loaded_mount",
+                width_mm=4.0,
+                length_mm=4.0,
+                cut_depth_mm=70.0,
                 create_geometry=False,
             )
 

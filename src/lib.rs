@@ -419,6 +419,8 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
             let feature_label = string_field(check, "feature_id")
                 .map(|id| format!(" {id}"))
                 .unwrap_or_default();
+            let is_slot = string_field(check, "rule_id")
+                .is_some_and(|rule_id| rule_id.contains("straight_slot"));
             let artifact = check
                 .pointer("/measured/artifact_path")
                 .and_then(Value::as_str)
@@ -426,12 +428,30 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
             let candidates = check
                 .pointer("/measured/candidate_cylinders")
                 .and_then(Value::as_u64);
-            let mut lines = vec![format!(
-                "Declared clearance hole{feature_label} is missing from the STEP artifact."
-            )];
+            let mut lines = if is_slot {
+                vec![format!(
+                    "Declared straight slot{feature_label} is missing from the STEP artifact."
+                )]
+            } else {
+                vec![format!(
+                    "Declared clearance hole{feature_label} is missing from the STEP artifact."
+                )]
+            };
             lines.push(format!("Checked artifact: {artifact}"));
             if let Some(value) = candidates {
                 lines.push(format!("Candidate cylinders found: {value}"));
+            }
+            if let Some(value) = check
+                .pointer("/measured/candidate_planes")
+                .and_then(Value::as_u64)
+            {
+                lines.push(format!("Candidate planes found: {value}"));
+            }
+            if let Some(value) = check
+                .pointer("/measured/matched_slot_side_planes")
+                .and_then(Value::as_u64)
+            {
+                lines.push(format!("Matched slot side planes: {value}"));
             }
             lines.push(
                 "Regenerate the STEP from the same helper that emitted the design data."
@@ -805,6 +825,16 @@ fn check_feature_presence(
         }
     };
 
+    if string_field(feature, "kind") == Some("straight_slot") {
+        return check_straight_slot_presence(
+            full_rule_id,
+            feature_id,
+            resolved_artifact,
+            rule,
+            feature,
+        );
+    }
+
     let Some(diameter) = number_field(feature, "diameter_mm").filter(|value| *value > 0.0) else {
         return json!({
             "rule_id": full_rule_id,
@@ -842,8 +872,8 @@ fn check_feature_presence(
         });
     };
 
-    let cylinders = match parse_step_cylinders(&resolved_artifact.file_path) {
-        Ok(cylinders) => cylinders,
+    let evidence = match parse_step_evidence(&resolved_artifact.file_path) {
+        Ok(evidence) => evidence,
         Err(error) => {
             return json!({
                 "rule_id": full_rule_id,
@@ -869,7 +899,7 @@ fn check_feature_presence(
         .clamp(0.0, 1.0);
     let mut best: Option<CylinderMatch> = None;
 
-    for cylinder in &cylinders {
+    for cylinder in &evidence.cylinders {
         let axis_dot = axis.dot(cylinder.axis).abs();
         let diameter_delta = (cylinder.radius_mm * 2.0 - diameter).abs();
         let centerline_distance = cylinder.point.distance_to_line(center, cylinder.axis);
@@ -895,7 +925,7 @@ fn check_feature_presence(
                 "feature_id": feature_id,
                 "measured": {
                     "artifact_path": resolved_artifact.label_path,
-                    "candidate_cylinders": cylinders.len(),
+                    "candidate_cylinders": evidence.cylinders.len(),
                     "diameter_delta_mm": round(diameter_delta),
                     "axis_dot": round(axis_dot),
                     "centerline_distance_mm": round(centerline_distance)
@@ -917,7 +947,7 @@ fn check_feature_presence(
         "feature_id": feature_id,
         "measured": {
             "artifact_path": resolved_artifact.label_path,
-            "candidate_cylinders": cylinders.len(),
+            "candidate_cylinders": evidence.cylinders.len(),
             "best_diameter_delta_mm": best.as_ref().map(|value| round(value.diameter_delta_mm)),
             "best_axis_dot": best.as_ref().map(|value| round(value.axis_dot)),
             "best_centerline_distance_mm": best.as_ref().map(|value| round(value.centerline_distance_mm))
@@ -931,6 +961,238 @@ fn check_feature_presence(
             "centerline_tolerance_mm": centerline_tolerance
         },
         "message": "Design data declares a clearance hole, but no matching cylindrical STEP geometry was found."
+    })
+}
+
+fn check_straight_slot_presence(
+    full_rule_id: String,
+    feature_id: Value,
+    resolved_artifact: ResolvedFileRef,
+    rule: &Value,
+    feature: &Value,
+) -> Value {
+    let Some(width) = number_field(feature, "width_mm").filter(|value| *value > 0.0) else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_slot_width",
+            "feature_id": feature_id,
+            "message": "Slot width_mm is required for STEP feature-presence checking."
+        });
+    };
+    let Some(length) = number_field(feature, "length_mm").filter(|value| *value > width) else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_slot_length",
+            "feature_id": feature_id,
+            "message": "Slot length_mm must be greater than width_mm for STEP feature-presence checking."
+        });
+    };
+    let Some(center) = feature
+        .get("center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_center",
+            "feature_id": feature_id,
+            "message": "Feature center_mm is required for STEP feature-presence checking."
+        });
+    };
+    let Some(axis) = feature
+        .get("axis")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .and_then(Vec3::normalized)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_axis",
+            "feature_id": feature_id,
+            "message": "Feature axis is required for STEP feature-presence checking."
+        });
+    };
+    let Some(span_axis) = feature
+        .get("span_axis")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .and_then(Vec3::normalized)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_slot_span_axis",
+            "feature_id": feature_id,
+            "message": "Slot span_axis is required for STEP feature-presence checking."
+        });
+    };
+
+    let evidence = match parse_step_evidence(&resolved_artifact.file_path) {
+        Ok(evidence) => evidence,
+        Err(error) => {
+            return json!({
+                "rule_id": full_rule_id,
+                "status": "fail",
+                "reason": "step_geometry_unreadable",
+                "feature_id": feature_id,
+                "measured": {
+                    "artifact_path": resolved_artifact.label_path
+                },
+                "message": error
+            });
+        }
+    };
+
+    let width_tolerance = number_field(rule, "width_tolerance_mm")
+        .or_else(|| number_field(rule, "diameter_tolerance_mm"))
+        .unwrap_or(0.05)
+        .max(0.0);
+    let endpoint_tolerance = number_field(rule, "endpoint_tolerance_mm")
+        .or_else(|| number_field(rule, "centerline_tolerance_mm"))
+        .unwrap_or(0.25)
+        .max(0.0);
+    let axis_dot_min = number_field(rule, "axis_dot_min")
+        .unwrap_or(0.99)
+        .clamp(0.0, 1.0);
+    let side_plane_tolerance = number_field(rule, "side_plane_tolerance_mm")
+        .or_else(|| number_field(rule, "endpoint_tolerance_mm"))
+        .or_else(|| number_field(rule, "centerline_tolerance_mm"))
+        .unwrap_or(0.25)
+        .max(0.0);
+    let Some(width_axis) = axis.cross(span_axis).normalized() else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "invalid_slot_axes",
+            "feature_id": feature_id,
+            "message": "Slot axis and span_axis must be perpendicular."
+        });
+    };
+    if axis.dot(span_axis).abs() > 0.001 {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "invalid_slot_axes",
+            "feature_id": feature_id,
+            "message": "Slot axis and span_axis must be perpendicular."
+        });
+    }
+    let endpoint_offset = (length - width) / 2.0;
+    let endpoints = [
+        center.add(span_axis.scale(-endpoint_offset)),
+        center.add(span_axis.scale(endpoint_offset)),
+    ];
+    let mut endpoint_matches = Vec::new();
+
+    for endpoint in endpoints {
+        let mut best: Option<CylinderMatch> = None;
+        let mut matched = false;
+        for cylinder in &evidence.cylinders {
+            let axis_dot = axis.dot(cylinder.axis).abs();
+            let width_delta = (cylinder.radius_mm * 2.0 - width).abs();
+            let centerline_distance = cylinder.point.distance_to_line(endpoint, cylinder.axis);
+            let candidate = CylinderMatch {
+                axis_dot,
+                diameter_delta_mm: width_delta,
+                centerline_distance_mm: centerline_distance,
+            };
+            if best
+                .as_ref()
+                .is_none_or(|best| candidate.score() < best.score())
+            {
+                best = Some(candidate);
+            }
+            if width_delta <= width_tolerance
+                && axis_dot >= axis_dot_min
+                && centerline_distance <= endpoint_tolerance
+            {
+                matched = true;
+            }
+        }
+        endpoint_matches.push(json!({
+            "matched": matched,
+            "best_width_delta_mm": best.as_ref().map(|value| round(value.diameter_delta_mm)),
+            "best_axis_dot": best.as_ref().map(|value| round(value.axis_dot)),
+            "best_endpoint_distance_mm": best.as_ref().map(|value| round(value.centerline_distance_mm))
+        }));
+    }
+
+    let matched_endpoints = endpoint_matches
+        .iter()
+        .filter(|value| value.get("matched").and_then(Value::as_bool) == Some(true))
+        .count();
+    let side_points = [
+        center.add(width_axis.scale(-(width / 2.0))),
+        center.add(width_axis.scale(width / 2.0)),
+    ];
+    let mut side_plane_matches = Vec::new();
+    for side_point in side_points {
+        let mut best: Option<PlaneMatch> = None;
+        let mut matched = false;
+        for plane in &evidence.planes {
+            let normal_dot = width_axis.dot(plane.normal).abs();
+            let distance = side_point.sub(plane.point).dot(plane.normal).abs();
+            let candidate = PlaneMatch {
+                normal_dot,
+                distance_mm: distance,
+            };
+            if best
+                .as_ref()
+                .is_none_or(|best| candidate.score() < best.score())
+            {
+                best = Some(candidate);
+            }
+            if normal_dot >= axis_dot_min && distance <= side_plane_tolerance {
+                matched = true;
+            }
+        }
+        side_plane_matches.push(json!({
+            "matched": matched,
+            "best_normal_dot": best.as_ref().map(|value| round(value.normal_dot)),
+            "best_plane_distance_mm": best.as_ref().map(|value| round(value.distance_mm))
+        }));
+    }
+    let matched_side_planes = side_plane_matches
+        .iter()
+        .filter(|value| value.get("matched").and_then(Value::as_bool) == Some(true))
+        .count();
+    let pass = matched_endpoints == 2 && matched_side_planes == 2;
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "missing_declared_feature" },
+        "feature_id": feature_id,
+        "measured": {
+            "artifact_path": resolved_artifact.label_path,
+            "candidate_cylinders": evidence.cylinders.len(),
+            "candidate_planes": evidence.planes.len(),
+            "matched_slot_endpoints": matched_endpoints,
+            "matched_slot_side_planes": matched_side_planes,
+            "slot_endpoint_matches": endpoint_matches,
+            "slot_side_plane_matches": side_plane_matches
+        },
+        "required": {
+            "width_mm": width,
+            "length_mm": length,
+            "center_mm": center.to_json(),
+            "axis": axis.to_json(),
+            "span_axis": span_axis.to_json(),
+            "width_axis": width_axis.to_json(),
+            "width_tolerance_mm": width_tolerance,
+            "axis_dot_min": axis_dot_min,
+            "endpoint_tolerance_mm": endpoint_tolerance,
+            "side_plane_tolerance_mm": side_plane_tolerance
+        },
+        "message": if pass {
+            "Declared straight-slot endpoint and side-plane geometry exists in the STEP artifact."
+        } else {
+            "Design data declares a straight slot, but matching endpoint cylinders and side planes were not found."
+        }
     })
 }
 
@@ -1041,6 +1303,22 @@ impl Vec3 {
         }
     }
 
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
+    }
+
+    fn scale(self, factor: f64) -> Self {
+        Self {
+            x: self.x * factor,
+            y: self.y * factor,
+            z: self.z * factor,
+        }
+    }
+
     fn distance_to_line(self, line_point: Self, line_axis: Self) -> f64 {
         self.sub(line_point).cross(line_axis).length()
     }
@@ -1057,6 +1335,18 @@ struct StepCylinder {
     radius_mm: f64,
 }
 
+#[derive(Debug, Default)]
+struct StepEvidence {
+    cylinders: Vec<StepCylinder>,
+    planes: Vec<StepPlane>,
+}
+
+#[derive(Debug)]
+struct StepPlane {
+    point: Vec3,
+    normal: Vec3,
+}
+
 #[derive(Debug)]
 struct CylinderMatch {
     axis_dot: f64,
@@ -1070,17 +1360,29 @@ impl CylinderMatch {
     }
 }
 
-fn parse_step_cylinders(path: &Path) -> Result<Vec<StepCylinder>, String> {
+#[derive(Debug)]
+struct PlaneMatch {
+    normal_dot: f64,
+    distance_mm: f64,
+}
+
+impl PlaneMatch {
+    fn score(&self) -> f64 {
+        (1.0 - self.normal_dot).abs() + self.distance_mm
+    }
+}
+
+fn parse_step_evidence(path: &Path) -> Result<StepEvidence, String> {
     if std::env::var("BURR_STEP_CYLINDER_BACKEND")
         .ok()
         .is_some_and(|backend| backend == "ocp")
     {
-        return parse_step_cylinders_with_ocp(path);
+        return parse_step_evidence_with_ocp(path);
     }
-    parse_step_cylinders_from_text(path)
+    parse_step_evidence_from_text(path)
 }
 
-fn parse_step_cylinders_with_ocp(path: &Path) -> Result<Vec<StepCylinder>, String> {
+fn parse_step_evidence_with_ocp(path: &Path) -> Result<StepEvidence, String> {
     let command = std::env::var("BURR_OCP_STEP_CYLINDERS")
         .unwrap_or_else(|_| "burr-ocp-step-cylinders".to_string());
     let mut parts = command.split_whitespace();
@@ -1111,16 +1413,16 @@ fn parse_step_cylinders_with_ocp(path: &Path) -> Result<Vec<StepCylinder>, Strin
     let stdout = String::from_utf8(output.stdout).map_err(|error| {
         format!("OCP STEP cylinder extractor returned non-UTF8 output: {error}")
     })?;
-    parse_ocp_step_cylinders_json(&stdout)
+    parse_ocp_step_evidence_json(&stdout)
 }
 
-fn parse_ocp_step_cylinders_json(text: &str) -> Result<Vec<StepCylinder>, String> {
+fn parse_ocp_step_evidence_json(text: &str) -> Result<StepEvidence, String> {
     let value = read_json_str(text)
         .map_err(|error| format!("Failed to parse OCP STEP cylinder JSON: {error}"))?;
     if string_field(&value, "schema_version") != Some("burr.ocp-step-cylinders.v1") {
         return Err("OCP STEP cylinder JSON has an unsupported schema_version.".to_string());
     }
-    let mut cylinders = Vec::new();
+    let mut evidence = StepEvidence::default();
     for cylinder in value
         .get("cylinders")
         .and_then(Value::as_array)
@@ -1145,16 +1447,44 @@ fn parse_ocp_step_cylinders_json(text: &str) -> Result<Vec<StepCylinder>, String
         let Some(radius) = number_field(cylinder, "radius_mm").filter(|value| *value > 0.0) else {
             continue;
         };
-        cylinders.push(StepCylinder {
+        evidence.cylinders.push(StepCylinder {
             point,
             axis,
             radius_mm: radius,
         });
     }
-    Ok(cylinders)
+    for plane in value
+        .get("planes")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+    {
+        let Some(point) = plane
+            .get("point_mm")
+            .and_then(number_array)
+            .and_then(Vec3::from_values)
+        else {
+            continue;
+        };
+        let Some(normal) = plane
+            .get("normal")
+            .and_then(number_array)
+            .and_then(Vec3::from_values)
+            .and_then(Vec3::normalized)
+        else {
+            continue;
+        };
+        evidence.planes.push(StepPlane { point, normal });
+    }
+    Ok(evidence)
 }
 
-fn parse_step_cylinders_from_text(path: &Path) -> Result<Vec<StepCylinder>, String> {
+#[cfg(test)]
+fn parse_ocp_step_cylinders_json(text: &str) -> Result<Vec<StepCylinder>, String> {
+    parse_ocp_step_evidence_json(text).map(|evidence| evidence.cylinders)
+}
+
+fn parse_step_evidence_from_text(path: &Path) -> Result<StepEvidence, String> {
     let text = fs::read_to_string(path)
         .map_err(|error| format!("Failed to read STEP artifact {}: {error}", path.display()))?;
     let entities = collect_step_entities(&text);
@@ -1191,29 +1521,37 @@ fn parse_step_cylinders_from_text(path: &Path) -> Result<Vec<StepCylinder>, Stri
         axes.insert(id.clone(), (point, axis));
     }
 
-    let mut cylinders = Vec::new();
+    let mut evidence = StepEvidence::default();
     for entity in entities.values() {
-        if !entity.starts_with("CYLINDRICAL_SURFACE") {
-            continue;
+        if entity.starts_with("CYLINDRICAL_SURFACE") {
+            let refs = step_refs(entity);
+            let Some(axis_ref) = refs.first() else {
+                continue;
+            };
+            let Some((point, axis)) = axes.get(axis_ref).copied() else {
+                continue;
+            };
+            let Some(radius) = parse_last_step_number(entity).filter(|value| *value > 0.0) else {
+                continue;
+            };
+            evidence.cylinders.push(StepCylinder {
+                point,
+                axis,
+                radius_mm: radius,
+            });
+        } else if entity.starts_with("PLANE") {
+            let refs = step_refs(entity);
+            let Some(axis_ref) = refs.first() else {
+                continue;
+            };
+            let Some((point, normal)) = axes.get(axis_ref).copied() else {
+                continue;
+            };
+            evidence.planes.push(StepPlane { point, normal });
         }
-        let refs = step_refs(entity);
-        let Some(axis_ref) = refs.first() else {
-            continue;
-        };
-        let Some((point, axis)) = axes.get(axis_ref).copied() else {
-            continue;
-        };
-        let Some(radius) = parse_last_step_number(entity).filter(|value| *value > 0.0) else {
-            continue;
-        };
-        cylinders.push(StepCylinder {
-            point,
-            axis,
-            radius_mm: radius,
-        });
     }
 
-    Ok(cylinders)
+    Ok(evidence)
 }
 
 fn collect_step_entities(text: &str) -> HashMap<String, String> {
@@ -1881,7 +2219,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.4.0")
+            Some("0.5.0")
         );
     }
 
@@ -1979,6 +2317,110 @@ mod tests {
                     .pointer("/measured/best_centerline_distance_mm")
                     .and_then(Value::as_f64)
                     == Some(2.0)
+        }));
+    }
+
+    #[test]
+    fn straight_slot_presence_requires_endpoint_cylinders_and_side_planes() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_surfaces(
+            &step_path,
+            &[
+                ((0.0, -6.0, 8.0), (1.0, 0.0, 0.0), 2.0),
+                ((0.0, 6.0, 8.0), (1.0, 0.0, 0.0), 2.0),
+            ],
+            &[
+                ((0.0, 0.0, 6.0), (0.0, 0.0, 1.0)),
+                ((0.0, 0.0, 10.0), (0.0, 0.0, 1.0)),
+            ],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = slot_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "mechanical_interface",
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:straight_slot_step_presence")
+                && string_field(check, "reason") == Some("ok")
+                && check
+                    .pointer("/measured/matched_slot_endpoints")
+                    .and_then(Value::as_u64)
+                    == Some(2)
+                && check
+                    .pointer("/measured/matched_slot_side_planes")
+                    .and_then(Value::as_u64)
+                    == Some(2)
+        }));
+    }
+
+    #[test]
+    fn straight_slot_presence_rejects_two_disconnected_holes() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinders(
+            &step_path,
+            &[
+                ((0.0, -6.0, 8.0), (1.0, 0.0, 0.0), 2.0),
+                ((0.0, 6.0, 8.0), (1.0, 0.0, 0.0), 2.0),
+            ],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = slot_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "mechanical_interface",
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:straight_slot_step_presence")
+                && string_field(check, "reason") == Some("missing_declared_feature")
+                && check
+                    .pointer("/measured/matched_slot_endpoints")
+                    .and_then(Value::as_u64)
+                    == Some(2)
+                && check
+                    .pointer("/measured/matched_slot_side_planes")
+                    .and_then(Value::as_u64)
+                    == Some(0)
+        }));
+    }
+
+    #[test]
+    fn cosmetic_straight_slot_intent_is_not_linted_by_actuator_rules() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinders(
+            &step_path,
+            &[
+                ((0.0, -6.0, 8.0), (1.0, 0.0, 0.0), 2.0),
+                ((0.0, 6.0, 8.0), (1.0, 0.0, 0.0), 2.0),
+            ],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = slot_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "cosmetic",
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id")
+                .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
         }));
     }
 
@@ -2136,9 +2578,17 @@ mod tests {
     }
 
     fn write_step_cylinders(path: &Path, cylinders: &[((f64, f64, f64), (f64, f64, f64), f64)]) {
+        write_step_surfaces(path, cylinders, &[]);
+    }
+
+    fn write_step_surfaces(
+        path: &Path,
+        cylinders: &[((f64, f64, f64), (f64, f64, f64), f64)],
+        planes: &[((f64, f64, f64), (f64, f64, f64))],
+    ) {
         let mut data = String::from("ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\n");
-        for (index, (point, axis, radius)) in cylinders.iter().enumerate() {
-            let base = index * 5 + 1;
+        let mut base = 1;
+        for (point, axis, radius) in cylinders {
             data.push_str(&format!(
                 "#{base} = CARTESIAN_POINT('',({},{},{}));\n#{} = DIRECTION('',({},{},{}));\n#{} = DIRECTION('',(0.,0.,1.));\n#{} = AXIS2_PLACEMENT_3D('',#{base},#{},#{});\n#{} = CYLINDRICAL_SURFACE('',#{},{});\n",
                 point.0,
@@ -2156,6 +2606,26 @@ mod tests {
                 base + 3,
                 radius,
             ));
+            base += 5;
+        }
+        for (point, normal) in planes {
+            data.push_str(&format!(
+                "#{base} = CARTESIAN_POINT('',({},{},{}));\n#{} = DIRECTION('',({},{},{}));\n#{} = DIRECTION('',(1.,0.,0.));\n#{} = AXIS2_PLACEMENT_3D('',#{base},#{},#{});\n#{} = PLANE('',#{});\n",
+                point.0,
+                point.1,
+                point.2,
+                base + 1,
+                normal.0,
+                normal.1,
+                normal.2,
+                base + 2,
+                base + 3,
+                base + 1,
+                base + 2,
+                base + 4,
+                base + 3,
+            ));
+            base += 5;
         }
         data.push_str("ENDSEC;\nEND-ISO-10303-21;\n");
         fs::write(path, data).unwrap();
@@ -2200,6 +2670,51 @@ mod tests {
                     "center_mm": [0.0, 0.0, 8.0],
                     "axis": [1.0, 0.0, 0.0],
                     "role": "alignment"
+                }
+            ]
+        })
+    }
+
+    fn slot_manifest(source_sha: String, artifact_sha: String, intent: &str) -> Value {
+        json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "unit-slot-presence",
+            "artifact_version": "0.1.0",
+            "artifact_type": "actuator_mount",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": source_sha,
+                "size_bytes": 16
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": artifact_sha
+                }
+            ],
+            "parts": [
+                {
+                    "id": "housing",
+                    "bbox_mm": {
+                        "min": [-20.0, -10.0, 0.0],
+                        "max": [20.0, 10.0, 16.0]
+                    }
+                }
+            ],
+            "features": [
+                {
+                    "id": "slot_claimed",
+                    "part": "housing",
+                    "kind": "straight_slot",
+                    "intent": intent,
+                    "width_mm": 4.0,
+                    "length_mm": 16.0,
+                    "center_mm": [0.0, 0.0, 8.0],
+                    "axis": [1.0, 0.0, 0.0],
+                    "span_axis": [0.0, 1.0, 0.0],
+                    "role": "loaded_mount"
                 }
             ]
         })
