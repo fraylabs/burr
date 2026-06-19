@@ -70,6 +70,9 @@ jobs:
       - name: Check build123d examples
         run: npm run check:build123d
 
+      - name: Check optional OCP STEP backend
+        run: npm run check:ocp
+
       - name: Confirm generated artifacts are untracked
         run: |
           test -z "$(git status --short --untracked-files=no)"

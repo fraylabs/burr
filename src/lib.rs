@@ -3,6 +3,7 @@ use sha2::{Digest, Sha256};
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::{Component, Path, PathBuf};
+use std::process::Command;
 
 pub const BURR_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const DESIGN_DATA_FILE_NAME: &str = "burr-design-data.json";
@@ -1016,6 +1017,90 @@ impl CylinderMatch {
 }
 
 fn parse_step_cylinders(path: &Path) -> Result<Vec<StepCylinder>, String> {
+    if std::env::var("BURR_STEP_CYLINDER_BACKEND")
+        .ok()
+        .is_some_and(|backend| backend == "ocp")
+    {
+        return parse_step_cylinders_with_ocp(path);
+    }
+    parse_step_cylinders_from_text(path)
+}
+
+fn parse_step_cylinders_with_ocp(path: &Path) -> Result<Vec<StepCylinder>, String> {
+    let command = std::env::var("BURR_OCP_STEP_CYLINDERS")
+        .unwrap_or_else(|_| "burr-ocp-step-cylinders".to_string());
+    let mut parts = command.split_whitespace();
+    let Some(program) = parts.next() else {
+        return Err("BURR_OCP_STEP_CYLINDERS is empty.".to_string());
+    };
+    let output = Command::new(program)
+        .args(parts)
+        .arg(path)
+        .output()
+        .map_err(|error| {
+            format!(
+                "Failed to run OCP STEP cylinder extractor `{command}`: {error}. Install optional package `burr-ocp` or unset BURR_STEP_CYLINDER_BACKEND."
+            )
+        })?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
+        return Err(format!(
+            "OCP STEP cylinder extractor failed with exit {}: {}",
+            output.status.code().unwrap_or(-1),
+            if stderr.is_empty() {
+                "<no stderr>"
+            } else {
+                stderr.as_str()
+            }
+        ));
+    }
+    let stdout = String::from_utf8(output.stdout).map_err(|error| {
+        format!("OCP STEP cylinder extractor returned non-UTF8 output: {error}")
+    })?;
+    parse_ocp_step_cylinders_json(&stdout)
+}
+
+fn parse_ocp_step_cylinders_json(text: &str) -> Result<Vec<StepCylinder>, String> {
+    let value = read_json_str(text)
+        .map_err(|error| format!("Failed to parse OCP STEP cylinder JSON: {error}"))?;
+    if string_field(&value, "schema_version") != Some("burr.ocp-step-cylinders.v1") {
+        return Err("OCP STEP cylinder JSON has an unsupported schema_version.".to_string());
+    }
+    let mut cylinders = Vec::new();
+    for cylinder in value
+        .get("cylinders")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+    {
+        let Some(point) = cylinder
+            .get("point_mm")
+            .and_then(number_array)
+            .and_then(Vec3::from_values)
+        else {
+            continue;
+        };
+        let Some(axis) = cylinder
+            .get("axis")
+            .and_then(number_array)
+            .and_then(Vec3::from_values)
+            .and_then(Vec3::normalized)
+        else {
+            continue;
+        };
+        let Some(radius) = number_field(cylinder, "radius_mm").filter(|value| *value > 0.0) else {
+            continue;
+        };
+        cylinders.push(StepCylinder {
+            point,
+            axis,
+            radius_mm: radius,
+        });
+    }
+    Ok(cylinders)
+}
+
+fn parse_step_cylinders_from_text(path: &Path) -> Result<Vec<StepCylinder>, String> {
     let text = fs::read_to_string(path)
         .map_err(|error| format!("Failed to read STEP artifact {}: {error}", path.display()))?;
     let entities = collect_step_entities(&text);
@@ -1764,6 +1849,146 @@ mod tests {
 
         assert!(pyproject.contains("name = \"my-starter-part\""));
         assert!(design.contains("artifact_id=\"my-starter-part\""));
+    }
+
+    #[test]
+    fn feature_presence_accepts_reversed_step_axis() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinder(&step_path, (0.0, 0.0, 8.0), (-1.0, 0.0, 0.0), 1.7);
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = test_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:m3_clearance_hole_step_presence")
+                && string_field(check, "reason") == Some("ok")
+                && check.pointer("/measured/axis_dot").and_then(Value::as_f64) == Some(1.0)
+        }));
+    }
+
+    #[test]
+    fn feature_presence_rejects_present_but_wrong_cylinder() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinder(&step_path, (0.0, 2.0, 8.0), (1.0, 0.0, 0.0), 1.9);
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = test_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:m3_clearance_hole_step_presence")
+                && string_field(check, "reason") == Some("missing_declared_feature")
+                && check
+                    .pointer("/measured/candidate_cylinders")
+                    .and_then(Value::as_u64)
+                    == Some(1)
+                && check
+                    .pointer("/measured/best_centerline_distance_mm")
+                    .and_then(Value::as_f64)
+                    == Some(2.0)
+        }));
+    }
+
+    #[test]
+    fn ocp_step_cylinder_json_maps_to_step_cylinders() {
+        let cylinders = parse_ocp_step_cylinders_json(
+            r#"{
+              "schema_version": "burr.ocp-step-cylinders.v1",
+              "units": "mm",
+              "cylinders": [
+                {
+                  "point_mm": [-4.0, 0.0, 8.0],
+                  "axis": [1.0, 0.0, 0.0],
+                  "radius_mm": 1.7
+                }
+              ],
+              "warnings": []
+            }"#,
+        )
+        .unwrap();
+
+        assert_eq!(cylinders.len(), 1);
+        assert_eq!(round(cylinders[0].radius_mm), 1.7);
+        assert_eq!(
+            round(cylinders[0].axis.dot(Vec3 {
+                x: 1.0,
+                y: 0.0,
+                z: 0.0
+            })),
+            1.0
+        );
+    }
+
+    fn write_step_cylinder(
+        path: &Path,
+        point: (f64, f64, f64),
+        axis: (f64, f64, f64),
+        radius: f64,
+    ) {
+        fs::write(
+            path,
+            format!(
+                "ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\n#1 = CARTESIAN_POINT('',({},{},{}));\n#2 = DIRECTION('',({},{},{}));\n#3 = DIRECTION('',(0.,0.,1.));\n#4 = AXIS2_PLACEMENT_3D('',#1,#2,#3);\n#5 = CYLINDRICAL_SURFACE('',#4,{});\nENDSEC;\nEND-ISO-10303-21;\n",
+                point.0, point.1, point.2, axis.0, axis.1, axis.2, radius,
+            ),
+        )
+        .unwrap();
+    }
+
+    fn test_manifest(source_sha: String, artifact_sha: String) -> Value {
+        json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "unit-presence",
+            "artifact_version": "0.1.0",
+            "artifact_type": "actuator_mount",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": source_sha,
+                "size_bytes": 16
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": artifact_sha
+                }
+            ],
+            "parts": [
+                {
+                    "id": "housing",
+                    "bbox_mm": {
+                        "min": [-20.0, -10.0, 0.0],
+                        "max": [20.0, 10.0, 16.0]
+                    }
+                }
+            ],
+            "features": [
+                {
+                    "id": "m3_claimed",
+                    "part": "housing",
+                    "kind": "clearance_hole",
+                    "fastener": "M3",
+                    "diameter_mm": 3.4,
+                    "center_mm": [0.0, 0.0, 8.0],
+                    "axis": [1.0, 0.0, 0.0],
+                    "role": "alignment"
+                }
+            ]
+        })
     }
 
     fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result<()> {

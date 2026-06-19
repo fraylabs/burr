@@ -11,6 +11,11 @@
     "packages/burr-build123d/pyproject.toml",
     "packages/burr-build123d/README.md",
     "packages/burr-build123d/src/burr_build123d/__init__.py",
+    "packages/burr-ocp/pyproject.toml",
+    "packages/burr-ocp/README.md",
+    "packages/burr-ocp/LICENSE",
+    "packages/burr-ocp/src/burr_ocp/__init__.py",
+    "packages/burr-ocp/src/burr_ocp/step_cylinders.py",
     "rules",
     "scripts",
     "examples/build123d-actuator/bad/design.py",
@@ -30,6 +35,7 @@
     "test:python": "uv run --package burr-build123d python -m unittest discover -s packages/burr-build123d/tests -p 'test_*.py'",
     "check:init": "node scripts/check-init-starter.mjs",
     "check:build123d": "PYTHON=\"uv run --package burr-build123d python\" node scripts/check-build123d-examples.mjs",
+    "check:ocp": "node scripts/check-ocp-step-cylinders.mjs",
     "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init"
   },
   "keywords": [

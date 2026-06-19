@@ -5,6 +5,7 @@ Burr has two pieces:
 ```txt
 burr             Rust CLI and linter
 burr-build123d   Python helper that emits burr-design-data.json from build123d
+burr-ocp        Optional Python/OpenCascade STEP geometry extractor
 ```
 
 The CLI is Rust-first. The Python helper is managed with uv.
@@ -58,6 +59,7 @@ Run checks:
 ```bash
 npm run check
 npm run check:build123d
+npm run check:ocp
 ```
 
 Use the local CLI without global install:
@@ -92,6 +94,24 @@ For your own local script in the same checkout:
 uv run --package burr-build123d python path/to/design.py
 ```
 
+## Optional OpenCascade STEP Backend
+
+The Rust CLI works without Python/OCP by default. For stronger local STEP
+cylinder extraction, use the optional `burr-ocp` workspace package:
+
+```bash
+uv sync --all-packages
+uv run --package burr-ocp burr-ocp-step-cylinders path/to/part.step
+```
+
+To make `burr check` use that extractor:
+
+```bash
+BURR_STEP_CYLINDER_BACKEND=ocp \
+BURR_OCP_STEP_CYLINDERS="uv run --package burr-ocp burr-ocp-step-cylinders" \
+cargo run -- check path/to/design-folder
+```
+
 ## Install the Python Helper From Local Path
 
 For another project on the same machine:
@@ -118,4 +138,5 @@ Planned package names:
 
 ```txt
 PyPI: burr-build123d
+PyPI: burr-ocp
 ```

@@ -5,6 +5,7 @@ requires-python = ">=3.11"
 [manifest]
 members = [
     "burr-build123d",
+    "burr-ocp",
     "burr-workspace",
 ]
 
@@ -64,6 +65,17 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [{ name = "build123d", specifier = ">=0.11.0" }]
+
+[[package]]
+name = "burr-ocp"
+version = "0.1.0"
+source = { editable = "packages/burr-ocp" }
+dependencies = [
+    { name = "cadquery-ocp-novtk" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "cadquery-ocp-novtk", specifier = ">=7.8.1" }]
 
 [[package]]
 name = "burr-workspace"
