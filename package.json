@@ -42,6 +42,7 @@
     "check:ocp": "node scripts/check-ocp-step-cylinders.mjs",
     "check:mixed-intent": "node scripts/check-mixed-intent.mjs",
     "check:slots": "node scripts/check-build123d-straight-slot.mjs",
+    "publish:python:local": "node scripts/publish-python-local.mjs",
     "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init"
   },
   "keywords": [

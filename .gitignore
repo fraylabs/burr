@@ -3,6 +3,8 @@ target/
 .venv/
 .venv-*/
 __pycache__/
+.env.local
+.env.*.local
 examples/build123d-actuator/*/actuator.step
 examples/build123d-actuator/*/burr-design-data.json
 examples/build123d-wall-thickness/*/wall.step

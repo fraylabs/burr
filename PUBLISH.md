@@ -47,10 +47,14 @@ match the claims above.
 Local token fallback:
 
 ```bash
-export UV_PUBLISH_TOKEN=pypi-...
-uv build --package burr-build123d
-uv publish dist/burr_build123d-0.5.0*
+cp .env.local.example .env.local
+# Replace the placeholder with the real PyPI API token.
+npm run publish:python:local
+npm run publish:python:local -- --confirm
 ```
+
+The local helper refuses to publish unless `UV_PUBLISH_TOKEN` is set to a real
+`pypi-...` token and `--confirm` is passed.
 
 After publishing, verify from a fresh project:
 
