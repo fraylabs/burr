@@ -12,7 +12,7 @@ pub const SUPPORTED_DESIGN_DATA_SCHEMA_VERSIONS: [&str; 1] = ["burr.design-data.
 pub const SUPPORTED_LEGACY_DESIGN_DATA_SCHEMA_VERSIONS: [&str; 1] = ["fray.cad.artifact.v1"];
 pub const SUPPORTED_RULEPACK_SCHEMA_VERSIONS: [&str; 1] = ["burr.rulepack.v1"];
 pub const RECEIPT_SCHEMA_VERSION: &str = "burr.receipt.v1";
-pub const BURR_BUILD123D_GIT_DEPENDENCY: &str = "burr-build123d @ git+https://github.com/fraylabs/burr.git@burr-build123d-v0.5.0#subdirectory=packages/burr-build123d";
+pub const BURR_BUILD123D_PYPI_DEPENDENCY: &str = "burr-build123d==0.5.0";
 
 const DEFAULT_RULEPACK: &str = include_str!("../rules/actuator_mount.rulepack.json");
 const SKIP_DIRS: [&str; 7] = [
@@ -1929,7 +1929,7 @@ version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
   "build123d>=0.11.0",
-  "{BURR_BUILD123D_GIT_DEPENDENCY}",
+  "{BURR_BUILD123D_PYPI_DEPENDENCY}",
 ]
 "#
     )
@@ -2236,7 +2236,8 @@ mod tests {
 
         let pyproject = fs::read_to_string(project.join("pyproject.toml")).unwrap();
         assert!(pyproject.contains("name = \"my-starter-part\""));
-        assert!(pyproject.contains(BURR_BUILD123D_GIT_DEPENDENCY));
+        assert!(pyproject.contains(BURR_BUILD123D_PYPI_DEPENDENCY));
+        assert!(!pyproject.contains("git+https://"));
 
         let design = fs::read_to_string(project.join("design.py")).unwrap();
         assert!(design.contains("artifact_id=\"my-starter-part\""));

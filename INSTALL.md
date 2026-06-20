@@ -39,8 +39,7 @@ uv run python design.py
 burr check .
 ```
 
-The generated project currently installs `burr-build123d` from the
-`burr-build123d-v0.5.0` Git tag because the PyPI package is still pending.
+The generated project installs `burr-build123d==0.5.0` from PyPI.
 
 ## Local Development Checkout
 
@@ -136,7 +135,7 @@ from burr_build123d import BurrDesignData, m3_clearance_hole
 
 ```txt
 Rust CLI: published to crates.io as burr
-PyPI package: not published
+PyPI package: burr-build123d==0.5.0
 uv local workspace install: supported
 ```
 

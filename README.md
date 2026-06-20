@@ -106,8 +106,8 @@ burr stamp <folder|burr-design-data.json>...
 ```
 
 `init` creates a minimal build123d project with `design.py`, `pyproject.toml`,
-and `.gitignore`. Until `burr-build123d` is published to PyPI, the generated
-project depends on the helper from the `burr-build123d-v0.5.0` Git tag.
+and `.gitignore`. The generated project depends on `burr-build123d==0.5.0`
+from PyPI.
 
 `check` finds `burr-design-data.json`, runs freshness checks and rulepack
 checks, then writes `burr-receipt.json` beside each design data file.
