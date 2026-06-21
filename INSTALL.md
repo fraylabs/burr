@@ -37,9 +37,16 @@ burr init my-part
 cd my-part
 uv run python design.py
 burr check .
+burr explain .
 ```
 
 The generated project installs `burr-build123d==0.7.0` from PyPI.
+
+To verify the published install path from a Burr checkout:
+
+```bash
+npm run check:fresh-install
+```
 
 ## Local Development Checkout
 
@@ -67,6 +74,7 @@ npm run check:slots
 npm run check:gallery
 npm run check:gallery:render
 npm run check:explain
+npm run check:fresh-install
 ```
 
 Use the local CLI without global install:

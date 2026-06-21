@@ -47,6 +47,17 @@ cargo install burr
 burr --version
 ```
 
+Fresh install proof:
+
+```bash
+cargo install burr --version 0.10.0
+burr init my-part
+cd my-part
+uv run python design.py
+burr check .
+burr explain .
+```
+
 Run the CLI from a local checkout:
 
 ```bash
