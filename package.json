@@ -45,6 +45,7 @@
     "README.md",
     "CHANGELOG.md",
     "INSTALL.md",
+    "docs",
     "LICENSE"
   ],
   "scripts": {
@@ -63,6 +64,7 @@
     "check:gallery:render": "node scripts/check-gallery-render.mjs",
     "gallery:artifact": "node scripts/build-gallery-artifact.mjs",
     "check:gallery:artifact": "node scripts/check-gallery-artifact.mjs",
+    "check:fray-website-contract": "node scripts/check-fray-website-contract.mjs",
     "check:explain": "node scripts/check-explain.mjs",
     "check:fresh-install": "node scripts/check-fresh-install.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",

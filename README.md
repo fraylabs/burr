@@ -146,6 +146,8 @@ artifacts/releases/burr-gallery-v<version>.zip
 The bundle contains PNG previews, passing Burr receipts, stamped design data,
 and a manifest. Burr owns these generated proof artifacts; websites should
 consume the zip or GitHub release asset read-only instead of regenerating CAD.
+See [docs/fray-website-contract.md](docs/fray-website-contract.md) for the
+website ingestion contract.
 
 Start a build123d part:
 
