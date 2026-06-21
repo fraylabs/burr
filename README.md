@@ -113,7 +113,7 @@ burr stamp <folder|burr-design-data.json>...
 ```
 
 `init` creates a minimal build123d project with `design.py`, `pyproject.toml`,
-and `.gitignore`. The generated project depends on `burr-build123d==0.6.0`
+and `.gitignore`. The generated project depends on `burr-build123d==0.7.0`
 from PyPI.
 
 `check` finds `burr-design-data.json`, runs freshness checks and rulepack
