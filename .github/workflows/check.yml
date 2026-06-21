@@ -88,6 +88,15 @@ jobs:
       - name: Check straight-slot CAD proof
         run: npm run check:slots
 
+      - name: Check receipt explanations
+        run: npm run check:explain
+
+      - name: Check printable gallery
+        run: npm run check:gallery
+
+      - name: Check gallery render proof
+        run: npm run check:gallery:render
+
       - name: Confirm generated artifacts are untracked
         run: |
           test -z "$(git status --short --untracked-files=no)"

@@ -1,25 +1,24 @@
 # Burr
 
-Burr is a design-rule linter for CAD-as-code workflows.
+Burr is design-rule checking for CAD-as-code.
 
-It checks generated design data and artifacts for mechanical mistakes before
-they become prints, prototypes, or expensive debugging sessions.
+It gives agents and humans a hard feedback loop before a part becomes a print:
 
 ```txt
 design file -> generated part -> burr-design-data.json -> Burr checks -> receipt
 ```
 
-Burr is not a constraint solver, FEA engine, or universal CAD brain. It does not
-design the part. It checks whether generated CAD violates known mechanical
-rules.
+Burr does not design the part. It verifies declared mechanical intent against
+metadata, dimensions, source/artifact freshness, and STEP geometry evidence.
 
 ## Why
 
-Image review is useful, but not enough. A screenshot can show that something
-looks suspicious; it cannot reliably prove exact hole distances, hidden
-clearances, source/STEP freshness, or rule-specific pass/fail.
+CAD agents can make parts that look plausible while hiding bad edge distances,
+missing holes, stale STEP exports, or decorative holes that should not be judged
+as fastener interfaces. Image review helps, but it cannot reliably prove those
+facts.
 
-Burr turns design data into measurable receipts:
+Burr turns CAD work into measurable receipts:
 
 ```txt
 M3 loaded mounting hole
@@ -28,29 +27,26 @@ required center-to-edge = 10.2 mm
 result = fail by 2.2 mm
 ```
 
-## Install
+Then `burr explain` turns the receipt into fix guidance:
 
-See [INSTALL.md](INSTALL.md) for current crates.io and uv install paths.
-
-For local development:
-
-```bash
-cargo test
-uv sync --all-packages
-npm run check
+```txt
+Feature: m3_lower_left
+Problem: the loaded M3 hole is too close to a free edge.
+Why it matters: thin edge material can crack, delaminate, or fail.
+Fix: move the hole inward or make the surrounding part larger.
 ```
 
-Install the Rust CLI from crates.io:
+## Quickstart
 
-```bash
-cargo install burr
-burr --version
-```
-
-Fresh install proof:
+Install from crates.io:
 
 ```bash
 cargo install burr --version 0.10.0
+```
+
+Create and check a build123d starter part:
+
+```bash
 burr init my-part
 cd my-part
 uv run python design.py
@@ -58,13 +54,37 @@ burr check .
 burr explain .
 ```
 
-Run the CLI from a local checkout:
+The generated starter installs `burr-build123d==0.7.0` from PyPI.
+
+To prove the published install path from this repo:
 
 ```bash
-cargo run -- --version
-cargo run -- init my-part
-cargo run -- check examples/linear-actuator-bad
-cargo run -- check examples/linear-actuator-good
+npm run check:fresh-install
+```
+
+## Product Loop
+
+Use Burr like tests for generated mechanical parts:
+
+```txt
+write or generate CAD
+  -> emit burr-design-data.json with intended features
+  -> export STEP
+  -> burr check .
+  -> burr explain .
+  -> fix CAD or metadata
+```
+
+Burr is not a constraint solver, FEA engine, slicer, or universal CAD brain.
+It checks specific declared mechanical claims. Workload/stress survival belongs
+to later FEA/FEM or physical testing.
+
+## Local Development
+
+```bash
+npm install
+uv sync --all-packages
+npm run check
 ```
 
 Run the build123d adapter examples:
