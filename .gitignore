@@ -13,6 +13,8 @@ examples/build123d-step-presence/*/presence.step
 examples/build123d-step-presence/*/burr-design-data.json
 examples/build123d-mixed-intent/mixed.step
 examples/build123d-mixed-intent/burr-design-data.json
+examples/build123d-bearing-seat/*/bearing-seat.step
+examples/build123d-bearing-seat/*/burr-design-data.json
 examples/build123d-counterbore/*/counterbore.step
 examples/build123d-counterbore/*/burr-design-data.json
 examples/build123d-heat-set-insert-pocket/*/insert-pocket.step

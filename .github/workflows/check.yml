@@ -76,6 +76,9 @@ jobs:
       - name: Check mixed-intent CAD proof
         run: npm run check:mixed-intent
 
+      - name: Check bearing-seat CAD proof
+        run: npm run check:bearing-seat
+
       - name: Check counterbore CAD proof
         run: npm run check:counterbore
 

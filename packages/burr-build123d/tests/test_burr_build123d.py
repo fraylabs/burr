@@ -6,6 +6,7 @@ import unittest
 from burr_build123d import (
     BurrDesignData,
     DESIGN_DATA_FILE,
+    bearing_seat,
     counterbore,
     heat_set_insert_pocket,
     m3_clearance_hole,
@@ -231,6 +232,55 @@ class BurrBuild123dTests(unittest.TestCase):
                 pocket_diameter_mm=4.6,
                 pocket_depth_mm=5.7,
                 host_depth_mm=5.7,
+                create_geometry=False,
+            )
+
+    def test_records_bearing_seat_without_build123d_geometry(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        bearing_seat(
+            design,
+            feature_id="608_bearing_seat",
+            part="housing",
+            center=(0, 0, 10),
+            axis=(1, 0, 0),
+            role="bearing_support",
+            bearing="608",
+            seat_diameter_mm=22.0,
+            seat_depth_mm=7.0,
+            host_depth_mm=24.0,
+            create_geometry=False,
+        )
+
+        feature = design.features[0]
+        self.assertEqual(feature["kind"], "bearing_seat")
+        self.assertEqual(feature["intent"], "mechanical_interface")
+        self.assertEqual(feature["bearing"], "608")
+        self.assertEqual(feature["seat_diameter_mm"], 22.0)
+        self.assertEqual(feature["seat_depth_mm"], 7.0)
+        self.assertEqual(feature["center_mm"], [0.0, 0.0, 10.0])
+        self.assertEqual(feature["seat_center_mm"], [-8.5, 0.0, 10.0])
+        self.assertEqual(feature["shoulder_center_mm"], [-5.0, 0.0, 10.0])
+
+    def test_rejects_invalid_bearing_seat(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        with self.assertRaises(ValueError):
+            bearing_seat(
+                design,
+                feature_id="bad_bearing_seat",
+                part="housing",
+                center=(0, 0, 0),
+                axis=(1, 0, 0),
+                role="bearing_support",
+                bearing="608",
+                seat_diameter_mm=22.0,
+                seat_depth_mm=7.0,
+                host_depth_mm=7.0,
                 create_geometry=False,
             )
 

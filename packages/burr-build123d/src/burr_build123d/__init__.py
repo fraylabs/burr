@@ -15,7 +15,7 @@ from typing import Any
 
 DESIGN_DATA_FILE = "burr-design-data.json"
 DESIGN_DATA_SCHEMA = "burr.design-data.v1"
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 
 def _round_vector(values: tuple[float, float, float] | list[float]) -> list[float]:
@@ -218,6 +218,44 @@ class BurrDesignData:
                 "axis": _round_vector(axis),
                 "pocket_center_mm": _round_vector(pocket_center),
                 "bottom_center_mm": _round_vector(bottom_center),
+                "role": role,
+            },
+        )
+
+    def bearing_seat(
+        self,
+        *,
+        feature_id: str,
+        part: str,
+        bearing: str,
+        seat_diameter_mm: float,
+        seat_depth_mm: float,
+        center: tuple[float, float, float] | list[float],
+        axis: tuple[float, float, float] | list[float],
+        seat_center: tuple[float, float, float] | list[float],
+        shoulder_center: tuple[float, float, float] | list[float],
+        role: str,
+        intent: str = "mechanical_interface",
+    ) -> None:
+        if not intent:
+            raise ValueError("bearing_seat intent must be a non-empty string.")
+        if seat_diameter_mm <= 0:
+            raise ValueError("bearing_seat seat_diameter_mm must be positive.")
+        if seat_depth_mm <= 0:
+            raise ValueError("bearing_seat seat_depth_mm must be positive.")
+        self.features.append(
+            {
+                "id": feature_id,
+                "part": part,
+                "kind": "bearing_seat",
+                "intent": intent,
+                "bearing": bearing,
+                "seat_diameter_mm": float(seat_diameter_mm),
+                "seat_depth_mm": float(seat_depth_mm),
+                "center_mm": _round_vector(center),
+                "axis": _round_vector(axis),
+                "seat_center_mm": _round_vector(seat_center),
+                "shoulder_center_mm": _round_vector(shoulder_center),
                 "role": role,
             },
         )
@@ -533,10 +571,87 @@ def heat_set_insert_pocket(
         )
 
 
+def bearing_seat(
+    design: BurrDesignData,
+    *,
+    feature_id: str,
+    part: str,
+    center: tuple[float, float, float] | list[float],
+    axis: tuple[float, float, float] | list[float],
+    role: str,
+    bearing: str,
+    seat_diameter_mm: float,
+    seat_depth_mm: float,
+    host_depth_mm: float,
+    side: str = "negative",
+    intent: str = "mechanical_interface",
+    create_geometry: bool = True,
+) -> None:
+    """Create a narrow build123d blind bearing seat and record seat intent.
+
+    V1 supports bearing seats cut along X from the negative or positive side.
+    Burr verifies the cylindrical seat wall and the seat shoulder plane.
+    """
+
+    if _round_vector(axis) != [1.0, 0.0, 0.0]:
+        raise ValueError("bearing_seat currently requires axis=(1, 0, 0).")
+    if side not in {"negative", "positive"}:
+        raise ValueError("bearing_seat side must be 'negative' or 'positive'.")
+    if host_depth_mm <= seat_depth_mm:
+        raise ValueError("bearing_seat host_depth_mm must be greater than seat_depth_mm.")
+
+    center_x, center_y, center_z = tuple(center)
+    side_sign = -1.0 if side == "negative" else 1.0
+    seat_center = (
+        center_x + side_sign * ((host_depth_mm - seat_depth_mm) / 2.0),
+        center_y,
+        center_z,
+    )
+    shoulder_center = (
+        seat_center[0] - side_sign * (seat_depth_mm / 2.0),
+        center_y,
+        center_z,
+    )
+
+    design.bearing_seat(
+        feature_id=feature_id,
+        part=part,
+        bearing=bearing,
+        seat_diameter_mm=seat_diameter_mm,
+        seat_depth_mm=seat_depth_mm,
+        center=center,
+        axis=axis,
+        seat_center=seat_center,
+        shoulder_center=shoulder_center,
+        role=role,
+        intent=intent,
+    )
+
+    if not create_geometry:
+        return
+
+    try:
+        from build123d import Cylinder, Locations, Mode
+    except ImportError as error:
+        raise RuntimeError(
+            "bearing_seat(create_geometry=True) requires build123d. "
+            "Install build123d or pass create_geometry=False.",
+        ) from error
+
+    with Locations(seat_center):
+        Cylinder(
+            radius=seat_diameter_mm / 2.0,
+            height=seat_depth_mm,
+            rotation=(0, 90, 0),
+            mode=Mode.SUBTRACT,
+        )
+
+
 __all__ = [
     "BurrDesignData",
     "DESIGN_DATA_FILE",
     "DESIGN_DATA_SCHEMA",
+    "bearing_seat",
     "counterbore",
     "heat_set_insert_pocket",
     "__version__",

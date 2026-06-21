@@ -25,40 +25,38 @@ for (const fixture of ["bad", "good"]) {
     "--package",
     "burr-build123d",
     "python",
-    `examples/build123d-counterbore/${fixture}/design.py`,
+    `examples/build123d-bearing-seat/${fixture}/design.py`,
   ])
 }
 
-const bad = run("cargo", ["run", "--quiet", "--", "check", "examples/build123d-counterbore/bad"], {
+const bad = run("cargo", ["run", "--quiet", "--", "check", "examples/build123d-bearing-seat/bad"], {
   expectFailure: true,
 })
-if (!bad.output.includes("Declared counterbore m3_mount_counterbore is missing from the STEP artifact.")) {
-  throw new Error(`Bad counterbore fixture did not report the missing counterbore.\n${bad.output}`)
+if (!bad.output.includes("Declared bearing seat bearing_608_seat is missing from the STEP artifact.")) {
+  throw new Error(`Bad bearing-seat fixture did not report the missing seat.\n${bad.output}`)
 }
 
-const good = run("cargo", ["run", "--quiet", "--", "check", "examples/build123d-counterbore/good"])
-if (!good.output.includes("PASS examples/build123d-counterbore/good/burr-design-data.json")) {
-  throw new Error(`Good counterbore fixture did not pass.\n${good.output}`)
+const good = run("cargo", ["run", "--quiet", "--", "check", "examples/build123d-bearing-seat/good"])
+if (!good.output.includes("PASS examples/build123d-bearing-seat/good/burr-design-data.json")) {
+  throw new Error(`Good bearing-seat fixture did not pass.\n${good.output}`)
 }
 
-checkReceipt("examples/build123d-counterbore/good/burr-receipt.json", {
+checkReceipt("examples/build123d-bearing-seat/good/burr-receipt.json", {
   status: "pass",
   checkStatus: "pass",
   checkReason: "ok",
-  matchedBore: true,
-  matchedCounterbore: true,
+  matchedSeat: true,
   matchedShoulder: true,
 })
-checkReceipt("examples/build123d-counterbore/bad/burr-receipt.json", {
+checkReceipt("examples/build123d-bearing-seat/bad/burr-receipt.json", {
   status: "fail",
   checkStatus: "fail",
   checkReason: "missing_declared_feature",
-  matchedBore: true,
-  matchedCounterbore: false,
+  matchedSeat: true,
   matchedShoulder: false,
 })
 
-console.log("build123d counterbore proof passed")
+console.log("build123d bearing-seat proof passed")
 
 function checkReceipt(path, expected) {
   const receipt = JSON.parse(fs.readFileSync(path, "utf8"))
@@ -69,40 +67,35 @@ function checkReceipt(path, expected) {
   expectEqual(summary.declared, 2, `${path} declared feature count`)
   expectEqual(summary.checked, 1, `${path} checked feature count`)
   expectEqual(summary.unchecked, 1, `${path} unchecked feature count`)
-  expectIncludes(summary.checked_feature_ids, "m3_mount_counterbore", `${path} checked feature ids`)
-  expectIncludes(summary.unchecked_feature_ids, "cosmetic_counterbore", `${path} unchecked feature ids`)
+  expectIncludes(summary.checked_feature_ids, "bearing_608_seat", `${path} checked feature ids`)
+  expectIncludes(summary.unchecked_feature_ids, "cosmetic_bearing_recess", `${path} unchecked feature ids`)
   expectEqual(summary.intent_counts.mechanical_interface, 1, `${path} mechanical intent count`)
   expectEqual(summary.intent_counts.cosmetic, 1, `${path} cosmetic intent count`)
 
-  const counterboreCheck = receipt.checks.find(
+  const seatCheck = receipt.checks.find(
     (check) =>
-      check.rule_id === "actuator_mount:counterbore_step_presence" &&
-      check.feature_id === "m3_mount_counterbore",
+      check.rule_id === "actuator_mount:bearing_seat_step_presence" &&
+      check.feature_id === "bearing_608_seat",
   )
-  if (!counterboreCheck) {
-    throw new Error(`${path} is missing the counterbore check`)
+  if (!seatCheck) {
+    throw new Error(`${path} is missing the bearing-seat check`)
   }
-  expectEqual(counterboreCheck.status, expected.checkStatus, `${path} counterbore status`)
-  expectEqual(counterboreCheck.reason, expected.checkReason, `${path} counterbore reason`)
+  expectEqual(seatCheck.status, expected.checkStatus, `${path} seat status`)
+  expectEqual(seatCheck.reason, expected.checkReason, `${path} seat reason`)
   expectEqual(
-    counterboreCheck.measured.matched_bore_cylinder,
-    expected.matchedBore,
-    `${path} matched bore cylinder`,
+    seatCheck.measured.matched_seat_cylinder,
+    expected.matchedSeat,
+    `${path} matched seat cylinder`,
   )
   expectEqual(
-    counterboreCheck.measured.matched_counterbore_cylinder,
-    expected.matchedCounterbore,
-    `${path} matched counterbore cylinder`,
-  )
-  expectEqual(
-    counterboreCheck.measured.matched_counterbore_shoulder_plane,
+    seatCheck.measured.matched_seat_shoulder_plane,
     expected.matchedShoulder,
-    `${path} matched shoulder plane`,
+    `${path} matched seat shoulder plane`,
   )
-  if (counterboreCheck.measured.candidate_cylinders < 2) {
-    throw new Error(`${path} expected at least two candidate cylinders`)
+  if (seatCheck.measured.candidate_cylinders < 1) {
+    throw new Error(`${path} expected at least one candidate cylinder`)
   }
-  if (counterboreCheck.measured.candidate_planes < 1) {
+  if (seatCheck.measured.candidate_planes < 1) {
     throw new Error(`${path} expected at least one candidate plane`)
   }
 
@@ -111,8 +104,8 @@ function checkReceipt(path, expected) {
       .map((check) => check.feature_id)
       .filter((featureId) => typeof featureId === "string"),
   )
-  if (checkedFeatureIds.has("cosmetic_counterbore")) {
-    throw new Error(`${path} linted the cosmetic counterbore`)
+  if (checkedFeatureIds.has("cosmetic_bearing_recess")) {
+    throw new Error(`${path} linted the cosmetic bearing seat`)
   }
 }
 

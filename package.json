@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Design-rule checks for CAD-as-code workflows.",
   "type": "module",
   "files": [
@@ -26,6 +26,8 @@
     "examples/build123d-step-presence/bad/design.py",
     "examples/build123d-step-presence/good/design.py",
     "examples/build123d-mixed-intent/design.py",
+    "examples/build123d-bearing-seat/bad/design.py",
+    "examples/build123d-bearing-seat/good/design.py",
     "examples/build123d-counterbore/bad/design.py",
     "examples/build123d-counterbore/good/design.py",
     "examples/build123d-heat-set-insert-pocket/bad/design.py",
@@ -45,6 +47,7 @@
     "check:build123d": "PYTHON=\"uv run --package burr-build123d python\" node scripts/check-build123d-examples.mjs",
     "check:ocp": "node scripts/check-ocp-step-cylinders.mjs",
     "check:mixed-intent": "node scripts/check-mixed-intent.mjs",
+    "check:bearing-seat": "node scripts/check-build123d-bearing-seat.mjs",
     "check:counterbore": "node scripts/check-build123d-counterbore.mjs",
     "check:insert-pocket": "node scripts/check-build123d-heat-set-insert-pocket.mjs",
     "check:slots": "node scripts/check-build123d-straight-slot.mjs",

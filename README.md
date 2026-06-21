@@ -239,14 +239,14 @@ mechanical rulepacks.
 The included actuator mount rulepack checks loaded M3 clearance-hole edge
 distance, minimum wall thickness around M3 clearance holes, whether declared M3
 clearance holes exist as matching cylindrical geometry in the exported STEP, and
-whether declared straight slots, counterbores, and heat-set insert pockets exist
-as matching STEP cylinder/plane evidence:
+whether declared straight slots, counterbores, heat-set insert pockets, and
+bearing seats exist as matching STEP cylinder/plane evidence:
 
 ```json
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -323,6 +323,20 @@ as matching STEP cylinder/plane evidence:
       "pocket_center_tolerance_mm": 0.5,
       "bottom_plane_tolerance_mm": 0.25,
       "axis_dot_min": 0.99
+    },
+    {
+      "id": "bearing_seat_step_presence",
+      "kind": "feature_presence",
+      "applies_to": {
+        "kind": "bearing_seat",
+        "intent_any": ["mechanical_interface"]
+      },
+      "artifact_kind": "step",
+      "seat_diameter_tolerance_mm": 0.05,
+      "centerline_tolerance_mm": 0.25,
+      "seat_center_tolerance_mm": 0.5,
+      "shoulder_plane_tolerance_mm": 0.25,
+      "axis_dot_min": 0.99
     }
   ]
 }
@@ -343,9 +357,9 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.8.0",
+  "burr_version": "0.9.0",
   "artifact_version": "0.1.0",
-  "rulepack_version": "0.7.0",
+  "rulepack_version": "0.8.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"
@@ -425,9 +439,9 @@ declared intent and the geometry fits the declared tolerances.
 
 Early prototype. Current checks combine design-data rules with narrow STEP
 feature-presence verification for declared M3 clearance holes, declared
-straight slots, declared counterbores, and declared heat-set insert pockets.
-Burr does not classify all holes, slots, counterbores, or pockets in a model or
-decide which features matter.
+straight slots, declared counterbores, declared heat-set insert pockets, and
+declared bearing seats. Burr does not classify all holes, slots, counterbores,
+pockets, or seats in a model or decide which features matter.
 
 By default, the Rust CLI reads simple analytic STEP cylinder entities directly.
 For stronger local verification, install the optional Python/OCP workspace and
