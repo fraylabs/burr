@@ -64,6 +64,7 @@ npm run check:bearing-seat
 npm run check:counterbore
 npm run check:insert-pocket
 npm run check:slots
+npm run check:gallery
 ```
 
 Use the local CLI without global install:
@@ -90,6 +91,7 @@ Run the example design files through uv:
 uv sync --all-packages
 uv run --package burr-build123d python examples/build123d-actuator/good/design.py
 cargo run -- check examples/build123d-actuator/good
+npm run check:gallery
 ```
 
 For your own local script in the same checkout:
