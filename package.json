@@ -36,8 +36,12 @@
     "examples/build123d-straight-slot/good/design.py",
     "examples/gallery/README.md",
     "examples/gallery/*/design.py",
-    "examples/linear-actuator-bad",
-    "examples/linear-actuator-good",
+    "examples/linear-actuator-bad/actuator.step",
+    "examples/linear-actuator-bad/burr-design-data.json",
+    "examples/linear-actuator-bad/source.py",
+    "examples/linear-actuator-good/actuator.step",
+    "examples/linear-actuator-good/burr-design-data.json",
+    "examples/linear-actuator-good/source.py",
     "README.md",
     "INSTALL.md",
     "LICENSE"
@@ -54,6 +58,7 @@
     "check:insert-pocket": "node scripts/check-build123d-heat-set-insert-pocket.mjs",
     "check:slots": "node scripts/check-build123d-straight-slot.mjs",
     "check:gallery": "node scripts/check-gallery.mjs",
+    "check:explain": "node scripts/check-explain.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",
     "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init"
   },

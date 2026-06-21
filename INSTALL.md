@@ -65,6 +65,7 @@ npm run check:counterbore
 npm run check:insert-pocket
 npm run check:slots
 npm run check:gallery
+npm run check:explain
 ```
 
 Use the local CLI without global install:
@@ -72,6 +73,7 @@ Use the local CLI without global install:
 ```bash
 cargo run -- --version
 cargo run -- check examples/linear-actuator-good
+cargo run -- explain examples/linear-actuator-good
 ```
 
 Or install the local Rust CLI while developing:

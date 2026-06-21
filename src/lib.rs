@@ -355,6 +355,16 @@ pub fn format_receipt_diagnostics(receipt: &Value) -> Vec<Vec<String>> {
         .collect()
 }
 
+pub fn format_receipt_explanations(receipt: &Value) -> Vec<Vec<String>> {
+    receipt
+        .get("checks")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(format_check_explanation)
+        .collect()
+}
+
 fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
     if string_field(check, "status") != Some("fail") {
         return None;
@@ -491,6 +501,276 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
         _ => Some(vec![string_field(check, "message")
             .unwrap_or("Check failed.")
             .to_string()]),
+    }
+}
+
+fn format_check_explanation(check: &Value) -> Option<Vec<String>> {
+    if string_field(check, "status") != Some("fail") {
+        return None;
+    }
+
+    let rule_id = string_field(check, "rule_id").unwrap_or("<unknown>");
+    let reason = string_field(check, "reason").unwrap_or("<unknown>");
+    let feature_id = string_field(check, "feature_id").unwrap_or("<none>");
+    let feature_kind = feature_kind_from_rule(rule_id);
+
+    let mut lines = vec![
+        format!("Feature: {feature_id}"),
+        format!("Rule: {rule_id}"),
+        format!(
+            "Problem: {}",
+            explanation_problem(check, reason, feature_kind)
+        ),
+    ];
+
+    lines.extend(explanation_evidence(check, reason));
+    lines.push(format!(
+        "Why it matters: {}",
+        explanation_why(reason, feature_kind)
+    ));
+    lines.push(format!("Fix: {}", explanation_fix(reason, feature_kind)));
+    Some(lines)
+}
+
+fn feature_kind_from_rule(rule_id: &str) -> &'static str {
+    if rule_id.contains("straight_slot") {
+        "straight slot"
+    } else if rule_id.contains("counterbore") {
+        "counterbore"
+    } else if rule_id.contains("heat_set_insert_pocket") {
+        "heat-set insert pocket"
+    } else if rule_id.contains("bearing_seat") {
+        "bearing seat"
+    } else if rule_id.contains("clearance_hole") || rule_id.contains("loaded_hole") {
+        "clearance hole"
+    } else {
+        "feature"
+    }
+}
+
+fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> String {
+    match reason {
+        "insufficient_edge_distance" => {
+            "the loaded M3 hole is too close to a free edge.".to_string()
+        }
+        "insufficient_wall_thickness" => {
+            "the M3 clearance hole leaves too little printable wall.".to_string()
+        }
+        "missing_declared_feature" => {
+            format!("the design data declares a {feature_kind}, but Burr cannot find matching STEP geometry.")
+        }
+        "source_hash_mismatch" | "artifact_hash_mismatch" => {
+            "the receipt was made from stale file hashes.".to_string()
+        }
+        "unsupported_design_data_schema" | "missing_design_data_schema" => {
+            "the design data schema is not supported by this Burr version.".to_string()
+        }
+        "unsupported_rulepack_schema" | "missing_rulepack_schema" => {
+            "the rulepack schema is not supported by this Burr version.".to_string()
+        }
+        "missing_hole_diameter" => "the feature is missing a valid hole diameter.".to_string(),
+        "missing_feature_center" => "the feature is missing center_mm.".to_string(),
+        "missing_feature_axis" => "the feature is missing axis.".to_string(),
+        "step_geometry_unreadable" => "Burr could not read STEP geometry evidence.".to_string(),
+        "invalid_counterbore_dimensions" => {
+            "the counterbore dimensions are internally invalid.".to_string()
+        }
+        _ => string_field(check, "message")
+            .unwrap_or("the check failed.")
+            .to_string(),
+    }
+}
+
+fn explanation_evidence(check: &Value, reason: &str) -> Vec<String> {
+    let mut lines = Vec::new();
+    match reason {
+        "insufficient_edge_distance" => {
+            push_measure(
+                &mut lines,
+                check,
+                "/measured/center_to_edge_mm",
+                "Measured center-to-edge",
+            );
+            push_measure(
+                &mut lines,
+                check,
+                "/required/center_to_edge_mm",
+                "Required center-to-edge",
+            );
+            push_margin(&mut lines, check);
+        }
+        "insufficient_wall_thickness" => {
+            push_measure(
+                &mut lines,
+                check,
+                "/measured/wall_thickness_mm",
+                "Measured wall thickness",
+            );
+            push_measure(
+                &mut lines,
+                check,
+                "/required/wall_thickness_mm",
+                "Required wall thickness",
+            );
+            push_margin(&mut lines, check);
+        }
+        "missing_declared_feature" => {
+            if let Some(artifact) = check
+                .pointer("/measured/artifact_path")
+                .and_then(Value::as_str)
+            {
+                lines.push(format!("Evidence: checked STEP artifact {artifact}."));
+            }
+            if let Some(value) = check
+                .pointer("/measured/candidate_cylinders")
+                .and_then(Value::as_u64)
+            {
+                lines.push(format!("Evidence: candidate cylinders found = {value}."));
+            }
+            if let Some(value) = check
+                .pointer("/measured/candidate_planes")
+                .and_then(Value::as_u64)
+            {
+                lines.push(format!("Evidence: candidate planes found = {value}."));
+            }
+            push_bool_evidence(check, &mut lines, "matched_hole", "matched hole cylinder");
+            push_bool_evidence(
+                check,
+                &mut lines,
+                "matched_slot_endpoints",
+                "matched slot endpoints",
+            );
+            push_bool_evidence(
+                check,
+                &mut lines,
+                "matched_bore_cylinder",
+                "matched bore cylinder",
+            );
+            push_bool_evidence(
+                check,
+                &mut lines,
+                "matched_counterbore_cylinder",
+                "matched counterbore cylinder",
+            );
+            push_bool_evidence(
+                check,
+                &mut lines,
+                "matched_shoulder_plane",
+                "matched shoulder plane",
+            );
+            push_bool_evidence(
+                check,
+                &mut lines,
+                "matched_pocket_cylinder",
+                "matched pocket cylinder",
+            );
+            push_bool_evidence(
+                check,
+                &mut lines,
+                "matched_bottom_plane",
+                "matched bottom plane",
+            );
+            push_bool_evidence(
+                check,
+                &mut lines,
+                "matched_seat_cylinder",
+                "matched seat cylinder",
+            );
+            push_bool_evidence(
+                check,
+                &mut lines,
+                "matched_seat_shoulder_plane",
+                "matched bearing shoulder plane",
+            );
+        }
+        "source_hash_mismatch" | "artifact_hash_mismatch" => {
+            if let Some(path) = string_field(check, "path") {
+                lines.push(format!("Evidence: stale path {path}."));
+            }
+        }
+        _ => {
+            if let Some(message) = string_field(check, "message") {
+                lines.push(format!("Evidence: {message}"));
+            }
+        }
+    }
+    lines
+}
+
+fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
+    match reason {
+        "insufficient_edge_distance" => {
+            "thin edge material can crack, delaminate, or fail when the fastener is loaded."
+        }
+        "insufficient_wall_thickness" => {
+            "FDM prints need enough material around holes to form reliable perimeters."
+        }
+        "missing_declared_feature" => {
+            match feature_kind {
+                "bearing seat" => "a declared bearing fit is only trustworthy if the exported STEP contains the seat cylinder and shoulder.",
+                "counterbore" => "a screw head fit is only trustworthy if the exported STEP contains the bore, counterbore, and shoulder.",
+                "heat-set insert pocket" => "an insert fit is only trustworthy if the exported STEP contains the blind pocket wall and bottom.",
+                "straight slot" => "an adjustable slot is only trustworthy if the exported STEP contains the slot endpoints and side faces.",
+                _ => "metadata alone is not enough; the exported STEP must contain the declared mechanical feature.",
+            }
+        }
+        "source_hash_mismatch" | "artifact_hash_mismatch" => {
+            "stale hashes mean the receipt may not describe the files currently on disk."
+        }
+        _ => "Burr cannot trust this mechanical claim until the failing rule is fixed.",
+    }
+}
+
+fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
+    match reason {
+        "insufficient_edge_distance" => "move the hole inward or make the surrounding part larger.",
+        "insufficient_wall_thickness" => "move the hole inward, reduce the hole size, or increase the local wall.",
+        "missing_declared_feature" => match feature_kind {
+            "bearing seat" => "regenerate the STEP from the bearing_seat helper or update the declared seat center/diameter/depth.",
+            "counterbore" => "regenerate the STEP from the counterbore helper or update the declared bore/counterbore dimensions.",
+            "heat-set insert pocket" => "regenerate the STEP from the heat_set_insert_pocket helper or update the declared pocket dimensions.",
+            "straight slot" => "regenerate the STEP from the straight_slot helper or update the declared slot width/length/center.",
+            _ => "regenerate the STEP from the same helper that emitted the design data, then rerun burr check.",
+        },
+        "source_hash_mismatch" | "artifact_hash_mismatch" => "rerun the CAD generator or burr stamp, then rerun burr check.",
+        "unsupported_design_data_schema" | "missing_design_data_schema" => {
+            "regenerate design data with a supported burr-build123d version."
+        }
+        "unsupported_rulepack_schema" | "missing_rulepack_schema" => {
+            "use a rulepack schema supported by this Burr release."
+        }
+        "missing_hole_diameter" => "add a positive diameter_mm to the feature metadata.",
+        "missing_feature_center" => "add center_mm to the feature metadata.",
+        "missing_feature_axis" => "add axis to the feature metadata.",
+        "step_geometry_unreadable" => "export a valid STEP artifact and make sure the design data points to it.",
+        "invalid_counterbore_dimensions" => {
+            "make counterbore_diameter_mm greater than bore_diameter_mm and use positive depths."
+        }
+        _ => "fix the rule input or generated geometry, then rerun burr check.",
+    }
+}
+
+fn push_measure(lines: &mut Vec<String>, check: &Value, pointer: &str, label: &str) {
+    if let Some(value) = check.pointer(pointer).and_then(Value::as_f64) {
+        lines.push(format!("Evidence: {label} = {} mm.", trim_float(value)));
+    }
+}
+
+fn push_margin(lines: &mut Vec<String>, check: &Value) {
+    if let Some(value) = number_field(check, "margin_mm") {
+        lines.push(format!(
+            "Evidence: short by {} mm.",
+            trim_float(round(value.abs()))
+        ));
+    }
+}
+
+fn push_bool_evidence(check: &Value, lines: &mut Vec<String>, key: &str, label: &str) {
+    if let Some(value) = check
+        .pointer(&format!("/measured/{key}"))
+        .and_then(Value::as_bool)
+    {
+        lines.push(format!("Evidence: {label} = {value}."));
     }
 }
 

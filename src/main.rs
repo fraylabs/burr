@@ -1,6 +1,6 @@
 use burr::{
-    find_design_data_paths, format_receipt_diagnostics, init_project, lint_targets, stamp_targets,
-    LintOptions, BURR_VERSION, DESIGN_DATA_FILE_NAME,
+    find_design_data_paths, format_receipt_diagnostics, format_receipt_explanations, init_project,
+    lint_targets, stamp_targets, LintOptions, BURR_VERSION, DESIGN_DATA_FILE_NAME,
 };
 use std::path::PathBuf;
 
@@ -29,6 +29,7 @@ fn run() -> Result<(), String> {
             std::process::exit(2);
         }
         Some("check") => run_check(args.collect()),
+        Some("explain") => run_explain(args.collect()),
         Some("stamp") => run_stamp(args.collect()),
         Some("init") => run_init(args.collect()),
         Some(command) => Err(format!("Unknown command: {command}")),
@@ -124,6 +125,62 @@ fn run_check(args: Vec<String>) -> Result<(), String> {
     std::process::exit(if failures == 0 { 0 } else { 1 });
 }
 
+fn run_explain(args: Vec<String>) -> Result<(), String> {
+    if args.is_empty() {
+        print_help();
+        std::process::exit(2);
+    }
+    if args.iter().any(|arg| arg == "--help" || arg == "-h") {
+        print_help();
+        return Ok(());
+    }
+
+    let cwd = std::env::current_dir().map_err(|error| error.to_string())?;
+    for input in args {
+        let path = resolve_receipt_path(PathBuf::from(input));
+        let receipt = read_receipt(&path)?;
+        println!("EXPLAIN {}", relative_label(&cwd, &path));
+        if let Some(source) = receipt
+            .get("source_design_data")
+            .and_then(serde_json::Value::as_str)
+        {
+            println!("Source: {source}");
+        }
+        let status = receipt
+            .get("status")
+            .and_then(serde_json::Value::as_str)
+            .unwrap_or("<unknown>");
+        println!("Status: {status}");
+
+        let explanations = format_receipt_explanations(&receipt);
+        if explanations.is_empty() {
+            println!("No failed checks in this receipt.");
+            println!();
+            continue;
+        }
+
+        println!();
+        println!(
+            "{} failed check{}:",
+            explanations.len(),
+            if explanations.len() == 1 { "" } else { "s" }
+        );
+        for (index, lines) in explanations.iter().enumerate() {
+            println!(
+                "{}. {}",
+                index + 1,
+                lines.first().unwrap_or(&"Failure".to_string())
+            );
+            for line in lines.iter().skip(1) {
+                println!("   {line}");
+            }
+        }
+        println!();
+    }
+
+    Ok(())
+}
+
 fn run_stamp(args: Vec<String>) -> Result<(), String> {
     if args.is_empty() {
         print_help();
@@ -183,9 +240,24 @@ fn parse_check_args(args: Vec<String>) -> Result<ParsedCheckArgs, String> {
     })
 }
 
+fn resolve_receipt_path(path: PathBuf) -> PathBuf {
+    if path.is_dir() {
+        path.join("burr-receipt.json")
+    } else {
+        path
+    }
+}
+
+fn read_receipt(path: &std::path::Path) -> Result<serde_json::Value, String> {
+    let content = std::fs::read_to_string(path)
+        .map_err(|error| format!("Failed to read {}: {error}", path.display()))?;
+    serde_json::from_str(&content)
+        .map_err(|error| format!("Failed to parse {} as JSON: {error}", path.display()))
+}
+
 fn print_help() {
     println!(
-        "Usage:\n  burr init <folder>\n  burr check [--rulepack <file>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n"
+        "Usage:\n  burr init <folder>\n  burr check [--rulepack <file>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr explain <folder|burr-receipt.json>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n"
     );
 }
 

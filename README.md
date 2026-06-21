@@ -117,6 +117,7 @@ burr check .
 burr --version
 burr init <folder>
 burr check <folder|burr-design-data.json>...
+burr explain <folder|burr-receipt.json>...
 burr stamp <folder|burr-design-data.json>...
 ```
 
@@ -126,6 +127,9 @@ from PyPI.
 
 `check` finds `burr-design-data.json`, runs freshness checks and rulepack
 checks, then writes `burr-receipt.json` beside each design data file.
+
+`explain` reads `burr-receipt.json` and expands failed checks into plain
+feature/rule/problem/evidence/why/fix output.
 
 `stamp` computes `sha256` and `size_bytes` for declared source and generated
 artifact files.
