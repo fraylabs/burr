@@ -4,7 +4,8 @@ import path from "node:path"
 import { spawnSync } from "node:child_process"
 
 const packageName = "burr-build123d"
-const distPrefix = "burr_build123d-"
+const packageVersion = readPackageVersion(`packages/${packageName}/pyproject.toml`)
+const distPrefix = `burr_build123d-${packageVersion}`
 const confirm = process.argv.includes("--confirm")
 const env = loadEnvLocal()
 const token = process.env.UV_PUBLISH_TOKEN ?? env.UV_PUBLISH_TOKEN
@@ -79,6 +80,15 @@ function unquote(value) {
     return value.slice(1, -1)
   }
   return value
+}
+
+function readPackageVersion(file) {
+  const text = fs.readFileSync(file, "utf8")
+  const match = text.match(/^version\s*=\s*"([^"]+)"$/m)
+  if (!match) {
+    throw new Error(`Could not read package version from ${file}`)
+  }
+  return match[1]
 }
 
 function run(command, args, options = {}) {

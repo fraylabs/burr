@@ -79,6 +79,9 @@ jobs:
       - name: Check counterbore CAD proof
         run: npm run check:counterbore
 
+      - name: Check heat-set insert pocket CAD proof
+        run: npm run check:insert-pocket
+
       - name: Check straight-slot CAD proof
         run: npm run check:slots
 
