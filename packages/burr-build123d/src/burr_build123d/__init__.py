@@ -144,6 +144,46 @@ class BurrDesignData:
             },
         )
 
+    def counterbore(
+        self,
+        *,
+        feature_id: str,
+        part: str,
+        bore_diameter_mm: float,
+        counterbore_diameter_mm: float,
+        counterbore_depth_mm: float,
+        center: tuple[float, float, float] | list[float],
+        axis: tuple[float, float, float] | list[float],
+        counterbore_center: tuple[float, float, float] | list[float],
+        shoulder_center: tuple[float, float, float] | list[float],
+        role: str,
+        intent: str = "mechanical_interface",
+    ) -> None:
+        if not intent:
+            raise ValueError("counterbore intent must be a non-empty string.")
+        if bore_diameter_mm <= 0:
+            raise ValueError("counterbore bore_diameter_mm must be positive.")
+        if counterbore_diameter_mm <= bore_diameter_mm:
+            raise ValueError("counterbore counterbore_diameter_mm must be greater than bore_diameter_mm.")
+        if counterbore_depth_mm <= 0:
+            raise ValueError("counterbore counterbore_depth_mm must be positive.")
+        self.features.append(
+            {
+                "id": feature_id,
+                "part": part,
+                "kind": "counterbore",
+                "intent": intent,
+                "bore_diameter_mm": float(bore_diameter_mm),
+                "counterbore_diameter_mm": float(counterbore_diameter_mm),
+                "counterbore_depth_mm": float(counterbore_depth_mm),
+                "center_mm": _round_vector(center),
+                "axis": _round_vector(axis),
+                "counterbore_center_mm": _round_vector(counterbore_center),
+                "shoulder_center_mm": _round_vector(shoulder_center),
+                "role": role,
+            },
+        )
+
     def to_dict(self) -> dict[str, Any]:
         data: dict[str, Any] = {
             "schema_version": DESIGN_DATA_SCHEMA,
@@ -296,10 +336,94 @@ def straight_slot(
             )
 
 
+def counterbore(
+    design: BurrDesignData,
+    *,
+    feature_id: str,
+    part: str,
+    center: tuple[float, float, float] | list[float],
+    axis: tuple[float, float, float] | list[float],
+    role: str,
+    bore_diameter_mm: float,
+    counterbore_diameter_mm: float,
+    counterbore_depth_mm: float,
+    through_depth_mm: float,
+    side: str = "negative",
+    intent: str = "mechanical_interface",
+    create_geometry: bool = True,
+) -> None:
+    """Create a narrow build123d counterbore cut and record counterbore intent.
+
+    V1 supports counterbores cut along X from the negative or positive side.
+    `through_depth_mm` should be the actual through-bore span of the part.
+    """
+
+    if _round_vector(axis) != [1.0, 0.0, 0.0]:
+        raise ValueError("counterbore currently requires axis=(1, 0, 0).")
+    if side not in {"negative", "positive"}:
+        raise ValueError("counterbore side must be 'negative' or 'positive'.")
+    if through_depth_mm <= counterbore_depth_mm:
+        raise ValueError("counterbore through_depth_mm must be greater than counterbore_depth_mm.")
+
+    center_x, center_y, center_z = tuple(center)
+    side_sign = -1.0 if side == "negative" else 1.0
+    counterbore_center = (
+        center_x + side_sign * ((through_depth_mm - counterbore_depth_mm) / 2.0),
+        center_y,
+        center_z,
+    )
+    shoulder_center = (
+        counterbore_center[0] - side_sign * (counterbore_depth_mm / 2.0),
+        center_y,
+        center_z,
+    )
+
+    design.counterbore(
+        feature_id=feature_id,
+        part=part,
+        bore_diameter_mm=bore_diameter_mm,
+        counterbore_diameter_mm=counterbore_diameter_mm,
+        counterbore_depth_mm=counterbore_depth_mm,
+        center=center,
+        axis=axis,
+        counterbore_center=counterbore_center,
+        shoulder_center=shoulder_center,
+        role=role,
+        intent=intent,
+    )
+
+    if not create_geometry:
+        return
+
+    try:
+        from build123d import Cylinder, Locations, Mode
+    except ImportError as error:
+        raise RuntimeError(
+            "counterbore(create_geometry=True) requires build123d. "
+            "Install build123d or pass create_geometry=False.",
+        ) from error
+
+    with Locations(tuple(center)):
+        Cylinder(
+            radius=bore_diameter_mm / 2.0,
+            height=through_depth_mm,
+            rotation=(0, 90, 0),
+            mode=Mode.SUBTRACT,
+        )
+    with Locations(counterbore_center):
+        Cylinder(
+            radius=counterbore_diameter_mm / 2.0,
+            height=counterbore_depth_mm,
+            rotation=(0, 90, 0),
+            mode=Mode.SUBTRACT,
+        )
+
+
 __all__ = [
     "BurrDesignData",
     "DESIGN_DATA_FILE",
     "DESIGN_DATA_SCHEMA",
+    "counterbore",
     "__version__",
     "m3_clearance_hole",
     "straight_slot",

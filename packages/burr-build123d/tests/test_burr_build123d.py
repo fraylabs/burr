@@ -3,7 +3,7 @@ import json
 import tempfile
 import unittest
 
-from burr_build123d import BurrDesignData, DESIGN_DATA_FILE, m3_clearance_hole, straight_slot
+from burr_build123d import BurrDesignData, DESIGN_DATA_FILE, counterbore, m3_clearance_hole, straight_slot
 
 
 class BurrBuild123dTests(unittest.TestCase):
@@ -126,6 +126,55 @@ class BurrBuild123dTests(unittest.TestCase):
                 width_mm=4.0,
                 length_mm=4.0,
                 cut_depth_mm=70.0,
+                create_geometry=False,
+            )
+
+    def test_records_counterbore_without_build123d_geometry(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        counterbore(
+            design,
+            feature_id="m3_counterbore",
+            part="housing",
+            center=(0, 0, 10),
+            axis=(1, 0, 0),
+            role="loaded_mount",
+            bore_diameter_mm=3.4,
+            counterbore_diameter_mm=6.8,
+            counterbore_depth_mm=4.0,
+            through_depth_mm=20.0,
+            create_geometry=False,
+        )
+
+        feature = design.features[0]
+        self.assertEqual(feature["kind"], "counterbore")
+        self.assertEqual(feature["intent"], "mechanical_interface")
+        self.assertEqual(feature["bore_diameter_mm"], 3.4)
+        self.assertEqual(feature["counterbore_diameter_mm"], 6.8)
+        self.assertEqual(feature["counterbore_depth_mm"], 4.0)
+        self.assertEqual(feature["center_mm"], [0.0, 0.0, 10.0])
+        self.assertEqual(feature["counterbore_center_mm"], [-8.0, 0.0, 10.0])
+        self.assertEqual(feature["shoulder_center_mm"], [-6.0, 0.0, 10.0])
+
+    def test_rejects_invalid_counterbore(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        with self.assertRaises(ValueError):
+            counterbore(
+                design,
+                feature_id="bad_counterbore",
+                part="housing",
+                center=(0, 0, 0),
+                axis=(1, 0, 0),
+                role="loaded_mount",
+                bore_diameter_mm=3.4,
+                counterbore_diameter_mm=3.4,
+                counterbore_depth_mm=4.0,
+                through_depth_mm=20.0,
                 create_geometry=False,
             )
 

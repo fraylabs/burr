@@ -77,6 +77,13 @@ uv sync --all-packages
 npm run check:mixed-intent
 ```
 
+Run the counterbore CAD proof:
+
+```bash
+uv sync --all-packages
+npm run check:counterbore
+```
+
 Run the straight-slot CAD proof:
 
 ```bash
@@ -232,13 +239,14 @@ mechanical rulepacks.
 The included actuator mount rulepack checks loaded M3 clearance-hole edge
 distance, minimum wall thickness around M3 clearance holes, whether declared M3
 clearance holes exist as matching cylindrical geometry in the exported STEP, and
-whether declared straight slots exist as endpoint cylinders plus side planes:
+whether declared straight slots and counterbores exist as matching STEP
+cylinder/plane evidence:
 
 ```json
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -286,6 +294,21 @@ whether declared straight slots exist as endpoint cylinders plus side planes:
       "endpoint_tolerance_mm": 0.25,
       "side_plane_tolerance_mm": 0.25,
       "axis_dot_min": 0.99
+    },
+    {
+      "id": "counterbore_step_presence",
+      "kind": "feature_presence",
+      "applies_to": {
+        "kind": "counterbore",
+        "intent_any": ["mechanical_interface"]
+      },
+      "artifact_kind": "step",
+      "bore_diameter_tolerance_mm": 0.05,
+      "counterbore_diameter_tolerance_mm": 0.05,
+      "centerline_tolerance_mm": 0.25,
+      "counterbore_center_tolerance_mm": 0.5,
+      "shoulder_plane_tolerance_mm": 0.25,
+      "axis_dot_min": 0.99
     }
   ]
 }
@@ -308,7 +331,7 @@ Receipts include all three:
   "schema_version": "burr.receipt.v1",
   "burr_version": "0.7.0",
   "artifact_version": "0.1.0",
-  "rulepack_version": "0.5.0",
+  "rulepack_version": "0.6.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"
@@ -387,9 +410,9 @@ declared intent and the geometry fits the declared tolerances.
 ## Status
 
 Early prototype. Current checks combine design-data rules with narrow STEP
-feature-presence verification for declared M3 clearance holes and declared
-straight slots. Burr does not classify all holes or slots in a model or decide
-which features matter.
+feature-presence verification for declared M3 clearance holes, declared
+straight slots, and declared counterbores. Burr does not classify all holes,
+slots, or counterbores in a model or decide which features matter.
 
 By default, the Rust CLI reads simple analytic STEP cylinder entities directly.
 For stronger local verification, install the optional Python/OCP workspace and

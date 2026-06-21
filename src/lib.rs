@@ -419,8 +419,15 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
             let feature_label = string_field(check, "feature_id")
                 .map(|id| format!(" {id}"))
                 .unwrap_or_default();
-            let is_slot = string_field(check, "rule_id")
-                .is_some_and(|rule_id| rule_id.contains("straight_slot"));
+            let feature_kind = string_field(check, "rule_id").and_then(|rule_id| {
+                if rule_id.contains("straight_slot") {
+                    Some("straight slot")
+                } else if rule_id.contains("counterbore") {
+                    Some("counterbore")
+                } else {
+                    None
+                }
+            });
             let artifact = check
                 .pointer("/measured/artifact_path")
                 .and_then(Value::as_str)
@@ -428,9 +435,9 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
             let candidates = check
                 .pointer("/measured/candidate_cylinders")
                 .and_then(Value::as_u64);
-            let mut lines = if is_slot {
+            let mut lines = if let Some(feature_kind) = feature_kind {
                 vec![format!(
-                    "Declared straight slot{feature_label} is missing from the STEP artifact."
+                    "Declared {feature_kind}{feature_label} is missing from the STEP artifact."
                 )]
             } else {
                 vec![format!(
@@ -825,6 +832,16 @@ fn check_feature_presence(
         }
     };
 
+    if string_field(feature, "kind") == Some("counterbore") {
+        return check_counterbore_presence(
+            full_rule_id,
+            feature_id,
+            resolved_artifact,
+            rule,
+            feature,
+        );
+    }
+
     if string_field(feature, "kind") == Some("straight_slot") {
         return check_straight_slot_presence(
             full_rule_id,
@@ -961,6 +978,269 @@ fn check_feature_presence(
             "centerline_tolerance_mm": centerline_tolerance
         },
         "message": "Design data declares a clearance hole, but no matching cylindrical STEP geometry was found."
+    })
+}
+
+fn check_counterbore_presence(
+    full_rule_id: String,
+    feature_id: Value,
+    resolved_artifact: ResolvedFileRef,
+    rule: &Value,
+    feature: &Value,
+) -> Value {
+    let Some(bore_diameter) = number_field(feature, "bore_diameter_mm")
+        .or_else(|| number_field(feature, "diameter_mm"))
+        .filter(|value| *value > 0.0)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_bore_diameter",
+            "feature_id": feature_id,
+            "message": "Counterbore bore_diameter_mm is required for STEP feature-presence checking."
+        });
+    };
+    let Some(counterbore_diameter) =
+        number_field(feature, "counterbore_diameter_mm").filter(|value| *value > 0.0)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_counterbore_diameter",
+            "feature_id": feature_id,
+            "message": "Counterbore counterbore_diameter_mm is required for STEP feature-presence checking."
+        });
+    };
+    let Some(counterbore_depth) =
+        number_field(feature, "counterbore_depth_mm").filter(|value| *value > 0.0)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_counterbore_depth",
+            "feature_id": feature_id,
+            "message": "Counterbore counterbore_depth_mm is required for STEP feature-presence checking."
+        });
+    };
+    if counterbore_diameter <= bore_diameter {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "invalid_counterbore_dimensions",
+            "feature_id": feature_id,
+            "message": "Counterbore diameter must be greater than bore diameter."
+        });
+    }
+    let Some(center) = feature
+        .get("center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_center",
+            "feature_id": feature_id,
+            "message": "Feature center_mm is required for STEP feature-presence checking."
+        });
+    };
+    let Some(axis) = feature
+        .get("axis")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .and_then(Vec3::normalized)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_axis",
+            "feature_id": feature_id,
+            "message": "Feature axis is required for STEP feature-presence checking."
+        });
+    };
+    let Some(counterbore_center) = feature
+        .get("counterbore_center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_counterbore_center",
+            "feature_id": feature_id,
+            "message": "Counterbore counterbore_center_mm is required for STEP feature-presence checking."
+        });
+    };
+    let Some(shoulder_center) = feature
+        .get("shoulder_center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_counterbore_shoulder_center",
+            "feature_id": feature_id,
+            "message": "Counterbore shoulder_center_mm is required for STEP feature-presence checking."
+        });
+    };
+
+    let evidence = match parse_step_evidence(&resolved_artifact.file_path) {
+        Ok(evidence) => evidence,
+        Err(error) => {
+            return json!({
+                "rule_id": full_rule_id,
+                "status": "fail",
+                "reason": "step_geometry_unreadable",
+                "feature_id": feature_id,
+                "measured": {
+                    "artifact_path": resolved_artifact.label_path
+                },
+                "message": error
+            });
+        }
+    };
+
+    let bore_diameter_tolerance = number_field(rule, "bore_diameter_tolerance_mm")
+        .or_else(|| number_field(rule, "diameter_tolerance_mm"))
+        .unwrap_or(0.05)
+        .max(0.0);
+    let counterbore_diameter_tolerance = number_field(rule, "counterbore_diameter_tolerance_mm")
+        .or_else(|| number_field(rule, "diameter_tolerance_mm"))
+        .unwrap_or(0.05)
+        .max(0.0);
+    let centerline_tolerance = number_field(rule, "centerline_tolerance_mm")
+        .unwrap_or(0.25)
+        .max(0.0);
+    let counterbore_center_tolerance = number_field(rule, "counterbore_center_tolerance_mm")
+        .unwrap_or(0.5)
+        .max(0.0);
+    let shoulder_plane_tolerance = number_field(rule, "shoulder_plane_tolerance_mm")
+        .or_else(|| number_field(rule, "plane_tolerance_mm"))
+        .unwrap_or(0.25)
+        .max(0.0);
+    let axis_dot_min = number_field(rule, "axis_dot_min")
+        .unwrap_or(0.99)
+        .clamp(0.0, 1.0);
+
+    let mut best_bore: Option<CylinderMatch> = None;
+    let mut matched_bore = false;
+    let mut best_counterbore: Option<CounterboreCylinderMatch> = None;
+    let mut matched_counterbore = false;
+
+    for cylinder in &evidence.cylinders {
+        let axis_dot = axis.dot(cylinder.axis).abs();
+        let bore_diameter_delta = (cylinder.radius_mm * 2.0 - bore_diameter).abs();
+        let centerline_distance = cylinder.point.distance_to_line(center, cylinder.axis);
+        let bore_candidate = CylinderMatch {
+            axis_dot,
+            diameter_delta_mm: bore_diameter_delta,
+            centerline_distance_mm: centerline_distance,
+        };
+        if best_bore
+            .as_ref()
+            .is_none_or(|best| bore_candidate.score() < best.score())
+        {
+            best_bore = Some(bore_candidate);
+        }
+        if bore_diameter_delta <= bore_diameter_tolerance
+            && axis_dot >= axis_dot_min
+            && centerline_distance <= centerline_tolerance
+        {
+            matched_bore = true;
+        }
+
+        let counterbore_diameter_delta = (cylinder.radius_mm * 2.0 - counterbore_diameter).abs();
+        let counterbore_centerline_distance =
+            cylinder.point.distance_to_line(center, cylinder.axis);
+        let counterbore_axial_distance = cylinder.point.sub(counterbore_center).dot(axis).abs();
+        let counterbore_candidate = CounterboreCylinderMatch {
+            axis_dot,
+            diameter_delta_mm: counterbore_diameter_delta,
+            centerline_distance_mm: counterbore_centerline_distance,
+            axial_distance_mm: counterbore_axial_distance,
+        };
+        if best_counterbore
+            .as_ref()
+            .is_none_or(|best| counterbore_candidate.score() < best.score())
+        {
+            best_counterbore = Some(counterbore_candidate);
+        }
+        if counterbore_diameter_delta <= counterbore_diameter_tolerance
+            && axis_dot >= axis_dot_min
+            && counterbore_centerline_distance <= centerline_tolerance
+            && counterbore_axial_distance
+                <= (counterbore_depth / 2.0 + counterbore_center_tolerance)
+        {
+            matched_counterbore = true;
+        }
+    }
+
+    let mut best_shoulder: Option<PlaneMatch> = None;
+    let mut matched_shoulder = false;
+    for plane in &evidence.planes {
+        let normal_dot = axis.dot(plane.normal).abs();
+        let distance = shoulder_center.sub(plane.point).dot(plane.normal).abs();
+        let candidate = PlaneMatch {
+            normal_dot,
+            distance_mm: distance,
+        };
+        if best_shoulder
+            .as_ref()
+            .is_none_or(|best| candidate.score() < best.score())
+        {
+            best_shoulder = Some(candidate);
+        }
+        if normal_dot >= axis_dot_min && distance <= shoulder_plane_tolerance {
+            matched_shoulder = true;
+        }
+    }
+
+    let pass = matched_bore && matched_counterbore && matched_shoulder;
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "missing_declared_feature" },
+        "feature_id": feature_id,
+        "measured": {
+            "artifact_path": resolved_artifact.label_path,
+            "candidate_cylinders": evidence.cylinders.len(),
+            "candidate_planes": evidence.planes.len(),
+            "matched_bore_cylinder": matched_bore,
+            "matched_counterbore_cylinder": matched_counterbore,
+            "matched_counterbore_shoulder_plane": matched_shoulder,
+            "best_bore_diameter_delta_mm": best_bore.as_ref().map(|value| round(value.diameter_delta_mm)),
+            "best_bore_axis_dot": best_bore.as_ref().map(|value| round(value.axis_dot)),
+            "best_bore_centerline_distance_mm": best_bore.as_ref().map(|value| round(value.centerline_distance_mm)),
+            "best_counterbore_diameter_delta_mm": best_counterbore.as_ref().map(|value| round(value.diameter_delta_mm)),
+            "best_counterbore_axis_dot": best_counterbore.as_ref().map(|value| round(value.axis_dot)),
+            "best_counterbore_centerline_distance_mm": best_counterbore.as_ref().map(|value| round(value.centerline_distance_mm)),
+            "best_counterbore_axial_distance_mm": best_counterbore.as_ref().map(|value| round(value.axial_distance_mm)),
+            "best_shoulder_plane_normal_dot": best_shoulder.as_ref().map(|value| round(value.normal_dot)),
+            "best_shoulder_plane_distance_mm": best_shoulder.as_ref().map(|value| round(value.distance_mm))
+        },
+        "required": {
+            "bore_diameter_mm": bore_diameter,
+            "counterbore_diameter_mm": counterbore_diameter,
+            "counterbore_depth_mm": counterbore_depth,
+            "center_mm": center.to_json(),
+            "axis": axis.to_json(),
+            "counterbore_center_mm": counterbore_center.to_json(),
+            "shoulder_center_mm": shoulder_center.to_json(),
+            "bore_diameter_tolerance_mm": bore_diameter_tolerance,
+            "counterbore_diameter_tolerance_mm": counterbore_diameter_tolerance,
+            "centerline_tolerance_mm": centerline_tolerance,
+            "counterbore_center_tolerance_mm": counterbore_center_tolerance,
+            "counterbore_axial_tolerance_mm": counterbore_depth / 2.0 + counterbore_center_tolerance,
+            "shoulder_plane_tolerance_mm": shoulder_plane_tolerance,
+            "axis_dot_min": axis_dot_min
+        },
+        "message": if pass {
+            "Declared counterbore bore, counterbore, and shoulder geometry exists in the STEP artifact."
+        } else {
+            "Design data declares a counterbore, but matching bore, counterbore, and shoulder geometry was not found."
+        }
     })
 }
 
@@ -1357,6 +1637,23 @@ struct CylinderMatch {
 impl CylinderMatch {
     fn score(&self) -> f64 {
         self.diameter_delta_mm + (1.0 - self.axis_dot).abs() + self.centerline_distance_mm
+    }
+}
+
+#[derive(Debug)]
+struct CounterboreCylinderMatch {
+    axis_dot: f64,
+    diameter_delta_mm: f64,
+    centerline_distance_mm: f64,
+    axial_distance_mm: f64,
+}
+
+impl CounterboreCylinderMatch {
+    fn score(&self) -> f64 {
+        self.diameter_delta_mm
+            + (1.0 - self.axis_dot).abs()
+            + self.centerline_distance_mm
+            + self.axial_distance_mm
     }
 }
 
@@ -2219,7 +2516,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.5.0")
+            Some("0.6.0")
         );
     }
 
@@ -2398,6 +2695,112 @@ mod tests {
     }
 
     #[test]
+    fn counterbore_presence_requires_bore_counterbore_and_shoulder_plane() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_surfaces(
+            &step_path,
+            &[
+                ((0.0, 0.0, 8.0), (1.0, 0.0, 0.0), 1.7),
+                ((-8.0, 0.0, 8.0), (1.0, 0.0, 0.0), 3.4),
+            ],
+            &[((-6.0, 0.0, 8.0), (1.0, 0.0, 0.0))],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = counterbore_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "mechanical_interface",
+            6.8,
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:counterbore_step_presence")
+                && string_field(check, "reason") == Some("ok")
+                && check
+                    .pointer("/measured/matched_bore_cylinder")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+                && check
+                    .pointer("/measured/matched_counterbore_cylinder")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+                && check
+                    .pointer("/measured/matched_counterbore_shoulder_plane")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+        }));
+    }
+
+    #[test]
+    fn counterbore_presence_rejects_two_cylinders_without_shoulder() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinders(
+            &step_path,
+            &[
+                ((0.0, 0.0, 8.0), (1.0, 0.0, 0.0), 1.7),
+                ((-8.0, 0.0, 8.0), (1.0, 0.0, 0.0), 3.4),
+            ],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = counterbore_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "mechanical_interface",
+            6.8,
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:counterbore_step_presence")
+                && string_field(check, "reason") == Some("missing_declared_feature")
+                && check
+                    .pointer("/measured/matched_bore_cylinder")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+                && check
+                    .pointer("/measured/matched_counterbore_cylinder")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+                && check
+                    .pointer("/measured/matched_counterbore_shoulder_plane")
+                    .and_then(Value::as_bool)
+                    == Some(false)
+        }));
+    }
+
+    #[test]
+    fn counterbore_presence_rejects_invalid_dimensions() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinder(&step_path, (0.0, 0.0, 8.0), (1.0, 0.0, 0.0), 1.7);
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = counterbore_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "mechanical_interface",
+            3.4,
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:counterbore_step_presence")
+                && string_field(check, "reason") == Some("invalid_counterbore_dimensions")
+        }));
+    }
+
+    #[test]
     fn cosmetic_straight_slot_intent_is_not_linted_by_actuator_rules() {
         let temp = tempfile::tempdir().unwrap();
         let step_path = temp.path().join("part.step");
@@ -2415,6 +2818,35 @@ mod tests {
             sha256_file(&source_path).unwrap(),
             sha256_file(&step_path).unwrap(),
             "cosmetic",
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id")
+                .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
+        }));
+    }
+
+    #[test]
+    fn cosmetic_counterbore_intent_is_not_linted_by_actuator_rules() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinders(
+            &step_path,
+            &[
+                ((0.0, 0.0, 8.0), (1.0, 0.0, 0.0), 1.7),
+                ((-8.0, 0.0, 8.0), (1.0, 0.0, 0.0), 3.4),
+            ],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = counterbore_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "cosmetic",
+            6.8,
         );
         let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
 
@@ -2715,6 +3147,58 @@ mod tests {
                     "center_mm": [0.0, 0.0, 8.0],
                     "axis": [1.0, 0.0, 0.0],
                     "span_axis": [0.0, 1.0, 0.0],
+                    "role": "loaded_mount"
+                }
+            ]
+        })
+    }
+
+    fn counterbore_manifest(
+        source_sha: String,
+        artifact_sha: String,
+        intent: &str,
+        counterbore_diameter: f64,
+    ) -> Value {
+        json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "unit-counterbore-presence",
+            "artifact_version": "0.1.0",
+            "artifact_type": "actuator_mount",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": source_sha,
+                "size_bytes": 16
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": artifact_sha
+                }
+            ],
+            "parts": [
+                {
+                    "id": "housing",
+                    "bbox_mm": {
+                        "min": [-10.0, -10.0, 0.0],
+                        "max": [10.0, 10.0, 16.0]
+                    }
+                }
+            ],
+            "features": [
+                {
+                    "id": "counterbore_claimed",
+                    "part": "housing",
+                    "kind": "counterbore",
+                    "intent": intent,
+                    "bore_diameter_mm": 3.4,
+                    "counterbore_diameter_mm": counterbore_diameter,
+                    "counterbore_depth_mm": 4.0,
+                    "center_mm": [0.0, 0.0, 8.0],
+                    "axis": [1.0, 0.0, 0.0],
+                    "counterbore_center_mm": [-8.0, 0.0, 8.0],
+                    "shoulder_center_mm": [-6.0, 0.0, 8.0],
                     "role": "loaded_mount"
                 }
             ]

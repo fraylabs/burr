@@ -60,6 +60,7 @@ npm run check
 npm run check:build123d
 npm run check:ocp
 npm run check:mixed-intent
+npm run check:counterbore
 npm run check:slots
 ```
 

@@ -26,6 +26,8 @@
     "examples/build123d-step-presence/bad/design.py",
     "examples/build123d-step-presence/good/design.py",
     "examples/build123d-mixed-intent/design.py",
+    "examples/build123d-counterbore/bad/design.py",
+    "examples/build123d-counterbore/good/design.py",
     "examples/build123d-straight-slot/bad/design.py",
     "examples/build123d-straight-slot/good/design.py",
     "examples/linear-actuator-bad",
@@ -41,6 +43,7 @@
     "check:build123d": "PYTHON=\"uv run --package burr-build123d python\" node scripts/check-build123d-examples.mjs",
     "check:ocp": "node scripts/check-ocp-step-cylinders.mjs",
     "check:mixed-intent": "node scripts/check-mixed-intent.mjs",
+    "check:counterbore": "node scripts/check-build123d-counterbore.mjs",
     "check:slots": "node scripts/check-build123d-straight-slot.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",
     "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init"
