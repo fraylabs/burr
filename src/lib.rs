@@ -424,6 +424,8 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
                     Some("straight slot")
                 } else if rule_id.contains("counterbore") {
                     Some("counterbore")
+                } else if rule_id.contains("heat_set_insert_pocket") {
+                    Some("heat-set insert pocket")
                 } else {
                     None
                 }
@@ -842,6 +844,16 @@ fn check_feature_presence(
         );
     }
 
+    if string_field(feature, "kind") == Some("heat_set_insert_pocket") {
+        return check_heat_set_insert_pocket_presence(
+            full_rule_id,
+            feature_id,
+            resolved_artifact,
+            rule,
+            feature,
+        );
+    }
+
     if string_field(feature, "kind") == Some("straight_slot") {
         return check_straight_slot_presence(
             full_rule_id,
@@ -978,6 +990,214 @@ fn check_feature_presence(
             "centerline_tolerance_mm": centerline_tolerance
         },
         "message": "Design data declares a clearance hole, but no matching cylindrical STEP geometry was found."
+    })
+}
+
+fn check_heat_set_insert_pocket_presence(
+    full_rule_id: String,
+    feature_id: Value,
+    resolved_artifact: ResolvedFileRef,
+    rule: &Value,
+    feature: &Value,
+) -> Value {
+    let Some(pocket_diameter) = number_field(feature, "pocket_diameter_mm")
+        .or_else(|| number_field(feature, "pilot_diameter_mm"))
+        .filter(|value| *value > 0.0)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_pocket_diameter",
+            "feature_id": feature_id,
+            "message": "Heat-set insert pocket_diameter_mm is required for STEP feature-presence checking."
+        });
+    };
+    let Some(pocket_depth) = number_field(feature, "pocket_depth_mm").filter(|value| *value > 0.0)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_pocket_depth",
+            "feature_id": feature_id,
+            "message": "Heat-set insert pocket_depth_mm is required for STEP feature-presence checking."
+        });
+    };
+    let Some(center) = feature
+        .get("center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_center",
+            "feature_id": feature_id,
+            "message": "Feature center_mm is required for STEP feature-presence checking."
+        });
+    };
+    let Some(axis) = feature
+        .get("axis")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .and_then(Vec3::normalized)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_axis",
+            "feature_id": feature_id,
+            "message": "Feature axis is required for STEP feature-presence checking."
+        });
+    };
+    let Some(pocket_center) = feature
+        .get("pocket_center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_pocket_center",
+            "feature_id": feature_id,
+            "message": "Heat-set insert pocket_center_mm is required for STEP feature-presence checking."
+        });
+    };
+    let Some(bottom_center) = feature
+        .get("bottom_center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_pocket_bottom_center",
+            "feature_id": feature_id,
+            "message": "Heat-set insert bottom_center_mm is required for STEP feature-presence checking."
+        });
+    };
+
+    let evidence = match parse_step_evidence(&resolved_artifact.file_path) {
+        Ok(evidence) => evidence,
+        Err(error) => {
+            return json!({
+                "rule_id": full_rule_id,
+                "status": "fail",
+                "reason": "step_geometry_unreadable",
+                "feature_id": feature_id,
+                "measured": {
+                    "artifact_path": resolved_artifact.label_path
+                },
+                "message": error
+            });
+        }
+    };
+
+    let pocket_diameter_tolerance = number_field(rule, "pocket_diameter_tolerance_mm")
+        .or_else(|| number_field(rule, "pilot_diameter_tolerance_mm"))
+        .or_else(|| number_field(rule, "diameter_tolerance_mm"))
+        .unwrap_or(0.05)
+        .max(0.0);
+    let centerline_tolerance = number_field(rule, "centerline_tolerance_mm")
+        .unwrap_or(0.25)
+        .max(0.0);
+    let pocket_center_tolerance = number_field(rule, "pocket_center_tolerance_mm")
+        .unwrap_or(0.5)
+        .max(0.0);
+    let bottom_plane_tolerance = number_field(rule, "bottom_plane_tolerance_mm")
+        .or_else(|| number_field(rule, "plane_tolerance_mm"))
+        .unwrap_or(0.25)
+        .max(0.0);
+    let axis_dot_min = number_field(rule, "axis_dot_min")
+        .unwrap_or(0.99)
+        .clamp(0.0, 1.0);
+
+    let mut best_pocket: Option<CounterboreCylinderMatch> = None;
+    let mut matched_pocket = false;
+    for cylinder in &evidence.cylinders {
+        let axis_dot = axis.dot(cylinder.axis).abs();
+        let diameter_delta = (cylinder.radius_mm * 2.0 - pocket_diameter).abs();
+        let centerline_distance = cylinder.point.distance_to_line(center, cylinder.axis);
+        let axial_distance = cylinder.point.sub(pocket_center).dot(axis).abs();
+        let candidate = CounterboreCylinderMatch {
+            axis_dot,
+            diameter_delta_mm: diameter_delta,
+            centerline_distance_mm: centerline_distance,
+            axial_distance_mm: axial_distance,
+        };
+        if best_pocket
+            .as_ref()
+            .is_none_or(|best| candidate.score() < best.score())
+        {
+            best_pocket = Some(candidate);
+        }
+        if diameter_delta <= pocket_diameter_tolerance
+            && axis_dot >= axis_dot_min
+            && centerline_distance <= centerline_tolerance
+            && axial_distance <= (pocket_depth / 2.0 + pocket_center_tolerance)
+        {
+            matched_pocket = true;
+        }
+    }
+
+    let mut best_bottom: Option<PlaneMatch> = None;
+    let mut matched_bottom = false;
+    for plane in &evidence.planes {
+        let normal_dot = axis.dot(plane.normal).abs();
+        let distance = bottom_center.sub(plane.point).dot(plane.normal).abs();
+        let candidate = PlaneMatch {
+            normal_dot,
+            distance_mm: distance,
+        };
+        if best_bottom
+            .as_ref()
+            .is_none_or(|best| candidate.score() < best.score())
+        {
+            best_bottom = Some(candidate);
+        }
+        if normal_dot >= axis_dot_min && distance <= bottom_plane_tolerance {
+            matched_bottom = true;
+        }
+    }
+
+    let pass = matched_pocket && matched_bottom;
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "missing_declared_feature" },
+        "feature_id": feature_id,
+        "measured": {
+            "artifact_path": resolved_artifact.label_path,
+            "candidate_cylinders": evidence.cylinders.len(),
+            "candidate_planes": evidence.planes.len(),
+            "matched_pocket_cylinder": matched_pocket,
+            "matched_pocket_bottom_plane": matched_bottom,
+            "best_pocket_diameter_delta_mm": best_pocket.as_ref().map(|value| round(value.diameter_delta_mm)),
+            "best_pocket_axis_dot": best_pocket.as_ref().map(|value| round(value.axis_dot)),
+            "best_pocket_centerline_distance_mm": best_pocket.as_ref().map(|value| round(value.centerline_distance_mm)),
+            "best_pocket_axial_distance_mm": best_pocket.as_ref().map(|value| round(value.axial_distance_mm)),
+            "best_bottom_plane_normal_dot": best_bottom.as_ref().map(|value| round(value.normal_dot)),
+            "best_bottom_plane_distance_mm": best_bottom.as_ref().map(|value| round(value.distance_mm))
+        },
+        "required": {
+            "pocket_diameter_mm": pocket_diameter,
+            "pocket_depth_mm": pocket_depth,
+            "center_mm": center.to_json(),
+            "axis": axis.to_json(),
+            "pocket_center_mm": pocket_center.to_json(),
+            "bottom_center_mm": bottom_center.to_json(),
+            "pocket_diameter_tolerance_mm": pocket_diameter_tolerance,
+            "centerline_tolerance_mm": centerline_tolerance,
+            "pocket_center_tolerance_mm": pocket_center_tolerance,
+            "pocket_axial_tolerance_mm": pocket_depth / 2.0 + pocket_center_tolerance,
+            "bottom_plane_tolerance_mm": bottom_plane_tolerance,
+            "axis_dot_min": axis_dot_min
+        },
+        "message": if pass {
+            "Declared heat-set insert pocket cylinder and bottom-plane geometry exists in the STEP artifact."
+        } else {
+            "Design data declares a heat-set insert pocket, but matching blind pocket geometry was not found."
+        }
     })
 }
 
@@ -2516,7 +2736,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.6.0")
+            Some("0.7.0")
         );
     }
 
@@ -2801,6 +3021,72 @@ mod tests {
     }
 
     #[test]
+    fn heat_set_insert_pocket_presence_requires_cylinder_and_bottom_plane() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_surfaces(
+            &step_path,
+            &[((-7.15, 0.0, 8.0), (1.0, 0.0, 0.0), 2.3)],
+            &[((-4.3, 0.0, 8.0), (1.0, 0.0, 0.0))],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = heat_set_insert_pocket_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "mechanical_interface",
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id")
+                == Some("actuator_mount:heat_set_insert_pocket_step_presence")
+                && string_field(check, "reason") == Some("ok")
+                && check
+                    .pointer("/measured/matched_pocket_cylinder")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+                && check
+                    .pointer("/measured/matched_pocket_bottom_plane")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+        }));
+    }
+
+    #[test]
+    fn heat_set_insert_pocket_presence_rejects_through_hole_without_bottom_plane() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinder(&step_path, (-7.15, 0.0, 8.0), (1.0, 0.0, 0.0), 2.3);
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = heat_set_insert_pocket_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "mechanical_interface",
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id")
+                == Some("actuator_mount:heat_set_insert_pocket_step_presence")
+                && string_field(check, "reason") == Some("missing_declared_feature")
+                && check
+                    .pointer("/measured/matched_pocket_cylinder")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+                && check
+                    .pointer("/measured/matched_pocket_bottom_plane")
+                    .and_then(Value::as_bool)
+                    == Some(false)
+        }));
+    }
+
+    #[test]
     fn cosmetic_straight_slot_intent_is_not_linted_by_actuator_rules() {
         let temp = tempfile::tempdir().unwrap();
         let step_path = temp.path().join("part.step");
@@ -2847,6 +3133,32 @@ mod tests {
             sha256_file(&step_path).unwrap(),
             "cosmetic",
             6.8,
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id")
+                .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
+        }));
+    }
+
+    #[test]
+    fn cosmetic_insert_pocket_intent_is_not_linted_by_actuator_rules() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_surfaces(
+            &step_path,
+            &[((-7.15, 0.0, 8.0), (1.0, 0.0, 0.0), 2.3)],
+            &[((-4.3, 0.0, 8.0), (1.0, 0.0, 0.0))],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = heat_set_insert_pocket_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "cosmetic",
         );
         let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
 
@@ -3200,6 +3512,57 @@ mod tests {
                     "counterbore_center_mm": [-8.0, 0.0, 8.0],
                     "shoulder_center_mm": [-6.0, 0.0, 8.0],
                     "role": "loaded_mount"
+                }
+            ]
+        })
+    }
+
+    fn heat_set_insert_pocket_manifest(
+        source_sha: String,
+        artifact_sha: String,
+        intent: &str,
+    ) -> Value {
+        json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "unit-heat-set-insert-pocket-presence",
+            "artifact_version": "0.1.0",
+            "artifact_type": "actuator_mount",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": source_sha,
+                "size_bytes": 16
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": artifact_sha
+                }
+            ],
+            "parts": [
+                {
+                    "id": "housing",
+                    "bbox_mm": {
+                        "min": [-10.0, -10.0, 0.0],
+                        "max": [10.0, 10.0, 16.0]
+                    }
+                }
+            ],
+            "features": [
+                {
+                    "id": "m3_insert_pocket",
+                    "part": "housing",
+                    "kind": "heat_set_insert_pocket",
+                    "intent": intent,
+                    "insert": "M3x5.7",
+                    "pocket_diameter_mm": 4.6,
+                    "pocket_depth_mm": 5.7,
+                    "center_mm": [0.0, 0.0, 8.0],
+                    "axis": [1.0, 0.0, 0.0],
+                    "pocket_center_mm": [-7.15, 0.0, 8.0],
+                    "bottom_center_mm": [-4.3, 0.0, 8.0],
+                    "role": "threaded_mount"
                 }
             ]
         })

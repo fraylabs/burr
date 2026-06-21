@@ -1,7 +1,7 @@
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "artifact_type": "actuator_mount",
   "process_kind": "FDM",
   "rules": [
@@ -70,6 +70,21 @@
       "centerline_tolerance_mm": 0.25,
       "counterbore_center_tolerance_mm": 0.5,
       "shoulder_plane_tolerance_mm": 0.25,
+      "axis_dot_min": 0.99
+    },
+    {
+      "id": "heat_set_insert_pocket_step_presence",
+      "kind": "feature_presence",
+      "description": "Declared heat-set insert pockets must exist as matching blind pocket cylindrical and bottom-plane geometry in the exported STEP artifact.",
+      "applies_to": {
+        "kind": "heat_set_insert_pocket",
+        "intent_any": ["mechanical_interface"]
+      },
+      "artifact_kind": "step",
+      "pocket_diameter_tolerance_mm": 0.05,
+      "centerline_tolerance_mm": 0.25,
+      "pocket_center_tolerance_mm": 0.5,
+      "bottom_plane_tolerance_mm": 0.25,
       "axis_dot_min": 0.99
     }
   ]

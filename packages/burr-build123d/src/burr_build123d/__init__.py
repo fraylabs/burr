@@ -15,7 +15,7 @@ from typing import Any
 
 DESIGN_DATA_FILE = "burr-design-data.json"
 DESIGN_DATA_SCHEMA = "burr.design-data.v1"
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 
 def _round_vector(values: tuple[float, float, float] | list[float]) -> list[float]:
@@ -180,6 +180,44 @@ class BurrDesignData:
                 "axis": _round_vector(axis),
                 "counterbore_center_mm": _round_vector(counterbore_center),
                 "shoulder_center_mm": _round_vector(shoulder_center),
+                "role": role,
+            },
+        )
+
+    def heat_set_insert_pocket(
+        self,
+        *,
+        feature_id: str,
+        part: str,
+        insert: str,
+        pocket_diameter_mm: float,
+        pocket_depth_mm: float,
+        center: tuple[float, float, float] | list[float],
+        axis: tuple[float, float, float] | list[float],
+        pocket_center: tuple[float, float, float] | list[float],
+        bottom_center: tuple[float, float, float] | list[float],
+        role: str,
+        intent: str = "mechanical_interface",
+    ) -> None:
+        if not intent:
+            raise ValueError("heat_set_insert_pocket intent must be a non-empty string.")
+        if pocket_diameter_mm <= 0:
+            raise ValueError("heat_set_insert_pocket pocket_diameter_mm must be positive.")
+        if pocket_depth_mm <= 0:
+            raise ValueError("heat_set_insert_pocket pocket_depth_mm must be positive.")
+        self.features.append(
+            {
+                "id": feature_id,
+                "part": part,
+                "kind": "heat_set_insert_pocket",
+                "intent": intent,
+                "insert": insert,
+                "pocket_diameter_mm": float(pocket_diameter_mm),
+                "pocket_depth_mm": float(pocket_depth_mm),
+                "center_mm": _round_vector(center),
+                "axis": _round_vector(axis),
+                "pocket_center_mm": _round_vector(pocket_center),
+                "bottom_center_mm": _round_vector(bottom_center),
                 "role": role,
             },
         )
@@ -419,11 +457,88 @@ def counterbore(
         )
 
 
+def heat_set_insert_pocket(
+    design: BurrDesignData,
+    *,
+    feature_id: str,
+    part: str,
+    center: tuple[float, float, float] | list[float],
+    axis: tuple[float, float, float] | list[float],
+    role: str,
+    insert: str,
+    pocket_diameter_mm: float,
+    pocket_depth_mm: float,
+    host_depth_mm: float,
+    side: str = "negative",
+    intent: str = "mechanical_interface",
+    create_geometry: bool = True,
+) -> None:
+    """Create a narrow build123d blind insert pocket and record pocket intent.
+
+    V1 supports blind pockets cut along X from the negative or positive side.
+    Burr verifies the cylindrical pocket wall and the pocket bottom plane.
+    """
+
+    if _round_vector(axis) != [1.0, 0.0, 0.0]:
+        raise ValueError("heat_set_insert_pocket currently requires axis=(1, 0, 0).")
+    if side not in {"negative", "positive"}:
+        raise ValueError("heat_set_insert_pocket side must be 'negative' or 'positive'.")
+    if host_depth_mm <= pocket_depth_mm:
+        raise ValueError("heat_set_insert_pocket host_depth_mm must be greater than pocket_depth_mm.")
+
+    center_x, center_y, center_z = tuple(center)
+    side_sign = -1.0 if side == "negative" else 1.0
+    pocket_center = (
+        center_x + side_sign * ((host_depth_mm - pocket_depth_mm) / 2.0),
+        center_y,
+        center_z,
+    )
+    bottom_center = (
+        pocket_center[0] - side_sign * (pocket_depth_mm / 2.0),
+        center_y,
+        center_z,
+    )
+
+    design.heat_set_insert_pocket(
+        feature_id=feature_id,
+        part=part,
+        insert=insert,
+        pocket_diameter_mm=pocket_diameter_mm,
+        pocket_depth_mm=pocket_depth_mm,
+        center=center,
+        axis=axis,
+        pocket_center=pocket_center,
+        bottom_center=bottom_center,
+        role=role,
+        intent=intent,
+    )
+
+    if not create_geometry:
+        return
+
+    try:
+        from build123d import Cylinder, Locations, Mode
+    except ImportError as error:
+        raise RuntimeError(
+            "heat_set_insert_pocket(create_geometry=True) requires build123d. "
+            "Install build123d or pass create_geometry=False.",
+        ) from error
+
+    with Locations(pocket_center):
+        Cylinder(
+            radius=pocket_diameter_mm / 2.0,
+            height=pocket_depth_mm,
+            rotation=(0, 90, 0),
+            mode=Mode.SUBTRACT,
+        )
+
+
 __all__ = [
     "BurrDesignData",
     "DESIGN_DATA_FILE",
     "DESIGN_DATA_SCHEMA",
     "counterbore",
+    "heat_set_insert_pocket",
     "__version__",
     "m3_clearance_hole",
     "straight_slot",

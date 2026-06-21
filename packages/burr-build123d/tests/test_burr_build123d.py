@@ -3,7 +3,14 @@ import json
 import tempfile
 import unittest
 
-from burr_build123d import BurrDesignData, DESIGN_DATA_FILE, counterbore, m3_clearance_hole, straight_slot
+from burr_build123d import (
+    BurrDesignData,
+    DESIGN_DATA_FILE,
+    counterbore,
+    heat_set_insert_pocket,
+    m3_clearance_hole,
+    straight_slot,
+)
 
 
 class BurrBuild123dTests(unittest.TestCase):
@@ -175,6 +182,55 @@ class BurrBuild123dTests(unittest.TestCase):
                 counterbore_diameter_mm=3.4,
                 counterbore_depth_mm=4.0,
                 through_depth_mm=20.0,
+                create_geometry=False,
+            )
+
+    def test_records_heat_set_insert_pocket_without_build123d_geometry(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        heat_set_insert_pocket(
+            design,
+            feature_id="m3_insert_pocket",
+            part="housing",
+            center=(0, 0, 10),
+            axis=(1, 0, 0),
+            role="threaded_mount",
+            insert="M3x5.7",
+            pocket_diameter_mm=4.6,
+            pocket_depth_mm=5.7,
+            host_depth_mm=20.0,
+            create_geometry=False,
+        )
+
+        feature = design.features[0]
+        self.assertEqual(feature["kind"], "heat_set_insert_pocket")
+        self.assertEqual(feature["intent"], "mechanical_interface")
+        self.assertEqual(feature["insert"], "M3x5.7")
+        self.assertEqual(feature["pocket_diameter_mm"], 4.6)
+        self.assertEqual(feature["pocket_depth_mm"], 5.7)
+        self.assertEqual(feature["center_mm"], [0.0, 0.0, 10.0])
+        self.assertEqual(feature["pocket_center_mm"], [-7.15, 0.0, 10.0])
+        self.assertEqual(feature["bottom_center_mm"], [-4.3, 0.0, 10.0])
+
+    def test_rejects_invalid_heat_set_insert_pocket(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        with self.assertRaises(ValueError):
+            heat_set_insert_pocket(
+                design,
+                feature_id="bad_insert_pocket",
+                part="housing",
+                center=(0, 0, 0),
+                axis=(1, 0, 0),
+                role="threaded_mount",
+                insert="M3x5.7",
+                pocket_diameter_mm=4.6,
+                pocket_depth_mm=5.7,
+                host_depth_mm=5.7,
                 create_geometry=False,
             )
 
