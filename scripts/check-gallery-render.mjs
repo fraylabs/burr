@@ -1,12 +1,9 @@
 #!/usr/bin/env node
 import fs from "node:fs"
 import { spawnSync } from "node:child_process"
+import { galleryExamples } from "./gallery-examples.mjs"
 
-const expected = [
-  "artifacts/gallery-previews/shaft-bearing-bracket.png",
-  "artifacts/gallery-previews/slotted-motor-plate.png",
-  "artifacts/gallery-previews/electronics-standoff-deck.png",
-]
+const expected = galleryExamples.map((example) => `artifacts/gallery-previews/${example.preview}`)
 
 const result = spawnSync("node", ["scripts/render-gallery.mjs"], {
   encoding: "utf8",
@@ -31,4 +28,3 @@ for (const png of expected) {
 }
 
 console.log("gallery render proof passed")
-

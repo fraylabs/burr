@@ -61,6 +61,8 @@
     "check:gallery": "node scripts/check-gallery.mjs",
     "gallery:render": "node scripts/render-gallery.mjs",
     "check:gallery:render": "node scripts/check-gallery-render.mjs",
+    "gallery:artifact": "node scripts/build-gallery-artifact.mjs",
+    "check:gallery:artifact": "node scripts/check-gallery-artifact.mjs",
     "check:explain": "node scripts/check-explain.mjs",
     "check:fresh-install": "node scripts/check-fresh-install.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",

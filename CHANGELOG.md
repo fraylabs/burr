@@ -8,6 +8,6 @@
   output.
 - Added gallery preview rendering with ignored PNG proof artifacts under
   `artifacts/gallery-previews/`.
+- Added versioned gallery artifact bundles for website/release consumption.
 - Tightened npm package contents so generated receipts and previews do not ship
   accidentally.
-
