@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Design-rule checks for CAD-as-code workflows.",
   "type": "module",
   "files": [
@@ -43,6 +43,7 @@
     "examples/linear-actuator-good/burr-design-data.json",
     "examples/linear-actuator-good/source.py",
     "README.md",
+    "CHANGELOG.md",
     "INSTALL.md",
     "LICENSE"
   ],

@@ -371,7 +371,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.9.0",
+  "burr_version": "0.10.0",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.8.0",
   "compatibility": {
