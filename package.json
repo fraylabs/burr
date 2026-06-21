@@ -58,6 +58,8 @@
     "check:insert-pocket": "node scripts/check-build123d-heat-set-insert-pocket.mjs",
     "check:slots": "node scripts/check-build123d-straight-slot.mjs",
     "check:gallery": "node scripts/check-gallery.mjs",
+    "gallery:render": "node scripts/render-gallery.mjs",
+    "check:gallery:render": "node scripts/check-gallery-render.mjs",
     "check:explain": "node scripts/check-explain.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",
     "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init"

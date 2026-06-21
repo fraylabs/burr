@@ -28,3 +28,4 @@ burr-receipt.json
 .DS_Store
 dist/
 coverage/
+artifacts/

@@ -65,6 +65,7 @@ npm run check:counterbore
 npm run check:insert-pocket
 npm run check:slots
 npm run check:gallery
+npm run check:gallery:render
 npm run check:explain
 ```
 
