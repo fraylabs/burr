@@ -1,29 +1,57 @@
 #!/usr/bin/env node
-import fs from "node:fs"
-import path from "node:path"
-import { spawnSync } from "node:child_process"
-import { galleryExamples } from "./gallery-examples.mjs"
+import fs from "node:fs";
+import path from "node:path";
+import { spawnSync } from "node:child_process";
+import { galleryExamples } from "./gallery-examples.mjs";
 
-const outputDir = "artifacts/gallery-previews"
+const outputDir = "artifacts/gallery-previews";
 
 function run(command, args) {
   const result = spawnSync(command, args, {
     encoding: "utf8",
     maxBuffer: 1024 * 1024 * 32,
-  })
-  const output = [result.stdout, result.stderr].filter(Boolean).join("\n")
+  });
+  const output = [result.stdout, result.stderr].filter(Boolean).join("\n");
   if (result.status !== 0) {
-    throw new Error(`${command} ${args.join(" ")} failed with exit ${result.status}\n${output}`)
+    throw new Error(
+      `${command} ${args.join(" ")} failed with exit ${result.status}\n${output}`,
+    );
   }
-  return output
+  return output;
 }
 
-fs.mkdirSync(outputDir, { recursive: true })
+function runCheck(example) {
+  const result = spawnSync(
+    "cargo",
+    ["run", "--quiet", "--", "check", example.dir],
+    {
+      encoding: "utf8",
+      maxBuffer: 1024 * 1024 * 32,
+    },
+  );
+  const output = [result.stdout, result.stderr].filter(Boolean).join("\n");
+  if (example.expectation === "fail") {
+    if (result.status === 0) {
+      throw new Error(
+        `${example.slug} unexpectedly passed Burr check\n${output}`,
+      );
+    }
+  } else if (result.status !== 0) {
+    throw new Error(
+      `${example.slug} failed Burr check with exit ${result.status}\n${output}`,
+    );
+  }
+  return output;
+}
+
+fs.mkdirSync(outputDir, { recursive: true });
 
 for (const example of galleryExamples) {
-  run("uv", ["run", "--package", "burr-build123d", "python", example.design])
-  run("cargo", ["run", "--quiet", "--", "check", path.dirname(example.design)])
-  const png = path.join(outputDir, `${example.slug}.png`)
+  if (example.design) {
+    run("uv", ["run", "--package", "burr-build123d", "python", example.design]);
+  }
+  runCheck(example);
+  const png = path.join(outputDir, `${example.slug}.png`);
   run("uv", [
     "run",
     "--package",
@@ -34,8 +62,8 @@ for (const example of galleryExamples) {
     png,
     "--title",
     example.title,
-  ])
-  console.log(`RENDER ${png}`)
+  ]);
+  console.log(`RENDER ${png}`);
 }
 
-console.log(`gallery previews written to ${outputDir}`)
+console.log(`gallery previews written to ${outputDir}`);

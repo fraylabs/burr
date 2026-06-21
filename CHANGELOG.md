@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.0
+
+- Expanded the Burr gallery artifact into a good-vs-bad proof gallery.
+- Added intentional failing gallery examples for missing bearing-seat shoulders,
+  missing counterbore recesses, through-hole insert pockets, and disconnected
+  slot geometry.
+- Added manifest `expectation`, `group`, and `failed_rules` fields so websites
+  can render caught mistakes as proof, not broken cards.
+
 ## 0.10.0
 
 - Added printable gallery examples for a shaft-bearing bracket, slotted motor
