@@ -100,3 +100,30 @@ jobs:
       - name: Confirm generated artifacts are untracked
         run: |
           test -z "$(git status --short --untracked-files=no)"
+
+  fresh-install:
+    name: Fresh Install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Setup Python
+        run: uv python install 3.11
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Check published install and starter fix loop
+        run: npm run check:fresh-install

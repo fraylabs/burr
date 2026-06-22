@@ -62,6 +62,10 @@ To prove the published install path from this repo:
 npm run check:fresh-install
 ```
 
+The fresh-install check also proves the starter failure-to-fix loop: move the M3
+hole too close to the side edge, fail edge distance, explain the measured
+problem, restore the hole, and pass again.
+
 ## Product Loop
 
 Use Burr like tests for generated mechanical parts:

@@ -48,6 +48,20 @@ To verify the published install path from a Burr checkout:
 npm run check:fresh-install
 ```
 
+That check proves the starter loop end to end:
+
+```txt
+cargo install published Burr
+  -> burr init
+  -> uv run python design.py
+  -> burr check passes
+  -> move the starter M3 hole toward the side edge
+  -> burr check fails on edge distance
+  -> burr explain reports measured 4 mm vs required 10.2 mm
+  -> restore the starter
+  -> burr check passes
+```
+
 ## Local Development Checkout
 
 Clone and install:

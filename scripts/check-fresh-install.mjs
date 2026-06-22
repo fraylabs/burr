@@ -26,7 +26,7 @@ function run(command, args, options = {}) {
     maxBuffer: 1024 * 1024 * 32,
   })
   const output = [result.stdout, result.stderr].filter(Boolean).join("\n")
-  if (result.status !== 0) {
+  if (!options.allowFailure && result.status !== 0) {
     throw new Error(`${command} ${args.join(" ")} failed with exit ${result.status}\n${output}`)
   }
   return { ...result, output }
@@ -59,6 +59,54 @@ try {
     throw new Error(`Fresh install explain output did not report no failures.\n${explain}`)
   }
 
+  const designPath = path.join(partDir, "design.py")
+  const goodDesign = fs.readFileSync(designPath, "utf8")
+  const badDesign = goodDesign.replace("m3_hole_y = 12.0", "m3_hole_y = 20.0")
+  if (badDesign === goodDesign) {
+    throw new Error("Could not patch starter design into failing edge-distance case.")
+  }
+
+  fs.writeFileSync(designPath, badDesign)
+  run("uv", ["run", "python", "design.py"], { cwd: partDir })
+
+  const badCheck = run("burr", ["check", "."], { allowFailure: true, cwd: partDir })
+  if (badCheck.status === 0) {
+    throw new Error("Expected bad starter design to fail Burr check.")
+  }
+  if (!badCheck.output.includes("FAIL burr-design-data.json -> burr-receipt.json")) {
+    throw new Error(`Unexpected failing Burr check output.\n${badCheck.output}`)
+  }
+
+  const badReceipt = JSON.parse(fs.readFileSync(path.join(partDir, "burr-receipt.json"), "utf8"))
+  const hasEdgeDistanceFailure = badReceipt.checks?.some(
+    (check) => check.status === "fail" && check.reason === "insufficient_edge_distance"
+  )
+  if (!hasEdgeDistanceFailure) {
+    throw new Error("Bad starter receipt did not fail on insufficient_edge_distance.")
+  }
+
+  const badExplain = run("burr", ["explain", "."], { cwd: partDir }).output
+  for (const expected of [
+    "Status: fail",
+    "Feature: m3_lower_left",
+    "Rule: actuator_mount:m3_loaded_hole_edge_distance",
+    "Problem: the loaded M3 hole is too close to a free edge.",
+    "Evidence: Measured center-to-edge = 4 mm.",
+    "Evidence: Required center-to-edge = 10.2 mm.",
+    "Fix: move the hole inward or make the surrounding part larger.",
+  ]) {
+    if (!badExplain.includes(expected)) {
+      throw new Error(`Fresh install explain output missing ${expected}.\n${badExplain}`)
+    }
+  }
+
+  fs.writeFileSync(designPath, goodDesign)
+  run("uv", ["run", "python", "design.py"], { cwd: partDir })
+  const fixedCheck = run("burr", ["check", "."], { cwd: partDir })
+  if (!fixedCheck.output.includes("PASS burr-design-data.json -> burr-receipt.json")) {
+    throw new Error(`Fixed starter design did not pass Burr check.\n${fixedCheck.output}`)
+  }
+
   for (const file of ["design.py", "actuator.step", "burr-design-data.json", "burr-receipt.json"]) {
     const target = path.join(partDir, file)
     if (!fs.existsSync(target)) {
@@ -66,8 +114,7 @@ try {
     }
   }
 
-  console.log(`fresh install proof passed with burr ${burrVersion}`)
+  console.log(`fresh install and failure-to-fix proof passed with burr ${burrVersion}`)
 } finally {
   fs.rmSync(tmp, { recursive: true, force: true })
 }
-
