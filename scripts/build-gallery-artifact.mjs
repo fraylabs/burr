@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { galleryExamples } from "./gallery-examples.mjs";
+import { buildRepairReports } from "./repair-report-builder.mjs";
 
 const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const version = packageJson.version;
@@ -31,16 +32,18 @@ fs.mkdirSync(releaseDir, { recursive: true });
 
 run("node", ["scripts/render-gallery.mjs"]);
 
+const generatedAt = new Date().toISOString();
 const manifest = {
   schema_version: "burr.gallery-artifact.v1",
   burr_version: version,
   artifact_id: artifactSlug,
-  generated_at: new Date().toISOString(),
+  generated_at: generatedAt,
   source: {
     repository: "fraylabs/burr",
     tag: `burr-v${version}`,
   },
   examples: [],
+  repair_reports: [],
 };
 
 for (const example of galleryExamples) {
@@ -88,6 +91,13 @@ for (const example of galleryExamples) {
   });
 }
 
+manifest.repair_reports = buildRepairReports({
+  releaseDir,
+  version,
+  generatedAt,
+  examples: manifest.examples,
+});
+
 fs.writeFileSync(
   path.join(releaseDir, "manifest.json"),
   JSON.stringify(manifest, null, 2) + "\n",
@@ -104,10 +114,12 @@ fs.writeFileSync(
     "- a PNG preview for visual review",
     "- a Burr receipt as proof",
     "- the stamped design data that generated the receipt",
+    "- repair reports that compare selected before/after receipts",
     "",
     "Passing examples show accepted design intent.",
     "Failing examples are intentional negative fixtures that show mistakes Burr catches.",
     "Preview PNGs are not the verifier. The Burr receipts are.",
+    "Repair reports are derived from the Burr receipts in this artifact.",
     "",
   ].join("\n"),
 );

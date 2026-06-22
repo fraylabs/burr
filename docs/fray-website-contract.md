@@ -7,9 +7,9 @@ regenerating CAD.
 
 ```txt
 repo: fraylabs/burr
-release_tag: burr-v0.14.0
-asset_name: burr-gallery-v0.14.0.zip
-asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.14.0/burr-gallery-v0.14.0.zip
+release_tag: burr-v0.15.0
+asset_name: burr-gallery-v0.15.0.zip
+asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.15.0/burr-gallery-v0.15.0.zip
 ```
 
 The website should treat Burr release assets as read-only product data.
@@ -33,9 +33,12 @@ The website should treat Burr release assets as read-only product data.
 ## Zip Layout
 
 ```txt
-burr-gallery-v0.14.0/
+burr-gallery-v0.15.0/
   README.md
   manifest.json
+  repair-reports/
+    actuator-housing-edge-distance.json
+    actuator-housing-edge-distance.md
   shaft-bearing-bracket/
     shaft-bearing-bracket.png
     shaft-bearing-bracket.receipt.json
@@ -75,7 +78,7 @@ burr-gallery-v0.14.0/
 Manifest path:
 
 ```txt
-burr-gallery-v0.14.0/manifest.json
+burr-gallery-v0.15.0/manifest.json
 ```
 
 Schema:
@@ -83,13 +86,25 @@ Schema:
 ```json
 {
   "schema_version": "burr.gallery-artifact.v1",
-  "burr_version": "0.14.0",
-  "artifact_id": "burr-gallery-v0.14.0",
+  "burr_version": "0.15.0",
+  "artifact_id": "burr-gallery-v0.15.0",
   "generated_at": "ISO-8601 timestamp",
   "source": {
     "repository": "fraylabs/burr",
-    "tag": "burr-v0.14.0"
+    "tag": "burr-v0.15.0"
   },
+  "repair_reports": [
+    {
+      "id": "actuator-housing-edge-distance",
+      "title": "Actuator Housing Edge-Distance Repair",
+      "kind": "before_after",
+      "before_slug": "bad-actuator-housing-edge-distance",
+      "after_slug": "fixed-actuator-housing",
+      "status": "pass",
+      "report_json": "repair-reports/actuator-housing-edge-distance.json",
+      "report_markdown": "repair-reports/actuator-housing-edge-distance.md"
+    }
+  ],
   "examples": [
     {
       "slug": "shaft-bearing-bracket",
@@ -158,6 +173,38 @@ caught. For the fixed actuator card, use `status: "pass"` to say the declared
 actuator checks now pass. Do not imply that Burr designed the repair; Burr
 checked the before state, explained the fix order, and checked the after state.
 
+## Burr 0.15 Repair Reports
+
+Burr 0.15 adds portable repair reports to the same gallery artifact. A report is
+not a new verifier. It is a receipt-backed summary of the before/after loop.
+
+Report JSON schema:
+
+```json
+{
+  "schema_version": "burr.repair-report.v1",
+  "id": "actuator-housing-edge-distance",
+  "title": "Actuator Housing Edge-Distance Repair",
+  "status": "pass",
+  "loop": "bad CAD -> Burr check -> explain fix order -> fixed CAD passes",
+  "first_fix": "Move the loaded M3 holes inward or increase the surrounding housing size.",
+  "before": {
+    "slug": "bad-actuator-housing-edge-distance",
+    "status": "fail",
+    "receipt": "bad-actuator-housing-edge-distance/bad-actuator-housing-edge-distance.receipt.json",
+    "failures": 4
+  },
+  "after": {
+    "slug": "fixed-actuator-housing",
+    "status": "pass",
+    "receipt": "fixed-actuator-housing/fixed-actuator-housing.receipt.json"
+  }
+}
+```
+
+The website should render report Markdown or selected report JSON fields only
+when `manifest.repair_reports[]` declares the files. Do not infer report paths.
+
 ## Website Rendering
 
 For each `examples[]` entry, render:
@@ -205,8 +252,8 @@ The website data model should use:
 ```json
 {
   "repo": "fraylabs/burr",
-  "release_tag": "burr-v0.14.0",
-  "asset_name": "burr-gallery-v0.14.0.zip"
+  "release_tag": "burr-v0.15.0",
+  "asset_name": "burr-gallery-v0.15.0.zip"
 }
 ```
 

@@ -37,6 +37,9 @@ if (manifest.examples.length !== galleryExamples.length) {
     `Unexpected manifest example count: ${manifest.examples.length}`,
   );
 }
+if (!Array.isArray(manifest.repair_reports) || manifest.repair_reports.length < 1) {
+  throw new Error("Manifest is missing repair reports.");
+}
 
 for (const example of galleryExamples) {
   const entry = manifest.examples.find((item) => item.slug === example.slug);
@@ -94,6 +97,22 @@ if (!statusCounts.pass || !statusCounts.fail) {
 
 if (!fs.existsSync(zipPath) || fs.statSync(zipPath).size < 4096) {
   throw new Error(`Gallery zip is missing or too small: ${zipPath}`);
+}
+
+for (const report of manifest.repair_reports) {
+  for (const key of ["report_json", "report_markdown"]) {
+    const file = path.join(releaseDir, report[key]);
+    if (!fs.existsSync(file) || fs.statSync(file).size < 256) {
+      throw new Error(`Missing or tiny repair report ${key}: ${file}`);
+    }
+  }
+  const json = JSON.parse(fs.readFileSync(path.join(releaseDir, report.report_json), "utf8"));
+  if (json.schema_version !== "burr.repair-report.v1") {
+    throw new Error(`Unexpected repair report schema: ${json.schema_version}`);
+  }
+  if (json.status !== report.status) {
+    throw new Error(`Repair report status mismatch for ${report.id}`);
+  }
 }
 
 console.log("gallery artifact proof passed");

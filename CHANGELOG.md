@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.15.0
+
+- Added repair report artifacts to the Burr gallery release bundle.
+- Added a receipt-backed actuator repair report in JSON and Markdown, linking
+  the bad actuator receipt, measured failures, first fix, and fixed passing
+  receipt.
+- Added `npm run check:repair-report` to prove the portable report exists and
+  contains the before/after repair facts agents and websites need.
+
 ## 0.14.0
 
 - Added the before/after actuator repair proof narrative: bad CAD fails a Burr
