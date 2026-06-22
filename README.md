@@ -220,6 +220,24 @@ That one helper call cuts the hole in build123d and records the feature Burr
 checks. Burr core still reads only `burr-design-data.json`, so other CAD tools
 can use the same contract.
 
+For custom rulepacks and non-standard features, the helper can emit plain Burr
+metadata without a specialized geometry helper:
+
+```python
+design.rulepack("../../../rules/captured_slider.rulepack.json")
+design.measurements_update({
+    "head_side_clearance_mm": 0.25,
+    "carriage_lip_each_side_mm": 3.5,
+})
+design.feature(
+    feature_id="left_capture_lip",
+    kind="capture_lip",
+    part="carriage",
+    role="lift_off_blocker",
+    engagement_mm=3.5,
+)
+```
+
 ## Design Data
 
 A lintable CAD artifact folder contains `burr-design-data.json`.

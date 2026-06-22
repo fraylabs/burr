@@ -26,3 +26,7 @@ declared mechanical intent to exported STEP geometry.
   checked by a count rule.
 - `t-slot-linear-slider`: two-part captured slider with declared clearance
   windows and capture lips.
+- `dense-random-hole-plate-too-few-reliefs`: negative fixture for feature-count
+  rules.
+- `t-slot-linear-slider-loose-clearance`: negative fixture for numeric clearance
+  rules.

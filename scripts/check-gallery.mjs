@@ -59,6 +59,20 @@ for (const example of galleryExamples) {
     throw new Error(`${example.dir} expected at least one failing check`);
   }
 
+  for (const expectedFailure of example.expectedFailures ?? []) {
+    if (
+      !receipt.checks.some(
+        (check) =>
+          check.rule_id === expectedFailure.rule_id &&
+          check.reason === expectedFailure.reason,
+      )
+    ) {
+      throw new Error(
+        `${example.dir} did not report ${expectedFailure.rule_id} ${expectedFailure.reason}`,
+      );
+    }
+  }
+
   if (receipt.summary.features.checked_feature_ids.length < 1) {
     throw new Error(`${example.dir} did not check any features`);
   }

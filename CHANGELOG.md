@@ -8,6 +8,10 @@
   dense plates, captured sliders, and other measurement-heavy CAD artifacts.
 - Added printed-plate and captured-slider rulepacks plus a T-slot linear slider
   gallery example.
+- Added burr-build123d helper methods for `rulepack`, `measurement`,
+  `measurements_update`, and generic `feature` metadata.
+- Added CLI negative fixtures for captured-slider clearance and capture-lip
+  failures.
 
 ## 0.12.0
 
