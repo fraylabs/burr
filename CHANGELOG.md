@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.13.2
+
+- Added triaged `burr explain` output so multi-failure receipts are sorted by fix order: stale artifacts first, missing declared STEP geometry second, unsafe dimensions third, and declared measurement issues after that.
+- Added explain proof coverage for messy receipts with failures deliberately emitted out of order.
+
 ## 0.13.1
 
 - Added a Burr-owned fresh-install release gate that installs the published CLI,

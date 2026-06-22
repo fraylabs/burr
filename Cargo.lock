@@ -19,7 +19,7 @@ dependencies = [
 
 [[package]]
 name = "burr"
-version = "0.13.1"
+version = "0.13.2"
 dependencies = [
  "serde_json",
  "sha2",

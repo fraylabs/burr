@@ -372,12 +372,21 @@ pub fn format_receipt_diagnostics(receipt: &Value) -> Vec<Vec<String>> {
 }
 
 pub fn format_receipt_explanations(receipt: &Value) -> Vec<Vec<String>> {
-    receipt
+    let mut explanations: Vec<_> = receipt
         .get("checks")
         .and_then(Value::as_array)
         .into_iter()
         .flatten()
-        .filter_map(format_check_explanation)
+        .enumerate()
+        .filter_map(|(index, check)| {
+            format_check_explanation(check).map(|lines| (explanation_rank(check), index, lines))
+        })
+        .collect();
+
+    explanations.sort_by_key(|(rank, index, _)| (*rank, *index));
+    explanations
+        .into_iter()
+        .map(|(_, _, lines)| lines)
         .collect()
 }
 
@@ -531,8 +540,10 @@ fn format_check_explanation(check: &Value) -> Option<Vec<String>> {
     let feature_kind = feature_kind_from_rule(rule_id);
 
     let mut lines = vec![
+        explanation_headline(reason, feature_kind).to_string(),
         format!("Feature: {feature_id}"),
         format!("Rule: {rule_id}"),
+        format!("Category: {}", explanation_category(reason)),
         format!(
             "Problem: {}",
             explanation_problem(check, reason, feature_kind)
@@ -546,6 +557,86 @@ fn format_check_explanation(check: &Value) -> Option<Vec<String>> {
     ));
     lines.push(format!("Fix: {}", explanation_fix(reason, feature_kind)));
     Some(lines)
+}
+
+fn explanation_rank(check: &Value) -> u8 {
+    explanation_rank_for_reason(string_field(check, "reason").unwrap_or("<unknown>"))
+}
+
+fn explanation_category(reason: &str) -> &'static str {
+    match reason {
+        "source_hash_mismatch"
+        | "artifact_hash_mismatch"
+        | "hash_read_failed"
+        | "missing_file_refs"
+        | "invalid_sha256"
+        | "missing_sha256"
+        | "source_file_missing"
+        | "artifact_file_missing"
+        | "missing_step_artifact_ref" => "stale artifact",
+        "unsupported_design_data_schema"
+        | "missing_design_data_schema"
+        | "unsupported_rulepack_schema"
+        | "missing_rulepack_schema" => "unsupported metadata",
+        "missing_declared_feature" | "step_geometry_unreadable" => "missing geometry",
+        "insufficient_edge_distance"
+        | "insufficient_wall_thickness"
+        | "missing_edge_measurement"
+        | "missing_hole_diameter"
+        | "missing_feature_center"
+        | "missing_feature_axis"
+        | "invalid_counterbore_dimensions" => "unsafe dimension",
+        "feature_count_out_of_range" | "numeric_value_out_of_range" | "missing_numeric_value" => {
+            "declared measurement"
+        }
+        _ => "other",
+    }
+}
+
+fn explanation_headline(reason: &str, feature_kind: &str) -> &'static str {
+    match explanation_rank_for_reason(reason) {
+        0 => "Fix first: regenerate or restamp stale CAD artifacts.",
+        1 => match feature_kind {
+            "bearing seat" => "Fix geometry: regenerate the missing bearing seat.",
+            "counterbore" => "Fix geometry: regenerate the missing counterbore.",
+            "heat-set insert pocket" => {
+                "Fix geometry: regenerate the missing heat-set insert pocket."
+            }
+            "straight slot" => "Fix geometry: regenerate the missing straight slot.",
+            _ => "Fix geometry: regenerate the missing declared feature.",
+        },
+        2 => "Fix dimension: move or resize unsafe geometry.",
+        3 => "Fix declared measurement: update the CAD or rule range.",
+        _ => "Fix check input: inspect the failed rule.",
+    }
+}
+
+fn explanation_rank_for_reason(reason: &str) -> u8 {
+    match reason {
+        "source_hash_mismatch"
+        | "artifact_hash_mismatch"
+        | "hash_read_failed"
+        | "missing_file_refs"
+        | "invalid_sha256"
+        | "missing_sha256"
+        | "source_file_missing"
+        | "artifact_file_missing"
+        | "missing_step_artifact_ref"
+        | "unsupported_design_data_schema"
+        | "missing_design_data_schema"
+        | "unsupported_rulepack_schema"
+        | "missing_rulepack_schema" => 0,
+        "missing_declared_feature" | "step_geometry_unreadable" => 1,
+        "insufficient_edge_distance"
+        | "insufficient_wall_thickness"
+        | "missing_edge_measurement"
+        | "missing_hole_diameter"
+        | "missing_feature_center"
+        | "missing_feature_axis"
+        | "invalid_counterbore_dimensions" => 2,
+        "feature_count_out_of_range" | "numeric_value_out_of_range" | "missing_numeric_value" => 3,
+        _ => 9,
+    }
 }
 
 fn feature_kind_from_rule(rule_id: &str) -> &'static str {

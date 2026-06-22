@@ -1,6 +1,6 @@
 [package]
 name = "burr"
-version = "0.13.1"
+version = "0.13.2"
 edition = "2021"
 description = "Design-rule checks for CAD-as-code workflows."
 license = "MIT"

@@ -30,18 +30,24 @@ result = fail by 2.2 mm
 Then `burr explain` turns the receipt into fix guidance:
 
 ```txt
+1. Fix dimension: move or resize unsafe geometry.
 Feature: m3_lower_left
+Category: unsafe dimension
 Problem: the loaded M3 hole is too close to a free edge.
 Why it matters: thin edge material can crack, delaminate, or fail.
 Fix: move the hole inward or make the surrounding part larger.
 ```
+
+When a receipt has multiple failures, `burr explain` sorts them by fix order:
+stale artifacts first, missing declared STEP geometry second, unsafe dimensions
+third, then declared measurement issues.
 
 ## Quickstart
 
 Install from crates.io:
 
 ```bash
-cargo install burr --version 0.13.1
+cargo install burr --version 0.13.2
 ```
 
 Create and check a build123d starter part:
@@ -465,7 +471,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.13.1",
+  "burr_version": "0.13.2",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.8.0",
   "compatibility": {

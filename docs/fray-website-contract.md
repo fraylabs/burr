@@ -7,9 +7,9 @@ regenerating CAD.
 
 ```txt
 repo: fraylabs/burr
-release_tag: burr-v0.13.1
-asset_name: burr-gallery-v0.13.1.zip
-asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.13.1/burr-gallery-v0.13.1.zip
+release_tag: burr-v0.13.2
+asset_name: burr-gallery-v0.13.2.zip
+asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.13.2/burr-gallery-v0.13.2.zip
 ```
 
 The website should treat Burr release assets as read-only product data.
@@ -30,7 +30,7 @@ The website should treat Burr release assets as read-only product data.
 ## Zip Layout
 
 ```txt
-burr-gallery-v0.13.1/
+burr-gallery-v0.13.2/
   README.md
   manifest.json
   shaft-bearing-bracket/
@@ -72,7 +72,7 @@ burr-gallery-v0.13.1/
 Manifest path:
 
 ```txt
-burr-gallery-v0.13.1/manifest.json
+burr-gallery-v0.13.2/manifest.json
 ```
 
 Schema:
@@ -80,12 +80,12 @@ Schema:
 ```json
 {
   "schema_version": "burr.gallery-artifact.v1",
-  "burr_version": "0.13.1",
-  "artifact_id": "burr-gallery-v0.13.1",
+  "burr_version": "0.13.2",
+  "artifact_id": "burr-gallery-v0.13.2",
   "generated_at": "ISO-8601 timestamp",
   "source": {
     "repository": "fraylabs/burr",
-    "tag": "burr-v0.13.1"
+    "tag": "burr-v0.13.2"
   },
   "examples": [
     {
@@ -177,8 +177,8 @@ The website data model should use:
 ```json
 {
   "repo": "fraylabs/burr",
-  "release_tag": "burr-v0.13.1",
-  "asset_name": "burr-gallery-v0.13.1.zip"
+  "release_tag": "burr-v0.13.2",
+  "asset_name": "burr-gallery-v0.13.2.zip"
 }
 ```
 
