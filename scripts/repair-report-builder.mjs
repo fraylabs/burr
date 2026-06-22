@@ -104,15 +104,37 @@ function buildBeforeAfterReport({ releaseDir, version, generatedAt, examples, sp
   );
 
   const firstFix = firstFixForReason(beforeFailures[0]?.reason);
-  const repairActions = beforeFailures.map((check) =>
-    buildRepairAction({
-      check,
+  const beforeSourceFilePath = sourceFilePath({
+    receipt: beforeReceipt,
+    designData: beforeDesign,
+  });
+  const afterSourceFilePath = sourceFilePath({
+    receipt: afterReceipt,
+    designData: afterDesign,
+  });
+  const beforeSource = readText(beforeSourceFilePath);
+  const afterSource = readText(afterSourceFilePath);
+  const repairActions = [
+    ...beforeFailures.map((check) =>
+      buildRepairAction({
+        check,
+        beforeReceipt,
+        beforeDesign,
+        afterDesign,
+        afterChecks,
+        beforeSource,
+        afterSource,
+      }),
+    ),
+    ...buildEnvelopeRepairActions({
       beforeReceipt,
       beforeDesign,
       afterDesign,
-      afterChecks,
+      beforeSource,
+      afterSource,
+      ruleId: spec.focusRuleId,
     }),
-  );
+  ];
 
   return {
     schema_version: "burr.repair-report.v1",
@@ -232,7 +254,15 @@ function summarizeProofCheck(check) {
   };
 }
 
-function buildRepairAction({ check, beforeReceipt, beforeDesign, afterDesign, afterChecks }) {
+function buildRepairAction({
+  check,
+  beforeReceipt,
+  beforeDesign,
+  afterDesign,
+  afterChecks,
+  beforeSource,
+  afterSource,
+}) {
   const featureId = check.feature_id;
   const beforeFeature = findDesignFeature(beforeDesign, featureId);
   const afterFeature = findDesignFeature(afterDesign, featureId);
@@ -240,6 +270,8 @@ function buildRepairAction({ check, beforeReceipt, beforeDesign, afterDesign, af
   const featureCenterDeltaMm = vectorDelta(afterFeature.center_mm, beforeFeature.center_mm);
   const parameter = "center_mm";
   const valuePath = `features[id=${featureId}].${parameter}`;
+  const beforeText = sourceLineForFeature({ source: beforeSource, featureId });
+  const afterText = sourceLineForFeature({ source: afterSource, featureId });
 
   return {
     feature_id: featureId,
@@ -250,6 +282,10 @@ function buildRepairAction({ check, beforeReceipt, beforeDesign, afterDesign, af
     suggested_delta_mm: featureCenterDeltaMm,
     source_hint: {
       source_file_path: sourceFilePath({ receipt: beforeReceipt, designData: beforeDesign }),
+      edit_kind: "replace_python_dict_entry",
+      selector: `mount_holes[${JSON.stringify(featureId)}]`,
+      before_text: beforeText,
+      after_text: afterText,
       feature_id: featureId,
       parameter,
       value_path: valuePath,
@@ -280,6 +316,64 @@ function buildRepairAction({ check, beforeReceipt, beforeDesign, afterDesign, af
   };
 }
 
+function buildEnvelopeRepairActions({
+  beforeReceipt,
+  beforeDesign,
+  afterDesign,
+  beforeSource,
+  afterSource,
+  ruleId,
+}) {
+  const beforePart = findDesignPart(beforeDesign, "housing");
+  const afterPart = findDesignPart(afterDesign, "housing");
+  const beforeSize = bboxSize(beforePart);
+  const afterSize = bboxSize(afterPart);
+  const dimensions = [
+    { selector: "housing_length", axis: 0 },
+    { selector: "housing_width", axis: 1 },
+    { selector: "housing_height", axis: 2 },
+  ];
+
+  return dimensions
+    .filter(({ axis }) => beforeSize[axis] !== afterSize[axis])
+    .map(({ selector, axis }) => {
+      const beforeValue = beforeSize[axis];
+      const afterValue = afterSize[axis];
+      return {
+        feature_id: beforePart.id,
+        action: "resize_part_envelope",
+        parameter: `bbox_mm.size[${axis}]`,
+        before_value_mm: beforeValue,
+        after_value_mm: afterValue,
+        suggested_delta_mm: roundMm(afterValue - beforeValue),
+        source_hint: {
+          source_file_path: sourceFilePath({
+            receipt: beforeReceipt,
+            designData: beforeDesign,
+          }),
+          edit_kind: "replace_python_assignment",
+          selector,
+          feature_id: beforePart.id,
+          parameter: `bbox_mm.size[${axis}]`,
+          value_path: `parts[id=${beforePart.id}].bbox_mm.size[${axis}]`,
+          before_value_mm: beforeValue,
+          after_value_mm: afterValue,
+          before_text: sourceLineForAssignment({ source: beforeSource, selector }),
+          after_text: sourceLineForAssignment({ source: afterSource, selector }),
+          confidence: "exact_from_design_data",
+          rationale: `The before and after design data declare parts[id=${beforePart.id}].bbox_mm; updating ${selector} changes the housing envelope needed by the moved mounting holes.`,
+        },
+        rule_id: ruleId,
+        failure_reason: "supporting_envelope_change",
+        reason: `Resize ${beforePart.id} ${selector} from ${formatMm(beforeValue)} to ${formatMm(afterValue)} so the repaired hole centers keep positive edge-distance margin.`,
+        verifies_against_after_part: {
+          part_id: afterPart.id,
+          bbox_size_mm: afterSize,
+        },
+      };
+    });
+}
+
 function sourceFilePath({ receipt, designData }) {
   const sourcePath = designData.source?.path ?? designData.sources?.[0]?.path;
   if (!sourcePath) {
@@ -301,6 +395,56 @@ function findDesignFeature(designData, featureId) {
     throw new Error(`Feature ${featureId} is missing center_mm for repair action.`);
   }
   return feature;
+}
+
+function findDesignPart(designData, partId) {
+  const part = designData.parts?.find((item) => item.id === partId);
+  if (!part) {
+    throw new Error(`Missing design-data part for repair action: ${partId}`);
+  }
+  if (!Array.isArray(part.bbox_mm?.min) || !Array.isArray(part.bbox_mm?.max)) {
+    throw new Error(`Part ${partId} is missing bbox_mm for repair action.`);
+  }
+  return part;
+}
+
+function bboxSize(part) {
+  return part.bbox_mm.max.map((value, index) =>
+    roundMm(value - part.bbox_mm.min[index]),
+  );
+}
+
+function sourceLineForFeature({ source, featureId }) {
+  return sourceLineForPattern({
+    source,
+    pattern: new RegExp(
+      `^\\s*["']${escapeRegExp(featureId)}["']\\s*:\\s*\\([^)]+\\),\\s*$`,
+      "m",
+    ),
+    label: `mount_holes entry for ${featureId}`,
+  });
+}
+
+function sourceLineForAssignment({ source, selector }) {
+  return sourceLineForPattern({
+    source,
+    pattern: new RegExp(
+      `^\\s*${escapeRegExp(selector)}\\s*=\\s*[-+]?\\d+(?:\\.\\d+)?\\s*$`,
+      "m",
+    ),
+    label: `assignment for ${selector}`,
+  });
+}
+
+function sourceLineForPattern({ source, pattern, label }) {
+  const globalPattern = pattern.global
+    ? pattern
+    : new RegExp(pattern.source, `${pattern.flags}g`);
+  const matches = [...source.matchAll(globalPattern)];
+  if (matches.length !== 1) {
+    throw new Error(`Expected one ${label}, found ${matches.length}`);
+  }
+  return matches[0][0];
 }
 
 function vectorDelta(after, before) {
@@ -424,6 +568,17 @@ function readJson(file) {
     throw new Error(`Missing repair report source JSON: ${file}`);
   }
   return JSON.parse(fs.readFileSync(file, "utf8"));
+}
+
+function readText(file) {
+  if (!fs.existsSync(file)) {
+    throw new Error(`Missing repair report source text: ${file}`);
+  }
+  return fs.readFileSync(file, "utf8");
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function uniqueSorted(values) {

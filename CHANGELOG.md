@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.18.0
+
+- Added Source Hint Contract V3 fields to repair-action `source_hint` objects:
+  `edit_kind`, `selector`, `before_text`, and `after_text`.
+- Added exact source-text validation for repair reports, proving each hint maps
+  once to the before/fixed Python source and still matches design-data
+  before/after values.
+- Added a supplemental envelope repair action for actuator housing width when
+  the fixed receipt requires both moved mount holes and a larger part envelope.
+
 ## 0.17.0
 
 - Added required repair-action `source_hint` fields with source file path,

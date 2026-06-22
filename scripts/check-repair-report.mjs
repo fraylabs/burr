@@ -245,7 +245,6 @@ function expectRepairActions({
   if (!Array.isArray(actions)) {
     throw new Error("Repair report must include repair_actions array");
   }
-  expectEqual(actions.length, failures.length, "repair action count");
 
   const failureByKey = new Map(failures.map((failure) => [failureKey(failure), failure]));
   const resultByKey = new Map(
@@ -255,8 +254,19 @@ function expectRepairActions({
     ]),
   );
   const seenActionKeys = new Set();
+  const moveActions = actions.filter((action) => action.action === "move_feature");
+  const envelopeActions = actions.filter((action) => action.action === "resize_part_envelope");
+  const unknownActions = actions.filter(
+    (action) => !["move_feature", "resize_part_envelope"].includes(action.action),
+  );
+  if (unknownActions.length > 0) {
+    throw new Error(
+      `Unexpected repair action kinds: ${unknownActions.map((action) => action.action).join(", ")}`,
+    );
+  }
+  expectEqual(moveActions.length, failures.length, "move repair action count");
 
-  for (const action of actions) {
+  for (const action of moveActions) {
     const key = failureKey(action);
     const failure = failureByKey.get(key);
     if (!failure) {
@@ -308,6 +318,7 @@ function expectRepairActions({
       failure,
       beforeReceipt,
       beforeDesign,
+      afterReceipt,
       afterDesign,
       key,
     });
@@ -336,9 +347,27 @@ function expectRepairActions({
   }
 
   expectArrayEqual([...seenActionKeys].sort(), [...failureByKey.keys()].sort(), "repair action keys");
+
+  for (const action of envelopeActions) {
+    expectEnvelopeAction({
+      action,
+      beforeReceipt,
+      beforeDesign,
+      afterReceipt,
+      afterDesign,
+    });
+  }
 }
 
-function expectSourceHint({ action, failure, beforeReceipt, beforeDesign, afterDesign, key }) {
+function expectSourceHint({
+  action,
+  failure,
+  beforeReceipt,
+  beforeDesign,
+  afterReceipt,
+  afterDesign,
+  key,
+}) {
   const hint = action.source_hint;
   if (hint === undefined) {
     throw new Error(`Repair action missing source_hint for ${key}`);
@@ -348,11 +377,23 @@ function expectSourceHint({ action, failure, beforeReceipt, beforeDesign, afterD
   const afterFeature = findDesignFeature(afterDesign, action.feature_id);
   const parameter = action.parameter ?? "center_mm";
   const valuePath = `features[id=${action.feature_id}].${parameter}`;
+  const beforeSourcePath = sourceFilePath({ receipt: beforeReceipt, designData: beforeDesign });
+  const afterSourcePath = sourceFilePath({ receipt: afterReceipt, designData: afterDesign });
 
   expectEqual(
     hint.source_file_path,
-    sourceFilePath({ receipt: beforeReceipt, designData: beforeDesign }),
+    beforeSourcePath,
     `repair action source file path for ${key}`,
+  );
+  expectEqual(
+    hint.edit_kind,
+    "replace_python_dict_entry",
+    `repair action source edit kind for ${key}`,
+  );
+  expectEqual(
+    hint.selector,
+    `mount_holes[${JSON.stringify(action.feature_id)}]`,
+    `repair action source selector for ${key}`,
   );
   expectEqual(hint.feature_id, action.feature_id, `repair action source feature for ${key}`);
   expectEqual(hint.feature_id, failure.feature_id, `repair action source failure feature for ${key}`);
@@ -378,12 +419,115 @@ function expectSourceHint({ action, failure, beforeReceipt, beforeDesign, afterD
     hint.after_value_mm,
     `repair action top-level after/source after for ${key}`,
   );
+  expectExactTextMapping({
+    beforeSourcePath,
+    afterSourcePath,
+    hint,
+    key,
+  });
+  expectMountHoleTextMapsToValues({
+    hint,
+    beforeValue: beforeFeature[parameter],
+    afterValue: afterFeature[parameter],
+    key,
+  });
   expectEqual(
     hint.confidence,
     "exact_from_design_data",
     `repair action source confidence for ${key}`,
   );
   expectNonEmptyString(hint.rationale, `repair action source rationale for ${key}`);
+}
+
+function expectEnvelopeAction({ action, beforeReceipt, beforeDesign, afterReceipt, afterDesign }) {
+  const key = `${action.action}:${action.feature_id}:${action.parameter}`;
+  expectEqual(action.feature_id, "housing", `envelope action feature for ${key}`);
+  expectEqual(action.rule_id, expected.ruleId, `envelope action rule for ${key}`);
+  expectEqual(action.failure_reason, "supporting_envelope_change", `envelope action reason for ${key}`);
+  expectNonEmptyString(action.reason, `envelope action explanation for ${key}`);
+  expectFiniteNumber(action.before_value_mm, `envelope before value for ${key}`);
+  expectFiniteNumber(action.after_value_mm, `envelope after value for ${key}`);
+  expectEqual(
+    action.suggested_delta_mm,
+    roundMm(action.after_value_mm - action.before_value_mm),
+    `envelope suggested delta for ${key}`,
+  );
+
+  const hint = action.source_hint;
+  if (hint === undefined) {
+    throw new Error(`Envelope action missing source_hint for ${key}`);
+  }
+  const beforeSourcePath = sourceFilePath({ receipt: beforeReceipt, designData: beforeDesign });
+  const afterSourcePath = sourceFilePath({ receipt: afterReceipt, designData: afterDesign });
+  const beforeValue = valueAtPath(beforeDesign, hint.value_path);
+  const afterValue = valueAtPath(afterDesign, hint.value_path);
+
+  expectEqual(hint.source_file_path, beforeSourcePath, `envelope source path for ${key}`);
+  expectEqual(hint.edit_kind, "replace_python_assignment", `envelope source edit kind for ${key}`);
+  expectNonEmptyString(hint.selector, `envelope source selector for ${key}`);
+  expectEqual(hint.feature_id, action.feature_id, `envelope source feature for ${key}`);
+  expectEqual(hint.parameter, action.parameter, `envelope source parameter for ${key}`);
+  expectEqual(hint.before_value_mm, beforeValue, `envelope source before design value for ${key}`);
+  expectEqual(hint.after_value_mm, afterValue, `envelope source after design value for ${key}`);
+  expectEqual(action.before_value_mm, hint.before_value_mm, `envelope action/source before for ${key}`);
+  expectEqual(action.after_value_mm, hint.after_value_mm, `envelope action/source after for ${key}`);
+  expectExactTextMapping({
+    beforeSourcePath,
+    afterSourcePath,
+    hint,
+    key,
+  });
+  expectAssignmentTextMapsToValues({
+    hint,
+    beforeValue,
+    afterValue,
+    key,
+  });
+  expectEqual(hint.confidence, "exact_from_design_data", `envelope confidence for ${key}`);
+  expectNonEmptyString(hint.rationale, `envelope rationale for ${key}`);
+}
+
+function expectExactTextMapping({ beforeSourcePath, afterSourcePath, hint, key }) {
+  expectNonEmptyString(hint.before_text, `source before_text for ${key}`);
+  expectNonEmptyString(hint.after_text, `source after_text for ${key}`);
+  const beforeSource = fs.readFileSync(beforeSourcePath, "utf8");
+  const afterSource = fs.readFileSync(afterSourcePath, "utf8");
+  expectEqual(
+    countOccurrences(beforeSource, hint.before_text),
+    1,
+    `source before_text occurrence count for ${key}`,
+  );
+  expectEqual(
+    countOccurrences(afterSource, hint.after_text),
+    1,
+    `source after_text occurrence count for ${key}`,
+  );
+}
+
+function expectMountHoleTextMapsToValues({ hint, beforeValue, afterValue, key }) {
+  const beforeTuple = parseMountHoleEntry(hint.before_text, `before_text for ${key}`);
+  const afterTuple = parseMountHoleEntry(hint.after_text, `after_text for ${key}`);
+  expectEqual(beforeTuple.id, hint.feature_id, `source before_text feature for ${key}`);
+  expectEqual(afterTuple.id, hint.feature_id, `source after_text feature for ${key}`);
+  expectEqual(beforeTuple.values[0], beforeValue[0], `source before_text x for ${key}`);
+  expectEqual(beforeTuple.values[1], beforeValue[1], `source before_text y for ${key}`);
+  expectEqual(afterTuple.values[0], afterValue[0], `source after_text x for ${key}`);
+  expectEqual(afterTuple.values[1], afterValue[1], `source after_text y for ${key}`);
+  expectEqual(beforeValue[2], afterValue[2], `source z unchanged for ${key}`);
+  if (Number.isFinite(beforeTuple.values[2])) {
+    expectEqual(beforeTuple.values[2], beforeValue[2], `source before_text z for ${key}`);
+  } else {
+    expectEqual(beforeTuple.tokens[2], afterTuple.tokens[2], `source z token for ${key}`);
+  }
+}
+
+function expectAssignmentTextMapsToValues({ hint, beforeValue, afterValue, key }) {
+  const beforeAssignment = parseAssignment(hint.before_text, `before_text for ${key}`);
+  const afterAssignment = parseAssignment(hint.after_text, `after_text for ${key}`);
+  expectEqual(beforeAssignment.name, hint.selector, `source before assignment selector for ${key}`);
+  expectEqual(afterAssignment.name, hint.selector, `source after assignment selector for ${key}`);
+  expectEqual(beforeAssignment.value, beforeValue, `source before assignment value for ${key}`);
+  expectEqual(afterAssignment.value, afterValue, `source after assignment value for ${key}`);
 }
 
 function repairActionDelta(action) {
@@ -484,6 +628,75 @@ function sourceFilePath({ receipt, designData }) {
   return path.posix.join(path.posix.dirname(sourceDesignData), sourcePath);
 }
 
+function valueAtPath(designData, valuePath) {
+  const featureMatch = /^features\[id=([^\]]+)\]\.([A-Za-z0-9_]+)$/.exec(valuePath);
+  if (featureMatch) {
+    return findDesignFeature(designData, featureMatch[1])[featureMatch[2]];
+  }
+
+  const partSizeMatch = /^parts\[id=([^\]]+)\]\.bbox_mm\.size\[(\d+)\]$/.exec(valuePath);
+  if (partSizeMatch) {
+    const part = findDesignPart(designData, partSizeMatch[1]);
+    const axis = Number(partSizeMatch[2]);
+    return roundMm(part.bbox_mm.max[axis] - part.bbox_mm.min[axis]);
+  }
+
+  throw new Error(`Unsupported source_hint value_path: ${valuePath}`);
+}
+
+function findDesignPart(designData, partId) {
+  const part = designData.parts?.find((item) => item.id === partId);
+  if (!part) {
+    throw new Error(`Missing design-data part for ${partId}`);
+  }
+  expectVector(part.bbox_mm?.min, `${partId} bbox min`);
+  expectVector(part.bbox_mm?.max, `${partId} bbox max`);
+  return part;
+}
+
+function parseMountHoleEntry(text, label) {
+  const match = /^\s*["']([^"']+)["']\s*:\s*\(([^)]+)\),\s*$/.exec(text);
+  if (!match) {
+    throw new Error(`Expected Python mount_holes entry for ${label}: ${JSON.stringify(text)}`);
+  }
+  const tokens = match[2].split(",").map((token) => token.trim());
+  if (tokens.length !== 3) {
+    throw new Error(`Expected 3 tuple tokens for ${label}: ${JSON.stringify(text)}`);
+  }
+  return {
+    id: match[1],
+    tokens,
+    values: tokens.map((token) => Number(token)),
+  };
+}
+
+function parseAssignment(text, label) {
+  const match = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([-+]?\d+(?:\.\d+)?)\s*$/.exec(text);
+  if (!match) {
+    throw new Error(`Expected Python numeric assignment for ${label}: ${JSON.stringify(text)}`);
+  }
+  return {
+    name: match[1],
+    value: Number(match[2]),
+  };
+}
+
+function countOccurrences(source, text) {
+  if (text === "") {
+    return 0;
+  }
+  let count = 0;
+  let offset = 0;
+  while (true) {
+    const found = source.indexOf(text, offset);
+    if (found < 0) {
+      return count;
+    }
+    count += 1;
+    offset = found + text.length;
+  }
+}
+
 function roundOptionalDelta(after, before) {
   if (Number.isFinite(after) && Number.isFinite(before)) {
     return roundMm(after - before);
@@ -551,5 +764,15 @@ function expectNonEmptyString(value, label) {
 function expectFiniteNumber(value, label) {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     throw new Error(`Expected finite ${label}; got ${JSON.stringify(value)}`);
+  }
+}
+
+function expectVector(value, label) {
+  if (
+    !Array.isArray(value) ||
+    value.length !== 3 ||
+    value.some((item) => typeof item !== "number" || !Number.isFinite(item))
+  ) {
+    throw new Error(`Expected finite numeric 3-vector for ${label}; got ${JSON.stringify(value)}`);
   }
 }

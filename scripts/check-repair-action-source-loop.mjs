@@ -45,30 +45,27 @@ try {
 
   const releaseDir = path.join(tmp, "release");
   const report = generateRepairReport({ releaseDir, beforeDir, afterDir });
-  const reportBeforeDesign = readJson(path.join(releaseDir, report.before.design_data));
-  const reportAfterDesign = readJson(path.join(releaseDir, report.after.design_data));
   expectEqual(report.report_id, reportId, "repair report id");
   expectEqual(report.focus_rule_id, focusRuleId, "repair report focus rule");
   expectEqual(report.before.status, "fail", "repair report before status");
   expectEqual(report.after.status, "pass", "repair report after status");
 
   const actions = report.repair_actions ?? [];
-  expectEqual(actions.length, expectedFeatureIds.length, "repair action count");
+  const moveActions = actions.filter((action) => action.action === "move_feature");
+  const sourceHintActions = actions.filter((action) => action.source_hint !== undefined);
+  expectEqual(moveActions.length, expectedFeatureIds.length, "move repair action count");
+  if (sourceHintActions.length !== actions.length) {
+    throw new Error("Every repair action must include source_hint for the source repair loop.");
+  }
   expectArrayEqual(
-    actions.map((action) => action.feature_id).sort(),
+    moveActions.map((action) => action.feature_id).sort(),
     expectedFeatureIds,
     "repair action features",
   );
 
   const sourcePath = path.join(repairedDir, "design.py");
   const startingSource = fs.readFileSync(sourcePath, "utf8");
-  const repairedSource = applyPartEnvelopeRepairHints(
-    applyRepairActions(startingSource, actions),
-    {
-      beforeDesign: reportBeforeDesign,
-      afterDesign: reportAfterDesign,
-    },
-  );
+  const repairedSource = applyRepairActions(startingSource, actions);
   if (repairedSource === startingSource) {
     throw new Error("Repair actions did not modify the copied source.");
   }
@@ -82,7 +79,7 @@ try {
   const repairedReceipt = readJson(path.join(repairedDir, receiptFile));
   expectEqual(repairedReceipt.status, "pass", "repaired source receipt status");
   expectPassingFileHashes(repairedReceipt);
-  expectRepairedFeatures({ repairedDesign, repairedReceipt, actions });
+  expectRepairedFeatures({ repairedDesign, repairedReceipt, actions: moveActions });
 
   console.log("repair action source loop proof passed");
 } finally {
@@ -140,111 +137,45 @@ function applyRepairActions(source, actions) {
 }
 
 function applyRepairAction(source, action) {
-  expectEqual(action.action, "move_feature", `repair action kind for ${action.feature_id}`);
-  expectEqual(action.parameter, "center_mm", `repair action parameter for ${action.feature_id}`);
   expectEqual(action.rule_id, focusRuleId, `repair action rule for ${action.feature_id}`);
-  expectVector(action.before_value_mm, `before value for ${action.feature_id}`);
-  expectVector(action.after_value_mm, `after value for ${action.feature_id}`);
+  if (action.action === "move_feature") {
+    expectEqual(action.parameter, "center_mm", `repair action parameter for ${action.feature_id}`);
+    expectVector(action.before_value_mm, `before value for ${action.feature_id}`);
+    expectVector(action.after_value_mm, `after value for ${action.feature_id}`);
+  } else if (action.action === "resize_part_envelope") {
+    expectNumber(action.before_value_mm, `before value for ${action.feature_id}`);
+    expectNumber(action.after_value_mm, `after value for ${action.feature_id}`);
+  } else {
+    throw new Error(`Unexpected repair action kind: ${action.action}`);
+  }
 
   const sourceHint = normalizeSourceHint(action);
-  if (sourceHint.before_text !== undefined || sourceHint.after_text !== undefined) {
-    return applyTextSourceHint(source, sourceHint, action.feature_id);
-  }
-
-  const featurePattern = new RegExp(
-    `(?<prefix>["']${escapeRegExp(action.feature_id)}["']\\s*:\\s*)\\((?<coords>[^)]+)\\)(?<suffix>,?)`,
-  );
-  const match = featurePattern.exec(source);
-  if (!match?.groups) {
-    throw new Error(`Could not locate mount_holes entry for ${action.feature_id}`);
-  }
-
-  const tokens = match.groups.coords.split(",").map((token) => token.trim());
-  if (tokens.length !== 3) {
-    throw new Error(`Expected 3 center tuple tokens for ${action.feature_id}: ${match.groups.coords}`);
-  }
-
-  expectEqual(Number(tokens[0]), action.before_value_mm[0], `${action.feature_id} source x before value`);
-  expectEqual(Number(tokens[1]), action.before_value_mm[1], `${action.feature_id} source y before value`);
-
-  const zToken = Number(tokens[2]) === action.before_value_mm[2]
-    ? formatPythonNumber(action.after_value_mm[2])
-    : tokens[2];
-  const replacement = `${match.groups.prefix}(${[
-    formatPythonNumber(action.after_value_mm[0]),
-    formatPythonNumber(action.after_value_mm[1]),
-    zToken,
-  ].join(", ")})${match.groups.suffix}`;
-
-  return replaceOnce(source, match[0], replacement, `source tuple for ${action.feature_id}`);
-}
-
-function applyPartEnvelopeRepairHints(source, { beforeDesign, afterDesign }) {
-  const beforeHousing = findPart(beforeDesign, "housing");
-  const afterHousing = findPart(afterDesign, "housing");
-  const beforeDims = bboxDimensions(beforeHousing);
-  const afterDims = bboxDimensions(afterHousing);
-  const dimensions = [
-    ["housing_length", 0],
-    ["housing_width", 1],
-    ["housing_height", 2],
-  ];
-
-  return dimensions.reduce((current, [name, axis]) => {
-    if (beforeDims[axis] === afterDims[axis]) {
-      return current;
-    }
-    return replaceNumericAssignment({
-      source: current,
-      name,
-      beforeValue: beforeDims[axis],
-      afterValue: afterDims[axis],
-    });
-  }, source);
-}
-
-function findPart(designData, partId) {
-  const part = designData.parts?.find((item) => item.id === partId);
-  if (!part) {
-    throw new Error(`Design data is missing part ${partId}`);
-  }
-  return part;
-}
-
-function bboxDimensions(part) {
-  const min = part.bbox_mm?.min;
-  const max = part.bbox_mm?.max;
-  expectVector(min, `${part.id} bbox min`);
-  expectVector(max, `${part.id} bbox max`);
-  return max.map((value, index) => Math.round((value - min[index]) * 1000) / 1000);
-}
-
-function replaceNumericAssignment({ source, name, beforeValue, afterValue }) {
-  const pattern = new RegExp(`^(?<prefix>${escapeRegExp(name)}\\s*=\\s*)(?<value>[-+]?\\d+(?:\\.\\d+)?)`, "m");
-  const match = pattern.exec(source);
-  if (!match?.groups) {
-    throw new Error(`Could not locate numeric assignment for ${name}`);
-  }
-  expectEqual(Number(match.groups.value), beforeValue, `${name} source before value`);
-  const replacement = `${match.groups.prefix}${formatPythonNumber(afterValue)}`;
-  return replaceOnce(source, match[0], replacement, `numeric assignment for ${name}`);
+  return applyTextSourceHint(source, sourceHint, action.feature_id);
 }
 
 function normalizeSourceHint(action) {
   const sourceHint = action.source_hint ?? action.sourceHint;
-  if (sourceHint !== undefined) {
-    return sourceHint;
+  if (sourceHint === undefined) {
+    throw new Error(
+      `Repair action for ${action.feature_id} is missing source_hint. Expected source_hint.before_text and source_hint.after_text exact source snippets.`,
+    );
   }
-  return {
-    path: `mount_holes.${action.feature_id}`,
-    before_value_mm: action.before_value_mm,
-    after_value_mm: action.after_value_mm,
-  };
+  return sourceHint;
 }
 
 function applyTextSourceHint(source, sourceHint, featureId) {
-  if (typeof sourceHint.before_text !== "string" || typeof sourceHint.after_text !== "string") {
-    throw new Error(`Invalid text source_hint for ${featureId}`);
+  // The proof loop is intentionally generic: it applies only exact text
+  // replacements supplied by the report producer, with no fixture-specific
+  // parsing or geometry inference.
+  if (
+    !sourceHint ||
+    typeof sourceHint !== "object" ||
+    typeof sourceHint.before_text !== "string" ||
+    typeof sourceHint.after_text !== "string"
+  ) {
+    throw new Error(
+      `Repair action for ${featureId} has invalid source_hint. Expected shape: { before_text: string, after_text: string } with exact source snippets.`,
+    );
   }
   return replaceOnce(source, sourceHint.before_text, sourceHint.after_text, `source_hint for ${featureId}`);
 }
@@ -355,13 +286,10 @@ function expectVector(value, label) {
   }
 }
 
-function formatPythonNumber(value) {
-  const rounded = Math.round(value * 1000) / 1000;
-  return Number.isInteger(rounded) ? rounded.toFixed(1) : String(rounded);
-}
-
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function expectNumber(value, label) {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    throw new Error(`Expected finite number for ${label}; got ${JSON.stringify(value)}`);
+  }
 }
 
 function expectIncludes(value, expected, label) {

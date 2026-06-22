@@ -7,9 +7,9 @@ regenerating CAD.
 
 ```txt
 repo: fraylabs/burr
-release_tag: burr-v0.17.0
-asset_name: burr-gallery-v0.17.0.zip
-asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.17.0/burr-gallery-v0.17.0.zip
+release_tag: burr-v0.18.0
+asset_name: burr-gallery-v0.18.0.zip
+asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.18.0/burr-gallery-v0.18.0.zip
 ```
 
 The website should treat Burr release assets as read-only product data.
@@ -33,7 +33,7 @@ The website should treat Burr release assets as read-only product data.
 ## Zip Layout
 
 ```txt
-burr-gallery-v0.17.0/
+burr-gallery-v0.18.0/
   README.md
   manifest.json
   repair-reports/
@@ -78,7 +78,7 @@ burr-gallery-v0.17.0/
 Manifest path:
 
 ```txt
-burr-gallery-v0.17.0/manifest.json
+burr-gallery-v0.18.0/manifest.json
 ```
 
 Schema:
@@ -86,12 +86,12 @@ Schema:
 ```json
 {
   "schema_version": "burr.gallery-artifact.v1",
-  "burr_version": "0.17.0",
-  "artifact_id": "burr-gallery-v0.17.0",
+  "burr_version": "0.18.0",
+  "artifact_id": "burr-gallery-v0.18.0",
   "generated_at": "ISO-8601 timestamp",
   "source": {
     "repository": "fraylabs/burr",
-    "tag": "burr-v0.17.0"
+    "tag": "burr-v0.18.0"
   },
   "repair_reports": [
     {
@@ -206,6 +206,10 @@ Report JSON schema:
       "suggested_delta_mm": [6, -4, 0],
       "source_hint": {
         "source_file_path": "examples/build123d-actuator-housing-repair/bad/design.py",
+        "edit_kind": "replace_python_dict_entry",
+        "selector": "mount_holes[\"m3_front_left\"]",
+        "before_text": "    \"m3_front_left\": (-28.0, -8.0, hole_z),",
+        "after_text": "    \"m3_front_left\": (-22.0, -12.0, hole_z),",
         "feature_id": "m3_front_left",
         "parameter": "center_mm",
         "value_path": "features[id=m3_front_left].center_mm",
@@ -237,17 +241,27 @@ Report JSON schema:
 The website should render report Markdown or selected report JSON fields only
 when `manifest.repair_reports[]` declares the files. Do not infer report paths.
 
-## Burr 0.17 Repair Action Contract V2
+## Burr 0.18 Repair Action Contract V3
 
-Burr 0.17 adds required `source_hint` fields to `repair_actions[]`. Repair
+Burr 0.18 adds required source-text fields to `source_hint` objects in
+`repair_actions[]`. Repair
 actions remain machine-readable suggestions derived from the bad/fixed receipts
 and design data. They are not automatic CAD edits.
 
-Every repair action must map to one failed before-receipt check by `rule_id` and
-`feature_id`. Every action also includes `source_hint`, which maps the suggested
-edit back to design data:
+Every `move_feature` repair action must map to one failed before-receipt check
+by `rule_id` and `feature_id`. A supplemental action may describe a source edit
+needed by the same before/after repair, such as resizing the housing envelope.
+Every action includes `source_hint`, which maps the suggested edit back to
+source text and design data:
 
 - `source_file_path`: source file path for the failing before design.
+- `edit_kind`: explicit edit operation, such as `replace_python_dict_entry` or
+  `replace_python_assignment`.
+- `selector`: stable source selector for the edit target.
+- `before_text`: exact source snippet in the failing before design, occurring
+  exactly once.
+- `after_text`: exact source snippet in the fixed after design, occurring
+  exactly once.
 - `feature_id`: same feature id as the failure and action.
 - `parameter`: editable value name, currently `center_mm` for actuator hole
   movement.
@@ -271,6 +285,10 @@ Example action:
   "suggested_delta_mm": [6, -4, 0],
   "source_hint": {
     "source_file_path": "examples/build123d-actuator-housing-repair/bad/design.py",
+    "edit_kind": "replace_python_dict_entry",
+    "selector": "mount_holes[\"m3_front_left\"]",
+    "before_text": "    \"m3_front_left\": (-28.0, -8.0, hole_z),",
+    "after_text": "    \"m3_front_left\": (-22.0, -12.0, hole_z),",
     "feature_id": "m3_front_left",
     "parameter": "center_mm",
     "value_path": "features[id=m3_front_left].center_mm",
@@ -289,6 +307,34 @@ Example action:
     "status": "pass",
     "margin_mm": 1.8
   }
+}
+```
+
+Supplemental envelope action example:
+
+```json
+{
+  "feature_id": "housing",
+  "action": "resize_part_envelope",
+  "parameter": "bbox_mm.size[1]",
+  "before_value_mm": 34,
+  "after_value_mm": 48,
+  "suggested_delta_mm": 14,
+  "source_hint": {
+    "source_file_path": "examples/build123d-actuator-housing-repair/bad/design.py",
+    "edit_kind": "replace_python_assignment",
+    "selector": "housing_width",
+    "before_text": "housing_width = 34.0",
+    "after_text": "housing_width = 48.0",
+    "feature_id": "housing",
+    "parameter": "bbox_mm.size[1]",
+    "value_path": "parts[id=housing].bbox_mm.size[1]",
+    "before_value_mm": 34,
+    "after_value_mm": 48,
+    "confidence": "exact_from_design_data",
+    "rationale": "The before and after design data declare parts[id=housing].bbox_mm; updating housing_width changes the housing envelope needed by the moved mounting holes."
+  },
+  "failure_reason": "supporting_envelope_change"
 }
 ```
 
@@ -339,8 +385,8 @@ The website data model should use:
 ```json
 {
   "repo": "fraylabs/burr",
-  "release_tag": "burr-v0.17.0",
-  "asset_name": "burr-gallery-v0.17.0.zip"
+  "release_tag": "burr-v0.18.0",
+  "asset_name": "burr-gallery-v0.18.0.zip"
 }
 ```
 
