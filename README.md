@@ -41,7 +41,7 @@ Fix: move the hole inward or make the surrounding part larger.
 Install from crates.io:
 
 ```bash
-cargo install burr --version 0.12.0
+cargo install burr --version 0.13.0
 ```
 
 Create and check a build123d starter part:
@@ -54,7 +54,7 @@ burr check .
 burr explain .
 ```
 
-The generated starter installs `burr-build123d==0.7.0` from PyPI.
+The generated starter installs `burr-build123d==0.8.0` from PyPI.
 
 To prove the published install path from this repo:
 
@@ -169,7 +169,7 @@ burr stamp <folder|burr-design-data.json>...
 ```
 
 `init` creates a minimal build123d project with `design.py`, `pyproject.toml`,
-and `.gitignore`. The generated project depends on `burr-build123d==0.7.0`
+and `.gitignore`. The generated project depends on `burr-build123d==0.8.0`
 from PyPI.
 
 `check` finds `burr-design-data.json`, runs freshness checks and rulepack
@@ -461,7 +461,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.12.0",
+  "burr_version": "0.13.0",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.8.0",
   "compatibility": {

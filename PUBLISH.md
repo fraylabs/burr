@@ -38,7 +38,7 @@ environment: pypi
 Then run the `Publish Python` GitHub Actions workflow with:
 
 ```txt
-ref: burr-build123d-v0.7.0
+ref: burr-build123d-v0.8.0
 ```
 
 If publish fails with `invalid-publisher`, the PyPI pending publisher does not

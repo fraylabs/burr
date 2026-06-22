@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.13.0
 
 - Added manifest-declared rulepack paths so a design can select a non-default
   rulepack without requiring CLI flags.
