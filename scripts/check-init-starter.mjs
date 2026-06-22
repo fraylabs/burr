@@ -36,6 +36,14 @@ try {
     if (!fs.existsSync(filePath)) throw new Error(`starter missing ${fileName}`)
   }
 
+  const generatedPyproject = fs.readFileSync(path.join(projectDir, "pyproject.toml"), "utf8")
+  if (!generatedPyproject.includes("burr-build123d==0.8.0")) {
+    throw new Error("starter pyproject does not pin burr-build123d==0.8.0")
+  }
+
+  run("uv", ["add", "--editable", path.join(repoRoot, "packages", "burr-build123d")], {
+    cwd: projectDir,
+  })
   run("uv", ["run", "python", "design.py"], { cwd: projectDir })
 
   for (const fileName of ["actuator.step", "burr-design-data.json"]) {

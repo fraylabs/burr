@@ -12,7 +12,7 @@ pub const SUPPORTED_DESIGN_DATA_SCHEMA_VERSIONS: [&str; 1] = ["burr.design-data.
 pub const SUPPORTED_LEGACY_DESIGN_DATA_SCHEMA_VERSIONS: [&str; 1] = ["fray.cad.artifact.v1"];
 pub const SUPPORTED_RULEPACK_SCHEMA_VERSIONS: [&str; 1] = ["burr.rulepack.v1"];
 pub const RECEIPT_SCHEMA_VERSION: &str = "burr.receipt.v1";
-pub const BURR_BUILD123D_PYPI_DEPENDENCY: &str = "burr-build123d==0.7.0";
+pub const BURR_BUILD123D_PYPI_DEPENDENCY: &str = "burr-build123d==0.8.0";
 
 const DEFAULT_RULEPACK: &str = include_str!("../rules/actuator_mount.rulepack.json");
 const SKIP_DIRS: [&str; 7] = [
