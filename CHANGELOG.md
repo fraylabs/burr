@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.17.0
+
+- Added required repair-action `source_hint` fields with source file path,
+  feature id, editable value path, before/after design-data values,
+  `exact_from_design_data` confidence, and rationale.
+- Added `npm run check:repair-action-source-loop`, proving repair actions can
+  edit a copied bad actuator CAD source and rerun Burr to a passing receipt.
+- Extended repair-report validation to prove every `source_hint` maps back to
+  exact before/after design-data values.
+
 ## 0.16.0
 
 - Added `repair_actions[]` to Burr repair report JSON.

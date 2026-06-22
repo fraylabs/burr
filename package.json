@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "Design-rule checks for CAD-as-code workflows.",
   "type": "module",
   "files": [
@@ -71,9 +71,10 @@
     "check:explain": "node scripts/check-explain.mjs",
     "check:repair-loop": "node scripts/check-repair-loop.mjs",
     "check:repair-report": "node scripts/check-repair-report.mjs",
+    "check:repair-action-source-loop": "node scripts/check-repair-action-source-loop.mjs",
     "check:fresh-install": "node scripts/check-fresh-install.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",
-    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init && npm run check:breadth-rules && npm run check:repair-loop && npm run check:repair-report"
+    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init && npm run check:breadth-rules && npm run check:repair-loop && npm run check:repair-report && npm run check:repair-action-source-loop"
   },
   "keywords": [
     "cad",

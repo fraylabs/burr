@@ -47,7 +47,7 @@ third, then declared measurement issues.
 Install from crates.io:
 
 ```bash
-cargo install burr --version 0.16.0
+cargo install burr --version 0.17.0
 ```
 
 Create and check a build123d starter part:
@@ -483,7 +483,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.16.0",
+  "burr_version": "0.17.0",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.8.0",
   "compatibility": {
@@ -529,9 +529,14 @@ That report links the bad receipt, measured failures, first fix, generated
 receipt/design-data suggestions only; Burr does not auto-edit CAD. Agents and
 websites can render the repair proof without scraping terminal output.
 
-In Burr 0.16, each action gives the failing feature, action kind, checked
+Since Burr 0.16, each action gives the failing feature, action kind, checked
 parameter, suggested feature-center movement, measured/required/margin evidence,
 failure reason, and the fixed after-feature that verifies the suggestion.
+
+In Burr 0.17, the repair action contract also includes a required `source_hint` with the source
+file path, failing `feature_id`, editable value path, before/after design-data
+values, `exact_from_design_data` confidence, and a short rationale. This is an
+edit hint only; Burr still does not auto-edit CAD.
 
 ## Example Result
 

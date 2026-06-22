@@ -155,7 +155,10 @@ expectRepairActions({
   actions: report.repair_actions,
   failures: beforeFailures,
   featureResults: report.feature_results ?? [],
+  beforeReceipt,
+  beforeDesign,
   afterReceipt,
+  afterDesign,
   ruleId: expected.ruleId,
 });
 
@@ -174,8 +177,10 @@ for (const expectedText of [
   String(reportAfterPass.required.center_to_edge_mm),
   String(reportAfterPass.margin_mm),
   "Repair Actions",
+  "exact_from_design_data",
+  "examples/build123d-actuator-housing-repair/bad/design.py",
+  "features[id=m3_front_left].center_mm",
   "move_feature",
-  "center_mm",
   "[6, -4, 0] mm",
 ]) {
   expectMarkdownIncludes(markdown, expectedText);
@@ -227,7 +232,16 @@ function checksForRule(receipt, ruleId) {
   return receipt.checks.filter((check) => check.rule_id === ruleId);
 }
 
-function expectRepairActions({ actions, failures, featureResults, afterReceipt, ruleId }) {
+function expectRepairActions({
+  actions,
+  failures,
+  featureResults,
+  beforeReceipt,
+  beforeDesign,
+  afterReceipt,
+  afterDesign,
+  ruleId,
+}) {
   if (!Array.isArray(actions)) {
     throw new Error("Repair report must include repair_actions array");
   }
@@ -289,6 +303,14 @@ function expectRepairActions({ actions, failures, featureResults, afterReceipt, 
     );
     const actionDelta = repairActionDelta(action);
     expectSuggestedDelta(action, failure, key);
+    expectSourceHint({
+      action,
+      failure,
+      beforeReceipt,
+      beforeDesign,
+      afterDesign,
+      key,
+    });
     expectAfterProof(action, afterCheck, key);
 
     expectEqual(
@@ -314,6 +336,54 @@ function expectRepairActions({ actions, failures, featureResults, afterReceipt, 
   }
 
   expectArrayEqual([...seenActionKeys].sort(), [...failureByKey.keys()].sort(), "repair action keys");
+}
+
+function expectSourceHint({ action, failure, beforeReceipt, beforeDesign, afterDesign, key }) {
+  const hint = action.source_hint;
+  if (hint === undefined) {
+    throw new Error(`Repair action missing source_hint for ${key}`);
+  }
+
+  const beforeFeature = findDesignFeature(beforeDesign, action.feature_id);
+  const afterFeature = findDesignFeature(afterDesign, action.feature_id);
+  const parameter = action.parameter ?? "center_mm";
+  const valuePath = `features[id=${action.feature_id}].${parameter}`;
+
+  expectEqual(
+    hint.source_file_path,
+    sourceFilePath({ receipt: beforeReceipt, designData: beforeDesign }),
+    `repair action source file path for ${key}`,
+  );
+  expectEqual(hint.feature_id, action.feature_id, `repair action source feature for ${key}`);
+  expectEqual(hint.feature_id, failure.feature_id, `repair action source failure feature for ${key}`);
+  expectEqual(hint.parameter, parameter, `repair action source parameter for ${key}`);
+  expectEqual(hint.value_path, valuePath, `repair action source value path for ${key}`);
+  expectArrayEqual(
+    hint.before_value_mm,
+    beforeFeature[parameter],
+    `repair action source before design value for ${key}`,
+  );
+  expectArrayEqual(
+    hint.after_value_mm,
+    afterFeature[parameter],
+    `repair action source after design value for ${key}`,
+  );
+  expectArrayEqual(
+    action.before_value_mm,
+    hint.before_value_mm,
+    `repair action top-level before/source before for ${key}`,
+  );
+  expectArrayEqual(
+    action.after_value_mm,
+    hint.after_value_mm,
+    `repair action top-level after/source after for ${key}`,
+  );
+  expectEqual(
+    hint.confidence,
+    "exact_from_design_data",
+    `repair action source confidence for ${key}`,
+  );
+  expectNonEmptyString(hint.rationale, `repair action source rationale for ${key}`);
 }
 
 function repairActionDelta(action) {
@@ -389,6 +459,29 @@ function expectAfterProof(action, afterCheck, key) {
   if ((afterProof.margin_mm ?? afterProof.margin) <= 0) {
     throw new Error(`Repair action after proof margin must be positive for ${key}`);
   }
+}
+
+function findDesignFeature(designData, featureId) {
+  const feature = designData.features?.find((item) => item.id === featureId);
+  if (!feature) {
+    throw new Error(`Missing design-data feature for ${featureId}`);
+  }
+  if (!Array.isArray(feature.center_mm) || feature.center_mm.length !== 3) {
+    throw new Error(`Design-data feature ${featureId} is missing center_mm`);
+  }
+  return feature;
+}
+
+function sourceFilePath({ receipt, designData }) {
+  const sourcePath = designData.source?.path ?? designData.sources?.[0]?.path;
+  if (!sourcePath) {
+    throw new Error("Design data is missing source path for source_hint validation");
+  }
+  const sourceDesignData = receipt.source_design_data ?? receipt.source_manifest;
+  if (!sourceDesignData) {
+    return sourcePath;
+  }
+  return path.posix.join(path.posix.dirname(sourceDesignData), sourcePath);
 }
 
 function roundOptionalDelta(after, before) {

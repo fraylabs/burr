@@ -107,6 +107,7 @@ function buildBeforeAfterReport({ releaseDir, version, generatedAt, examples, sp
   const repairActions = beforeFailures.map((check) =>
     buildRepairAction({
       check,
+      beforeReceipt,
       beforeDesign,
       afterDesign,
       afterChecks,
@@ -231,20 +232,32 @@ function summarizeProofCheck(check) {
   };
 }
 
-function buildRepairAction({ check, beforeDesign, afterDesign, afterChecks }) {
+function buildRepairAction({ check, beforeReceipt, beforeDesign, afterDesign, afterChecks }) {
   const featureId = check.feature_id;
   const beforeFeature = findDesignFeature(beforeDesign, featureId);
   const afterFeature = findDesignFeature(afterDesign, featureId);
   const afterCheck = findFeatureCheck(afterChecks, featureId);
   const featureCenterDeltaMm = vectorDelta(afterFeature.center_mm, beforeFeature.center_mm);
+  const parameter = "center_mm";
+  const valuePath = `features[id=${featureId}].${parameter}`;
 
   return {
     feature_id: featureId,
     action: "move_feature",
-    parameter: "center_mm",
+    parameter,
     before_value_mm: beforeFeature.center_mm,
     after_value_mm: afterFeature.center_mm,
     suggested_delta_mm: featureCenterDeltaMm,
+    source_hint: {
+      source_file_path: sourceFilePath({ receipt: beforeReceipt, designData: beforeDesign }),
+      feature_id: featureId,
+      parameter,
+      value_path: valuePath,
+      before_value_mm: beforeFeature.center_mm,
+      after_value_mm: afterFeature.center_mm,
+      confidence: "exact_from_design_data",
+      rationale: `The before and after design data declare ${valuePath}; updating that editable value moves the failed clearance-hole center used by this edge-distance check.`,
+    },
     rule_id: check.rule_id,
     failure_reason: check.reason,
     reason: `Move ${featureId} from [${beforeFeature.center_mm.join(", ")}] mm to [${afterFeature.center_mm.join(", ")}] mm so center-to-edge increases from ${formatMm(check.measured?.center_to_edge_mm)} to at least ${formatMm(check.required?.center_to_edge_mm)}.`,
@@ -265,6 +278,18 @@ function buildRepairAction({ check, beforeDesign, afterDesign, afterChecks }) {
       margin_mm: afterCheck.margin_mm ?? null,
     },
   };
+}
+
+function sourceFilePath({ receipt, designData }) {
+  const sourcePath = designData.source?.path ?? designData.sources?.[0]?.path;
+  if (!sourcePath) {
+    throw new Error("Missing design-data source path for repair action source_hint.");
+  }
+  const sourceDesignData = receipt.source_design_data ?? receipt.source_manifest;
+  if (!sourceDesignData) {
+    return sourcePath;
+  }
+  return path.posix.join(path.posix.dirname(sourceDesignData), sourcePath);
 }
 
 function findDesignFeature(designData, featureId) {
@@ -342,13 +367,15 @@ function renderMarkdown(report) {
     "## Repair Actions",
     "",
     [
-      "| Feature | Action | Parameter | Suggested delta | Reason |",
-      "| --- | --- | --- | ---: | --- |",
+      "| Feature | Action | Source | Value path | Confidence | Suggested delta | Reason |",
+      "| --- | --- | --- | --- | --- | ---: | --- |",
       ...report.repair_actions.map((action) =>
         `| ${[
           markdownCell(action.feature_id),
           markdownCell(action.action),
-          markdownCell(action.parameter),
+          markdownCell(action.source_hint.source_file_path),
+          markdownCell(action.source_hint.value_path),
+          markdownCell(action.source_hint.confidence),
           formatDeltaMm(action.suggested_delta_mm),
           markdownCell(action.reason),
         ].join(" | ")} |`,

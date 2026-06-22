@@ -7,9 +7,9 @@ regenerating CAD.
 
 ```txt
 repo: fraylabs/burr
-release_tag: burr-v0.16.0
-asset_name: burr-gallery-v0.16.0.zip
-asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.16.0/burr-gallery-v0.16.0.zip
+release_tag: burr-v0.17.0
+asset_name: burr-gallery-v0.17.0.zip
+asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.17.0/burr-gallery-v0.17.0.zip
 ```
 
 The website should treat Burr release assets as read-only product data.
@@ -33,7 +33,7 @@ The website should treat Burr release assets as read-only product data.
 ## Zip Layout
 
 ```txt
-burr-gallery-v0.16.0/
+burr-gallery-v0.17.0/
   README.md
   manifest.json
   repair-reports/
@@ -78,7 +78,7 @@ burr-gallery-v0.16.0/
 Manifest path:
 
 ```txt
-burr-gallery-v0.16.0/manifest.json
+burr-gallery-v0.17.0/manifest.json
 ```
 
 Schema:
@@ -86,12 +86,12 @@ Schema:
 ```json
 {
   "schema_version": "burr.gallery-artifact.v1",
-  "burr_version": "0.16.0",
-  "artifact_id": "burr-gallery-v0.16.0",
+  "burr_version": "0.17.0",
+  "artifact_id": "burr-gallery-v0.17.0",
   "generated_at": "ISO-8601 timestamp",
   "source": {
     "repository": "fraylabs/burr",
-    "tag": "burr-v0.16.0"
+    "tag": "burr-v0.17.0"
   },
   "repair_reports": [
     {
@@ -204,6 +204,16 @@ Report JSON schema:
       "before_value_mm": [-28, -8, 9],
       "after_value_mm": [-22, -12, 9],
       "suggested_delta_mm": [6, -4, 0],
+      "source_hint": {
+        "source_file_path": "examples/build123d-actuator-housing-repair/bad/design.py",
+        "feature_id": "m3_front_left",
+        "parameter": "center_mm",
+        "value_path": "features[id=m3_front_left].center_mm",
+        "before_value_mm": [-28, -8, 9],
+        "after_value_mm": [-22, -12, 9],
+        "confidence": "exact_from_design_data",
+        "rationale": "The before and after design data declare features[id=m3_front_left].center_mm; updating that editable value moves the failed clearance-hole center used by this edge-distance check."
+      },
       "failure_reason": "insufficient_edge_distance",
       "reason": "Move m3_front_left from [-28, -8, 9] mm to [-22, -12, 9] mm so center-to-edge increases from 8 mm to at least 10.2 mm.",
       "measured": { "center_to_edge_mm": 8.0 },
@@ -227,11 +237,27 @@ Report JSON schema:
 The website should render report Markdown or selected report JSON fields only
 when `manifest.repair_reports[]` declares the files. Do not infer report paths.
 
-## Burr 0.16 Repair Actions
+## Burr 0.17 Repair Action Contract V2
 
-Burr 0.16 adds `repair_actions[]` to the repair report JSON. These are
-machine-readable suggestions derived from the bad/fixed receipts and design
-data. They are not automatic CAD edits.
+Burr 0.17 adds required `source_hint` fields to `repair_actions[]`. Repair
+actions remain machine-readable suggestions derived from the bad/fixed receipts
+and design data. They are not automatic CAD edits.
+
+Every repair action must map to one failed before-receipt check by `rule_id` and
+`feature_id`. Every action also includes `source_hint`, which maps the suggested
+edit back to design data:
+
+- `source_file_path`: source file path for the failing before design.
+- `feature_id`: same feature id as the failure and action.
+- `parameter`: editable value name, currently `center_mm` for actuator hole
+  movement.
+- `value_path`: stable design-data path to the editable value, currently
+  `features[id=<feature_id>].center_mm`.
+- `before_value_mm`: exact value from the bad design data.
+- `after_value_mm`: exact value from the fixed design data.
+- `confidence`: currently `exact_from_design_data`.
+- `rationale`: short human explanation of why this source hint is the edit
+  target.
 
 Example action:
 
@@ -243,6 +269,16 @@ Example action:
   "before_value_mm": [-28, -8, 9],
   "after_value_mm": [-22, -12, 9],
   "suggested_delta_mm": [6, -4, 0],
+  "source_hint": {
+    "source_file_path": "examples/build123d-actuator-housing-repair/bad/design.py",
+    "feature_id": "m3_front_left",
+    "parameter": "center_mm",
+    "value_path": "features[id=m3_front_left].center_mm",
+    "before_value_mm": [-28, -8, 9],
+    "after_value_mm": [-22, -12, 9],
+    "confidence": "exact_from_design_data",
+    "rationale": "The before and after design data declare features[id=m3_front_left].center_mm; updating that editable value moves the failed clearance-hole center used by this edge-distance check."
+  },
   "failure_reason": "insufficient_edge_distance",
   "reason": "Move m3_front_left from [-28, -8, 9] mm to [-22, -12, 9] mm so center-to-edge increases from 8 mm to at least 10.2 mm.",
   "measured": { "center_to_edge_mm": 8.0 },
@@ -303,8 +339,8 @@ The website data model should use:
 ```json
 {
   "repo": "fraylabs/burr",
-  "release_tag": "burr-v0.16.0",
-  "asset_name": "burr-gallery-v0.16.0.zip"
+  "release_tag": "burr-v0.17.0",
+  "asset_name": "burr-gallery-v0.17.0.zip"
 }
 ```
 
