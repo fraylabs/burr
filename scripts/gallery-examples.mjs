@@ -62,6 +62,18 @@ export const galleryExamples = [
     rulepackVersion: "0.1.0",
   },
   {
+    slug: "fixed-actuator-housing",
+    title: "Fixed Actuator Housing",
+    expectation: "pass",
+    group: "functional-good",
+    dir: "examples/build123d-actuator-housing-repair/fixed",
+    design: "examples/build123d-actuator-housing-repair/fixed/design.py",
+    step: "examples/build123d-actuator-housing-repair/fixed/actuator-housing.step",
+    preview: "fixed-actuator-housing.png",
+    receipt: "fixed-actuator-housing.receipt.json",
+    designData: "fixed-actuator-housing.design-data.json",
+  },
+  {
     slug: "bad-bearing-seat-missing-shoulder",
     title: "Bad Bearing Seat Missing Shoulder",
     expectation: "fail",
@@ -108,6 +120,24 @@ export const galleryExamples = [
       {
         rule_id: "captured_slider:head_side_clearance_window",
         reason: "numeric_value_out_of_range",
+      },
+    ],
+  },
+  {
+    slug: "bad-actuator-housing-edge-distance",
+    title: "Bad Actuator Housing Edge Distance",
+    expectation: "fail",
+    group: "mistake-caught",
+    dir: "examples/build123d-actuator-housing-repair/bad",
+    design: "examples/build123d-actuator-housing-repair/bad/design.py",
+    step: "examples/build123d-actuator-housing-repair/bad/actuator-housing.step",
+    preview: "bad-actuator-housing-edge-distance.png",
+    receipt: "bad-actuator-housing-edge-distance.receipt.json",
+    designData: "bad-actuator-housing-edge-distance.design-data.json",
+    expectedFailures: [
+      {
+        rule_id: "actuator_mount:m3_loaded_hole_edge_distance",
+        reason: "insufficient_edge_distance",
       },
     ],
   },

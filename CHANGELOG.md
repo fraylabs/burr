@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.14.0
+
+- Added the before/after actuator repair proof narrative: bad CAD fails a Burr
+  check, `burr explain` gives the fix order, and the fixed CAD passes.
+- Clarified that the gallery repair story is receipt-backed proof. Preview
+  images show the part, but Burr receipts prove the bad and fixed states.
+- Added contract copy for rendering actuator repair cards as one loop instead
+  of unrelated good and bad examples.
+
 ## 0.13.2
 
 - Added triaged `burr explain` output so multi-failure receipts are sorted by fix order: stale artifacts first, missing declared STEP geometry second, unsafe dimensions third, and declared measurement issues after that.

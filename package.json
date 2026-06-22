@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.13.2",
+  "version": "0.14.0",
   "description": "Design-rule checks for CAD-as-code workflows.",
   "type": "module",
   "files": [
@@ -20,6 +20,8 @@
     "scripts",
     "examples/build123d-actuator/bad/design.py",
     "examples/build123d-actuator/good/design.py",
+    "examples/build123d-actuator-housing-repair/bad/design.py",
+    "examples/build123d-actuator-housing-repair/fixed/design.py",
     "examples/build123d-wall-thickness/bad/design.py",
     "examples/build123d-wall-thickness/good/design.py",
     "examples/build123d-step-presence/README.md",
@@ -67,9 +69,10 @@
     "check:gallery:artifact": "node scripts/check-gallery-artifact.mjs",
     "check:fray-website-contract": "node scripts/check-fray-website-contract.mjs",
     "check:explain": "node scripts/check-explain.mjs",
+    "check:repair-loop": "node scripts/check-repair-loop.mjs",
     "check:fresh-install": "node scripts/check-fresh-install.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",
-    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init && npm run check:breadth-rules"
+    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init && npm run check:breadth-rules && npm run check:repair-loop"
   },
   "keywords": [
     "cad",

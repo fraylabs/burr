@@ -7,9 +7,9 @@ regenerating CAD.
 
 ```txt
 repo: fraylabs/burr
-release_tag: burr-v0.13.2
-asset_name: burr-gallery-v0.13.2.zip
-asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.13.2/burr-gallery-v0.13.2.zip
+release_tag: burr-v0.14.0
+asset_name: burr-gallery-v0.14.0.zip
+asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.14.0/burr-gallery-v0.14.0.zip
 ```
 
 The website should treat Burr release assets as read-only product data.
@@ -26,11 +26,14 @@ The website should treat Burr release assets as read-only product data.
   image appearance.
 - A failing gallery card is allowed when `expectation: "fail"` and the receipt
   has at least one failed check. These are intentional negative fixtures.
+- A before/after repair proof is a pair of receipt-backed states: the before
+  card fails for a declared mechanical reason, and the after card passes after
+  the CAD is repaired.
 
 ## Zip Layout
 
 ```txt
-burr-gallery-v0.13.2/
+burr-gallery-v0.14.0/
   README.md
   manifest.json
   shaft-bearing-bracket/
@@ -72,7 +75,7 @@ burr-gallery-v0.13.2/
 Manifest path:
 
 ```txt
-burr-gallery-v0.13.2/manifest.json
+burr-gallery-v0.14.0/manifest.json
 ```
 
 Schema:
@@ -80,12 +83,12 @@ Schema:
 ```json
 {
   "schema_version": "burr.gallery-artifact.v1",
-  "burr_version": "0.13.2",
-  "artifact_id": "burr-gallery-v0.13.2",
+  "burr_version": "0.14.0",
+  "artifact_id": "burr-gallery-v0.14.0",
   "generated_at": "ISO-8601 timestamp",
   "source": {
     "repository": "fraylabs/burr",
-    "tag": "burr-v0.13.2"
+    "tag": "burr-v0.14.0"
   },
   "examples": [
     {
@@ -129,6 +132,31 @@ Schema:
 the Burr receipt. The receipt remains the source of proof if the website needs
 more detail. `failed_rules` is a display summary copied from failed receipt
 checks for intentional negative fixtures.
+
+## Burr 0.14 Repair Narrative
+
+For Burr 0.14, render the actuator repair proof as one simple loop:
+
+```txt
+bad CAD -> Burr check -> explain fix order -> fixed CAD passes
+```
+
+Use the existing manifest and receipt fields. No website-side CAD regeneration
+or new geometry interpretation is required.
+
+Recommended repair copy:
+
+```txt
+Before: Burr caught the declared actuator mistake.
+Check: the receipt records the measured failure.
+Fix order: burr explain says what to repair first.
+After: the repaired actuator has a passing Burr receipt.
+```
+
+For the bad actuator card, use the failed receipt summary to say what Burr
+caught. For the fixed actuator card, use `status: "pass"` to say the declared
+actuator checks now pass. Do not imply that Burr designed the repair; Burr
+checked the before state, explained the fix order, and checked the after state.
 
 ## Website Rendering
 
@@ -177,8 +205,8 @@ The website data model should use:
 ```json
 {
   "repo": "fraylabs/burr",
-  "release_tag": "burr-v0.13.2",
-  "asset_name": "burr-gallery-v0.13.2.zip"
+  "release_tag": "burr-v0.14.0",
+  "asset_name": "burr-gallery-v0.14.0.zip"
 }
 ```
 

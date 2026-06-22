@@ -47,7 +47,7 @@ third, then declared measurement issues.
 Install from crates.io:
 
 ```bash
-cargo install burr --version 0.13.2
+cargo install burr --version 0.14.0
 ```
 
 Create and check a build123d starter part:
@@ -83,6 +83,13 @@ write or generate CAD
   -> burr check .
   -> burr explain .
   -> fix CAD or metadata
+```
+
+For Burr 0.14, the gallery explains the same loop as a before/after actuator
+repair proof:
+
+```txt
+bad CAD -> Burr check -> explain fix order -> fixed CAD passes
 ```
 
 Burr is not a constraint solver, FEA engine, slicer, or universal CAD brain.
@@ -158,6 +165,11 @@ and a manifest. Burr owns these generated proof artifacts; websites should
 consume the zip or GitHub release asset read-only instead of regenerating CAD.
 See [docs/fray-website-contract.md](docs/fray-website-contract.md) for the
 website ingestion contract.
+
+For the Burr 0.14 actuator repair proof, the gallery should read as one loop:
+the bad actuator CAD fails with measured evidence, `burr explain` tells the
+repair order, and the fixed actuator CAD passes. The preview is visual context;
+the receipt is the verifier.
 
 Start a build123d part:
 
@@ -471,7 +483,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.13.2",
+  "burr_version": "0.14.0",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.8.0",
   "compatibility": {
@@ -487,22 +499,44 @@ untrustworthy receipts.
 Legacy `fray-cad.json` files with schema `fray.cad.artifact.v1` are still read
 for transition, but new integrations should emit `burr-design-data.json`.
 
-## Example Result
+## Repair Loop Proof
 
-Bad actuator:
+Burr's core loop is:
 
 ```txt
-FAIL examples/build123d-actuator/bad/burr-design-data.json -> <not written>
+bad CAD -> Burr check -> explain fix order -> fixed CAD passes
+```
 
-1 problem:
-1. M3 loaded hole m3_lower_left is too close to the edge.
+Run it with:
+
+```bash
+npm run check:repair-loop
+```
+
+The bad actuator housing intentionally puts loaded M3 mounting holes too close
+to free edges. Burr reports the measured shortage, `burr explain` says what to
+fix first, and the fixed housing passes with positive edge-distance margins.
+
+## Example Result
+
+Before repair, the actuator CAD is bad:
+
+```txt
+FAIL examples/build123d-actuator-housing-repair/bad/burr-design-data.json -> <not written>
+
+4 problems:
+1. M3 loaded hole m3_front_left is too close to the edge.
    Measured center-to-edge: 8 mm
    Required center-to-edge: 10.2 mm
    Short by: 2.2 mm
    Try moving the hole inward or increasing the surrounding part size.
 ```
 
-Fixed actuator:
+`burr explain` turns the failed receipt into plain repair guidance: fix stale or
+missing artifacts first if they exist, then fix unsafe dimensions such as a
+loaded M3 hole near an edge.
+
+After repair, the actuator CAD passes:
 
 ```json
 {
