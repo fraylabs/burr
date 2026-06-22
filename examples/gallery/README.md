@@ -22,4 +22,11 @@ declared mechanical intent to exported STEP geometry.
 - `shaft-bearing-bracket`: bearing seat plus loaded M3 side mounts.
 - `slotted-motor-plate`: adjustable straight slot plus counterbored fasteners.
 - `electronics-standoff-deck`: heat-set insert pockets plus clearance holes.
-
+- `dense-random-hole-plate`: mechanical mount holes plus many cosmetic holes
+  checked by a count rule.
+- `t-slot-linear-slider`: two-part captured slider with declared clearance
+  windows and capture lips.
+- `dense-random-hole-plate-too-few-reliefs`: negative fixture for feature-count
+  rules.
+- `t-slot-linear-slider-loose-clearance`: negative fixture for numeric clearance
+  rules.

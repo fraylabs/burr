@@ -220,6 +220,24 @@ That one helper call cuts the hole in build123d and records the feature Burr
 checks. Burr core still reads only `burr-design-data.json`, so other CAD tools
 can use the same contract.
 
+For custom rulepacks and non-standard features, the helper can emit plain Burr
+metadata without a specialized geometry helper:
+
+```python
+design.rulepack("../../../rules/captured_slider.rulepack.json")
+design.measurements_update({
+    "head_side_clearance_mm": 0.25,
+    "carriage_lip_each_side_mm": 3.5,
+})
+design.feature(
+    feature_id="left_capture_lip",
+    kind="capture_lip",
+    part="carriage",
+    role="lift_off_blocker",
+    engagement_mm=3.5,
+)
+```
+
 ## Design Data
 
 A lintable CAD artifact folder contains `burr-design-data.json`.
@@ -400,6 +418,33 @@ bearing seats exist as matching STEP cylinder/plane evidence:
   ]
 }
 ```
+
+Design data can also choose a rulepack beside the artifact:
+
+```json
+{
+  "schema_version": "burr.design-data.v1",
+  "artifact_type": "captured_slider",
+  "rulepack": { "path": "../../../rules/captured_slider.rulepack.json" }
+}
+```
+
+The CLI `--rulepack <file>` flag still overrides this when you want to run a
+different rulepack against the same artifact.
+
+Supported rule kinds include:
+
+```txt
+hole_edge_distance       -> feature center is far enough from a free edge
+minimum_wall_thickness   -> enough material remains around a declared hole
+feature_presence         -> declared feature has matching STEP evidence
+feature_count            -> enough matching declared features exist
+numeric_range            -> declared measurement is inside an allowed range
+```
+
+`feature_count` and `numeric_range` are useful for parts that are not mostly
+mechanical interfaces: dense plates, captured sliders, clearance windows, and
+other cases where the source emits measurements Burr can check directly.
 
 ## Versioning
 

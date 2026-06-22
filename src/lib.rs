@@ -147,12 +147,15 @@ pub fn lint_targets(inputs: &[String], options: &LintOptions) -> Result<Vec<Lint
 }
 
 pub fn lint_design_data_file(path: &Path, options: &LintOptions) -> Result<LintResult, String> {
-    let rulepack = match &options.rulepack_path {
-        Some(path) => read_json_file(path)?,
-        None => default_rulepack()?,
-    };
     let manifest = read_json_file(path)?;
     let manifest_dir = path.parent().unwrap_or_else(|| Path::new("."));
+    let rulepack = match &options.rulepack_path {
+        Some(path) => read_json_file(path)?,
+        None => match design_data_rulepack_path(&manifest, manifest_dir)? {
+            Some(path) => read_json_file(&path)?,
+            None => default_rulepack()?,
+        },
+    };
     let source_manifest = relative_label(&options.cwd, path);
     let receipt = lint_design_data(&manifest, &rulepack, manifest_dir, Some(source_manifest));
     let receipt_path = manifest_dir.join("burr-receipt.json");
@@ -211,13 +214,6 @@ pub fn lint_design_data(
             .into_iter()
             .flatten()
         {
-            let features: Vec<&Value> = manifest
-                .get("features")
-                .and_then(Value::as_array)
-                .into_iter()
-                .flatten()
-                .filter(|feature| feature_applies(feature, rule.get("applies_to")))
-                .collect();
             let rule_kind = string_field(rule, "kind");
 
             if !matches!(
@@ -225,6 +221,8 @@ pub fn lint_design_data(
                 Some("hole_edge_distance")
                     | Some("minimum_wall_thickness")
                     | Some("feature_presence")
+                    | Some("feature_count")
+                    | Some("numeric_range")
             ) {
                 warnings.push(json!({
                     "rule_id": format!("{}:{}", string_field(rulepack, "id").unwrap_or("<missing>"), string_field(rule, "id").unwrap_or("<missing>")),
@@ -234,6 +232,24 @@ pub fn lint_design_data(
                 }));
                 continue;
             }
+
+            if rule_kind == Some("feature_count") {
+                checks.push(check_feature_count(manifest, rulepack, rule));
+                continue;
+            }
+
+            if rule_kind == Some("numeric_range") {
+                checks.push(check_numeric_range(manifest, rulepack, rule));
+                continue;
+            }
+
+            let features: Vec<&Value> = manifest
+                .get("features")
+                .and_then(Value::as_array)
+                .into_iter()
+                .flatten()
+                .filter(|feature| feature_applies(feature, rule.get("applies_to")))
+                .collect();
 
             if features.is_empty() {
                 warnings.push(json!({
@@ -575,6 +591,15 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
         "invalid_counterbore_dimensions" => {
             "the counterbore dimensions are internally invalid.".to_string()
         }
+        "feature_count_out_of_range" => {
+            "the number of matching declared features is outside the allowed range.".to_string()
+        }
+        "numeric_value_out_of_range" => {
+            "the declared numeric measurement is outside the allowed range.".to_string()
+        }
+        "missing_numeric_value" => {
+            "the rule points at a numeric measurement that is missing or invalid.".to_string()
+        }
         _ => string_field(check, "message")
             .unwrap_or("the check failed.")
             .to_string(),
@@ -688,6 +713,19 @@ fn explanation_evidence(check: &Value, reason: &str) -> Vec<String> {
                 lines.push(format!("Evidence: stale path {path}."));
             }
         }
+        "feature_count_out_of_range" => {
+            push_count(&mut lines, check, "/measured/count", "Measured count");
+            push_count(&mut lines, check, "/required/min_count", "Minimum count");
+            push_count(&mut lines, check, "/required/max_count", "Maximum count");
+        }
+        "numeric_value_out_of_range" | "missing_numeric_value" => {
+            if let Some(path) = string_field(check, "path") {
+                lines.push(format!("Evidence: checked numeric path {path}."));
+            }
+            push_measure(&mut lines, check, "/measured/value", "Measured value");
+            push_measure(&mut lines, check, "/required/min", "Minimum value");
+            push_measure(&mut lines, check, "/required/max", "Maximum value");
+        }
         _ => {
             if let Some(message) = string_field(check, "message") {
                 lines.push(format!("Evidence: {message}"));
@@ -717,6 +755,12 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
         "source_hash_mismatch" | "artifact_hash_mismatch" => {
             "stale hashes mean the receipt may not describe the files currently on disk."
         }
+        "feature_count_out_of_range" => {
+            "declared feature inventory is part of the design contract for this artifact."
+        }
+        "numeric_value_out_of_range" | "missing_numeric_value" => {
+            "Burr cannot trust a clearance, engagement, or other derived claim unless the source declares it in range."
+        }
         _ => "Burr cannot trust this mechanical claim until the failing rule is fixed.",
     }
 }
@@ -742,6 +786,12 @@ fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
         "missing_hole_diameter" => "add a positive diameter_mm to the feature metadata.",
         "missing_feature_center" => "add center_mm to the feature metadata.",
         "missing_feature_axis" => "add axis to the feature metadata.",
+        "feature_count_out_of_range" => {
+            "add/remove declared features or adjust the rulepack range if the design intent changed."
+        }
+        "numeric_value_out_of_range" | "missing_numeric_value" => {
+            "fix the CAD dimensions or emit the expected measurement in burr-design-data.json."
+        }
         "step_geometry_unreadable" => "export a valid STEP artifact and make sure the design data points to it.",
         "invalid_counterbore_dimensions" => {
             "make counterbore_diameter_mm greater than bore_diameter_mm and use positive depths."
@@ -753,6 +803,12 @@ fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
 fn push_measure(lines: &mut Vec<String>, check: &Value, pointer: &str, label: &str) {
     if let Some(value) = check.pointer(pointer).and_then(Value::as_f64) {
         lines.push(format!("Evidence: {label} = {} mm.", trim_float(value)));
+    }
+}
+
+fn push_count(lines: &mut Vec<String>, check: &Value, pointer: &str, label: &str) {
+    if let Some(value) = check.pointer(pointer).and_then(Value::as_u64) {
+        lines.push(format!("Evidence: {label} = {value}."));
     }
 }
 
@@ -1075,6 +1131,114 @@ fn check_minimum_wall_thickness(
             "Hole wall thickness passes rule.".to_string()
         } else {
             format!("Hole wall thickness is short by {} mm.", trim_float(round(margin.abs())))
+        }
+    })
+}
+
+fn check_feature_count(manifest: &Value, rulepack: &Value, rule: &Value) -> Value {
+    let full_rule_id = format!(
+        "{}:{}",
+        string_field(rulepack, "id").unwrap_or("<missing>"),
+        string_field(rule, "id").unwrap_or("<missing>")
+    );
+    let features: Vec<&Value> = manifest
+        .get("features")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter(|feature| feature_applies(feature, rule.get("applies_to")))
+        .collect();
+    let count = features.len() as u64;
+    let min_count = rule.get("min_count").and_then(Value::as_u64);
+    let max_count = rule.get("max_count").and_then(Value::as_u64);
+    if min_count.is_none() && max_count.is_none() {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "invalid_feature_count_rule_bounds",
+            "message": "feature_count rules must declare min_count, max_count, or both."
+        });
+    }
+    let min_pass = min_count.map_or(true, |value| count >= value);
+    let max_pass = max_count.map_or(true, |value| count <= value);
+    let pass = min_pass && max_pass;
+    let feature_ids: Vec<Value> = features
+        .iter()
+        .filter_map(|feature| string_field(feature, "id").map(|id| Value::String(id.to_string())))
+        .collect();
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "feature_count_out_of_range" },
+        "feature_ids": feature_ids,
+        "measured": { "count": count },
+        "required": {
+            "min_count": min_count,
+            "max_count": max_count
+        },
+        "message": if pass {
+            "Feature count passes rule.".to_string()
+        } else {
+            format!("Feature count {count} is outside declared range.")
+        }
+    })
+}
+
+fn check_numeric_range(manifest: &Value, rulepack: &Value, rule: &Value) -> Value {
+    let full_rule_id = format!(
+        "{}:{}",
+        string_field(rulepack, "id").unwrap_or("<missing>"),
+        string_field(rule, "id").unwrap_or("<missing>")
+    );
+    let path = string_field(rule, "path").unwrap_or("");
+    let value = value_at_path(manifest, path).and_then(Value::as_f64);
+    let value = value.filter(|value| value.is_finite());
+    let min = number_field(rule, "min");
+    let max = number_field(rule, "max");
+    if min.is_none() && max.is_none() {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "invalid_numeric_range_rule_bounds",
+            "path": path,
+            "message": "numeric_range rules must declare min, max, or both."
+        });
+    }
+
+    let Some(value) = value else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_numeric_value",
+            "path": path,
+            "measured": { "value": Value::Null },
+            "required": {
+                "min": min,
+                "max": max
+            },
+            "message": "Numeric design value cannot be derived."
+        });
+    };
+
+    let min_pass = min.map_or(true, |minimum| value >= minimum);
+    let max_pass = max.map_or(true, |maximum| value <= maximum);
+    let pass = min_pass && max_pass;
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "numeric_value_out_of_range" },
+        "path": path,
+        "measured": { "value": round(value) },
+        "required": {
+            "min": min,
+            "max": max
+        },
+        "message": if pass {
+            "Numeric design value passes rule.".to_string()
+        } else {
+            format!("Numeric design value {} is outside declared range.", trim_float(round(value)))
         }
     })
 }
@@ -2201,10 +2365,21 @@ fn summarize_features(manifest: &Value, checks: &[Value]) -> Value {
         .into_iter()
         .flatten()
         .collect();
-    let checked_feature_ids: HashSet<String> = checks
-        .iter()
-        .filter_map(|check| string_field(check, "feature_id").map(ToString::to_string))
-        .collect();
+    let mut checked_feature_ids: HashSet<String> = HashSet::new();
+    for check in checks {
+        if let Some(feature_id) = string_field(check, "feature_id") {
+            checked_feature_ids.insert(feature_id.to_string());
+        }
+        for feature_id in check
+            .get("feature_ids")
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+            .filter_map(Value::as_str)
+        {
+            checked_feature_ids.insert(feature_id.to_string());
+        }
+    }
     let mut checked = Vec::new();
     let mut unchecked = Vec::new();
     let mut intent_counts: HashMap<String, usize> = HashMap::new();
@@ -2729,6 +2904,30 @@ fn resolve_file_ref(manifest_dir: &Path, file_ref: &Value) -> Result<ResolvedFil
     })
 }
 
+fn design_data_rulepack_path(
+    manifest: &Value,
+    manifest_dir: &Path,
+) -> Result<Option<PathBuf>, String> {
+    let Some(rulepack) = manifest.get("rulepack") else {
+        return Ok(None);
+    };
+    let path = if let Some(path) = rulepack.as_str() {
+        path
+    } else if let Some(object) = rulepack.as_object() {
+        let Some(path) = object.get("path") else {
+            return Err("Manifest rulepack object must include path.".to_string());
+        };
+        path.as_str()
+            .ok_or_else(|| "Manifest rulepack path must be a string.".to_string())?
+    } else {
+        return Err("Manifest rulepack must be a string path or object with path.".to_string());
+    };
+    if path.is_empty() {
+        return Err("Manifest rulepack path must be a non-empty string.".to_string());
+    }
+    Ok(Some(normalize_path(&manifest_dir.join(path))))
+}
+
 fn stamp_ref(manifest_dir: &Path, file_ref: &mut Value) -> Result<(), String> {
     let resolved = resolve_file_ref(manifest_dir, file_ref)?;
     if !resolved.file_path.exists() {
@@ -2749,6 +2948,11 @@ fn feature_applies(feature: &Value, applies_to: Option<&Value>) -> bool {
     let Some(applies_to) = applies_to else {
         return true;
     };
+    if let Some(id) = string_field(applies_to, "id") {
+        if string_field(feature, "id") != Some(id) {
+            return false;
+        }
+    }
     if let Some(kind) = string_field(applies_to, "kind") {
         if string_field(feature, "kind") != Some(kind) {
             return false;
@@ -3101,6 +3305,20 @@ fn number_field(value: &Value, field: &str) -> Option<f64> {
         .filter(|value| value.is_finite())
 }
 
+fn value_at_path<'a>(value: &'a Value, path: &str) -> Option<&'a Value> {
+    if path.is_empty() {
+        return None;
+    }
+    let mut current = value;
+    for segment in path.split('.') {
+        if segment.is_empty() {
+            return None;
+        }
+        current = current.get(segment)?;
+    }
+    Some(current)
+}
+
 fn number_array(value: &Value) -> Option<Vec<f64>> {
     value
         .as_array()?
@@ -3283,6 +3501,346 @@ mod tests {
 
         assert!(pyproject.contains("name = \"my-starter-part\""));
         assert!(design.contains("artifact_id=\"my-starter-part\""));
+    }
+
+    #[test]
+    fn manifest_declared_rulepack_is_used_when_cli_rulepack_is_absent() {
+        let temp = tempfile::tempdir().unwrap();
+        let source_path = temp.path().join("source.py");
+        let step_path = temp.path().join("part.step");
+        let rulepack_path = temp.path().join("local.rulepack.json");
+        let manifest_path = temp.path().join(DESIGN_DATA_FILE_NAME);
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(&step_path, "ISO-10303-21;\nEND-ISO-10303-21;\n").unwrap();
+
+        let manifest = json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "local-rulepack-part",
+            "artifact_version": "0.1.0",
+            "artifact_type": "unit_rulepack_part",
+            "units": "mm",
+            "rulepack": { "path": "local.rulepack.json" },
+            "source": {
+                "path": "source.py",
+                "sha256": sha256_file(&source_path).unwrap()
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": sha256_file(&step_path).unwrap()
+                }
+            ],
+            "measurements": {
+                "clearance_mm": 0.25
+            }
+        });
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "local_rulepack",
+            "version": "0.1.0",
+            "artifact_type": "unit_rulepack_part",
+            "rules": [
+                {
+                    "id": "clearance_window",
+                    "kind": "numeric_range",
+                    "path": "measurements.clearance_mm",
+                    "min": 0.2,
+                    "max": 0.35
+                }
+            ]
+        });
+        write_json_file(&manifest_path, &manifest).unwrap();
+        write_json_file(&rulepack_path, &rulepack).unwrap();
+
+        let result = lint_design_data_file(
+            &manifest_path,
+            &LintOptions {
+                cwd: temp.path().to_path_buf(),
+                write_receipt: false,
+                rulepack_path: None,
+            },
+        )
+        .unwrap();
+
+        assert_eq!(string_field(&result.receipt, "status"), Some("pass"));
+        assert_eq!(
+            string_field(&result.receipt, "rulepack_id"),
+            Some("local_rulepack")
+        );
+    }
+
+    #[test]
+    fn malformed_manifest_rulepack_is_an_error_not_default_fallback() {
+        let temp = tempfile::tempdir().unwrap();
+        let source_path = temp.path().join("source.py");
+        let step_path = temp.path().join("part.step");
+        let manifest_path = temp.path().join(DESIGN_DATA_FILE_NAME);
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(&step_path, "ISO-10303-21;\nEND-ISO-10303-21;\n").unwrap();
+
+        let mut manifest = json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "bad-rulepack-ref",
+            "artifact_version": "0.1.0",
+            "artifact_type": "captured_slider",
+            "units": "mm",
+            "rulepack": {},
+            "source": {
+                "path": "source.py",
+                "sha256": sha256_file(&source_path).unwrap()
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": sha256_file(&step_path).unwrap()
+                }
+            ]
+        });
+        write_json_file(&manifest_path, &manifest).unwrap();
+
+        let options = LintOptions {
+            cwd: temp.path().to_path_buf(),
+            write_receipt: false,
+            rulepack_path: None,
+        };
+        let error = lint_design_data_file(&manifest_path, &options).unwrap_err();
+        assert!(error.contains("Manifest rulepack object must include path"));
+
+        manifest["rulepack"] = json!({ "path": "" });
+        write_json_file(&manifest_path, &manifest).unwrap();
+        let error = lint_design_data_file(&manifest_path, &options).unwrap_err();
+        assert!(error.contains("Manifest rulepack path must be a non-empty string"));
+    }
+
+    #[test]
+    fn cli_rulepack_overrides_manifest_declared_rulepack() {
+        let temp = tempfile::tempdir().unwrap();
+        let source_path = temp.path().join("source.py");
+        let step_path = temp.path().join("part.step");
+        let manifest_path = temp.path().join(DESIGN_DATA_FILE_NAME);
+        let manifest_rulepack_path = temp.path().join("manifest.rulepack.json");
+        let cli_rulepack_path = temp.path().join("cli.rulepack.json");
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(&step_path, "ISO-10303-21;\nEND-ISO-10303-21;\n").unwrap();
+
+        write_json_file(
+            &manifest_rulepack_path,
+            &json!({
+                "schema_version": "burr.rulepack.v1",
+                "id": "manifest_rulepack",
+                "version": "0.1.0",
+                "artifact_type": "unit_rulepack_part",
+                "rules": []
+            }),
+        )
+        .unwrap();
+        write_json_file(
+            &cli_rulepack_path,
+            &json!({
+                "schema_version": "burr.rulepack.v1",
+                "id": "cli_rulepack",
+                "version": "0.1.0",
+                "artifact_type": "unit_rulepack_part",
+                "rules": []
+            }),
+        )
+        .unwrap();
+        write_json_file(
+            &manifest_path,
+            &json!({
+                "schema_version": "burr.design-data.v1",
+                "artifact_id": "override-rulepack-part",
+                "artifact_version": "0.1.0",
+                "artifact_type": "unit_rulepack_part",
+                "units": "mm",
+                "rulepack": { "path": "manifest.rulepack.json" },
+                "source": {
+                    "path": "source.py",
+                    "sha256": sha256_file(&source_path).unwrap()
+                },
+                "artifacts": [
+                    {
+                        "kind": "step",
+                        "path": "part.step",
+                        "sha256": sha256_file(&step_path).unwrap()
+                    }
+                ]
+            }),
+        )
+        .unwrap();
+
+        let result = lint_design_data_file(
+            &manifest_path,
+            &LintOptions {
+                cwd: temp.path().to_path_buf(),
+                write_receipt: false,
+                rulepack_path: Some(cli_rulepack_path),
+            },
+        )
+        .unwrap();
+        assert_eq!(
+            string_field(&result.receipt, "rulepack_id"),
+            Some("cli_rulepack")
+        );
+    }
+
+    #[test]
+    fn feature_count_and_numeric_range_check_manifest_level_claims() {
+        let temp = tempfile::tempdir().unwrap();
+        let source_path = temp.path().join("source.py");
+        let step_path = temp.path().join("part.step");
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(&step_path, "ISO-10303-21;\nEND-ISO-10303-21;\n").unwrap();
+
+        let manifest = json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "count-range-part",
+            "artifact_version": "0.1.0",
+            "artifact_type": "breadth_fixture",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": sha256_file(&source_path).unwrap()
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": sha256_file(&step_path).unwrap()
+                }
+            ],
+            "measurements": {
+                "clearance_mm": 0.25
+            },
+            "features": [
+                { "id": "relief_a", "kind": "clearance_hole", "intent": "cosmetic", "role": "visual_lightening" },
+                { "id": "relief_b", "kind": "clearance_hole", "intent": "cosmetic", "role": "visual_lightening" },
+                { "id": "relief_c", "kind": "clearance_hole", "intent": "cosmetic", "role": "visual_lightening" }
+            ]
+        });
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "breadth_fixture",
+            "version": "0.1.0",
+            "artifact_type": "breadth_fixture",
+            "rules": [
+                {
+                    "id": "cosmetic_relief_inventory",
+                    "kind": "feature_count",
+                    "applies_to": {
+                        "kind": "clearance_hole",
+                        "intent_any": ["cosmetic"],
+                        "role_any": ["visual_lightening"]
+                    },
+                    "min_count": 3,
+                    "max_count": 12
+                },
+                {
+                    "id": "clearance_window",
+                    "kind": "numeric_range",
+                    "path": "measurements.clearance_mm",
+                    "min": 0.2,
+                    "max": 0.35
+                }
+            ]
+        });
+
+        let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert_eq!(
+            receipt
+                .pointer("/summary/features/checked_feature_ids")
+                .and_then(Value::as_array)
+                .unwrap()
+                .len(),
+            3
+        );
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("breadth_fixture:clearance_window")
+                && check.pointer("/measured/value").and_then(Value::as_f64) == Some(0.25)
+        }));
+
+        let mut failing_manifest = manifest.clone();
+        failing_manifest["measurements"]["clearance_mm"] = json!(0.5);
+        failing_manifest["features"] = json!([
+            { "id": "relief_a", "kind": "clearance_hole", "intent": "cosmetic", "role": "visual_lightening" },
+            { "id": "relief_b", "kind": "clearance_hole", "intent": "cosmetic", "role": "visual_lightening" }
+        ]);
+        let failing = lint_design_data(&failing_manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&failing, "status"), Some("fail"));
+        assert!(failing["checks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|check| { string_field(check, "reason") == Some("feature_count_out_of_range") }));
+        assert!(failing["checks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|check| { string_field(check, "reason") == Some("numeric_value_out_of_range") }));
+    }
+
+    #[test]
+    fn count_and_range_rules_require_bounds() {
+        let temp = tempfile::tempdir().unwrap();
+        let source_path = temp.path().join("source.py");
+        let step_path = temp.path().join("part.step");
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(&step_path, "ISO-10303-21;\nEND-ISO-10303-21;\n").unwrap();
+
+        let manifest = json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "bad-rule-bounds",
+            "artifact_version": "0.1.0",
+            "artifact_type": "breadth_fixture",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": sha256_file(&source_path).unwrap()
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": sha256_file(&step_path).unwrap()
+                }
+            ],
+            "measurements": {
+                "clearance_mm": 0.25
+            },
+            "features": [
+                { "id": "relief_a", "kind": "clearance_hole", "intent": "cosmetic", "role": "visual_lightening" }
+            ]
+        });
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "breadth_fixture",
+            "version": "0.1.0",
+            "artifact_type": "breadth_fixture",
+            "rules": [
+                {
+                    "id": "unbounded_feature_count",
+                    "kind": "feature_count",
+                    "applies_to": { "kind": "clearance_hole" }
+                },
+                {
+                    "id": "unbounded_numeric_range",
+                    "kind": "numeric_range",
+                    "path": "measurements.clearance_mm"
+                }
+            ]
+        });
+
+        let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "reason") == Some("invalid_feature_count_rule_bounds")
+        }));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "reason") == Some("invalid_numeric_range_rule_bounds")
+        }));
     }
 
     #[test]

@@ -5,14 +5,14 @@ from burr_build123d import BurrDesignData, DESIGN_DATA_FILE, m3_clearance_hole, 
 
 
 BASE_DIR = Path(__file__).resolve().parent
-STEP_FILE = "dense-random-hole-plate.step"
+STEP_FILE = "dense-random-hole-plate-too-few-reliefs.step"
 
 length = 16.0
 width = 96.0
 height = 62.0
 
 design = BurrDesignData(
-    artifact_id="gallery-dense-random-hole-plate",
+    artifact_id="gallery-dense-random-hole-plate-too-few-reliefs",
     artifact_type="printed_plate",
     artifact_version="0.1.0",
     process={"kind": "FDM", "material": "PETG", "nozzle_mm": 0.4},
@@ -34,20 +34,7 @@ cosmetic_holes = [
     ("cosmetic_grid_a5", 24.0, -20.0, 2.6),
     ("cosmetic_grid_a6", 36.0, -20.0, 2.6),
     ("cosmetic_grid_b1", -30.0, 5.0, 3.2),
-    ("cosmetic_grid_b2", -18.0, 5.0, 3.2),
-    ("cosmetic_grid_b3", 18.0, 5.0, 3.2),
-    ("cosmetic_grid_b4", 30.0, 5.0, 3.2),
 ]
-
-untracked_visual_holes = [
-    (-40.0, 22.0, 2.2),
-    (-28.0, 24.0, 1.8),
-    (-8.0, 23.0, 2.4),
-    (8.0, 23.0, 2.4),
-    (28.0, 24.0, 1.8),
-    (40.0, 22.0, 2.2),
-]
-
 
 with BuildPart() as part:
     Box(length, width, height)
@@ -90,15 +77,6 @@ with BuildPart() as part:
             role="visual_lightening",
             intent="cosmetic",
         )
-        with Locations((0, y, z)):
-            Cylinder(
-                radius=diameter / 2.0,
-                height=length + 4,
-                rotation=(0, 90, 0),
-                mode=Mode.SUBTRACT,
-            )
-
-    for y, z, diameter in untracked_visual_holes:
         with Locations((0, y, z)):
             Cylinder(
                 radius=diameter / 2.0,

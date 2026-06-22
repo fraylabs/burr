@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -58,12 +59,31 @@ class BurrDesignData:
     artifacts: list[dict[str, Any]] = field(default_factory=list)
     parts: list[dict[str, Any]] = field(default_factory=list)
     features: list[dict[str, Any]] = field(default_factory=list)
+    rulepack_ref: dict[str, Any] | None = None
+    measurements: dict[str, float] = field(default_factory=dict)
 
     def source(self, path: str, kind: str = "design_file") -> None:
         self.sources.append({"kind": kind, "path": path})
 
     def artifact(self, path: str, kind: str = "step") -> None:
         self.artifacts.append({"kind": kind, "path": path})
+
+    def rulepack(self, path: str) -> None:
+        if not path:
+            raise ValueError("rulepack path must be a non-empty string.")
+        self.rulepack_ref = {"path": path}
+
+    def measurement(self, name: str, value: float) -> None:
+        if not name:
+            raise ValueError("measurement name must be a non-empty string.")
+        value = float(value)
+        if not math.isfinite(value):
+            raise ValueError("measurement value must be finite.")
+        self.measurements[name] = value
+
+    def measurements_update(self, values: dict[str, float]) -> None:
+        for name, value in values.items():
+            self.measurement(name, value)
 
     def part(
         self,
@@ -81,6 +101,39 @@ class BurrDesignData:
                 },
             },
         )
+
+    def feature(
+        self,
+        *,
+        feature_id: str,
+        kind: str,
+        part: str | None = None,
+        intent: str = "mechanical_interface",
+        role: str | list[str] | None = None,
+        **fields: Any,
+    ) -> None:
+        if not feature_id:
+            raise ValueError("feature_id must be a non-empty string.")
+        if not kind:
+            raise ValueError("feature kind must be a non-empty string.")
+        if not intent:
+            raise ValueError("feature intent must be a non-empty string.")
+        reserved = {"id", "kind", "intent", "part", "role"}
+        conflicts = reserved.intersection(fields)
+        if conflicts:
+            names = ", ".join(sorted(conflicts))
+            raise ValueError(f"feature fields cannot override reserved keys: {names}.")
+        feature: dict[str, Any] = {
+            "id": feature_id,
+            "kind": kind,
+            "intent": intent,
+            **fields,
+        }
+        if part is not None:
+            feature["part"] = part
+        if role is not None:
+            feature["role"] = role
+        self.features.append(feature)
 
     def clearance_hole(
         self,
@@ -276,6 +329,10 @@ class BurrDesignData:
             data["source"] = self.sources[0]
         if self.process:
             data["process"] = self.process
+        if self.rulepack_ref:
+            data["rulepack"] = self.rulepack_ref
+        if self.measurements:
+            data["measurements"] = self.measurements
         return data
 
     def write(self, path: str | Path) -> Path:

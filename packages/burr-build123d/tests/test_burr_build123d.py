@@ -72,6 +72,53 @@ class BurrBuild123dTests(unittest.TestCase):
 
         self.assertEqual(design.features[0]["intent"], "weight_reduction")
 
+    def test_records_rulepack_measurements_and_generic_feature(self):
+        design = BurrDesignData(
+            artifact_id="unit-slider",
+            artifact_type="captured_slider",
+        )
+        design.rulepack("../rules/captured_slider.rulepack.json")
+        design.measurement("head_side_clearance_mm", 0.25)
+        design.measurements_update({"carriage_lip_each_side_mm": 3.5})
+        design.feature(
+            feature_id="left_capture_lip",
+            kind="capture_lip",
+            part="carriage",
+            role="lift_off_blocker",
+            engagement_mm=3.5,
+        )
+
+        data = design.to_dict()
+
+        self.assertEqual(data["rulepack"]["path"], "../rules/captured_slider.rulepack.json")
+        self.assertEqual(data["measurements"]["head_side_clearance_mm"], 0.25)
+        self.assertEqual(data["measurements"]["carriage_lip_each_side_mm"], 3.5)
+        self.assertEqual(data["features"][0]["id"], "left_capture_lip")
+        self.assertEqual(data["features"][0]["kind"], "capture_lip")
+        self.assertEqual(data["features"][0]["role"], "lift_off_blocker")
+        self.assertEqual(data["features"][0]["intent"], "mechanical_interface")
+
+    def test_rejects_invalid_rulepack_measurement_and_generic_feature(self):
+        design = BurrDesignData(
+            artifact_id="unit-slider",
+            artifact_type="captured_slider",
+        )
+
+        with self.assertRaises(ValueError):
+            design.rulepack("")
+        with self.assertRaises(ValueError):
+            design.measurement("", 0.25)
+        with self.assertRaises(ValueError):
+            design.measurement("bad", float("nan"))
+        with self.assertRaises(ValueError):
+            design.feature(feature_id="", kind="capture_lip")
+        with self.assertRaises(ValueError):
+            design.feature(feature_id="capture", kind="", intent="mechanical_interface")
+        with self.assertRaises(ValueError):
+            design.feature(feature_id="capture", kind="capture_lip", intent="")
+        with self.assertRaises(ValueError):
+            design.feature(feature_id="capture", kind="capture_lip", id="override")
+
     def test_rejects_empty_intent(self):
         design = BurrDesignData(
             artifact_id="unit-actuator",
