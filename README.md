@@ -41,7 +41,7 @@ Fix: move the hole inward or make the surrounding part larger.
 Install from crates.io:
 
 ```bash
-cargo install burr --version 0.13.0
+cargo install burr --version 0.13.1
 ```
 
 Create and check a build123d starter part:
@@ -465,7 +465,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.13.0",
+  "burr_version": "0.13.1",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.8.0",
   "compatibility": {

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.13.1
+
+- Added a Burr-owned fresh-install release gate that installs the published CLI,
+  initializes the starter build123d project, proves the starter passes, mutates
+  the starter into an edge-distance failure, verifies `burr explain` reports the
+  measured problem, restores the starter, and verifies it passes again.
+- Added the fresh-install release gate to CI so the public package path is
+  checked independently from local workspace examples.
+
 ## 0.13.0
 
 - Added manifest-declared rulepack paths so a design can select a non-default
