@@ -401,6 +401,33 @@ bearing seats exist as matching STEP cylinder/plane evidence:
 }
 ```
 
+Design data can also choose a rulepack beside the artifact:
+
+```json
+{
+  "schema_version": "burr.design-data.v1",
+  "artifact_type": "captured_slider",
+  "rulepack": { "path": "../../../rules/captured_slider.rulepack.json" }
+}
+```
+
+The CLI `--rulepack <file>` flag still overrides this when you want to run a
+different rulepack against the same artifact.
+
+Supported rule kinds include:
+
+```txt
+hole_edge_distance       -> feature center is far enough from a free edge
+minimum_wall_thickness   -> enough material remains around a declared hole
+feature_presence         -> declared feature has matching STEP evidence
+feature_count            -> enough matching declared features exist
+numeric_range            -> declared measurement is inside an allowed range
+```
+
+`feature_count` and `numeric_range` are useful for parts that are not mostly
+mechanical interfaces: dense plates, captured sliders, clearance windows, and
+other cases where the source emits measurements Burr can check directly.
+
 ## Versioning
 
 Burr has three versioned surfaces:

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from build123d import Box, BuildPart, Cylinder, Locations, Mode, export_step
@@ -13,7 +14,7 @@ height = 62.0
 
 design = BurrDesignData(
     artifact_id="gallery-dense-random-hole-plate",
-    artifact_type="actuator_mount",
+    artifact_type="printed_plate",
     artifact_version="0.1.0",
     process={"kind": "FDM", "material": "PETG", "nozzle_mm": 0.4},
 )
@@ -107,4 +108,8 @@ with BuildPart() as part:
             )
 
 export_step(part.part, BASE_DIR / STEP_FILE)
-design.write(BASE_DIR / DESIGN_DATA_FILE)
+design_path = BASE_DIR / DESIGN_DATA_FILE
+design.write(design_path)
+design_data = json.loads(design_path.read_text())
+design_data["rulepack"] = {"path": "../../../rules/printed_plate.rulepack.json"}
+design_path.write_text(json.dumps(design_data, indent=2) + "\n")

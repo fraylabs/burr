@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Added manifest-declared rulepack paths so a design can select a non-default
+  rulepack without requiring CLI flags.
+- Added `feature_count` and `numeric_range` rule kinds for breadth checks on
+  dense plates, captured sliders, and other measurement-heavy CAD artifacts.
+- Added printed-plate and captured-slider rulepacks plus a T-slot linear slider
+  gallery example.
+
 ## 0.12.0
 
 - Added a dense random-hole gallery example that proves Burr checks declared

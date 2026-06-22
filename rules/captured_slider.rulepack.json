@@ -1,0 +1,37 @@
+{
+  "schema_version": "burr.rulepack.v1",
+  "id": "captured_slider",
+  "version": "0.1.0",
+  "artifact_type": "captured_slider",
+  "rules": [
+    {
+      "id": "head_side_clearance_window",
+      "kind": "numeric_range",
+      "path": "measurements.head_side_clearance_mm",
+      "min": 0.2,
+      "max": 0.35
+    },
+    {
+      "id": "neck_side_clearance_window",
+      "kind": "numeric_range",
+      "path": "measurements.neck_side_clearance_mm",
+      "min": 0.2,
+      "max": 0.35
+    },
+    {
+      "id": "capture_lip_inventory",
+      "kind": "feature_count",
+      "applies_to": {
+        "kind": "capture_lip",
+        "role_any": ["lift_off_blocker"]
+      },
+      "min_count": 2
+    },
+    {
+      "id": "capture_lip_engagement",
+      "kind": "numeric_range",
+      "path": "measurements.carriage_lip_each_side_mm",
+      "min": 2.5
+    }
+  ]
+}

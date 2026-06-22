@@ -1,0 +1,41 @@
+{
+  "schema_version": "burr.rulepack.v1",
+  "id": "printed_plate",
+  "version": "0.1.0",
+  "artifact_type": "printed_plate",
+  "rules": [
+    {
+      "id": "m3_mount_hole_edge_distance",
+      "kind": "hole_edge_distance",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["mount", "loaded_mount", "alignment"]
+      },
+      "min_center_to_edge_diameter_multiple": 3.0
+    },
+    {
+      "id": "m3_mount_hole_wall_thickness",
+      "kind": "minimum_wall_thickness",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["mount", "loaded_mount", "alignment"]
+      },
+      "min_wall_thickness_mm": 1.2
+    },
+    {
+      "id": "cosmetic_relief_inventory",
+      "kind": "feature_count",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "intent_any": ["cosmetic"],
+        "role_any": ["visual_lightening"]
+      },
+      "min_count": 8,
+      "max_count": 80
+    }
+  ]
+}
