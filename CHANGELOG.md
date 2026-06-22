@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.12.0
+
+- Added a dense random-hole gallery example that proves Burr checks declared
+  mechanical intent while ignoring cosmetic and undeclared visual holes.
+
 ## 0.11.0
 
 - Expanded the Burr gallery artifact into a good-vs-bad proof gallery.

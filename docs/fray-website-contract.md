@@ -7,9 +7,9 @@ regenerating CAD.
 
 ```txt
 repo: fraylabs/burr
-release_tag: burr-v0.11.0
-asset_name: burr-gallery-v0.11.0.zip
-asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.11.0/burr-gallery-v0.11.0.zip
+release_tag: burr-v0.12.0
+asset_name: burr-gallery-v0.12.0.zip
+asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.12.0/burr-gallery-v0.12.0.zip
 ```
 
 The website should treat Burr release assets as read-only product data.
@@ -30,7 +30,7 @@ The website should treat Burr release assets as read-only product data.
 ## Zip Layout
 
 ```txt
-burr-gallery-v0.11.0/
+burr-gallery-v0.12.0/
   README.md
   manifest.json
   shaft-bearing-bracket/
@@ -45,6 +45,10 @@ burr-gallery-v0.11.0/
     electronics-standoff-deck.png
     electronics-standoff-deck.receipt.json
     electronics-standoff-deck.design-data.json
+  dense-random-hole-plate/
+    dense-random-hole-plate.png
+    dense-random-hole-plate.receipt.json
+    dense-random-hole-plate.design-data.json
   bad-bearing-seat-missing-shoulder/
     bad-bearing-seat-missing-shoulder.png
     bad-bearing-seat-missing-shoulder.receipt.json
@@ -68,7 +72,7 @@ burr-gallery-v0.11.0/
 Manifest path:
 
 ```txt
-burr-gallery-v0.11.0/manifest.json
+burr-gallery-v0.12.0/manifest.json
 ```
 
 Schema:
@@ -76,12 +80,12 @@ Schema:
 ```json
 {
   "schema_version": "burr.gallery-artifact.v1",
-  "burr_version": "0.11.0",
-  "artifact_id": "burr-gallery-v0.11.0",
+  "burr_version": "0.12.0",
+  "artifact_id": "burr-gallery-v0.12.0",
   "generated_at": "ISO-8601 timestamp",
   "source": {
     "repository": "fraylabs/burr",
-    "tag": "burr-v0.11.0"
+    "tag": "burr-v0.12.0"
   },
   "examples": [
     {
@@ -173,8 +177,8 @@ The website data model should use:
 ```json
 {
   "repo": "fraylabs/burr",
-  "release_tag": "burr-v0.11.0",
-  "asset_name": "burr-gallery-v0.11.0.zip"
+  "release_tag": "burr-v0.12.0",
+  "asset_name": "burr-gallery-v0.12.0.zip"
 }
 ```
 

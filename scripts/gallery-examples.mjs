@@ -36,6 +36,18 @@ export const galleryExamples = [
     designData: "electronics-standoff-deck.design-data.json",
   },
   {
+    slug: "dense-random-hole-plate",
+    title: "Dense Random-Hole Plate",
+    expectation: "pass",
+    group: "functional-good",
+    dir: "examples/gallery/dense-random-hole-plate",
+    design: "examples/gallery/dense-random-hole-plate/design.py",
+    step: "examples/gallery/dense-random-hole-plate/dense-random-hole-plate.step",
+    preview: "dense-random-hole-plate.png",
+    receipt: "dense-random-hole-plate.receipt.json",
+    designData: "dense-random-hole-plate.design-data.json",
+  },
+  {
     slug: "bad-bearing-seat-missing-shoulder",
     title: "Bad Bearing Seat Missing Shoulder",
     expectation: "fail",
