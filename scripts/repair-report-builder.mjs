@@ -45,6 +45,8 @@ function buildBeforeAfterReport({ releaseDir, version, generatedAt, examples, sp
   const afterExample = findExample(examples, spec.afterExampleSlug);
   const beforeReceipt = readJson(path.join(releaseDir, beforeExample.receipt));
   const afterReceipt = readJson(path.join(releaseDir, afterExample.receipt));
+  const beforeDesign = readJson(path.join(releaseDir, beforeExample.design_data));
+  const afterDesign = readJson(path.join(releaseDir, afterExample.design_data));
 
   if (beforeReceipt.status !== "fail") {
     throw new Error(
@@ -102,6 +104,14 @@ function buildBeforeAfterReport({ releaseDir, version, generatedAt, examples, sp
   );
 
   const firstFix = firstFixForReason(beforeFailures[0]?.reason);
+  const repairActions = beforeFailures.map((check) =>
+    buildRepairAction({
+      check,
+      beforeDesign,
+      afterDesign,
+      afterChecks,
+    }),
+  );
 
   return {
     schema_version: "burr.repair-report.v1",
@@ -137,6 +147,7 @@ function buildBeforeAfterReport({ releaseDir, version, generatedAt, examples, sp
       proofChecks: afterChecks.filter((check) => check.status === "pass"),
     }),
     failures: beforeFailures.map((check) => summarizeFailure(check, firstFix)),
+    repair_actions: repairActions,
     feature_results: featureResults,
   };
 }
@@ -220,6 +231,57 @@ function summarizeProofCheck(check) {
   };
 }
 
+function buildRepairAction({ check, beforeDesign, afterDesign, afterChecks }) {
+  const featureId = check.feature_id;
+  const beforeFeature = findDesignFeature(beforeDesign, featureId);
+  const afterFeature = findDesignFeature(afterDesign, featureId);
+  const afterCheck = findFeatureCheck(afterChecks, featureId);
+  const featureCenterDeltaMm = vectorDelta(afterFeature.center_mm, beforeFeature.center_mm);
+
+  return {
+    feature_id: featureId,
+    action: "move_feature",
+    parameter: "center_mm",
+    before_value_mm: beforeFeature.center_mm,
+    after_value_mm: afterFeature.center_mm,
+    suggested_delta_mm: featureCenterDeltaMm,
+    rule_id: check.rule_id,
+    failure_reason: check.reason,
+    reason: `Move ${featureId} from [${beforeFeature.center_mm.join(", ")}] mm to [${afterFeature.center_mm.join(", ")}] mm so center-to-edge increases from ${formatMm(check.measured?.center_to_edge_mm)} to at least ${formatMm(check.required?.center_to_edge_mm)}.`,
+    measured_delta_mm: roundMm(
+      (afterCheck.measured?.center_to_edge_mm ?? 0) -
+        (check.measured?.center_to_edge_mm ?? 0),
+    ),
+    margin_delta_mm: roundMm((afterCheck.margin_mm ?? 0) - (check.margin_mm ?? 0)),
+    measured: check.measured ?? {},
+    required: check.required ?? {},
+    margin_mm: check.margin_mm ?? null,
+    verifies_against_after_feature: {
+      feature_id: afterCheck.feature_id ?? featureId,
+      status: afterCheck.status,
+      reason: afterCheck.reason,
+      measured: afterCheck.measured ?? {},
+      required: afterCheck.required ?? {},
+      margin_mm: afterCheck.margin_mm ?? null,
+    },
+  };
+}
+
+function findDesignFeature(designData, featureId) {
+  const feature = designData.features?.find((item) => item.id === featureId);
+  if (!feature) {
+    throw new Error(`Missing design-data feature for repair action: ${featureId}`);
+  }
+  if (!Array.isArray(feature.center_mm) || feature.center_mm.length !== 3) {
+    throw new Error(`Feature ${featureId} is missing center_mm for repair action.`);
+  }
+  return feature;
+}
+
+function vectorDelta(after, before) {
+  return after.map((value, index) => roundMm(value - before[index]));
+}
+
 function renderMarkdown(report) {
   return [
     `# ${report.title}`,
@@ -277,6 +339,22 @@ function renderMarkdown(report) {
       `- First fix: ${failure.first_fix}`,
       "",
     ]),
+    "## Repair Actions",
+    "",
+    [
+      "| Feature | Action | Parameter | Suggested delta | Reason |",
+      "| --- | --- | --- | ---: | --- |",
+      ...report.repair_actions.map((action) =>
+        `| ${[
+          markdownCell(action.feature_id),
+          markdownCell(action.action),
+          markdownCell(action.parameter),
+          formatDeltaMm(action.suggested_delta_mm),
+          markdownCell(action.reason),
+        ].join(" | ")} |`,
+      ),
+    ].join("\n"),
+    "",
     "## After Pass",
     "",
     ...(report.after.proof_checks ?? []).flatMap((check) => [
@@ -334,6 +412,13 @@ function formatMm(value) {
     return "n/a";
   }
   return `${value} mm`;
+}
+
+function formatDeltaMm(value) {
+  if (Array.isArray(value)) {
+    return `[${value.join(", ")}] mm`;
+  }
+  return formatMm(value);
 }
 
 function markdownCell(value) {

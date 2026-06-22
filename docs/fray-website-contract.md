@@ -7,9 +7,9 @@ regenerating CAD.
 
 ```txt
 repo: fraylabs/burr
-release_tag: burr-v0.15.0
-asset_name: burr-gallery-v0.15.0.zip
-asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.15.0/burr-gallery-v0.15.0.zip
+release_tag: burr-v0.16.0
+asset_name: burr-gallery-v0.16.0.zip
+asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.16.0/burr-gallery-v0.16.0.zip
 ```
 
 The website should treat Burr release assets as read-only product data.
@@ -33,7 +33,7 @@ The website should treat Burr release assets as read-only product data.
 ## Zip Layout
 
 ```txt
-burr-gallery-v0.15.0/
+burr-gallery-v0.16.0/
   README.md
   manifest.json
   repair-reports/
@@ -78,7 +78,7 @@ burr-gallery-v0.15.0/
 Manifest path:
 
 ```txt
-burr-gallery-v0.15.0/manifest.json
+burr-gallery-v0.16.0/manifest.json
 ```
 
 Schema:
@@ -86,12 +86,12 @@ Schema:
 ```json
 {
   "schema_version": "burr.gallery-artifact.v1",
-  "burr_version": "0.15.0",
-  "artifact_id": "burr-gallery-v0.15.0",
+  "burr_version": "0.16.0",
+  "artifact_id": "burr-gallery-v0.16.0",
   "generated_at": "ISO-8601 timestamp",
   "source": {
     "repository": "fraylabs/burr",
-    "tag": "burr-v0.15.0"
+    "tag": "burr-v0.16.0"
   },
   "repair_reports": [
     {
@@ -173,10 +173,12 @@ caught. For the fixed actuator card, use `status: "pass"` to say the declared
 actuator checks now pass. Do not imply that Burr designed the repair; Burr
 checked the before state, explained the fix order, and checked the after state.
 
-## Burr 0.15 Repair Reports
+## Burr 0.16 Repair Reports
 
-Burr 0.15 adds portable repair reports to the same gallery artifact. A report is
-not a new verifier. It is a receipt-backed summary of the before/after loop.
+Burr 0.16 repair reports include portable `repair_actions[]` in the same gallery
+artifact. A report is not a new verifier. It is a receipt-backed summary of the
+before/after loop, with suggested actions derived from the bad/fixed receipts and
+design data only.
 
 Report JSON schema:
 
@@ -194,6 +196,26 @@ Report JSON schema:
     "receipt": "bad-actuator-housing-edge-distance/bad-actuator-housing-edge-distance.receipt.json",
     "failures": 4
   },
+  "repair_actions": [
+    {
+      "feature_id": "m3_front_left",
+      "action": "move_feature",
+      "parameter": "center_mm",
+      "before_value_mm": [-28, -8, 9],
+      "after_value_mm": [-22, -12, 9],
+      "suggested_delta_mm": [6, -4, 0],
+      "failure_reason": "insufficient_edge_distance",
+      "reason": "Move m3_front_left from [-28, -8, 9] mm to [-22, -12, 9] mm so center-to-edge increases from 8 mm to at least 10.2 mm.",
+      "measured": { "center_to_edge_mm": 8.0 },
+      "required": { "center_to_edge_mm": 10.2 },
+      "margin_mm": -2.2,
+      "verifies_against_after_feature": {
+        "feature_id": "m3_front_left",
+        "status": "pass",
+        "margin_mm": 1.8
+      }
+    }
+  ],
   "after": {
     "slug": "fixed-actuator-housing",
     "status": "pass",
@@ -204,6 +226,35 @@ Report JSON schema:
 
 The website should render report Markdown or selected report JSON fields only
 when `manifest.repair_reports[]` declares the files. Do not infer report paths.
+
+## Burr 0.16 Repair Actions
+
+Burr 0.16 adds `repair_actions[]` to the repair report JSON. These are
+machine-readable suggestions derived from the bad/fixed receipts and design
+data. They are not automatic CAD edits.
+
+Example action:
+
+```json
+{
+  "feature_id": "m3_front_left",
+  "action": "move_feature",
+  "parameter": "center_mm",
+  "before_value_mm": [-28, -8, 9],
+  "after_value_mm": [-22, -12, 9],
+  "suggested_delta_mm": [6, -4, 0],
+  "failure_reason": "insufficient_edge_distance",
+  "reason": "Move m3_front_left from [-28, -8, 9] mm to [-22, -12, 9] mm so center-to-edge increases from 8 mm to at least 10.2 mm.",
+  "measured": { "center_to_edge_mm": 8.0 },
+  "required": { "center_to_edge_mm": 10.2 },
+  "margin_mm": -2.2,
+  "verifies_against_after_feature": {
+    "feature_id": "m3_front_left",
+    "status": "pass",
+    "margin_mm": 1.8
+  }
+}
+```
 
 ## Website Rendering
 
@@ -252,8 +303,8 @@ The website data model should use:
 ```json
 {
   "repo": "fraylabs/burr",
-  "release_tag": "burr-v0.15.0",
-  "asset_name": "burr-gallery-v0.15.0.zip"
+  "release_tag": "burr-v0.16.0",
+  "asset_name": "burr-gallery-v0.16.0.zip"
 }
 ```
 

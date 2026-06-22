@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.16.0
+
+- Added `repair_actions[]` to Burr repair report JSON.
+- Repair actions now suggest receipt-derived edge-distance deltas for actuator
+  edge-distance failures and tie each suggestion to the fixed passing receipt
+  and design feature. Burr still does not auto-edit CAD.
+- Extended repair-report validation to prove actions map to failures and the
+  fixed receipt verifies positive after margins.
+
 ## 0.15.0
 
 - Added repair report artifacts to the Burr gallery release bundle.
