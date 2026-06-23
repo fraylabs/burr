@@ -146,22 +146,26 @@ class BurrDesignData:
         axis: tuple[float, float, float] | list[float],
         role: str,
         intent: str = "mechanical_interface",
+        support_diameter_mm: float | None = None,
     ) -> None:
         if not intent:
             raise ValueError("clearance_hole intent must be a non-empty string.")
-        self.features.append(
-            {
-                "id": feature_id,
-                "part": part,
-                "kind": "clearance_hole",
-                "intent": intent,
-                "fastener": fastener,
-                "diameter_mm": float(diameter_mm),
-                "center_mm": _round_vector(center),
-                "axis": _round_vector(axis),
-                "role": role,
-            },
-        )
+        if support_diameter_mm is not None and support_diameter_mm <= diameter_mm:
+            raise ValueError("clearance_hole support_diameter_mm must be greater than diameter_mm.")
+        feature = {
+            "id": feature_id,
+            "part": part,
+            "kind": "clearance_hole",
+            "intent": intent,
+            "fastener": fastener,
+            "diameter_mm": float(diameter_mm),
+            "center_mm": _round_vector(center),
+            "axis": _round_vector(axis),
+            "role": role,
+        }
+        if support_diameter_mm is not None:
+            feature["support_diameter_mm"] = float(support_diameter_mm)
+        self.features.append(feature)
 
     def straight_slot(
         self,
@@ -251,6 +255,7 @@ class BurrDesignData:
         bottom_center: tuple[float, float, float] | list[float],
         role: str,
         intent: str = "mechanical_interface",
+        support_diameter_mm: float | None = None,
     ) -> None:
         if not intent:
             raise ValueError("heat_set_insert_pocket intent must be a non-empty string.")
@@ -258,22 +263,27 @@ class BurrDesignData:
             raise ValueError("heat_set_insert_pocket pocket_diameter_mm must be positive.")
         if pocket_depth_mm <= 0:
             raise ValueError("heat_set_insert_pocket pocket_depth_mm must be positive.")
-        self.features.append(
-            {
-                "id": feature_id,
-                "part": part,
-                "kind": "heat_set_insert_pocket",
-                "intent": intent,
-                "insert": insert,
-                "pocket_diameter_mm": float(pocket_diameter_mm),
-                "pocket_depth_mm": float(pocket_depth_mm),
-                "center_mm": _round_vector(center),
-                "axis": _round_vector(axis),
-                "pocket_center_mm": _round_vector(pocket_center),
-                "bottom_center_mm": _round_vector(bottom_center),
-                "role": role,
-            },
-        )
+        if support_diameter_mm is not None and support_diameter_mm <= pocket_diameter_mm:
+            raise ValueError(
+                "heat_set_insert_pocket support_diameter_mm must be greater than pocket_diameter_mm.",
+            )
+        feature = {
+            "id": feature_id,
+            "part": part,
+            "kind": "heat_set_insert_pocket",
+            "intent": intent,
+            "insert": insert,
+            "pocket_diameter_mm": float(pocket_diameter_mm),
+            "pocket_depth_mm": float(pocket_depth_mm),
+            "center_mm": _round_vector(center),
+            "axis": _round_vector(axis),
+            "pocket_center_mm": _round_vector(pocket_center),
+            "bottom_center_mm": _round_vector(bottom_center),
+            "role": role,
+        }
+        if support_diameter_mm is not None:
+            feature["support_diameter_mm"] = float(support_diameter_mm)
+        self.features.append(feature)
 
     def bearing_seat(
         self,
@@ -368,6 +378,7 @@ def m3_clearance_hole(
     intent: str = "mechanical_interface",
     diameter_mm: float = 3.4,
     cut_depth_mm: float = 8.0,
+    support_diameter_mm: float | None = None,
     create_geometry: bool = True,
 ) -> None:
     """Create a build123d cut and record an M3 clearance-hole feature."""
@@ -381,6 +392,7 @@ def m3_clearance_hole(
         axis=axis,
         role=role,
         intent=intent,
+        support_diameter_mm=support_diameter_mm,
     )
 
     if not create_geometry:
@@ -566,6 +578,7 @@ def heat_set_insert_pocket(
     host_depth_mm: float,
     side: str = "negative",
     intent: str = "mechanical_interface",
+    support_diameter_mm: float | None = None,
     create_geometry: bool = True,
 ) -> None:
     """Create a narrow build123d blind insert pocket and record pocket intent.
@@ -606,6 +619,7 @@ def heat_set_insert_pocket(
         bottom_center=bottom_center,
         role=role,
         intent=intent,
+        support_diameter_mm=support_diameter_mm,
     )
 
     if not create_geometry:

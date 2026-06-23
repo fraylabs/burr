@@ -20,3 +20,6 @@ from burr_build123d import BurrDesignData, m3_clearance_hole
 
 This package does not replace build123d. It records mechanical intent while
 normal build123d code creates geometry.
+
+For boss-supported fasteners, pass `support_diameter_mm` to the helper so Burr
+can check the declared radial material around the hole or insert pocket.

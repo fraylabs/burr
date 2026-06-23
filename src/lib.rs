@@ -220,6 +220,7 @@ pub fn lint_design_data(
                 rule_kind,
                 Some("hole_edge_distance")
                     | Some("minimum_wall_thickness")
+                    | Some("fastener_support_wall_thickness")
                     | Some("feature_presence")
                     | Some("feature_count")
                     | Some("numeric_range")
@@ -269,6 +270,11 @@ pub fn lint_design_data(
                     Some("minimum_wall_thickness") => {
                         checks.push(check_minimum_wall_thickness(
                             manifest, rulepack, rule, feature,
+                        ));
+                    }
+                    Some("fastener_support_wall_thickness") => {
+                        checks.push(check_fastener_support_wall_thickness(
+                            rulepack, rule, feature,
                         ));
                     }
                     Some("feature_presence") => {
@@ -562,6 +568,34 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
             lines.push("Try moving the hole inward or increasing part width.".to_string());
             Some(lines)
         }
+        Some("insufficient_fastener_support_wall") => {
+            let feature_label = string_field(check, "feature_id")
+                .map(|id| format!(" {id}"))
+                .unwrap_or_default();
+            let measured = check
+                .pointer("/measured/support_wall_thickness_mm")
+                .and_then(Value::as_f64);
+            let required = check
+                .pointer("/required/wall_thickness_mm")
+                .and_then(Value::as_f64);
+            let short_by = number_field(check, "margin_mm").map(|value| round(value.abs()));
+            let mut lines = vec![format!(
+                "Fastener support{feature_label} leaves too little boss material."
+            )];
+            if let Some(value) = measured {
+                lines.push(format!("Measured support wall: {} mm", trim_float(value)));
+            }
+            if let Some(value) = required {
+                lines.push(format!("Required support wall: {} mm", trim_float(value)));
+            }
+            if let Some(value) = short_by {
+                lines.push(format!("Short by: {} mm", trim_float(value)));
+            }
+            lines.push(
+                "Try increasing the support or boss diameter around the fastener.".to_string(),
+            );
+            Some(lines)
+        }
         Some("missing_declared_feature") => {
             let feature_label = string_field(check, "feature_id")
                 .map(|id| format!(" {id}"))
@@ -693,8 +727,11 @@ fn explanation_category(reason: &str) -> &'static str {
         "missing_declared_feature" | "step_geometry_unreadable" => "missing geometry",
         "insufficient_edge_distance"
         | "insufficient_wall_thickness"
+        | "insufficient_fastener_support_wall"
         | "missing_edge_measurement"
         | "missing_hole_diameter"
+        | "missing_fastener_support_inner_diameter"
+        | "missing_fastener_support_diameter"
         | "missing_feature_center"
         | "missing_feature_axis"
         | "invalid_counterbore_dimensions" => "unsafe dimension",
@@ -741,8 +778,11 @@ fn explanation_rank_for_reason(reason: &str) -> u8 {
         "missing_declared_feature" | "step_geometry_unreadable" => 1,
         "insufficient_edge_distance"
         | "insufficient_wall_thickness"
+        | "insufficient_fastener_support_wall"
         | "missing_edge_measurement"
         | "missing_hole_diameter"
+        | "missing_fastener_support_inner_diameter"
+        | "missing_fastener_support_diameter"
         | "missing_feature_center"
         | "missing_feature_axis"
         | "invalid_counterbore_dimensions" => 2,
@@ -775,6 +815,10 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
         "insufficient_wall_thickness" => {
             "the M3 clearance hole leaves too little printable wall.".to_string()
         }
+        "insufficient_fastener_support_wall" => {
+            "the fastener support or boss leaves too little radial material around the hole."
+                .to_string()
+        }
         "missing_declared_feature" => {
             format!("the design data declares a {feature_kind}, but Burr cannot find matching STEP geometry.")
         }
@@ -788,6 +832,13 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
             "the rulepack schema is not supported by this Burr version.".to_string()
         }
         "missing_hole_diameter" => "the feature is missing a valid hole diameter.".to_string(),
+        "missing_fastener_support_inner_diameter" => {
+            "the feature is missing the hole, pocket, or bore diameter used inside the support."
+                .to_string()
+        }
+        "missing_fastener_support_diameter" => {
+            "the feature is missing the declared support or boss outer diameter.".to_string()
+        }
         "missing_feature_center" => "the feature is missing center_mm.".to_string(),
         "missing_feature_axis" => "the feature is missing axis.".to_string(),
         "step_geometry_unreadable" => "Burr could not read STEP geometry evidence.".to_string(),
@@ -839,6 +890,33 @@ fn explanation_evidence(check: &Value, reason: &str) -> Vec<String> {
                 check,
                 "/required/wall_thickness_mm",
                 "Required wall thickness",
+            );
+            push_margin(&mut lines, check);
+        }
+        "insufficient_fastener_support_wall" => {
+            push_measure(
+                &mut lines,
+                check,
+                "/measured/inner_diameter_mm",
+                "Measured inner diameter",
+            );
+            push_measure(
+                &mut lines,
+                check,
+                "/measured/support_diameter_mm",
+                "Measured support diameter",
+            );
+            push_measure(
+                &mut lines,
+                check,
+                "/measured/support_wall_thickness_mm",
+                "Measured support wall",
+            );
+            push_measure(
+                &mut lines,
+                check,
+                "/required/wall_thickness_mm",
+                "Required support wall",
             );
             push_margin(&mut lines, check);
         }
@@ -946,6 +1024,9 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
         "insufficient_wall_thickness" => {
             "FDM prints need enough material around holes to form reliable perimeters."
         }
+        "insufficient_fastener_support_wall" => {
+            "a boss or local support with too little radial material can split around the fastener or insert."
+        }
         "missing_declared_feature" => {
             match feature_kind {
                 "bearing seat" => "a declared bearing fit is only trustworthy if the exported STEP contains the seat cylinder and shoulder.",
@@ -972,6 +1053,7 @@ fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
     match reason {
         "insufficient_edge_distance" => "move the hole inward or make the surrounding part larger.",
         "insufficient_wall_thickness" => "move the hole inward, reduce the hole size, or increase the local wall.",
+        "insufficient_fastener_support_wall" => "increase support_diameter_mm or boss_diameter_mm, reduce the inner hole/pocket size, or change the support intent.",
         "missing_declared_feature" => match feature_kind {
             "bearing seat" => "regenerate the STEP from the bearing_seat helper or update the declared seat center/diameter/depth.",
             "counterbore" => "regenerate the STEP from the counterbore helper or update the declared bore/counterbore dimensions.",
@@ -987,6 +1069,12 @@ fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
             "use a rulepack schema supported by this Burr release."
         }
         "missing_hole_diameter" => "add a positive diameter_mm to the feature metadata.",
+        "missing_fastener_support_inner_diameter" => {
+            "add diameter_mm, pocket_diameter_mm, or bore_diameter_mm to the feature metadata."
+        }
+        "missing_fastener_support_diameter" => {
+            "add support_diameter_mm, boss_diameter_mm, or outer_diameter_mm to the feature metadata."
+        }
         "missing_feature_center" => "add center_mm to the feature metadata.",
         "missing_feature_axis" => "add axis to the feature metadata.",
         "feature_count_out_of_range" => {
@@ -1334,6 +1422,83 @@ fn check_minimum_wall_thickness(
             "Hole wall thickness passes rule.".to_string()
         } else {
             format!("Hole wall thickness is short by {} mm.", trim_float(round(margin.abs())))
+        }
+    })
+}
+
+fn check_fastener_support_wall_thickness(rulepack: &Value, rule: &Value, feature: &Value) -> Value {
+    let full_rule_id = format!(
+        "{}:{}",
+        string_field(rulepack, "id").unwrap_or("<missing>"),
+        string_field(rule, "id").unwrap_or("<missing>")
+    );
+    let feature_id = feature.get("id").cloned().unwrap_or(Value::Null);
+    let fastener_diameter = number_field(feature, "diameter_mm")
+        .or_else(|| number_field(feature, "pocket_diameter_mm"))
+        .or_else(|| number_field(feature, "bore_diameter_mm"));
+    if !fastener_diameter.is_some_and(|value| value > 0.0) {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_fastener_support_inner_diameter",
+            "feature_id": feature_id,
+            "message": "Feature diameter, pocket_diameter_mm, or bore_diameter_mm is required for fastener support linting."
+        });
+    }
+    let fastener_diameter = fastener_diameter.unwrap();
+
+    let support_diameter = number_field(feature, "support_diameter_mm")
+        .or_else(|| number_field(feature, "boss_diameter_mm"))
+        .or_else(|| number_field(feature, "outer_diameter_mm"));
+    if !support_diameter.is_some_and(|value| value > 0.0) {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_fastener_support_diameter",
+            "feature_id": feature_id,
+            "measured": {
+                "inner_diameter_mm": round(fastener_diameter),
+                "support_diameter_mm": Value::Null
+            },
+            "message": "Declared fastener-support features must include support_diameter_mm, boss_diameter_mm, or outer_diameter_mm."
+        });
+    }
+    let support_diameter = support_diameter.unwrap();
+
+    let required_wall_thickness = number_field(rule, "min_wall_thickness_mm");
+    if !required_wall_thickness.is_some_and(|value| value > 0.0) {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "invalid_rule_min_wall_thickness",
+            "feature_id": feature_id,
+            "message": "Rule min_wall_thickness_mm must be a positive number."
+        });
+    }
+    let required_wall_thickness = required_wall_thickness.unwrap();
+
+    let support_wall_thickness = (support_diameter - fastener_diameter) / 2.0;
+    let margin = support_wall_thickness - required_wall_thickness;
+    let pass = margin >= 0.0;
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "insufficient_fastener_support_wall" },
+        "feature_id": feature_id,
+        "measured": {
+            "inner_diameter_mm": round(fastener_diameter),
+            "support_diameter_mm": round(support_diameter),
+            "support_wall_thickness_mm": round(support_wall_thickness)
+        },
+        "required": {
+            "wall_thickness_mm": round(required_wall_thickness)
+        },
+        "margin_mm": round(margin),
+        "message": if pass {
+            "Fastener support wall thickness passes rule.".to_string()
+        } else {
+            format!("Fastener support wall thickness is short by {} mm.", trim_float(round(margin.abs())))
         }
     })
 }
@@ -4044,6 +4209,140 @@ mod tests {
         assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
             string_field(check, "reason") == Some("invalid_numeric_range_rule_bounds")
         }));
+    }
+
+    #[test]
+    fn fastener_support_wall_thickness_checks_declared_boss_meat() {
+        let temp = tempfile::tempdir().unwrap();
+        let source_path = temp.path().join("source.py");
+        let step_path = temp.path().join("part.step");
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(&step_path, "ISO-10303-21;\nEND-ISO-10303-21;\n").unwrap();
+
+        let manifest = json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "boss-meat-fixture",
+            "artifact_version": "0.1.0",
+            "artifact_type": "boss_meat_fixture",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": sha256_file(&source_path).unwrap()
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": sha256_file(&step_path).unwrap()
+                }
+            ],
+            "features": [
+                {
+                    "id": "m3_bad_boss",
+                    "kind": "clearance_hole",
+                    "intent": "mechanical_interface",
+                    "role": "bossed_mount",
+                    "fastener": "M3",
+                    "diameter_mm": 3.4,
+                    "support_diameter_mm": 6.0
+                },
+                {
+                    "id": "m3_good_boss",
+                    "kind": "clearance_hole",
+                    "intent": "mechanical_interface",
+                    "role": "bossed_mount",
+                    "fastener": "M3",
+                    "diameter_mm": 3.4,
+                    "support_diameter_mm": 8.0
+                },
+                {
+                    "id": "m3_bad_insert_boss",
+                    "kind": "heat_set_insert_pocket",
+                    "intent": "mechanical_interface",
+                    "role": "bossed_insert",
+                    "insert": "M3x5.7",
+                    "pocket_diameter_mm": 4.6,
+                    "support_diameter_mm": 8.0
+                },
+                {
+                    "id": "m3_good_insert_boss",
+                    "kind": "heat_set_insert_pocket",
+                    "intent": "mechanical_interface",
+                    "role": "bossed_insert",
+                    "insert": "M3x5.7",
+                    "pocket_diameter_mm": 4.6,
+                    "support_diameter_mm": 9.0
+                }
+            ]
+        });
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "boss_meat_fixture",
+            "version": "0.1.0",
+            "artifact_type": "boss_meat_fixture",
+            "rules": [
+                {
+                    "id": "support_wall",
+                    "kind": "fastener_support_wall_thickness",
+                    "applies_to": {
+                        "kind": "clearance_hole",
+                        "intent_any": ["mechanical_interface"],
+                        "role_any": ["bossed_mount"]
+                    },
+                    "min_wall_thickness_mm": 2.0
+                },
+                {
+                    "id": "insert_support_wall",
+                    "kind": "fastener_support_wall_thickness",
+                    "applies_to": {
+                        "kind": "heat_set_insert_pocket",
+                        "intent_any": ["mechanical_interface"],
+                        "role_any": ["bossed_insert"]
+                    },
+                    "min_wall_thickness_mm": 2.0
+                }
+            ]
+        });
+
+        let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "feature_id") == Some("m3_bad_boss")
+                && string_field(check, "reason") == Some("insufficient_fastener_support_wall")
+                && check
+                    .pointer("/measured/support_wall_thickness_mm")
+                    .and_then(Value::as_f64)
+                    == Some(1.3)
+                && check.pointer("/margin_mm").and_then(Value::as_f64) == Some(-0.7)
+        }));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "feature_id") == Some("m3_good_boss")
+                && string_field(check, "reason") == Some("ok")
+                && check
+                    .pointer("/measured/support_wall_thickness_mm")
+                    .and_then(Value::as_f64)
+                    == Some(2.3)
+        }));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "feature_id") == Some("m3_bad_insert_boss")
+                && string_field(check, "reason") == Some("insufficient_fastener_support_wall")
+                && check
+                    .pointer("/measured/support_wall_thickness_mm")
+                    .and_then(Value::as_f64)
+                    == Some(1.7)
+        }));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "feature_id") == Some("m3_good_insert_boss")
+                && string_field(check, "reason") == Some("ok")
+                && check
+                    .pointer("/measured/support_wall_thickness_mm")
+                    .and_then(Value::as_f64)
+                    == Some(2.2)
+        }));
+        assert!(format_receipt_diagnostics(&receipt)
+            .iter()
+            .flatten()
+            .any(|line| line.contains("Measured support wall: 1.3 mm")));
     }
 
     #[test]

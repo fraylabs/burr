@@ -40,6 +40,7 @@ class BurrBuild123dTests(unittest.TestCase):
                 center=(39.5, -8, 8),
                 axis=(1, 0, 0),
                 role="loaded_mount",
+                support_diameter_mm=8.0,
                 create_geometry=False,
             )
 
@@ -53,6 +54,7 @@ class BurrBuild123dTests(unittest.TestCase):
             self.assertEqual(data["features"][0]["fastener"], "M3")
             self.assertEqual(data["features"][0]["role"], "loaded_mount")
             self.assertEqual(data["features"][0]["intent"], "mechanical_interface")
+            self.assertEqual(data["features"][0]["support_diameter_mm"], 8.0)
 
     def test_records_non_mechanical_intent(self):
         design = BurrDesignData(
@@ -133,6 +135,23 @@ class BurrBuild123dTests(unittest.TestCase):
                 axis=(1, 0, 0),
                 role="mount",
                 intent="",
+                create_geometry=False,
+            )
+
+    def test_rejects_clearance_hole_support_smaller_than_hole(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        with self.assertRaises(ValueError):
+            m3_clearance_hole(
+                design,
+                feature_id="m3_bad_support",
+                part="housing",
+                center=(0, 0, 0),
+                axis=(1, 0, 0),
+                role="bossed_mount",
+                support_diameter_mm=3.4,
                 create_geometry=False,
             )
 
@@ -249,6 +268,7 @@ class BurrBuild123dTests(unittest.TestCase):
             pocket_diameter_mm=4.6,
             pocket_depth_mm=5.7,
             host_depth_mm=20.0,
+            support_diameter_mm=9.0,
             create_geometry=False,
         )
 
@@ -258,6 +278,7 @@ class BurrBuild123dTests(unittest.TestCase):
         self.assertEqual(feature["insert"], "M3x5.7")
         self.assertEqual(feature["pocket_diameter_mm"], 4.6)
         self.assertEqual(feature["pocket_depth_mm"], 5.7)
+        self.assertEqual(feature["support_diameter_mm"], 9.0)
         self.assertEqual(feature["center_mm"], [0.0, 0.0, 10.0])
         self.assertEqual(feature["pocket_center_mm"], [-7.15, 0.0, 10.0])
         self.assertEqual(feature["bottom_center_mm"], [-4.3, 0.0, 10.0])
@@ -279,6 +300,21 @@ class BurrBuild123dTests(unittest.TestCase):
                 pocket_diameter_mm=4.6,
                 pocket_depth_mm=5.7,
                 host_depth_mm=5.7,
+                create_geometry=False,
+            )
+        with self.assertRaises(ValueError):
+            heat_set_insert_pocket(
+                design,
+                feature_id="bad_insert_support",
+                part="housing",
+                center=(0, 0, 0),
+                axis=(1, 0, 0),
+                role="bossed_insert",
+                insert="M3x5.7",
+                pocket_diameter_mm=4.6,
+                pocket_depth_mm=5.7,
+                host_depth_mm=20.0,
+                support_diameter_mm=4.6,
                 create_geometry=False,
             )
 

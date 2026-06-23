@@ -29,6 +29,29 @@
       "min_wall_thickness_mm": 2.0
     },
     {
+      "id": "m3_bossed_mount_support_wall_thickness",
+      "kind": "fastener_support_wall_thickness",
+      "description": "Boss-supported M3 clearance holes need enough declared radial material around the hole.",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["bossed_mount", "fastener_support"]
+      },
+      "min_wall_thickness_mm": 2.0
+    },
+    {
+      "id": "m3_insert_support_wall_thickness",
+      "kind": "fastener_support_wall_thickness",
+      "description": "Boss-supported M3 heat-set insert pockets need enough declared radial material around the pocket.",
+      "applies_to": {
+        "kind": "heat_set_insert_pocket",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["bossed_insert", "fastener_support"]
+      },
+      "min_wall_thickness_mm": 2.0
+    },
+    {
       "id": "m3_clearance_hole_step_presence",
       "kind": "feature_presence",
       "description": "Declared M3 clearance holes must exist as matching cylindrical geometry in the exported STEP artifact.",
