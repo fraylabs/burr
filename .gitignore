@@ -13,6 +13,8 @@ examples/build123d-wall-thickness/*/wall.step
 examples/build123d-wall-thickness/*/burr-design-data.json
 examples/build123d-fastener-support/*/fastener-support.step
 examples/build123d-fastener-support/*/burr-design-data.json
+examples/build123d-standoff-boss-presence/*/standoff-boss.step
+examples/build123d-standoff-boss-presence/*/burr-design-data.json
 examples/build123d-step-presence/*/presence.step
 examples/build123d-step-presence/*/burr-design-data.json
 examples/build123d-mixed-intent/mixed.step

@@ -285,6 +285,46 @@ class BurrDesignData:
             feature["support_diameter_mm"] = float(support_diameter_mm)
         self.features.append(feature)
 
+    def standoff_boss(
+        self,
+        *,
+        feature_id: str,
+        part: str,
+        fastener: str,
+        boss_diameter_mm: float,
+        boss_height_mm: float,
+        center: tuple[float, float, float] | list[float],
+        axis: tuple[float, float, float] | list[float],
+        boss_center: tuple[float, float, float] | list[float],
+        top_center: tuple[float, float, float] | list[float],
+        role: str,
+        intent: str = "mechanical_interface",
+        supports_feature_id: str | None = None,
+    ) -> None:
+        if not intent:
+            raise ValueError("standoff_boss intent must be a non-empty string.")
+        if boss_diameter_mm <= 0:
+            raise ValueError("standoff_boss boss_diameter_mm must be positive.")
+        if boss_height_mm <= 0:
+            raise ValueError("standoff_boss boss_height_mm must be positive.")
+        feature = {
+            "id": feature_id,
+            "part": part,
+            "kind": "standoff_boss",
+            "intent": intent,
+            "fastener": fastener,
+            "boss_diameter_mm": float(boss_diameter_mm),
+            "boss_height_mm": float(boss_height_mm),
+            "center_mm": _round_vector(center),
+            "axis": _round_vector(axis),
+            "boss_center_mm": _round_vector(boss_center),
+            "top_center_mm": _round_vector(top_center),
+            "role": role,
+        }
+        if supports_feature_id is not None:
+            feature["supports_feature_id"] = supports_feature_id
+        self.features.append(feature)
+
     def bearing_seat(
         self,
         *,
@@ -638,7 +678,74 @@ def heat_set_insert_pocket(
             radius=pocket_diameter_mm / 2.0,
             height=pocket_depth_mm,
             rotation=(0, 90, 0),
-            mode=Mode.SUBTRACT,
+        mode=Mode.SUBTRACT,
+    )
+
+
+def standoff_boss(
+    design: BurrDesignData,
+    *,
+    feature_id: str,
+    part: str,
+    center: tuple[float, float, float] | list[float],
+    axis: tuple[float, float, float] | list[float],
+    role: str,
+    boss_diameter_mm: float,
+    boss_height_mm: float,
+    fastener: str = "M3",
+    intent: str = "mechanical_interface",
+    supports_feature_id: str | None = None,
+    create_geometry: bool = True,
+) -> None:
+    """Create a raised build123d boss and record boss intent."""
+
+    axis_vector = _round_vector(axis)
+    if axis_vector not in ([1.0, 0.0, 0.0], [-1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, 1.0], [0.0, 0.0, -1.0]):
+        raise ValueError("standoff_boss currently requires an axis-aligned axis.")
+    if boss_diameter_mm <= 0:
+        raise ValueError("standoff_boss boss_diameter_mm must be positive.")
+    if boss_height_mm <= 0:
+        raise ValueError("standoff_boss boss_height_mm must be positive.")
+
+    center_tuple = tuple(float(value) for value in center)
+    axis_tuple = tuple(float(value) for value in axis_vector)
+    top_center = tuple(
+        center_tuple[index] + axis_tuple[index] * (boss_height_mm / 2.0)
+        for index in range(3)
+    )
+
+    design.standoff_boss(
+        feature_id=feature_id,
+        part=part,
+        fastener=fastener,
+        boss_diameter_mm=boss_diameter_mm,
+        boss_height_mm=boss_height_mm,
+        center=center,
+        axis=axis,
+        boss_center=center,
+        top_center=top_center,
+        role=role,
+        intent=intent,
+        supports_feature_id=supports_feature_id,
+    )
+
+    if not create_geometry:
+        return
+
+    try:
+        from build123d import Cylinder, Locations, Mode
+    except ImportError as error:
+        raise RuntimeError(
+            "standoff_boss(create_geometry=True) requires build123d. "
+            "Install build123d or pass create_geometry=False.",
+        ) from error
+
+    with Locations(center_tuple):
+        Cylinder(
+            radius=boss_diameter_mm / 2.0,
+            height=boss_height_mm,
+            rotation=_axis_rotation(axis),
+            mode=Mode.ADD,
         )
 
 
@@ -727,5 +834,6 @@ __all__ = [
     "heat_set_insert_pocket",
     "__version__",
     "m3_clearance_hole",
+    "standoff_boss",
     "straight_slot",
 ]

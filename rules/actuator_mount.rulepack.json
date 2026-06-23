@@ -124,6 +124,23 @@
       "seat_center_tolerance_mm": 0.5,
       "shoulder_plane_tolerance_mm": 0.25,
       "axis_dot_min": 0.99
+    },
+    {
+      "id": "m3_standoff_boss_step_presence",
+      "kind": "feature_presence",
+      "description": "Declared M3 standoff bosses must exist as matching boss cylindrical and top-plane geometry in the exported STEP artifact.",
+      "applies_to": {
+        "kind": "standoff_boss",
+        "fastener": "M3",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["pcb_standoff", "fastener_support", "bossed_mount"]
+      },
+      "artifact_kind": "step",
+      "boss_diameter_tolerance_mm": 0.05,
+      "centerline_tolerance_mm": 0.25,
+      "boss_center_tolerance_mm": 0.5,
+      "top_plane_tolerance_mm": 0.25,
+      "axis_dot_min": 0.99
     }
   ]
 }

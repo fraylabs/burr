@@ -161,6 +161,13 @@ uv sync --all-packages
 npm run check:fastener-support
 ```
 
+Run the standoff boss STEP-presence proof:
+
+```bash
+uv sync --all-packages
+npm run check:standoff-boss
+```
+
 Run the straight-slot CAD proof:
 
 ```bash
@@ -187,6 +194,12 @@ boss-supported M3 hole or insert pocket should declare the inner hole/pocket
 diameter and `support_diameter_mm`; Burr then checks the radial wall around the
 fastener. This catches the common case where a rendered boss looks plausible but
 has too little material around the screw or insert.
+
+Boss existence is a separate STEP-presence claim. Declare a `standoff_boss`
+feature for the raised support body; Burr checks that the exported STEP contains
+the boss cylinder and top face. Together, the boss-presence and support-wall
+rules prove both that the support is physically in the CAD and that its declared
+radial material is large enough for the checked fastener.
 
 For website or release use, `npm run gallery:artifact` writes a versioned bundle:
 

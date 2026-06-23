@@ -23,3 +23,7 @@ normal build123d code creates geometry.
 
 For boss-supported fasteners, pass `support_diameter_mm` to the helper so Burr
 can check the declared radial material around the hole or insert pocket.
+
+Use `standoff_boss(...)` when the raised boss itself should be checked in the
+exported STEP. Burr verifies the declared boss cylinder and top face separately
+from the hole or insert it supports.

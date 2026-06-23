@@ -609,6 +609,8 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
                     Some("heat-set insert pocket")
                 } else if rule_id.contains("bearing_seat") {
                     Some("bearing seat")
+                } else if rule_id.contains("standoff_boss") {
+                    Some("standoff boss")
                 } else {
                     None
                 }
@@ -800,6 +802,8 @@ fn feature_kind_from_rule(rule_id: &str) -> &'static str {
         "heat-set insert pocket"
     } else if rule_id.contains("bearing_seat") {
         "bearing seat"
+    } else if rule_id.contains("standoff_boss") {
+        "standoff boss"
     } else if rule_id.contains("clearance_hole") || rule_id.contains("loaded_hole") {
         "clearance hole"
     } else {
@@ -988,6 +992,18 @@ fn explanation_evidence(check: &Value, reason: &str) -> Vec<String> {
                 "matched_seat_shoulder_plane",
                 "matched bearing shoulder plane",
             );
+            push_bool_evidence(
+                check,
+                &mut lines,
+                "matched_boss_cylinder",
+                "matched boss cylinder",
+            );
+            push_bool_evidence(
+                check,
+                &mut lines,
+                "matched_boss_top_plane",
+                "matched boss top plane",
+            );
         }
         "source_hash_mismatch" | "artifact_hash_mismatch" => {
             if let Some(path) = string_field(check, "path") {
@@ -1032,6 +1048,7 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
                 "bearing seat" => "a declared bearing fit is only trustworthy if the exported STEP contains the seat cylinder and shoulder.",
                 "counterbore" => "a screw head fit is only trustworthy if the exported STEP contains the bore, counterbore, and shoulder.",
                 "heat-set insert pocket" => "an insert fit is only trustworthy if the exported STEP contains the blind pocket wall and bottom.",
+                "standoff boss" => "a support boss is only trustworthy if the exported STEP contains the raised boss cylinder and top face.",
                 "straight slot" => "an adjustable slot is only trustworthy if the exported STEP contains the slot endpoints and side faces.",
                 _ => "metadata alone is not enough; the exported STEP must contain the declared mechanical feature.",
             }
@@ -1058,6 +1075,7 @@ fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
             "bearing seat" => "regenerate the STEP from the bearing_seat helper or update the declared seat center/diameter/depth.",
             "counterbore" => "regenerate the STEP from the counterbore helper or update the declared bore/counterbore dimensions.",
             "heat-set insert pocket" => "regenerate the STEP from the heat_set_insert_pocket helper or update the declared pocket dimensions.",
+            "standoff boss" => "regenerate the STEP from the standoff_boss helper or update the declared boss diameter/height/center.",
             "straight slot" => "regenerate the STEP from the straight_slot helper or update the declared slot width/length/center.",
             _ => "regenerate the STEP from the same helper that emitted the design data, then rerun burr check.",
         },
@@ -1678,6 +1696,16 @@ fn check_feature_presence(
         );
     }
 
+    if string_field(feature, "kind") == Some("standoff_boss") {
+        return check_standoff_boss_presence(
+            full_rule_id,
+            feature_id,
+            resolved_artifact,
+            rule,
+            feature,
+        );
+    }
+
     if string_field(feature, "kind") == Some("straight_slot") {
         return check_straight_slot_presence(
             full_rule_id,
@@ -2019,6 +2047,200 @@ fn check_bearing_seat_presence(
             "Declared bearing seat cylinder and shoulder-plane geometry exists in the STEP artifact."
         } else {
             "Design data declares a bearing seat, but matching seated pocket geometry was not found."
+        }
+    })
+}
+
+fn check_standoff_boss_presence(
+    full_rule_id: String,
+    feature_id: Value,
+    resolved_artifact: ResolvedFileRef,
+    rule: &Value,
+    feature: &Value,
+) -> Value {
+    let Some(boss_diameter) = number_field(feature, "boss_diameter_mm")
+        .or_else(|| number_field(feature, "support_diameter_mm"))
+        .or_else(|| number_field(feature, "outer_diameter_mm"))
+        .filter(|value| *value > 0.0)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_boss_diameter",
+            "feature_id": feature_id,
+            "message": "Boss diameter is required for STEP feature-presence checking."
+        });
+    };
+    let Some(boss_height) = number_field(feature, "boss_height_mm")
+        .or_else(|| number_field(feature, "height_mm"))
+        .filter(|value| *value > 0.0)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_boss_height",
+            "feature_id": feature_id,
+            "message": "Boss height is required for STEP feature-presence checking."
+        });
+    };
+    let Some(axis) = feature
+        .get("axis")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .and_then(Vec3::normalized)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_axis",
+            "feature_id": feature_id,
+            "message": "Feature axis is required for STEP feature-presence checking."
+        });
+    };
+    let Some(boss_center) = feature
+        .get("boss_center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .or_else(|| {
+            feature
+                .get("center_mm")
+                .and_then(number_array)
+                .and_then(Vec3::from_values)
+        })
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_boss_center",
+            "feature_id": feature_id,
+            "message": "Boss boss_center_mm or center_mm is required for STEP feature-presence checking."
+        });
+    };
+    let top_center = feature
+        .get("top_center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .unwrap_or_else(|| boss_center.add(axis.scale(boss_height / 2.0)));
+
+    let evidence = match parse_step_evidence(&resolved_artifact.file_path) {
+        Ok(evidence) => evidence,
+        Err(error) => {
+            return json!({
+                "rule_id": full_rule_id,
+                "status": "fail",
+                "reason": "step_geometry_unreadable",
+                "feature_id": feature_id,
+                "measured": {
+                    "artifact_path": resolved_artifact.label_path
+                },
+                "message": error
+            });
+        }
+    };
+
+    let boss_diameter_tolerance = number_field(rule, "boss_diameter_tolerance_mm")
+        .or_else(|| number_field(rule, "diameter_tolerance_mm"))
+        .unwrap_or(0.05)
+        .max(0.0);
+    let centerline_tolerance = number_field(rule, "centerline_tolerance_mm")
+        .unwrap_or(0.25)
+        .max(0.0);
+    let boss_center_tolerance = number_field(rule, "boss_center_tolerance_mm")
+        .unwrap_or(0.5)
+        .max(0.0);
+    let top_plane_tolerance = number_field(rule, "top_plane_tolerance_mm")
+        .or_else(|| number_field(rule, "plane_tolerance_mm"))
+        .unwrap_or(0.25)
+        .max(0.0);
+    let axis_dot_min = number_field(rule, "axis_dot_min")
+        .unwrap_or(0.99)
+        .clamp(0.0, 1.0);
+
+    let mut best_boss: Option<CounterboreCylinderMatch> = None;
+    let mut matched_boss = false;
+    for cylinder in &evidence.cylinders {
+        let axis_dot = axis.dot(cylinder.axis).abs();
+        let diameter_delta = (cylinder.radius_mm * 2.0 - boss_diameter).abs();
+        let centerline_distance = cylinder.point.distance_to_line(boss_center, cylinder.axis);
+        let axial_distance = cylinder.point.sub(boss_center).dot(axis).abs();
+        let candidate = CounterboreCylinderMatch {
+            axis_dot,
+            diameter_delta_mm: diameter_delta,
+            centerline_distance_mm: centerline_distance,
+            axial_distance_mm: axial_distance,
+        };
+        if best_boss
+            .as_ref()
+            .is_none_or(|best| candidate.score() < best.score())
+        {
+            best_boss = Some(candidate);
+        }
+        if diameter_delta <= boss_diameter_tolerance
+            && axis_dot >= axis_dot_min
+            && centerline_distance <= centerline_tolerance
+            && axial_distance <= (boss_height / 2.0 + boss_center_tolerance)
+        {
+            matched_boss = true;
+        }
+    }
+
+    let mut best_top: Option<PlaneMatch> = None;
+    let mut matched_top = false;
+    for plane in &evidence.planes {
+        let normal_dot = axis.dot(plane.normal).abs();
+        let distance = top_center.sub(plane.point).dot(plane.normal).abs();
+        let candidate = PlaneMatch {
+            normal_dot,
+            distance_mm: distance,
+        };
+        if best_top
+            .as_ref()
+            .is_none_or(|best| candidate.score() < best.score())
+        {
+            best_top = Some(candidate);
+        }
+        if normal_dot >= axis_dot_min && distance <= top_plane_tolerance {
+            matched_top = true;
+        }
+    }
+
+    let pass = matched_boss && matched_top;
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "missing_declared_feature" },
+        "feature_id": feature_id,
+        "measured": {
+            "artifact_path": resolved_artifact.label_path,
+            "candidate_cylinders": evidence.cylinders.len(),
+            "candidate_planes": evidence.planes.len(),
+            "matched_boss_cylinder": matched_boss,
+            "matched_boss_top_plane": matched_top,
+            "best_boss_diameter_delta_mm": best_boss.as_ref().map(|value| round(value.diameter_delta_mm)),
+            "best_boss_axis_dot": best_boss.as_ref().map(|value| round(value.axis_dot)),
+            "best_boss_centerline_distance_mm": best_boss.as_ref().map(|value| round(value.centerline_distance_mm)),
+            "best_boss_axial_distance_mm": best_boss.as_ref().map(|value| round(value.axial_distance_mm)),
+            "best_top_plane_normal_dot": best_top.as_ref().map(|value| round(value.normal_dot)),
+            "best_top_plane_distance_mm": best_top.as_ref().map(|value| round(value.distance_mm))
+        },
+        "required": {
+            "boss_diameter_mm": boss_diameter,
+            "boss_height_mm": boss_height,
+            "axis": axis.to_json(),
+            "boss_center_mm": boss_center.to_json(),
+            "top_center_mm": top_center.to_json(),
+            "boss_diameter_tolerance_mm": boss_diameter_tolerance,
+            "centerline_tolerance_mm": centerline_tolerance,
+            "boss_center_tolerance_mm": boss_center_tolerance,
+            "boss_axial_tolerance_mm": boss_height / 2.0 + boss_center_tolerance,
+            "top_plane_tolerance_mm": top_plane_tolerance,
+            "axis_dot_min": axis_dot_min
+        },
+        "message": if pass {
+            "Declared standoff boss cylinder and top-plane geometry exists in the STEP artifact."
+        } else {
+            "Design data declares a standoff boss, but matching raised boss geometry was not found."
         }
     })
 }
@@ -4709,6 +4931,104 @@ mod tests {
     }
 
     #[test]
+    fn standoff_boss_presence_requires_outer_cylinder_and_top_plane() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_surfaces(
+            &step_path,
+            &[((0.0, 0.0, 6.5), (0.0, 0.0, 1.0), 4.0)],
+            &[((0.0, 0.0, 9.0), (0.0, 0.0, 1.0))],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = standoff_boss_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "mechanical_interface",
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:m3_standoff_boss_step_presence")
+                && string_field(check, "reason") == Some("ok")
+                && check
+                    .pointer("/measured/matched_boss_cylinder")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+                && check
+                    .pointer("/measured/matched_boss_top_plane")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+        }));
+    }
+
+    #[test]
+    fn standoff_boss_presence_rejects_inner_hole_without_outer_boss() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_surfaces(
+            &step_path,
+            &[((0.0, 0.0, 6.5), (0.0, 0.0, 1.0), 1.7)],
+            &[((0.0, 0.0, 9.0), (0.0, 0.0, 1.0))],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = standoff_boss_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "mechanical_interface",
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:m3_standoff_boss_step_presence")
+                && string_field(check, "reason") == Some("missing_declared_feature")
+                && check
+                    .pointer("/measured/matched_boss_cylinder")
+                    .and_then(Value::as_bool)
+                    == Some(false)
+                && check
+                    .pointer("/measured/matched_boss_top_plane")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+        }));
+    }
+
+    #[test]
+    fn standoff_boss_presence_rejects_boss_cylinder_without_top_plane() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_cylinder(&step_path, (0.0, 0.0, 6.5), (0.0, 0.0, 1.0), 4.0);
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = standoff_boss_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "mechanical_interface",
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("actuator_mount:m3_standoff_boss_step_presence")
+                && string_field(check, "reason") == Some("missing_declared_feature")
+                && check
+                    .pointer("/measured/matched_boss_cylinder")
+                    .and_then(Value::as_bool)
+                    == Some(true)
+                && check
+                    .pointer("/measured/matched_boss_top_plane")
+                    .and_then(Value::as_bool)
+                    == Some(false)
+        }));
+    }
+
+    #[test]
     fn cosmetic_straight_slot_intent_is_not_linted_by_actuator_rules() {
         let temp = tempfile::tempdir().unwrap();
         let step_path = temp.path().join("part.step");
@@ -4804,6 +5124,32 @@ mod tests {
         fs::write(&source_path, "print('source')\n").unwrap();
 
         let manifest = bearing_seat_manifest(
+            sha256_file(&source_path).unwrap(),
+            sha256_file(&step_path).unwrap(),
+            "cosmetic",
+        );
+        let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
+
+        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id")
+                .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
+        }));
+    }
+
+    #[test]
+    fn cosmetic_standoff_boss_intent_is_not_linted_by_actuator_rules() {
+        let temp = tempfile::tempdir().unwrap();
+        let step_path = temp.path().join("part.step");
+        write_step_surfaces(
+            &step_path,
+            &[((0.0, 0.0, 6.5), (0.0, 0.0, 1.0), 4.0)],
+            &[((0.0, 0.0, 9.0), (0.0, 0.0, 1.0))],
+        );
+        let source_path = temp.path().join("source.py");
+        fs::write(&source_path, "print('source')\n").unwrap();
+
+        let manifest = standoff_boss_manifest(
             sha256_file(&source_path).unwrap(),
             sha256_file(&step_path).unwrap(),
             "cosmetic",
@@ -5258,6 +5604,51 @@ mod tests {
                     "seat_center_mm": [-8.5, 0.0, 8.0],
                     "shoulder_center_mm": [-5.0, 0.0, 8.0],
                     "role": "bearing_support"
+                }
+            ]
+        })
+    }
+
+    fn standoff_boss_manifest(source_sha: String, artifact_sha: String, intent: &str) -> Value {
+        json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "unit-standoff-boss-presence",
+            "artifact_version": "0.1.0",
+            "artifact_type": "actuator_mount",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": source_sha,
+                "size_bytes": 16
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": artifact_sha
+                }
+            ],
+            "parts": [
+                {
+                    "id": "housing",
+                    "bbox_mm": {
+                        "min": [-12.0, -12.0, 0.0],
+                        "max": [12.0, 12.0, 9.0]
+                    }
+                }
+            ],
+            "features": [
+                {
+                    "id": "m3_standoff_boss",
+                    "part": "housing",
+                    "kind": "standoff_boss",
+                    "intent": intent,
+                    "fastener": "M3",
+                    "boss_diameter_mm": 8.0,
+                    "boss_height_mm": 5.0,
+                    "center_mm": [0.0, 0.0, 6.5],
+                    "axis": [0.0, 0.0, 1.0],
+                    "role": "pcb_standoff"
                 }
             ]
         })
