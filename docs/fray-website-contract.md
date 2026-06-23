@@ -276,13 +276,13 @@ source text and design data:
 Agent source-edit loop:
 
 ```txt
-agent generates CAD source
-  -> Burr check writes a failing receipt
-  -> Burr explain --json returns a repair packet
-  -> repair reports can include exact repair_actions[] source edits
-  -> agent applies exact source_hint.before_text -> source_hint.after_text
-  -> agent regenerates design data and STEP from the edited source
-  -> Burr check writes the final passing receipt
+generate: agent writes CAD source and artifacts
+  -> check: Burr check writes a receipt
+  -> explain-json: Burr explain --json returns a repair packet
+  -> apply only exact source_hint.before_text -> source_hint.after_text edits
+  -> regenerate design data and STEP from edited source
+  -> check again
+  -> stop when pass, or when no exact source edit is available
 ```
 
 The repair packet must be treated as a guarded edit contract. A consumer may
@@ -291,7 +291,9 @@ the current source file, the `source_hint.value_path` matches the declared
 before design data value, and `source_hint.confidence` is
 `exact_from_design_data`. Consumers must not infer a nearby edit, rewrite CAD
 from measured geometry alone, or treat the repair report as the verifier. The
-verifier is the regenerated Burr receipt after the exact source edit.
+verifier is the regenerated Burr receipt after the exact source edit. If the
+packet has no exact source edits left, or any exact-text/value-path guard fails,
+the runner must stop rather than guess.
 
 Example action:
 

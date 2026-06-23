@@ -85,15 +85,16 @@ write or generate CAD
   -> fix CAD or metadata
 ```
 
-For an agent repair workflow, keep the loop source-driven and receipt-backed:
+For an agent repair runner, keep the loop source-driven and receipt-backed:
 
 ```txt
-generate CAD source
-  -> run burr check
-  -> run burr explain --json for a machine-readable repair packet
+generate CAD source and artifacts
+  -> check: run burr check
+  -> explain-json: run burr explain --json for a repair packet
   -> apply only exact source_hint before_text -> after_text edits
-  -> regenerate design data and STEP from the same source
-  -> run burr check again
+  -> regenerate design data and STEP from edited source
+  -> check again
+  -> stop when pass, or when no exact source edit is available
 ```
 
 The packet is guidance, not an auto-editor. A plain failed receipt can rank the
@@ -101,9 +102,10 @@ problem and name the fix, but it cannot honestly invent exact source edits. An
 agent should only apply a `source_hint` when `before_text` occurs exactly once
 in the current source and the hint carries `confidence:
 "exact_from_design_data"`. If the exact source text, selector, or design-data
-value path does not match, stop and ask for a new generation or human edit
-instead of guessing. The final trust signal is the fresh regenerated passing
-Burr receipt, including source and artifact freshness checks.
+value path does not match, or the packet has no exact `source_hint` edits left,
+stop and ask for a new generation or human edit instead of guessing. The final
+trust signal is the fresh regenerated passing Burr receipt, including source
+and artifact freshness checks.
 
 For Burr 0.14, the gallery explains the same loop as a before/after actuator
 repair proof:
@@ -553,10 +555,13 @@ Since Burr 0.16, each action gives the failing feature, action kind, checked
 parameter, suggested feature-center movement, measured/required/margin evidence,
 failure reason, and the fixed after-feature that verifies the suggestion.
 
-In Burr 0.18, the repair action contract also includes a required `source_hint` with the source
-file path, edit kind, selector, exact before/after source text, editable value
-path, before/after design-data values, `exact_from_design_data` confidence, and
-a short rationale. This is an edit hint only; Burr still does not auto-edit CAD.
+In Burr 0.18, the repair action contract also includes a required `source_hint`
+with the source file path, edit kind, selector, exact before/after source text,
+editable value path, before/after design-data values,
+`exact_from_design_data` confidence, and a short rationale. This is an edit hint
+only; Burr still does not auto-edit CAD. Agent repair runners should iterate
+generate/check/explain-json, apply only exact source hints, and stop when the
+part passes or the packet no longer contains an exact source edit.
 
 ## Example Result
 

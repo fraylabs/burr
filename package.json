@@ -73,9 +73,10 @@
     "check:repair-report": "node scripts/check-repair-report.mjs",
     "check:repair-action-source-loop": "node scripts/check-repair-action-source-loop.mjs",
     "check:multi-fixture-source-hint-repair": "node scripts/check-multi-fixture-source-hint-repair.mjs",
+    "check:agent-repair-runner": "node scripts/check-agent-repair-runner.mjs",
     "check:fresh-install": "node scripts/check-fresh-install.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",
-    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init && npm run check:breadth-rules && npm run check:explain && npm run check:repair-loop && npm run check:repair-report && npm run check:repair-action-source-loop && npm run check:multi-fixture-source-hint-repair"
+    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init && npm run check:breadth-rules && npm run check:explain && npm run check:repair-loop && npm run check:repair-report && npm run check:repair-action-source-loop && npm run check:multi-fixture-source-hint-repair && npm run check:agent-repair-runner"
   },
   "keywords": [
     "cad",
