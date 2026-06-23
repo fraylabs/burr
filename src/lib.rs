@@ -390,6 +390,118 @@ pub fn format_receipt_explanations(receipt: &Value) -> Vec<Vec<String>> {
         .collect()
 }
 
+pub fn build_receipt_repair_packet(receipt: &Value) -> Value {
+    let mut failures: Vec<_> = receipt
+        .get("checks")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .enumerate()
+        .filter(|(_, check)| string_field(check, "status") == Some("fail"))
+        .map(|(index, check)| {
+            let rule_id = string_field(check, "rule_id").unwrap_or("<unknown>");
+            let reason = string_field(check, "reason").unwrap_or("<unknown>");
+            let feature_kind = feature_kind_from_rule(rule_id);
+            let source_hint = check.get("source_hint").cloned().unwrap_or(Value::Null);
+            let has_exact_source_edit = source_hint.as_object().is_some_and(|hint| {
+                hint.get("before_text").is_some() && hint.get("after_text").is_some()
+            });
+
+            json!({
+                "rank": explanation_rank(check),
+                "input_order": index,
+                "rule_id": rule_id,
+                "feature_id": check.get("feature_id").cloned().unwrap_or(Value::Null),
+                "reason": reason,
+                "category": explanation_category(reason),
+                "headline": explanation_headline(reason, feature_kind),
+                "problem": explanation_problem(check, reason, feature_kind),
+                "evidence": explanation_evidence(check, reason)
+                    .into_iter()
+                    .map(|line| line.strip_prefix("Evidence: ").unwrap_or(&line).to_string())
+                    .collect::<Vec<_>>(),
+                "why": explanation_why(reason, feature_kind),
+                "fix": explanation_fix(reason, feature_kind),
+                "source_hint": source_hint,
+                "exact_source_edit_available": has_exact_source_edit
+            })
+        })
+        .collect();
+
+    failures.sort_by_key(|failure| {
+        (
+            failure.get("rank").and_then(Value::as_u64).unwrap_or(9),
+            failure
+                .get("input_order")
+                .and_then(Value::as_u64)
+                .unwrap_or(u64::MAX),
+        )
+    });
+
+    let exact_source_edits = failures
+        .iter()
+        .filter(|failure| {
+            failure
+                .get("exact_source_edit_available")
+                .and_then(Value::as_bool)
+                == Some(true)
+        })
+        .count();
+
+    json!({
+        "schema_version": "burr.repair-packet.v1",
+        "burr_version": BURR_VERSION,
+        "source_kind": "receipt",
+        "source_design_data": receipt.get("source_design_data").cloned().unwrap_or(Value::Null),
+        "status": receipt.get("status").and_then(Value::as_str).unwrap_or("<unknown>"),
+        "summary": {
+            "failure_count": failures.len(),
+            "exact_source_edit_count": exact_source_edits,
+            "exact_source_edits_available": exact_source_edits > 0
+        },
+        "failures": failures
+    })
+}
+
+pub fn build_repair_report_packet(report: &Value) -> Value {
+    let actions: Vec<Value> = report
+        .get("repair_actions")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .cloned()
+        .collect();
+    let exact_source_edits = actions
+        .iter()
+        .filter(|action| {
+            action
+                .get("source_hint")
+                .and_then(Value::as_object)
+                .is_some_and(|hint| {
+                    hint.get("before_text").is_some() && hint.get("after_text").is_some()
+                })
+        })
+        .count();
+
+    json!({
+        "schema_version": "burr.repair-packet.v1",
+        "burr_version": BURR_VERSION,
+        "source_kind": "repair_report",
+        "repair_report_id": report.get("report_id").or_else(|| report.get("id")).cloned().unwrap_or(Value::Null),
+        "focus_rule_id": report.get("focus_rule_id").cloned().unwrap_or(Value::Null),
+        "status": report.get("status").and_then(Value::as_str).unwrap_or("<unknown>"),
+        "summary": {
+            "failure_count": report.pointer("/summary/before_failures").cloned().unwrap_or(Value::Null),
+            "repair_action_count": actions.len(),
+            "exact_source_edit_count": exact_source_edits,
+            "exact_source_edits_available": exact_source_edits > 0
+        },
+        "first_fix": report.get("first_fix").cloned().unwrap_or(Value::Null),
+        "failures": report.get("failures").cloned().unwrap_or_else(|| json!([])),
+        "repair_actions": actions
+    })
+}
+
 fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
     if string_field(check, "status") != Some("fail") {
         return None;

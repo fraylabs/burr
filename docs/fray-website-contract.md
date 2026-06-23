@@ -7,9 +7,9 @@ regenerating CAD.
 
 ```txt
 repo: fraylabs/burr
-release_tag: burr-v0.18.0
-asset_name: burr-gallery-v0.18.0.zip
-asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.18.0/burr-gallery-v0.18.0.zip
+release_tag: burr-v0.19.0
+asset_name: burr-gallery-v0.19.0.zip
+asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.19.0/burr-gallery-v0.19.0.zip
 ```
 
 The website should treat Burr release assets as read-only product data.
@@ -33,7 +33,7 @@ The website should treat Burr release assets as read-only product data.
 ## Zip Layout
 
 ```txt
-burr-gallery-v0.18.0/
+burr-gallery-v0.19.0/
   README.md
   manifest.json
   repair-reports/
@@ -78,7 +78,7 @@ burr-gallery-v0.18.0/
 Manifest path:
 
 ```txt
-burr-gallery-v0.18.0/manifest.json
+burr-gallery-v0.19.0/manifest.json
 ```
 
 Schema:
@@ -86,12 +86,12 @@ Schema:
 ```json
 {
   "schema_version": "burr.gallery-artifact.v1",
-  "burr_version": "0.18.0",
-  "artifact_id": "burr-gallery-v0.18.0",
+  "burr_version": "0.19.0",
+  "artifact_id": "burr-gallery-v0.19.0",
   "generated_at": "ISO-8601 timestamp",
   "source": {
     "repository": "fraylabs/burr",
-    "tag": "burr-v0.18.0"
+    "tag": "burr-v0.19.0"
   },
   "repair_reports": [
     {
@@ -273,6 +273,26 @@ source text and design data:
 - `rationale`: short human explanation of why this source hint is the edit
   target.
 
+Agent source-edit loop:
+
+```txt
+agent generates CAD source
+  -> Burr check writes a failing receipt
+  -> Burr explain --json returns a repair packet
+  -> repair reports can include exact repair_actions[] source edits
+  -> agent applies exact source_hint.before_text -> source_hint.after_text
+  -> agent regenerates design data and STEP from the edited source
+  -> Burr check writes the final passing receipt
+```
+
+The repair packet must be treated as a guarded edit contract. A consumer may
+apply a repair action only when `source_hint.before_text` occurs exactly once in
+the current source file, the `source_hint.value_path` matches the declared
+before design data value, and `source_hint.confidence` is
+`exact_from_design_data`. Consumers must not infer a nearby edit, rewrite CAD
+from measured geometry alone, or treat the repair report as the verifier. The
+verifier is the regenerated Burr receipt after the exact source edit.
+
 Example action:
 
 ```json
@@ -385,8 +405,8 @@ The website data model should use:
 ```json
 {
   "repo": "fraylabs/burr",
-  "release_tag": "burr-v0.18.0",
-  "asset_name": "burr-gallery-v0.18.0.zip"
+  "release_tag": "burr-v0.19.0",
+  "asset_name": "burr-gallery-v0.19.0.zip"
 }
 ```
 

@@ -47,7 +47,7 @@ third, then declared measurement issues.
 Install from crates.io:
 
 ```bash
-cargo install burr --version 0.18.0
+cargo install burr --version 0.19.0
 ```
 
 Create and check a build123d starter part:
@@ -84,6 +84,26 @@ write or generate CAD
   -> burr explain .
   -> fix CAD or metadata
 ```
+
+For an agent repair workflow, keep the loop source-driven and receipt-backed:
+
+```txt
+generate CAD source
+  -> run burr check
+  -> run burr explain --json for a machine-readable repair packet
+  -> apply only exact source_hint before_text -> after_text edits
+  -> regenerate design data and STEP from the same source
+  -> run burr check again
+```
+
+The packet is guidance, not an auto-editor. A plain failed receipt can rank the
+problem and name the fix, but it cannot honestly invent exact source edits. An
+agent should only apply a `source_hint` when `before_text` occurs exactly once
+in the current source and the hint carries `confidence:
+"exact_from_design_data"`. If the exact source text, selector, or design-data
+value path does not match, stop and ask for a new generation or human edit
+instead of guessing. The final trust signal is the fresh regenerated passing
+Burr receipt, including source and artifact freshness checks.
 
 For Burr 0.14, the gallery explains the same loop as a before/after actuator
 repair proof:
@@ -483,7 +503,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.18.0",
+  "burr_version": "0.19.0",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.8.0",
   "compatibility": {

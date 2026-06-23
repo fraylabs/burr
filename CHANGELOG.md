@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.19.0
+
+- Added `burr explain --json`, which emits `burr.repair-packet.v1` JSON for
+  receipt-backed agent loops.
+- Repair packets from plain receipts rank failures and name fixes without
+  inventing exact source edits.
+- Repair packets from Burr repair reports preserve exact `source_hint`
+  `before_text`/`after_text` repair actions.
+- Added a multi-fixture source-hint repair proof for printed-plate and captured
+  slider fixtures.
+
 ## 0.18.0
 
 - Added Source Hint Contract V3 fields to repair-action `source_hint` objects:

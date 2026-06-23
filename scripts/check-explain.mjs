@@ -37,6 +37,32 @@ expectIncludes(edgeDistance.output, "Problem: the loaded M3 hole is too close to
 expectIncludes(edgeDistance.output, "Why it matters: thin edge material can crack")
 expectIncludes(edgeDistance.output, "Fix: move the hole inward or make the surrounding part larger.")
 
+const edgeDistancePacket = run("cargo", [
+  "run",
+  "--quiet",
+  "--",
+  "explain",
+  "--json",
+  "examples/linear-actuator-bad",
+])
+const edgeDistanceJson = JSON.parse(edgeDistancePacket.output)
+expectEqual(edgeDistanceJson.schema_version, "burr.repair-packet.v1", "receipt packet schema")
+expectEqual(edgeDistanceJson.source_kind, "receipt", "receipt packet source kind")
+expectEqual(edgeDistanceJson.status, "fail", "receipt packet status")
+expectEqual(edgeDistanceJson.summary.exact_source_edits_available, false, "receipt exact edit availability")
+const edgeDistanceFailure = edgeDistanceJson.failures.find(
+  (failure) => failure.feature_id === "m3_lower_left",
+)
+if (!edgeDistanceFailure) {
+  throw new Error(`Missing m3_lower_left failure in JSON packet.\n${edgeDistancePacket.output}`)
+}
+expectEqual(edgeDistanceFailure.category, "unsafe dimension", "receipt packet category")
+expectEqual(
+  edgeDistanceFailure.fix,
+  "move the hole inward or make the surrounding part larger.",
+  "receipt packet fix",
+)
+
 for (const fixture of ["bad", "good"]) {
   run("uv", [
     "run",
@@ -137,6 +163,65 @@ try {
     "3. Fix dimension: move or resize unsafe geometry.",
     "Category: unsafe dimension",
   ])
+
+  const repairReport = path.join(tmp, "repair-report.json")
+  fs.writeFileSync(
+    repairReport,
+    JSON.stringify(
+      {
+        schema_version: "burr.repair-report.v1",
+        id: "demo-repair",
+        report_id: "demo-repair",
+        status: "pass",
+        focus_rule_id: "actuator_mount:m3_loaded_hole_edge_distance",
+        first_fix: "Move the loaded M3 hole inward.",
+        summary: { before_failures: 1 },
+        failures: [
+          {
+            feature_id: "m3_lower_left",
+            rule_id: "actuator_mount:m3_loaded_hole_edge_distance",
+            reason: "insufficient_edge_distance",
+          },
+        ],
+        repair_actions: [
+          {
+            feature_id: "m3_lower_left",
+            action: "move_feature",
+            parameter: "center_mm",
+            rule_id: "actuator_mount:m3_loaded_hole_edge_distance",
+            suggested_delta_mm: [4, 0, 0],
+            source_hint: {
+              source_file_path: "source.py",
+              edit_kind: "replace_python_assignment",
+              selector: "m3_lower_left_center",
+              value_path: "features[id=m3_lower_left].center_mm",
+              before_text: "m3_lower_left_center = (-28.0, -8.0, 0.0)",
+              after_text: "m3_lower_left_center = (-24.0, -8.0, 0.0)",
+              confidence: "exact_from_design_data",
+            },
+          },
+        ],
+      },
+      null,
+      2,
+    ) + "\n",
+  )
+  const repairPacket = run("cargo", ["run", "--quiet", "--", "explain", "--json", repairReport])
+  const repairJson = JSON.parse(repairPacket.output)
+  expectEqual(repairJson.schema_version, "burr.repair-packet.v1", "repair packet schema")
+  expectEqual(repairJson.source_kind, "repair_report", "repair packet source kind")
+  expectEqual(repairJson.summary.exact_source_edits_available, true, "repair packet exact edit availability")
+  expectEqual(repairJson.summary.exact_source_edit_count, 1, "repair packet exact edit count")
+  expectEqual(
+    repairJson.repair_actions[0].source_hint.before_text,
+    "m3_lower_left_center = (-28.0, -8.0, 0.0)",
+    "repair packet before_text",
+  )
+  expectEqual(
+    repairJson.repair_actions[0].source_hint.after_text,
+    "m3_lower_left_center = (-24.0, -8.0, 0.0)",
+    "repair packet after_text",
+  )
 } finally {
   fs.rmSync(tmp, { recursive: true, force: true })
 }
@@ -146,6 +231,12 @@ console.log("explain proof passed")
 function expectIncludes(output, expected) {
   if (!output.includes(expected)) {
     throw new Error(`Expected output to include ${JSON.stringify(expected)}.\n${output}`)
+  }
+}
+
+function expectEqual(actual, expected, label) {
+  if (actual !== expected) {
+    throw new Error(`Unexpected ${label}: got ${JSON.stringify(actual)}, expected ${JSON.stringify(expected)}`)
   }
 }
 
