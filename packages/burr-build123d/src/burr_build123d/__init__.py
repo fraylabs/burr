@@ -16,7 +16,7 @@ from typing import Any
 
 DESIGN_DATA_FILE = "burr-design-data.json"
 DESIGN_DATA_SCHEMA = "burr.design-data.v1"
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 
 def _round_vector(values: tuple[float, float, float] | list[float]) -> list[float]:

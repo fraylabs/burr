@@ -45,8 +45,8 @@ try {
   run("burr", ["init", "my-part"], { cwd: projectRoot })
 
   const pyproject = fs.readFileSync(path.join(partDir, "pyproject.toml"), "utf8")
-  if (!pyproject.includes("burr-build123d==0.8.0")) {
-    throw new Error("Starter pyproject does not pin burr-build123d==0.8.0")
+  if (!pyproject.includes("burr-build123d==0.9.0")) {
+    throw new Error("Starter pyproject does not pin burr-build123d==0.9.0")
   }
 
   run("uv", ["run", "python", "design.py"], { cwd: partDir })

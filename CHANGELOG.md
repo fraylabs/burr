@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.20.0
+
+- Added `fastener_support_wall_thickness`, which checks declared boss/support
+  diameter around M3 clearance holes and heat-set insert pockets.
+- Added `standoff_boss` STEP-presence checking, proving declared raised bosses
+  exist as matching boss cylinders and top faces in exported STEP files.
+- Added `burr-build123d.standoff_boss(...)` and support-diameter metadata for
+  boss-supported fasteners.
+- Added bad/good build123d proofs for fastener boss wall thickness and standoff
+  boss STEP presence.
+
 ## 0.19.0
 
 - Added `burr explain --json`, which emits `burr.repair-packet.v1` JSON for
