@@ -510,11 +510,13 @@ minimum_wall_thickness   -> enough material remains around a declared hole
 feature_presence         -> declared feature has matching STEP evidence
 feature_count            -> enough matching declared features exist
 numeric_range            -> declared measurement is inside an allowed range
+feature_pair_spacing     -> declared feature pairs leave enough material between them
 ```
 
-`feature_count` and `numeric_range` are useful for parts that are not mostly
-mechanical interfaces: dense plates, captured sliders, clearance windows, and
-other cases where the source emits measurements Burr can check directly.
+`feature_count`, `numeric_range`, and `feature_pair_spacing` are useful for
+parts that are not mostly mechanical interfaces: dense plates, captured sliders,
+clearance windows, repeated cosmetic holes, and other cases where the source
+emits measurements Burr can check directly.
 
 ## Versioning
 

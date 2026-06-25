@@ -223,6 +223,7 @@ pub fn lint_design_data(
                     | Some("fastener_support_wall_thickness")
                     | Some("feature_presence")
                     | Some("feature_count")
+                    | Some("feature_pair_spacing")
                     | Some("numeric_range")
             ) {
                 warnings.push(json!({
@@ -241,6 +242,11 @@ pub fn lint_design_data(
 
             if rule_kind == Some("numeric_range") {
                 checks.push(check_numeric_range(manifest, rulepack, rule));
+                continue;
+            }
+
+            if rule_kind == Some("feature_pair_spacing") {
+                checks.push(check_feature_pair_spacing(manifest, rulepack, rule));
                 continue;
             }
 
@@ -728,14 +734,17 @@ fn explanation_category(reason: &str) -> &'static str {
         | "missing_rulepack_schema" => "unsupported metadata",
         "missing_declared_feature" | "step_geometry_unreadable" => "missing geometry",
         "insufficient_edge_distance"
+        | "insufficient_feature_pair_spacing"
         | "insufficient_wall_thickness"
         | "insufficient_fastener_support_wall"
         | "missing_edge_measurement"
         | "missing_hole_diameter"
+        | "missing_pair_spacing_geometry"
         | "missing_fastener_support_inner_diameter"
         | "missing_fastener_support_diameter"
         | "missing_feature_center"
         | "missing_feature_axis"
+        | "invalid_pair_spacing_rule_clearance"
         | "invalid_counterbore_dimensions" => "unsafe dimension",
         "feature_count_out_of_range" | "numeric_value_out_of_range" | "missing_numeric_value" => {
             "declared measurement"
@@ -779,14 +788,17 @@ fn explanation_rank_for_reason(reason: &str) -> u8 {
         | "missing_rulepack_schema" => 0,
         "missing_declared_feature" | "step_geometry_unreadable" => 1,
         "insufficient_edge_distance"
+        | "insufficient_feature_pair_spacing"
         | "insufficient_wall_thickness"
         | "insufficient_fastener_support_wall"
         | "missing_edge_measurement"
         | "missing_hole_diameter"
+        | "missing_pair_spacing_geometry"
         | "missing_fastener_support_inner_diameter"
         | "missing_fastener_support_diameter"
         | "missing_feature_center"
         | "missing_feature_axis"
+        | "invalid_pair_spacing_rule_clearance"
         | "invalid_counterbore_dimensions" => 2,
         "feature_count_out_of_range" | "numeric_value_out_of_range" | "missing_numeric_value" => 3,
         _ => 9,
@@ -816,6 +828,9 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
         "insufficient_edge_distance" => {
             "the loaded M3 hole is too close to a free edge.".to_string()
         }
+        "insufficient_feature_pair_spacing" => {
+            "two declared features leave too little material between them.".to_string()
+        }
         "insufficient_wall_thickness" => {
             "the M3 clearance hole leaves too little printable wall.".to_string()
         }
@@ -836,6 +851,12 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
             "the rulepack schema is not supported by this Burr version.".to_string()
         }
         "missing_hole_diameter" => "the feature is missing a valid hole diameter.".to_string(),
+        "missing_pair_spacing_geometry" => {
+            "a feature in a pair-spacing rule is missing center_mm or diameter_mm.".to_string()
+        }
+        "invalid_pair_spacing_rule_clearance" => {
+            "the pair-spacing rule is missing a valid min_clearance_mm.".to_string()
+        }
         "missing_fastener_support_inner_diameter" => {
             "the feature is missing the hole, pocket, or bore diameter used inside the support."
                 .to_string()
@@ -879,6 +900,27 @@ fn explanation_evidence(check: &Value, reason: &str) -> Vec<String> {
                 check,
                 "/required/center_to_edge_mm",
                 "Required center-to-edge",
+            );
+            push_margin(&mut lines, check);
+        }
+        "insufficient_feature_pair_spacing" => {
+            push_measure(
+                &mut lines,
+                check,
+                "/measured/closest_pair/center_distance_mm",
+                "Closest center distance",
+            );
+            push_measure(
+                &mut lines,
+                check,
+                "/measured/closest_pair/clearance_mm",
+                "Closest ligament",
+            );
+            push_measure(
+                &mut lines,
+                check,
+                "/required/min_clearance_mm",
+                "Required ligament",
             );
             push_margin(&mut lines, check);
         }
@@ -1037,6 +1079,9 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
         "insufficient_edge_distance" => {
             "thin edge material can crack, delaminate, or fail when the fastener is loaded."
         }
+        "insufficient_feature_pair_spacing" => {
+            "thin ligaments between holes can crack, delaminate, or disappear during printing."
+        }
         "insufficient_wall_thickness" => {
             "FDM prints need enough material around holes to form reliable perimeters."
         }
@@ -1069,6 +1114,7 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
 fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
     match reason {
         "insufficient_edge_distance" => "move the hole inward or make the surrounding part larger.",
+        "insufficient_feature_pair_spacing" => "move the features farther apart, reduce their diameters, or remove one feature.",
         "insufficient_wall_thickness" => "move the hole inward, reduce the hole size, or increase the local wall.",
         "insufficient_fastener_support_wall" => "increase support_diameter_mm or boss_diameter_mm, reduce the inner hole/pocket size, or change the support intent.",
         "missing_declared_feature" => match feature_kind {
@@ -1087,6 +1133,12 @@ fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
             "use a rulepack schema supported by this Burr release."
         }
         "missing_hole_diameter" => "add a positive diameter_mm to the feature metadata.",
+        "missing_pair_spacing_geometry" => {
+            "add center_mm and diameter_mm to every feature selected by the pair-spacing rule."
+        }
+        "invalid_pair_spacing_rule_clearance" => {
+            "set min_clearance_mm to the minimum material bridge this rule should require."
+        }
         "missing_fastener_support_inner_diameter" => {
             "add diameter_mm, pocket_diameter_mm, or bore_diameter_mm to the feature metadata."
         }
@@ -1625,6 +1677,185 @@ fn check_numeric_range(manifest: &Value, rulepack: &Value, rule: &Value) -> Valu
             "Numeric design value passes rule.".to_string()
         } else {
             format!("Numeric design value {} is outside declared range.", trim_float(round(value)))
+        }
+    })
+}
+
+#[derive(Debug, Clone)]
+struct PairSpacingFeature {
+    id: String,
+    center: Vec3,
+    diameter_mm: f64,
+}
+
+#[derive(Debug, Clone)]
+struct PairSpacingCandidate {
+    a_id: String,
+    b_id: String,
+    center_distance_mm: f64,
+    clearance_mm: f64,
+    margin_mm: f64,
+}
+
+fn check_feature_pair_spacing(manifest: &Value, rulepack: &Value, rule: &Value) -> Value {
+    let full_rule_id = format!(
+        "{}:{}",
+        string_field(rulepack, "id").unwrap_or("<missing>"),
+        string_field(rule, "id").unwrap_or("<missing>")
+    );
+    let min_clearance = number_field(rule, "min_clearance_mm");
+    if !min_clearance.is_some_and(|value| value >= 0.0) {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "invalid_pair_spacing_rule_clearance",
+            "message": "feature_pair_spacing rules must declare min_clearance_mm as a non-negative number."
+        });
+    }
+    let min_clearance = min_clearance.unwrap();
+
+    let center_field = string_field(rule, "center_field").unwrap_or("center_mm");
+    let diameter_field = string_field(rule, "diameter_field").unwrap_or("diameter_mm");
+    let features: Vec<&Value> = manifest
+        .get("features")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter(|feature| feature_applies(feature, rule.get("applies_to")))
+        .collect();
+
+    let mut checked_features = Vec::new();
+    for feature in features {
+        let feature_id = string_field(feature, "id")
+            .unwrap_or("<missing>")
+            .to_string();
+        let center = feature
+            .get(center_field)
+            .and_then(number_array)
+            .and_then(Vec3::from_values);
+        let diameter = number_field(feature, diameter_field).filter(|value| *value > 0.0);
+        let (Some(center), Some(diameter)) = (center, diameter) else {
+            return json!({
+                "rule_id": full_rule_id,
+                "status": "fail",
+                "reason": "missing_pair_spacing_geometry",
+                "feature_id": feature.get("id").cloned().unwrap_or(Value::Null),
+                "measured": {
+                    "center_field": center_field,
+                    "diameter_field": diameter_field,
+                    "center_present": feature.get(center_field).is_some(),
+                    "diameter_present": feature.get(diameter_field).is_some()
+                },
+                "required": {
+                    "center_field": center_field,
+                    "diameter_field": diameter_field,
+                    "diameter_mm": "> 0"
+                },
+                "message": "Pair-spacing checks require center and diameter metadata for every selected feature."
+            });
+        };
+        checked_features.push(PairSpacingFeature {
+            id: feature_id,
+            center,
+            diameter_mm: diameter,
+        });
+    }
+
+    if checked_features.len() < 2 {
+        let feature_ids: Vec<Value> = checked_features
+            .iter()
+            .map(|feature| Value::String(feature.id.clone()))
+            .collect();
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "pass",
+            "reason": "ok",
+            "feature_ids": feature_ids,
+            "measured": {
+                "pair_count": 0,
+                "closest_pair": Value::Null
+            },
+            "required": {
+                "min_clearance_mm": round(min_clearance)
+            },
+            "message": "Fewer than two matching features; no pair spacing to check."
+        });
+    }
+
+    let mut closest: Option<PairSpacingCandidate> = None;
+    let mut violations = Vec::new();
+    for left_index in 0..checked_features.len() {
+        for right_index in (left_index + 1)..checked_features.len() {
+            let left = &checked_features[left_index];
+            let right = &checked_features[right_index];
+            let center_distance = left.center.sub(right.center).length();
+            let clearance = center_distance - left.diameter_mm / 2.0 - right.diameter_mm / 2.0;
+            let margin = clearance - min_clearance;
+            let candidate = PairSpacingCandidate {
+                a_id: left.id.clone(),
+                b_id: right.id.clone(),
+                center_distance_mm: center_distance,
+                clearance_mm: clearance,
+                margin_mm: margin,
+            };
+            if closest
+                .as_ref()
+                .is_none_or(|closest| candidate.clearance_mm < closest.clearance_mm)
+            {
+                closest = Some(candidate.clone());
+            }
+            if margin < 0.0 {
+                violations.push(json!({
+                    "feature_ids": [left.id.clone(), right.id.clone()],
+                    "center_distance_mm": round(center_distance),
+                    "clearance_mm": round(clearance),
+                    "margin_mm": round(margin)
+                }));
+            }
+        }
+    }
+
+    let closest_pair = closest
+        .as_ref()
+        .map(|pair| {
+            json!({
+                "feature_ids": [pair.a_id.clone(), pair.b_id.clone()],
+                "center_distance_mm": round(pair.center_distance_mm),
+                "clearance_mm": round(pair.clearance_mm),
+                "margin_mm": round(pair.margin_mm)
+            })
+        })
+        .unwrap_or(Value::Null);
+    let pass = violations.is_empty();
+    let feature_ids: Vec<Value> = checked_features
+        .iter()
+        .map(|feature| Value::String(feature.id.clone()))
+        .collect();
+    let margin = closest
+        .as_ref()
+        .map(|pair| pair.margin_mm)
+        .unwrap_or(min_clearance);
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "insufficient_feature_pair_spacing" },
+        "feature_ids": feature_ids,
+        "measured": {
+            "pair_count": checked_features.len() * (checked_features.len() - 1) / 2,
+            "closest_pair": closest_pair,
+            "violating_pairs": violations
+        },
+        "required": {
+            "min_clearance_mm": round(min_clearance),
+            "center_field": center_field,
+            "diameter_field": diameter_field
+        },
+        "margin_mm": round(margin),
+        "message": if pass {
+            "Feature pair spacing passes rule.".to_string()
+        } else {
+            format!("Feature pair spacing is short by {} mm.", trim_float(round(margin.abs())))
         }
     })
 }
@@ -4370,6 +4601,124 @@ mod tests {
             .unwrap()
             .iter()
             .any(|check| { string_field(check, "reason") == Some("numeric_value_out_of_range") }));
+    }
+
+    #[test]
+    fn feature_pair_spacing_checks_declared_ligaments() {
+        let temp = tempfile::tempdir().unwrap();
+        let source_path = temp.path().join("source.py");
+        let step_path = temp.path().join("part.step");
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(&step_path, "ISO-10303-21;\nEND-ISO-10303-21;\n").unwrap();
+
+        let manifest = json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "dense-hole-part",
+            "artifact_version": "0.1.0",
+            "artifact_type": "printed_plate",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": sha256_file(&source_path).unwrap()
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": sha256_file(&step_path).unwrap()
+                }
+            ],
+            "features": [
+                {
+                    "id": "relief_a",
+                    "kind": "clearance_hole",
+                    "intent": "cosmetic",
+                    "role": "visual_lightening",
+                    "center_mm": [0.0, 0.0, 0.0],
+                    "diameter_mm": 3.0
+                },
+                {
+                    "id": "relief_b",
+                    "kind": "clearance_hole",
+                    "intent": "cosmetic",
+                    "role": "visual_lightening",
+                    "center_mm": [0.0, 3.4, 0.0],
+                    "diameter_mm": 3.0
+                },
+                {
+                    "id": "relief_c",
+                    "kind": "clearance_hole",
+                    "intent": "cosmetic",
+                    "role": "visual_lightening",
+                    "center_mm": [0.0, 12.0, 0.0],
+                    "diameter_mm": 3.0
+                },
+                {
+                    "id": "loaded_mount",
+                    "kind": "clearance_hole",
+                    "intent": "mechanical_interface",
+                    "role": "loaded_mount",
+                    "center_mm": [0.0, 3.5, 0.0],
+                    "diameter_mm": 3.0
+                }
+            ]
+        });
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "printed_plate",
+            "version": "0.1.0",
+            "artifact_type": "printed_plate",
+            "rules": [
+                {
+                    "id": "cosmetic_relief_ligament",
+                    "kind": "feature_pair_spacing",
+                    "applies_to": {
+                        "kind": "clearance_hole",
+                        "intent_any": ["cosmetic"],
+                        "role_any": ["visual_lightening"]
+                    },
+                    "min_clearance_mm": 1.2
+                }
+            ]
+        });
+
+        let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        let check = receipt["checks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|check| {
+                string_field(check, "rule_id") == Some("printed_plate:cosmetic_relief_ligament")
+            })
+            .unwrap();
+        assert_eq!(
+            string_field(check, "reason"),
+            Some("insufficient_feature_pair_spacing")
+        );
+        assert_eq!(
+            check
+                .pointer("/measured/closest_pair/clearance_mm")
+                .and_then(Value::as_f64),
+            Some(0.4)
+        );
+        assert_eq!(
+            check
+                .pointer("/required/min_clearance_mm")
+                .and_then(Value::as_f64),
+            Some(1.2)
+        );
+        assert_eq!(
+            check
+                .pointer("/measured/pair_count")
+                .and_then(Value::as_u64),
+            Some(3)
+        );
+
+        let mut passing_manifest = manifest.clone();
+        passing_manifest["features"][1]["center_mm"] = json!([0.0, 5.0, 0.0]);
+        let passing = lint_design_data(&passing_manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&passing, "status"), Some("pass"));
     }
 
     #[test]

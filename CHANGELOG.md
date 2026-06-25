@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added `feature_pair_spacing`, which checks the thinnest declared ligament
+  between matching feature pairs.
+- Added printed-plate fixtures proving dense cosmetic relief holes pass when
+  spaced safely and fail when declared holes are too close together.
+
 ## 0.20.0
 
 - Added `fastener_support_wall_thickness`, which checks declared boss/support
