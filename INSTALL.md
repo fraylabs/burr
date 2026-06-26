@@ -40,7 +40,7 @@ burr check .
 burr explain .
 ```
 
-The generated project installs `burr-build123d==0.9.0` from PyPI.
+The generated project installs `burr-build123d==0.10.0` from PyPI.
 
 To verify the published install path from a Burr checkout:
 
@@ -166,7 +166,7 @@ from burr_build123d import BurrDesignData, m3_clearance_hole
 
 ```txt
 Rust CLI: published to crates.io as burr
-PyPI package: burr-build123d==0.9.0
+PyPI package: burr-build123d==0.10.0
 uv local workspace install: supported
 ```
 

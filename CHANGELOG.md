@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.21.0
+
 - Added `feature_pair_spacing`, a declared-feature ligament rule that checks
   the minimum spacing implied by selected holes, straight slots, or explicit
   circle/capsule spacing-envelope metadata.

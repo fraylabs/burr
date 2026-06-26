@@ -37,8 +37,8 @@ try {
   }
 
   const generatedPyproject = fs.readFileSync(path.join(projectDir, "pyproject.toml"), "utf8")
-  if (!generatedPyproject.includes("burr-build123d==0.9.0")) {
-    throw new Error("starter pyproject does not pin burr-build123d==0.9.0")
+  if (!generatedPyproject.includes("burr-build123d==0.10.0")) {
+    throw new Error("starter pyproject does not pin burr-build123d==0.10.0")
   }
 
   run("uv", ["add", "--editable", path.join(repoRoot, "packages", "burr-build123d")], {
