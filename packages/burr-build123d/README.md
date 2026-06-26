@@ -27,3 +27,26 @@ can check the declared radial material around the hole or insert pocket.
 Use `standoff_boss(...)` when the raised boss itself should be checked in the
 exported STEP. Burr verifies the declared boss cylinder and top face separately
 from the hole or insert it supports.
+
+For custom reliefs or cutouts, keep creating geometry in normal build123d code
+and attach an explicit spacing envelope to the declared feature:
+
+```python
+from burr_build123d import spacing_envelope
+
+design.feature(
+    feature_id="rounded_relief_window",
+    kind="cutout",
+    part="plate",
+    intent="cosmetic",
+    role="relief_slot",
+    spacing_envelope=spacing_envelope(
+        segment_start=(0, -8, 0),
+        segment_end=(0, 8, 0),
+        radius_mm=3.0,
+    ),
+)
+```
+
+`spacing_envelope(...)` emits metadata only. It does not create or verify the
+cutout geometry by itself.
