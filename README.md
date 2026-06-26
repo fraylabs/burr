@@ -310,6 +310,33 @@ design.feature(
 )
 ```
 
+For custom reliefs, windows, and decorative cutouts, geometry still belongs in
+normal CAD code. Add an explicit envelope only when a rulepack should check the
+declared spacing around that feature:
+
+```python
+from burr_build123d import spacing_envelope
+
+design.feature(
+    feature_id="rounded_relief_window",
+    kind="cutout",
+    part="plate",
+    intent="cosmetic",
+    role="relief_slot",
+    spacing_envelope=spacing_envelope(
+        segment_start=(0, -8, 0),
+        segment_end=(0, 8, 0),
+        radius_mm=3.0,
+    ),
+)
+```
+
+For `feature_pair_spacing`, Burr uses an explicit `spacing_envelope` when one
+is present. Otherwise it derives a circle from `center_mm` and `diameter_mm`, or
+a straight-slot capsule from `center_mm`, `width_mm`, `length_mm`, and
+`span_axis`. The receipt reports the closest declared pair, clearance, and
+margin. It does not search the whole STEP for every thin region.
+
 ## Design Data
 
 A lintable CAD artifact folder contains `burr-design-data.json`.
