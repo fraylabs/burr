@@ -31,6 +31,13 @@ def _sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _positive_finite_float(name: str, value: float) -> float:
+    value = float(value)
+    if not math.isfinite(value) or value <= 0:
+        raise ValueError(f"{name} must be positive and finite.")
+    return value
+
+
 def _stamp_ref(base_dir: Path, ref: dict[str, Any]) -> None:
     path = ref.get("path")
     if not path:
@@ -405,6 +412,44 @@ def _axis_rotation(axis: tuple[float, float, float] | list[float]) -> tuple[floa
     if rounded == (0.0, 0.0, 1.0) or rounded == (0.0, 0.0, -1.0):
         return (0, 0, 0)
     raise ValueError(f"Unsupported hole axis for build123d helper: {axis!r}")
+
+
+def spacing_envelope(
+    *,
+    radius_mm: float,
+    center: tuple[float, float, float] | list[float] | None = None,
+    segment_start: tuple[float, float, float] | list[float] | None = None,
+    segment_end: tuple[float, float, float] | list[float] | None = None,
+) -> dict[str, Any]:
+    """Return explicit circle/capsule spacing metadata for a declared feature."""
+
+    radius = _positive_finite_float("spacing_envelope radius_mm", radius_mm)
+    has_center = center is not None
+    has_segment = segment_start is not None or segment_end is not None
+    if has_center == has_segment:
+        raise ValueError(
+            "spacing_envelope requires either center or segment_start plus segment_end.",
+        )
+
+    if has_center:
+        return {
+            "kind": "circle",
+            "center_mm": _round_vector(center),
+            "radius_mm": radius,
+        }
+
+    if segment_start is None or segment_end is None:
+        raise ValueError("capsule spacing_envelope requires segment_start and segment_end.")
+    start = _round_vector(segment_start)
+    end = _round_vector(segment_end)
+    if start == end:
+        raise ValueError("capsule spacing_envelope segment_start and segment_end must differ.")
+    return {
+        "kind": "capsule",
+        "segment_start_mm": start,
+        "segment_end_mm": end,
+        "radius_mm": radius,
+    }
 
 
 def m3_clearance_hole(
@@ -834,6 +879,7 @@ __all__ = [
     "heat_set_insert_pocket",
     "__version__",
     "m3_clearance_hole",
+    "spacing_envelope",
     "standoff_boss",
     "straight_slot",
 ]

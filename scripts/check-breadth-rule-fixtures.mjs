@@ -104,6 +104,69 @@ try {
       marginMm: -0.7,
     },
   });
+  writePrintedPlateFixture("printed-plate-explicit-envelope-spacing-good", {
+    holes: [
+      ["nearby_cutout", 15.0, 0, 4.0],
+      ["relief_a2", -40, 30, 3.0],
+      ["relief_a3", -28, 30, 3.0],
+      ["relief_a4", -16, 30, 3.0],
+      ["relief_a5", -4, 30, 3.0],
+      ["relief_a6", 16, 30, 3.0],
+      ["relief_a7", 28, 30, 3.0],
+      ["relief_a8", 40, 30, 3.0],
+    ],
+    envelopes: [
+      {
+        id: "rounded_relief_window",
+        spacing_envelope: {
+          kind: "capsule",
+          segment_start_mm: [0, -8, 0],
+          segment_end_mm: [0, 8, 0],
+          radius_mm: 3.0,
+        },
+      },
+    ],
+    expect: "pass",
+    expectedPair: {
+      featureIds: ["nearby_cutout", "rounded_relief_window"],
+      featureShapes: ["circle", "capsule"],
+      shapeDistanceMm: 7.0,
+      clearanceMm: 2.0,
+      marginMm: 0.8,
+    },
+  });
+  writePrintedPlateFixture("printed-plate-explicit-envelope-spacing-tight", {
+    holes: [
+      ["nearby_cutout", 13.2, 0, 4.0],
+      ["relief_a2", -40, 30, 3.0],
+      ["relief_a3", -28, 30, 3.0],
+      ["relief_a4", -16, 30, 3.0],
+      ["relief_a5", -4, 30, 3.0],
+      ["relief_a6", 16, 30, 3.0],
+      ["relief_a7", 28, 30, 3.0],
+      ["relief_a8", 40, 30, 3.0],
+    ],
+    envelopes: [
+      {
+        id: "rounded_relief_window",
+        spacing_envelope: {
+          kind: "capsule",
+          segment_start_mm: [0, -8, 0],
+          segment_end_mm: [0, 8, 0],
+          radius_mm: 3.0,
+        },
+      },
+    ],
+    expect: "fail",
+    reason: "insufficient_feature_pair_spacing",
+    expectedPair: {
+      featureIds: ["nearby_cutout", "rounded_relief_window"],
+      featureShapes: ["circle", "capsule"],
+      shapeDistanceMm: 5.2,
+      clearanceMm: 0.2,
+      marginMm: -1.0,
+    },
+  });
   console.log("breadth rule fixtures passed");
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
@@ -212,7 +275,15 @@ function writePrintedPlateFixture(slug, options) {
     span_axis: spanAxis,
     role: "relief_slot",
   }));
-  const features = [...holeFeatures, ...slotFeatures];
+  const envelopeFeatures = (options.envelopes ?? []).map((envelope) => ({
+    id: envelope.id,
+    part: "plate",
+    kind: "cutout",
+    intent: "cosmetic",
+    role: "relief_slot",
+    spacing_envelope: envelope.spacing_envelope,
+  }));
+  const features = [...holeFeatures, ...slotFeatures, ...envelopeFeatures];
 
   fs.writeFileSync(
     path.join(dir, "burr-design-data.json"),

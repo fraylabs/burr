@@ -3,8 +3,10 @@
 ## Unreleased
 
 - Added `feature_pair_spacing`, a declared-feature ligament rule that checks
-  the minimum spacing implied by selected slot, hole, cutout, or explicit
-  spacing-envelope metadata.
+  the minimum spacing implied by selected holes, straight slots, or explicit
+  circle/capsule spacing-envelope metadata.
+- Added `burr-build123d.spacing_envelope(...)` for declaring custom feature
+  spacing envelopes while keeping geometry creation in normal CAD code.
 - Added printed-plate fixtures proving dense cosmetic relief features pass when
   declared spacing is wide enough and fail when declared features are too close.
   This is a design-rule check, not CAD constraint solving or FEA.

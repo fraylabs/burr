@@ -10,6 +10,7 @@ from burr_build123d import (
     counterbore,
     heat_set_insert_pocket,
     m3_clearance_hole,
+    spacing_envelope,
     standoff_boss,
     straight_slot,
 )
@@ -121,6 +122,83 @@ class BurrBuild123dTests(unittest.TestCase):
             design.feature(feature_id="capture", kind="capture_lip", intent="")
         with self.assertRaises(ValueError):
             design.feature(feature_id="capture", kind="capture_lip", id="override")
+
+    def test_records_spacing_envelope_metadata(self):
+        design = BurrDesignData(
+            artifact_id="unit-plate",
+            artifact_type="printed_plate",
+        )
+        design.feature(
+            feature_id="rounded_window",
+            kind="cutout",
+            part="plate",
+            intent="cosmetic",
+            role="relief_slot",
+            spacing_envelope=spacing_envelope(
+                segment_start=(0, -8, 0),
+                segment_end=(0, 8, 0),
+                radius_mm=2.5,
+            ),
+        )
+        design.feature(
+            feature_id="round_relief",
+            kind="cutout",
+            part="plate",
+            intent="cosmetic",
+            role="visual_lightening",
+            spacing_envelope=spacing_envelope(
+                center=(0, 18, 0),
+                radius_mm=2.0,
+            ),
+        )
+
+        capsule = design.features[0]
+        self.assertEqual(capsule["kind"], "cutout")
+        self.assertEqual(capsule["intent"], "cosmetic")
+        self.assertEqual(capsule["role"], "relief_slot")
+        self.assertEqual(capsule["spacing_envelope"]["kind"], "capsule")
+        self.assertEqual(capsule["spacing_envelope"]["segment_start_mm"], [0.0, -8.0, 0.0])
+        self.assertEqual(capsule["spacing_envelope"]["segment_end_mm"], [0.0, 8.0, 0.0])
+        self.assertEqual(capsule["spacing_envelope"]["radius_mm"], 2.5)
+
+        circle = design.features[1]
+        self.assertEqual(circle["spacing_envelope"]["kind"], "circle")
+        self.assertEqual(circle["spacing_envelope"]["center_mm"], [0.0, 18.0, 0.0])
+        self.assertEqual(circle["spacing_envelope"]["radius_mm"], 2.0)
+
+    def test_rejects_invalid_spacing_envelope_metadata(self):
+        design = BurrDesignData(
+            artifact_id="unit-plate",
+            artifact_type="printed_plate",
+        )
+
+        with self.assertRaises(ValueError):
+            spacing_envelope(
+                center=(0, 0, 0),
+                radius_mm=0,
+            )
+        with self.assertRaises(ValueError):
+            spacing_envelope(
+                radius_mm=1.0,
+            )
+        with self.assertRaises(ValueError):
+            spacing_envelope(
+                segment_start=(0, 0, 0),
+                radius_mm=1.0,
+            )
+        with self.assertRaises(ValueError):
+            spacing_envelope(
+                center=(0, 0, 0),
+                segment_start=(0, -1, 0),
+                segment_end=(0, 1, 0),
+                radius_mm=1.0,
+            )
+        with self.assertRaises(ValueError):
+            spacing_envelope(
+                segment_start=(0, 0, 0),
+                segment_end=(0, 0, 0),
+                radius_mm=1.0,
+            )
 
     def test_rejects_empty_intent(self):
         design = BurrDesignData(
