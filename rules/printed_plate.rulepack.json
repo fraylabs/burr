@@ -41,9 +41,9 @@
       "id": "cosmetic_relief_ligament",
       "kind": "feature_pair_spacing",
       "applies_to": {
-        "kind": "clearance_hole",
+        "kind_any": ["clearance_hole", "straight_slot"],
         "intent_any": ["cosmetic"],
-        "role_any": ["visual_lightening"]
+        "role_any": ["visual_lightening", "relief_slot"]
       },
       "min_clearance_mm": 1.2
     }

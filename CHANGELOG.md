@@ -2,10 +2,12 @@
 
 ## Unreleased
 
-- Added `feature_pair_spacing`, which checks the thinnest declared ligament
-  between matching feature pairs.
-- Added printed-plate fixtures proving dense cosmetic relief holes pass when
-  spaced safely and fail when declared holes are too close together.
+- Added `feature_pair_spacing`, a declared-feature ligament rule that checks
+  the minimum spacing implied by selected slot, hole, cutout, or explicit
+  spacing-envelope metadata.
+- Added printed-plate fixtures proving dense cosmetic relief features pass when
+  declared spacing is wide enough and fail when declared features are too close.
+  This is a design-rule check, not CAD constraint solving or FEA.
 
 ## 0.20.0
 
