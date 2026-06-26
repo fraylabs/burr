@@ -1684,15 +1684,26 @@ fn check_numeric_range(manifest: &Value, rulepack: &Value, rule: &Value) -> Valu
 #[derive(Debug, Clone)]
 struct PairSpacingFeature {
     id: String,
+    shape: PairSpacingShape,
+}
+
+#[derive(Debug, Clone)]
+struct PairSpacingShape {
+    kind: &'static str,
     center: Vec3,
-    diameter_mm: f64,
+    segment_start: Vec3,
+    segment_end: Vec3,
+    radius_mm: f64,
 }
 
 #[derive(Debug, Clone)]
 struct PairSpacingCandidate {
     a_id: String,
     b_id: String,
+    a_shape: &'static str,
+    b_shape: &'static str,
     center_distance_mm: f64,
+    shape_distance_mm: f64,
     clearance_mm: f64,
     margin_mm: f64,
 }
@@ -1716,6 +1727,9 @@ fn check_feature_pair_spacing(manifest: &Value, rulepack: &Value, rule: &Value) 
 
     let center_field = string_field(rule, "center_field").unwrap_or("center_mm");
     let diameter_field = string_field(rule, "diameter_field").unwrap_or("diameter_mm");
+    let width_field = string_field(rule, "width_field").unwrap_or("width_mm");
+    let length_field = string_field(rule, "length_field").unwrap_or("length_mm");
+    let span_axis_field = string_field(rule, "span_axis_field").unwrap_or("span_axis");
     let features: Vec<&Value> = manifest
         .get("features")
         .and_then(Value::as_array)
@@ -1729,12 +1743,14 @@ fn check_feature_pair_spacing(manifest: &Value, rulepack: &Value, rule: &Value) 
         let feature_id = string_field(feature, "id")
             .unwrap_or("<missing>")
             .to_string();
-        let center = feature
-            .get(center_field)
-            .and_then(number_array)
-            .and_then(Vec3::from_values);
-        let diameter = number_field(feature, diameter_field).filter(|value| *value > 0.0);
-        let (Some(center), Some(diameter)) = (center, diameter) else {
+        let Some(shape) = pair_spacing_shape(
+            feature,
+            center_field,
+            diameter_field,
+            width_field,
+            length_field,
+            span_axis_field,
+        ) else {
             return json!({
                 "rule_id": full_rule_id,
                 "status": "fail",
@@ -1743,21 +1759,29 @@ fn check_feature_pair_spacing(manifest: &Value, rulepack: &Value, rule: &Value) 
                 "measured": {
                     "center_field": center_field,
                     "diameter_field": diameter_field,
+                    "width_field": width_field,
+                    "length_field": length_field,
+                    "span_axis_field": span_axis_field,
                     "center_present": feature.get(center_field).is_some(),
-                    "diameter_present": feature.get(diameter_field).is_some()
+                    "diameter_present": feature.get(diameter_field).is_some(),
+                    "width_present": feature.get(width_field).is_some(),
+                    "length_present": feature.get(length_field).is_some(),
+                    "span_axis_present": feature.get(span_axis_field).is_some(),
+                    "spacing_envelope_present": feature.get("spacing_envelope").is_some()
                 },
                 "required": {
                     "center_field": center_field,
                     "diameter_field": diameter_field,
-                    "diameter_mm": "> 0"
+                    "circle": "center_mm and diameter_mm > 0",
+                    "slot_capsule": "straight_slot with center_mm, width_mm > 0, length_mm >= width_mm, and span_axis",
+                    "spacing_envelope": "optional circle or capsule spacing_envelope"
                 },
-                "message": "Pair-spacing checks require center and diameter metadata for every selected feature."
+                "message": "Pair-spacing checks require circle or slot/capsule geometry metadata for every selected feature."
             });
         };
         checked_features.push(PairSpacingFeature {
             id: feature_id,
-            center,
-            diameter_mm: diameter,
+            shape,
         });
     }
 
@@ -1788,13 +1812,22 @@ fn check_feature_pair_spacing(manifest: &Value, rulepack: &Value, rule: &Value) 
         for right_index in (left_index + 1)..checked_features.len() {
             let left = &checked_features[left_index];
             let right = &checked_features[right_index];
-            let center_distance = left.center.sub(right.center).length();
-            let clearance = center_distance - left.diameter_mm / 2.0 - right.diameter_mm / 2.0;
+            let center_distance = left.shape.center.sub(right.shape.center).length();
+            let shape_distance = segment_segment_distance(
+                left.shape.segment_start,
+                left.shape.segment_end,
+                right.shape.segment_start,
+                right.shape.segment_end,
+            );
+            let clearance = shape_distance - left.shape.radius_mm - right.shape.radius_mm;
             let margin = clearance - min_clearance;
             let candidate = PairSpacingCandidate {
                 a_id: left.id.clone(),
                 b_id: right.id.clone(),
+                a_shape: left.shape.kind,
+                b_shape: right.shape.kind,
                 center_distance_mm: center_distance,
+                shape_distance_mm: shape_distance,
                 clearance_mm: clearance,
                 margin_mm: margin,
             };
@@ -1807,7 +1840,9 @@ fn check_feature_pair_spacing(manifest: &Value, rulepack: &Value, rule: &Value) 
             if margin < 0.0 {
                 violations.push(json!({
                     "feature_ids": [left.id.clone(), right.id.clone()],
+                    "feature_shapes": [left.shape.kind, right.shape.kind],
                     "center_distance_mm": round(center_distance),
+                    "shape_distance_mm": round(shape_distance),
                     "clearance_mm": round(clearance),
                     "margin_mm": round(margin)
                 }));
@@ -1820,7 +1855,9 @@ fn check_feature_pair_spacing(manifest: &Value, rulepack: &Value, rule: &Value) 
         .map(|pair| {
             json!({
                 "feature_ids": [pair.a_id.clone(), pair.b_id.clone()],
+                "feature_shapes": [pair.a_shape, pair.b_shape],
                 "center_distance_mm": round(pair.center_distance_mm),
+                "shape_distance_mm": round(pair.shape_distance_mm),
                 "clearance_mm": round(pair.clearance_mm),
                 "margin_mm": round(pair.margin_mm)
             })
@@ -1849,7 +1886,10 @@ fn check_feature_pair_spacing(manifest: &Value, rulepack: &Value, rule: &Value) 
         "required": {
             "min_clearance_mm": round(min_clearance),
             "center_field": center_field,
-            "diameter_field": diameter_field
+            "diameter_field": diameter_field,
+            "width_field": width_field,
+            "length_field": length_field,
+            "span_axis_field": span_axis_field
         },
         "margin_mm": round(margin),
         "message": if pass {
@@ -1858,6 +1898,162 @@ fn check_feature_pair_spacing(manifest: &Value, rulepack: &Value, rule: &Value) 
             format!("Feature pair spacing is short by {} mm.", trim_float(round(margin.abs())))
         }
     })
+}
+
+fn pair_spacing_shape(
+    feature: &Value,
+    center_field: &str,
+    diameter_field: &str,
+    width_field: &str,
+    length_field: &str,
+    span_axis_field: &str,
+) -> Option<PairSpacingShape> {
+    if let Some(envelope) = feature.get("spacing_envelope") {
+        return pair_spacing_envelope_shape(envelope);
+    }
+
+    if string_field(feature, "kind") == Some("straight_slot") {
+        return pair_spacing_slot_shape(
+            feature,
+            center_field,
+            width_field,
+            length_field,
+            span_axis_field,
+        );
+    }
+
+    pair_spacing_circle_shape(feature, center_field, diameter_field)
+}
+
+fn pair_spacing_circle_shape(
+    feature: &Value,
+    center_field: &str,
+    diameter_field: &str,
+) -> Option<PairSpacingShape> {
+    let center = feature
+        .get(center_field)
+        .and_then(number_array)
+        .and_then(Vec3::from_values)?;
+    let diameter = number_field(feature, diameter_field).filter(|value| *value > 0.0)?;
+
+    Some(PairSpacingShape {
+        kind: "circle",
+        center,
+        segment_start: center,
+        segment_end: center,
+        radius_mm: diameter / 2.0,
+    })
+}
+
+fn pair_spacing_slot_shape(
+    feature: &Value,
+    center_field: &str,
+    width_field: &str,
+    length_field: &str,
+    span_axis_field: &str,
+) -> Option<PairSpacingShape> {
+    let center = feature
+        .get(center_field)
+        .and_then(number_array)
+        .and_then(Vec3::from_values)?;
+    let width = number_field(feature, width_field).filter(|value| *value > 0.0)?;
+    let length = number_field(feature, length_field).filter(|value| *value >= width)?;
+    let span_axis = feature
+        .get(span_axis_field)
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .and_then(Vec3::normalized)?;
+    let half_segment = ((length - width) / 2.0).max(0.0);
+    Some(PairSpacingShape {
+        kind: "capsule",
+        center,
+        segment_start: center.add(span_axis.scale(-half_segment)),
+        segment_end: center.add(span_axis.scale(half_segment)),
+        radius_mm: width / 2.0,
+    })
+}
+
+fn pair_spacing_envelope_shape(envelope: &Value) -> Option<PairSpacingShape> {
+    match string_field(envelope, "kind") {
+        Some("circle") => {
+            let center = envelope
+                .get("center_mm")
+                .and_then(number_array)
+                .and_then(Vec3::from_values)?;
+            let radius = number_field(envelope, "radius_mm").filter(|value| *value > 0.0)?;
+            Some(PairSpacingShape {
+                kind: "circle",
+                center,
+                segment_start: center,
+                segment_end: center,
+                radius_mm: radius,
+            })
+        }
+        Some("capsule") => {
+            let segment_start = envelope
+                .get("segment_start_mm")
+                .and_then(number_array)
+                .and_then(Vec3::from_values)?;
+            let segment_end = envelope
+                .get("segment_end_mm")
+                .and_then(number_array)
+                .and_then(Vec3::from_values)?;
+            let radius = number_field(envelope, "radius_mm").filter(|value| *value > 0.0)?;
+            Some(PairSpacingShape {
+                kind: "capsule",
+                center: segment_start.add(segment_end).scale(0.5),
+                segment_start,
+                segment_end,
+                radius_mm: radius,
+            })
+        }
+        _ => None,
+    }
+}
+
+fn segment_segment_distance(a0: Vec3, a1: Vec3, b0: Vec3, b1: Vec3) -> f64 {
+    // Closest distance between finite 3D segments. Handles point segments too.
+    const EPSILON: f64 = 1e-9;
+    let u = a1.sub(a0);
+    let v = b1.sub(b0);
+    let w = a0.sub(b0);
+    let a = u.dot(u);
+    let b = u.dot(v);
+    let c = v.dot(v);
+    let d = u.dot(w);
+    let e = v.dot(w);
+    let denominator = a * c - b * b;
+
+    if a <= EPSILON && c <= EPSILON {
+        return a0.sub(b0).length();
+    }
+    if a <= EPSILON {
+        let t = (e / c).clamp(0.0, 1.0);
+        return a0.sub(b0.add(v.scale(t))).length();
+    }
+    if c <= EPSILON {
+        let s = (-d / a).clamp(0.0, 1.0);
+        return a0.add(u.scale(s)).sub(b0).length();
+    }
+
+    let mut s = if denominator.abs() > EPSILON {
+        ((b * e - c * d) / denominator).clamp(0.0, 1.0)
+    } else {
+        0.0
+    };
+    let mut t = (b * s + e) / c;
+
+    if t < 0.0 {
+        t = 0.0;
+        s = (-d / a).clamp(0.0, 1.0);
+    } else if t > 1.0 {
+        t = 1.0;
+        s = ((b - d) / a).clamp(0.0, 1.0);
+    }
+
+    let closest_a = a0.add(u.scale(s));
+    let closest_b = b0.add(v.scale(t));
+    closest_a.sub(closest_b).length()
 }
 
 fn check_feature_presence(
@@ -3779,6 +3975,17 @@ fn feature_applies(feature: &Value, applies_to: Option<&Value>) -> bool {
             return false;
         }
     }
+    if let Some(kind_any) = applies_to.get("kind_any").and_then(Value::as_array) {
+        if !kind_any.is_empty() {
+            let Some(kind) = string_field(feature, "kind") else {
+                return false;
+            };
+            let allowed: HashSet<&str> = kind_any.iter().filter_map(Value::as_str).collect();
+            if !allowed.contains(kind) {
+                return false;
+            }
+        }
+    }
     if let Some(fastener) = string_field(applies_to, "fastener") {
         if string_field(feature, "fastener") != Some(fastener) {
             return false;
@@ -4717,6 +4924,102 @@ mod tests {
 
         let mut passing_manifest = manifest.clone();
         passing_manifest["features"][1]["center_mm"] = json!([0.0, 5.0, 0.0]);
+        let passing = lint_design_data(&passing_manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&passing, "status"), Some("pass"));
+    }
+
+    #[test]
+    fn feature_pair_spacing_checks_slot_capsules() {
+        let temp = tempfile::tempdir().unwrap();
+        let source_path = temp.path().join("source.py");
+        let step_path = temp.path().join("part.step");
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(&step_path, "ISO-10303-21;\nEND-ISO-10303-21;\n").unwrap();
+
+        let manifest = json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "slot-ligament-part",
+            "artifact_version": "0.1.0",
+            "artifact_type": "printed_plate",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": sha256_file(&source_path).unwrap()
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": sha256_file(&step_path).unwrap()
+                }
+            ],
+            "features": [
+                {
+                    "id": "relief_slot",
+                    "kind": "straight_slot",
+                    "intent": "cosmetic",
+                    "role": "relief_slot",
+                    "center_mm": [0.0, 0.0, 0.0],
+                    "width_mm": 2.0,
+                    "length_mm": 10.0,
+                    "span_axis": [0.0, 0.0, 1.0]
+                },
+                {
+                    "id": "relief_hole",
+                    "kind": "clearance_hole",
+                    "intent": "cosmetic",
+                    "role": "visual_lightening",
+                    "center_mm": [0.0, 0.0, 5.8],
+                    "diameter_mm": 3.0
+                }
+            ]
+        });
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "printed_plate",
+            "version": "0.1.0",
+            "artifact_type": "printed_plate",
+            "rules": [
+                {
+                    "id": "relief_ligament",
+                    "kind": "feature_pair_spacing",
+                    "applies_to": {
+                        "kind_any": ["clearance_hole", "straight_slot"],
+                        "intent_any": ["cosmetic"],
+                        "role_any": ["visual_lightening", "relief_slot"]
+                    },
+                    "min_clearance_mm": 1.2
+                }
+            ]
+        });
+
+        let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        let check = receipt["checks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|check| string_field(check, "rule_id") == Some("printed_plate:relief_ligament"))
+            .unwrap();
+        assert_eq!(
+            string_field(check, "reason"),
+            Some("insufficient_feature_pair_spacing")
+        );
+        assert_eq!(
+            check
+                .pointer("/measured/closest_pair/shape_distance_mm")
+                .and_then(Value::as_f64),
+            Some(1.8)
+        );
+        assert_eq!(
+            check
+                .pointer("/measured/closest_pair/clearance_mm")
+                .and_then(Value::as_f64),
+            Some(-0.7)
+        );
+
+        let mut passing_manifest = manifest.clone();
+        passing_manifest["features"][1]["center_mm"] = json!([0.0, 0.0, 8.0]);
         let passing = lint_design_data(&passing_manifest, &rulepack, temp.path(), None);
         assert_eq!(string_field(&passing, "status"), Some("pass"));
     }

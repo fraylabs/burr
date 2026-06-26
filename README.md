@@ -115,8 +115,10 @@ bad CAD -> Burr check -> explain fix order -> fixed CAD passes
 ```
 
 Burr is not a constraint solver, FEA engine, slicer, or universal CAD brain.
-It checks specific declared mechanical claims. Workload/stress survival belongs
-to later FEA/FEM or physical testing.
+It checks specific declared mechanical claims. A ligament rule only checks the
+declared spacing between selected slots, holes, or cutouts; it does not prove
+part strength or find every thin web in the CAD model. Workload/stress survival
+belongs to later FEA/FEM or physical testing.
 
 ## Local Development
 
@@ -510,13 +512,14 @@ minimum_wall_thickness   -> enough material remains around a declared hole
 feature_presence         -> declared feature has matching STEP evidence
 feature_count            -> enough matching declared features exist
 numeric_range            -> declared measurement is inside an allowed range
-feature_pair_spacing     -> declared feature pairs leave enough material between them
+feature_pair_spacing     -> declared slots, holes, or cutouts keep a minimum metadata-based ligament
 ```
 
 `feature_count`, `numeric_range`, and `feature_pair_spacing` are useful for
 parts that are not mostly mechanical interfaces: dense plates, captured sliders,
-clearance windows, repeated cosmetic holes, and other cases where the source
-emits measurements Burr can check directly.
+clearance windows, repeated relief holes or slots, and other cases where the
+source emits bounded measurements Burr can check directly. These are declared
+design-rule checks, not automatic CAD constraint solving or stress analysis.
 
 ## Versioning
 
@@ -664,6 +667,10 @@ feature-presence verification for declared M3 clearance holes, declared
 straight slots, declared counterbores, declared heat-set insert pockets, and
 declared bearing seats. Burr does not classify all holes, slots, counterbores,
 pockets, or seats in a model or decide which features matter.
+
+Ligament checks use declared feature metadata selected by a rulepack. Burr does
+not search the whole model for every thin region, infer load paths, or certify
+that the remaining material survives use.
 
 By default, the Rust CLI reads simple analytic STEP cylinder entities directly.
 For stronger local verification, install the optional Python/OCP workspace and
