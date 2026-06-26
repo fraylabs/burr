@@ -14,7 +14,8 @@ The Python helper is published to PyPI as `burr-build123d`.
 
 Preferred path: GitHub trusted publishing.
 
-Configure PyPI with a pending publisher:
+Configure PyPI with a trusted publisher. For a first publish, PyPI calls this a
+pending publisher until the workflow succeeds once.
 
 ```txt
 PyPI project: burr-build123d
@@ -35,16 +36,18 @@ ref: refs/heads/main
 environment: pypi
 ```
 
-Then run the `Publish Python` GitHub Actions workflow with:
+Then run the `Publish Python` GitHub Actions workflow against the matching
+package tag:
 
-```txt
-ref: burr-build123d-v0.9.0
+```bash
+gh workflow run "Publish Python" --repo fraylabs/burr -f ref=burr-build123d-v0.9.0
+gh run list --repo fraylabs/burr --workflow "Publish Python" --limit 1
 ```
 
 If publish fails with `invalid-publisher`, the PyPI pending publisher does not
 match the claims above.
 
-Local token fallback:
+Local token fallback, for emergencies only:
 
 ```bash
 cp .env.local.example .env.local
