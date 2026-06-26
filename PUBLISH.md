@@ -40,7 +40,7 @@ Then run the `Publish Python` GitHub Actions workflow against the matching
 package tag:
 
 ```bash
-gh workflow run "Publish Python" --repo fraylabs/burr -f ref=burr-build123d-v0.9.0
+gh workflow run "Publish Python" --repo fraylabs/burr -f ref=burr-build123d-v0.10.0
 gh run list --repo fraylabs/burr --workflow "Publish Python" --limit 1
 ```
 
