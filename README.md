@@ -216,6 +216,20 @@ consume the zip or GitHub release asset read-only instead of regenerating CAD.
 See [docs/fray-website-contract.md](docs/fray-website-contract.md) for the
 website ingestion contract.
 
+Static docs use the same release-artifact pattern:
+
+```txt
+npm run docs:artifact
+npm run check:docs:artifact
+artifacts/releases/burr-docs-v<version>/
+artifacts/releases/burr-docs-v<version>.zip
+```
+
+The docs bundle contains Markdown docs plus package, rulepack, and license
+references indexed by `manifest.json`. See
+[docs/static-docs-bundle.md](docs/static-docs-bundle.md) for the fray-site
+integration contract.
+
 For the Burr 0.14 actuator repair proof, the gallery should read as one loop:
 the bad actuator CAD fails with measured evidence, `burr explain` tells the
 repair order, and the fixed actuator CAD passes. The preview is visual context;
