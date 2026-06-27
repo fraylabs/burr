@@ -1,0 +1,150 @@
+{
+  "schema_version": "burr.docs-source-manifest.v1",
+  "artifact_kind": "static_docs",
+  "description": "Public Burr Markdown and reference files for static website ingestion.",
+  "documents": [
+    {
+      "source_path": "docs/site/how-it-works.md",
+      "bundle_path": "markdown/how-it-works.md",
+      "title": "How Burr Works",
+      "kind": "site_page",
+      "content_type": "text/markdown; charset=utf-8",
+      "slug": "how-it-works",
+      "section": "Overview",
+      "nav_order": 20
+    },
+    {
+      "source_path": "docs/site/reference/design-data.md",
+      "bundle_path": "markdown/reference/design-data.md",
+      "title": "Design Data Reference",
+      "kind": "site_page",
+      "content_type": "text/markdown; charset=utf-8",
+      "slug": "reference/design-data",
+      "section": "Reference",
+      "nav_order": 110
+    },
+    {
+      "source_path": "docs/site/reference/receipt.md",
+      "bundle_path": "markdown/reference/receipt.md",
+      "title": "Receipt Reference",
+      "kind": "site_page",
+      "content_type": "text/markdown; charset=utf-8",
+      "slug": "reference/receipt",
+      "section": "Reference",
+      "nav_order": 120
+    },
+    {
+      "source_path": "docs/site/reference/cli.md",
+      "bundle_path": "markdown/reference/cli.md",
+      "title": "CLI Reference",
+      "kind": "site_page",
+      "content_type": "text/markdown; charset=utf-8",
+      "slug": "reference/cli",
+      "section": "Reference",
+      "nav_order": 130
+    },
+    {
+      "source_path": "docs/site/reference/rulepack.md",
+      "bundle_path": "markdown/reference/rulepack.md",
+      "title": "Rulepack Reference",
+      "kind": "site_page",
+      "content_type": "text/markdown; charset=utf-8",
+      "slug": "reference/rulepack",
+      "section": "Reference",
+      "nav_order": 140
+    },
+    {
+      "source_path": "README.md",
+      "bundle_path": "markdown/overview.md",
+      "title": "Burr Overview",
+      "kind": "overview",
+      "content_type": "text/markdown; charset=utf-8"
+    },
+    {
+      "source_path": "INSTALL.md",
+      "bundle_path": "markdown/install.md",
+      "title": "Install Burr",
+      "kind": "install",
+      "content_type": "text/markdown; charset=utf-8"
+    },
+    {
+      "source_path": "CHANGELOG.md",
+      "bundle_path": "markdown/changelog.md",
+      "title": "Burr Changelog",
+      "kind": "changelog",
+      "content_type": "text/markdown; charset=utf-8"
+    },
+    {
+      "source_path": "docs/fray-website-contract.md",
+      "bundle_path": "markdown/fray-gallery-contract.md",
+      "title": "Fray Website Gallery Contract",
+      "kind": "integration_contract",
+      "content_type": "text/markdown; charset=utf-8"
+    },
+    {
+      "source_path": "docs/static-docs-bundle.md",
+      "bundle_path": "markdown/fray-static-docs-contract.md",
+      "title": "Fray Static Docs Contract",
+      "kind": "integration_contract",
+      "content_type": "text/markdown; charset=utf-8"
+    },
+    {
+      "source_path": "examples/gallery/README.md",
+      "bundle_path": "markdown/gallery.md",
+      "title": "Burr Example Gallery",
+      "kind": "gallery_notes",
+      "content_type": "text/markdown; charset=utf-8"
+    },
+    {
+      "source_path": "packages/burr-build123d/README.md",
+      "bundle_path": "markdown/burr-build123d.md",
+      "title": "burr-build123d Helper",
+      "kind": "adapter_reference",
+      "content_type": "text/markdown; charset=utf-8"
+    },
+    {
+      "source_path": "packages/burr-ocp/README.md",
+      "bundle_path": "markdown/burr-ocp.md",
+      "title": "burr-ocp STEP Backend",
+      "kind": "adapter_reference",
+      "content_type": "text/markdown; charset=utf-8"
+    }
+  ],
+  "references": [
+    {
+      "source_path": "package.json",
+      "bundle_path": "reference/package.json",
+      "title": "NPM Package Metadata",
+      "kind": "package_metadata",
+      "content_type": "application/json"
+    },
+    {
+      "source_path": "rules/actuator_mount.rulepack.json",
+      "bundle_path": "reference/rules/actuator_mount.rulepack.json",
+      "title": "Actuator Mount Rulepack",
+      "kind": "rulepack",
+      "content_type": "application/json"
+    },
+    {
+      "source_path": "rules/printed_plate.rulepack.json",
+      "bundle_path": "reference/rules/printed_plate.rulepack.json",
+      "title": "Printed Plate Rulepack",
+      "kind": "rulepack",
+      "content_type": "application/json"
+    },
+    {
+      "source_path": "rules/captured_slider.rulepack.json",
+      "bundle_path": "reference/rules/captured_slider.rulepack.json",
+      "title": "Captured Slider Rulepack",
+      "kind": "rulepack",
+      "content_type": "application/json"
+    },
+    {
+      "source_path": "LICENSE",
+      "bundle_path": "reference/LICENSE",
+      "title": "MIT License",
+      "kind": "license",
+      "content_type": "text/plain; charset=utf-8"
+    }
+  ]
+}

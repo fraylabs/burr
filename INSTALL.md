@@ -88,6 +88,7 @@ npm run check:slots
 npm run check:gallery
 npm run check:gallery:render
 npm run check:gallery:artifact
+npm run check:docs:artifact
 npm run check:explain
 npm run check:fresh-install
 ```

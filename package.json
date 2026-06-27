@@ -73,6 +73,8 @@
     "check:gallery:render": "node scripts/check-gallery-render.mjs",
     "gallery:artifact": "node scripts/build-gallery-artifact.mjs",
     "check:gallery:artifact": "node scripts/check-gallery-artifact.mjs",
+    "docs:artifact": "node scripts/build-docs-artifact.mjs",
+    "check:docs:artifact": "node scripts/check-docs-artifact.mjs",
     "check:fray-website-contract": "node scripts/check-fray-website-contract.mjs",
     "check:explain": "node scripts/check-explain.mjs",
     "check:repair-loop": "node scripts/check-repair-loop.mjs",
