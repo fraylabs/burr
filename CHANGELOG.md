@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added a spacing-envelope agent repair proof that turns a thin relief-ligament
+  failure into exact source guidance, applies it through the generic repair
+  runner, regenerates CAD, and verifies the repaired receipt passes.
+
 ## 0.21.0
 
 - Added `feature_pair_spacing`, a declared-feature ligament rule that checks
