@@ -50,7 +50,7 @@ for (const example of galleryExamples) {
   );
   assertEqual(
     receipt.rulepack_version,
-    example.rulepackVersion ?? "0.8.0",
+    example.rulepackVersion ?? "0.9.0",
     `${example.dir} rulepack version`,
   );
   if (example.expectation === "pass") {

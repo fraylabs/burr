@@ -10,7 +10,7 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "artifact_type": "actuator_mount",
   "rules": [
     {
@@ -40,6 +40,36 @@ The CLI can override that choice:
 
 ```bash
 burr check --rulepack rules/printed_plate.rulepack.json .
+```
+
+## Supported Rule Kinds
+
+```txt
+hole_edge_distance             -> hole center has enough distance to a free edge
+minimum_wall_thickness         -> hole leaves enough printable wall
+fastener_support_wall_thickness -> boss/support leaves enough radial material
+standoff_boss_support_link     -> boss references and aligns with the hole or insert it supports
+feature_presence               -> declared feature exists in the exported STEP
+feature_count                  -> declared feature inventory count is in range
+feature_pair_spacing           -> declared feature pair leaves enough ligament
+numeric_range                  -> declared measurement is in range
+```
+
+`standoff_boss_support_link` checks metadata relationship, not STEP geometry:
+
+```json
+{
+  "id": "m3_standoff_boss_support_link",
+  "kind": "standoff_boss_support_link",
+  "applies_to": {
+    "kind": "standoff_boss",
+    "fastener": "M3",
+    "intent_any": ["mechanical_interface"]
+  },
+  "centerline_tolerance_mm": 0.25,
+  "support_diameter_tolerance_mm": 0.05,
+  "axis_dot_min": 0.99
+}
 ```
 
 ## Boundary

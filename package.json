@@ -28,6 +28,8 @@
     "examples/build123d-fastener-support/good/design.py",
     "examples/build123d-standoff-boss-presence/bad/design.py",
     "examples/build123d-standoff-boss-presence/good/design.py",
+    "examples/build123d-standoff-boss-support-link/bad/design.py",
+    "examples/build123d-standoff-boss-support-link/good/design.py",
     "examples/build123d-step-presence/README.md",
     "examples/build123d-step-presence/bad/design.py",
     "examples/build123d-step-presence/good/design.py",
@@ -63,6 +65,7 @@
     "check:mixed-intent": "node scripts/check-mixed-intent.mjs",
     "check:fastener-support": "node scripts/check-build123d-fastener-support.mjs",
     "check:standoff-boss": "node scripts/check-build123d-standoff-boss-presence.mjs",
+    "check:standoff-boss-support-link": "node scripts/check-build123d-standoff-boss-support-link.mjs",
     "check:bearing-seat": "node scripts/check-build123d-bearing-seat.mjs",
     "check:counterbore": "node scripts/check-build123d-counterbore.mjs",
     "check:insert-pocket": "node scripts/check-build123d-heat-set-insert-pocket.mjs",
@@ -85,7 +88,7 @@
     "check:spacing-envelope-agent-repair": "node scripts/check-spacing-envelope-agent-repair.mjs",
     "check:fresh-install": "node scripts/check-fresh-install.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",
-    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init && npm run check:breadth-rules && npm run check:fastener-support && npm run check:standoff-boss && npm run check:explain && npm run check:repair-loop && npm run check:repair-report && npm run check:repair-action-source-loop && npm run check:multi-fixture-source-hint-repair && npm run check:agent-repair-runner && npm run check:spacing-envelope-agent-repair"
+    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init && npm run check:breadth-rules && npm run check:fastener-support && npm run check:standoff-boss && npm run check:standoff-boss-support-link && npm run check:explain && npm run check:repair-loop && npm run check:repair-report && npm run check:repair-action-source-loop && npm run check:multi-fixture-source-hint-repair && npm run check:agent-repair-runner && npm run check:spacing-envelope-agent-repair"
   },
   "keywords": [
     "cad",

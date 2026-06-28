@@ -28,6 +28,10 @@ Use `standoff_boss(...)` when the raised boss itself should be checked in the
 exported STEP. Burr verifies the declared boss cylinder and top face separately
 from the hole or insert it supports.
 
+When that boss supports a declared hole or insert, pass
+`supports_feature_id="..."`. Burr can then check that the boss centerline, axis,
+and declared support diameter align with the feature it claims to support.
+
 For custom reliefs or cutouts, keep creating geometry in normal build123d code
 and attach an explicit spacing envelope to the declared feature:
 

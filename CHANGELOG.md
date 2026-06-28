@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Added `standoff_boss_support_link`, which checks that declared M3 standoff
+  bosses name the hole or insert they support and align to its centerline, axis,
+  and support diameter.
+- Bumped the default `actuator_mount` rulepack to `0.9.0`; mechanical
+  `standoff_boss` features selected by that rulepack now need
+  `supports_feature_id`.
+
 ## 0.22.0
 
 - Added a spacing-envelope agent repair proof that turns a thin relief-ligament
