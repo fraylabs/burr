@@ -36,6 +36,8 @@ checked, but the receipts are the proof.
 - `shaft-bearing-bracket`: bearing seat plus loaded M3 side mounts.
 - `slotted-motor-plate`: adjustable straight slot plus counterbored fasteners.
 - `electronics-standoff-deck`: heat-set insert pockets plus clearance holes.
+- `boss-supported-m3-mount`: boss-supported M3 mount with enough radial
+  material around the fastener.
 - `dense-random-hole-plate`: mechanical mount holes plus many cosmetic holes
   checked by a count rule.
 - `relief-envelope-plate`: custom cosmetic relief cutout with an explicit
@@ -50,3 +52,7 @@ checked, but the receipts are the proof.
   spacing-envelope ligament rules.
 - `t-slot-linear-slider-loose-clearance`: negative fixture for numeric clearance
   rules.
+- `bad-boss-support-too-thin`: negative fixture for boss radial wall checks
+  around a fastener.
+- `bad-standoff-boss-missing-step`: negative fixture proving declared standoff
+  bosses must exist in the exported STEP, not only in metadata.
