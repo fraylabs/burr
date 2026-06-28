@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.24.0
+
 - Added `feature_edge_distance`, which checks a declared feature envelope
   against its host part bounding box instead of only checking circular hole
   center distance.
