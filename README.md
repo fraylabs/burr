@@ -170,6 +170,13 @@ uv sync --all-packages
 npm run check:standoff-boss
 ```
 
+Run the standoff boss support-link proof:
+
+```bash
+uv sync --all-packages
+npm run check:standoff-boss-support-link
+```
+
 Run the straight-slot CAD proof:
 
 ```bash
@@ -202,6 +209,11 @@ feature for the raised support body; Burr checks that the exported STEP contains
 the boss cylinder and top face. Together, the boss-presence and support-wall
 rules prove both that the support is physically in the CAD and that its declared
 radial material is large enough for the checked fastener.
+
+Boss linkage is the third support claim. A mechanical `standoff_boss` should set
+`supports_feature_id` to the clearance hole or heat-set insert pocket it
+supports. Burr checks that the referenced feature exists and that the boss
+centerline, axis, and declared support diameter align with that feature.
 
 For website or release use, `npm run gallery:artifact` writes a versioned bundle:
 
@@ -436,7 +448,7 @@ bearing seats exist as matching STEP cylinder/plane evidence:
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -579,7 +591,7 @@ Receipts include all three:
   "schema_version": "burr.receipt.v1",
   "burr_version": "0.22.0",
   "artifact_version": "0.1.0",
-  "rulepack_version": "0.8.0",
+  "rulepack_version": "0.9.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"

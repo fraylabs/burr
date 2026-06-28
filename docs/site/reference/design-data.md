@@ -81,3 +81,13 @@ fluid_or_air_path     -> separate rules, not screw-mount rules
 manufacturing_feature -> process-specific rules only
 cosmetic              -> normally unjudged
 ```
+
+## Standoff Boss Links
+
+For `kind: "standoff_boss"`, `supports_feature_id` links the raised boss to the
+declared `clearance_hole` or `heat_set_insert_pocket` it supports.
+
+The linked feature should expose `center_mm`, `axis`, and a comparable diameter
+such as `support_diameter_mm`, `diameter_mm`, or `pocket_diameter_mm`. Burr uses
+those fields to check that the boss is centered on the supported feature instead
+of merely existing somewhere nearby.

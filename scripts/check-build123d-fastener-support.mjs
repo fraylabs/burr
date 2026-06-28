@@ -58,7 +58,7 @@ console.log("build123d fastener-support proof passed")
 function checkReceipt(path, expected) {
   const receipt = JSON.parse(fs.readFileSync(path, "utf8"))
   expectEqual(receipt.status, expected.status, `${path} receipt status`)
-  expectEqual(receipt.rulepack_version, "0.8.0", `${path} rulepack version`)
+  expectEqual(receipt.rulepack_version, "0.9.0", `${path} rulepack version`)
 
   const check = receipt.checks.find(
     (item) =>

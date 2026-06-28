@@ -221,6 +221,7 @@ pub fn lint_design_data(
                 Some("hole_edge_distance")
                     | Some("minimum_wall_thickness")
                     | Some("fastener_support_wall_thickness")
+                    | Some("standoff_boss_support_link")
                     | Some("feature_presence")
                     | Some("feature_count")
                     | Some("feature_pair_spacing")
@@ -281,6 +282,11 @@ pub fn lint_design_data(
                     Some("fastener_support_wall_thickness") => {
                         checks.push(check_fastener_support_wall_thickness(
                             rulepack, rule, feature,
+                        ));
+                    }
+                    Some("standoff_boss_support_link") => {
+                        checks.push(check_standoff_boss_support_link(
+                            manifest, rulepack, rule, feature,
                         ));
                     }
                     Some("feature_presence") => {
@@ -602,6 +608,73 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
             );
             Some(lines)
         }
+        Some("standoff_boss_support_mismatch") => {
+            let feature_label = string_field(check, "feature_id")
+                .map(|id| format!(" {id}"))
+                .unwrap_or_default();
+            let supported_label = check
+                .pointer("/measured/supported_feature_id")
+                .and_then(Value::as_str)
+                .map(|id| format!(" to {id}"))
+                .unwrap_or_default();
+            let centerline_distance = check
+                .pointer("/measured/centerline_distance_mm")
+                .and_then(Value::as_f64);
+            let axis_dot = check.pointer("/measured/axis_dot").and_then(Value::as_f64);
+            let mut lines = vec![format!(
+                "Standoff boss{feature_label} is not aligned{supported_label}."
+            )];
+            if let Some(value) = centerline_distance {
+                lines.push(format!(
+                    "Measured centerline offset: {} mm",
+                    trim_float(value)
+                ));
+            }
+            if let Some(value) = check
+                .pointer("/required/centerline_tolerance_mm")
+                .and_then(Value::as_f64)
+            {
+                lines.push(format!(
+                    "Allowed centerline offset: {} mm",
+                    trim_float(value)
+                ));
+            }
+            if let Some(value) = axis_dot {
+                lines.push(format!("Measured axis alignment: {}", trim_float(value)));
+            }
+            lines.push(
+                "Try aligning the standoff boss center and axis to the supported hole or insert."
+                    .to_string(),
+            );
+            Some(lines)
+        }
+        Some("missing_standoff_support_link")
+        | Some("missing_supported_feature")
+        | Some("unsupported_standoff_support_kind") => {
+            let feature_label = string_field(check, "feature_id")
+                .map(|id| format!(" {id}"))
+                .unwrap_or_default();
+            let mut lines = vec![format!(
+                "Standoff boss{feature_label} is not linked to a supported feature."
+            )];
+            if let Some(id) = check
+                .pointer("/measured/supported_feature_id")
+                .and_then(Value::as_str)
+                .or_else(|| string_field(check, "related_feature_id"))
+            {
+                lines.push(format!("Declared support link: {id}"));
+            }
+            if let Some(kind) = check
+                .pointer("/measured/supported_feature_kind")
+                .and_then(Value::as_str)
+            {
+                lines.push(format!("Linked feature kind: {kind}"));
+            }
+            if let Some(message) = string_field(check, "message") {
+                lines.push(message.to_string());
+            }
+            Some(lines)
+        }
         Some("missing_declared_feature") => {
             let feature_label = string_field(check, "feature_id")
                 .map(|id| format!(" {id}"))
@@ -737,9 +810,15 @@ fn explanation_category(reason: &str) -> &'static str {
         | "insufficient_feature_pair_spacing"
         | "insufficient_wall_thickness"
         | "insufficient_fastener_support_wall"
+        | "standoff_boss_support_mismatch"
         | "missing_edge_measurement"
         | "missing_hole_diameter"
         | "missing_pair_spacing_geometry"
+        | "missing_supported_feature"
+        | "unsupported_standoff_support_kind"
+        | "missing_standoff_support_link"
+        | "missing_standoff_boss_diameter"
+        | "missing_supported_feature_diameter"
         | "missing_fastener_support_inner_diameter"
         | "missing_fastener_support_diameter"
         | "missing_feature_center"
@@ -791,9 +870,15 @@ fn explanation_rank_for_reason(reason: &str) -> u8 {
         | "insufficient_feature_pair_spacing"
         | "insufficient_wall_thickness"
         | "insufficient_fastener_support_wall"
+        | "standoff_boss_support_mismatch"
         | "missing_edge_measurement"
         | "missing_hole_diameter"
         | "missing_pair_spacing_geometry"
+        | "missing_supported_feature"
+        | "unsupported_standoff_support_kind"
+        | "missing_standoff_support_link"
+        | "missing_standoff_boss_diameter"
+        | "missing_supported_feature_diameter"
         | "missing_fastener_support_inner_diameter"
         | "missing_fastener_support_diameter"
         | "missing_feature_center"
@@ -837,6 +922,25 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
         "insufficient_fastener_support_wall" => {
             "the fastener support or boss leaves too little radial material around the hole."
                 .to_string()
+        }
+        "standoff_boss_support_mismatch" => {
+            "the standoff boss is not aligned with the hole or insert it claims to support."
+                .to_string()
+        }
+        "missing_standoff_support_link" => {
+            "the standoff boss does not declare supports_feature_id.".to_string()
+        }
+        "missing_supported_feature" => {
+            "the standoff boss points to a supported feature id that does not exist.".to_string()
+        }
+        "unsupported_standoff_support_kind" => {
+            "the standoff boss points to a feature kind this rule cannot compare.".to_string()
+        }
+        "missing_standoff_boss_diameter" => {
+            "the standoff boss is missing boss_diameter_mm.".to_string()
+        }
+        "missing_supported_feature_diameter" => {
+            "the supported hole or insert is missing its inner diameter.".to_string()
         }
         "missing_declared_feature" => {
             format!("the design data declares a {feature_kind}, but Burr cannot find matching STEP geometry.")
@@ -966,6 +1070,40 @@ fn explanation_evidence(check: &Value, reason: &str) -> Vec<String> {
             );
             push_margin(&mut lines, check);
         }
+        "standoff_boss_support_mismatch" => {
+            if let Some(id) = check
+                .pointer("/measured/supported_feature_id")
+                .and_then(Value::as_str)
+            {
+                lines.push(format!("Evidence: supported feature id = {id}."));
+            }
+            push_measure(
+                &mut lines,
+                check,
+                "/measured/centerline_distance_mm",
+                "Measured centerline offset",
+            );
+            push_measure(
+                &mut lines,
+                check,
+                "/required/centerline_tolerance_mm",
+                "Allowed centerline offset",
+            );
+            push_measure(&mut lines, check, "/measured/axis_dot", "Measured axis dot");
+            push_measure(
+                &mut lines,
+                check,
+                "/measured/support_diameter_delta_mm",
+                "Measured support diameter delta",
+            );
+            push_measure(
+                &mut lines,
+                check,
+                "/required/support_diameter_tolerance_mm",
+                "Allowed support diameter delta",
+            );
+            push_margin(&mut lines, check);
+        }
         "missing_declared_feature" => {
             if let Some(artifact) = check
                 .pointer("/measured/artifact_path")
@@ -1088,6 +1226,9 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
         "insufficient_fastener_support_wall" => {
             "a boss or local support with too little radial material can split around the fastener or insert."
         }
+        "standoff_boss_support_mismatch" => {
+            "a boss only supports a fastener if its centerline and axis line up with the fastener feature."
+        }
         "missing_declared_feature" => {
             match feature_kind {
                 "bearing seat" => "a declared bearing fit is only trustworthy if the exported STEP contains the seat cylinder and shoulder.",
@@ -1117,6 +1258,12 @@ fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
         "insufficient_feature_pair_spacing" => "move the features farther apart, reduce their diameters, or remove one feature.",
         "insufficient_wall_thickness" => "move the hole inward, reduce the hole size, or increase the local wall.",
         "insufficient_fastener_support_wall" => "increase support_diameter_mm or boss_diameter_mm, reduce the inner hole/pocket size, or change the support intent.",
+        "standoff_boss_support_mismatch" => "align the standoff boss center_mm, boss_center_mm, and top_center_mm to the supported feature center, or correct supports_feature_id.",
+        "missing_standoff_support_link" => "set supports_feature_id on the standoff_boss feature.",
+        "missing_supported_feature" => "declare the supported hole or insert feature, or correct supports_feature_id.",
+        "unsupported_standoff_support_kind" => "point supports_feature_id at a clearance_hole or heat_set_insert_pocket.",
+        "missing_standoff_boss_diameter" => "set boss_diameter_mm on the standoff_boss feature.",
+        "missing_supported_feature_diameter" => "set diameter_mm or pocket_diameter_mm on the supported feature.",
         "missing_declared_feature" => match feature_kind {
             "bearing seat" => "regenerate the STEP from the bearing_seat helper or update the declared seat center/diameter/depth.",
             "counterbore" => "regenerate the STEP from the counterbore helper or update the declared bore/counterbore dimensions.",
@@ -1569,6 +1716,224 @@ fn check_fastener_support_wall_thickness(rulepack: &Value, rule: &Value, feature
             "Fastener support wall thickness passes rule.".to_string()
         } else {
             format!("Fastener support wall thickness is short by {} mm.", trim_float(round(margin.abs())))
+        }
+    })
+}
+
+fn check_standoff_boss_support_link(
+    manifest: &Value,
+    rulepack: &Value,
+    rule: &Value,
+    feature: &Value,
+) -> Value {
+    let full_rule_id = format!(
+        "{}:{}",
+        string_field(rulepack, "id").unwrap_or("<missing>"),
+        string_field(rule, "id").unwrap_or("<missing>")
+    );
+    let feature_id = feature.get("id").cloned().unwrap_or(Value::Null);
+    let feature_id_string = string_field(feature, "id").unwrap_or("<missing>");
+
+    let Some(supported_feature_id) = string_field(feature, "supports_feature_id") else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_standoff_support_link",
+            "feature_id": feature_id,
+            "message": "Declared standoff bosses must name the feature they support with supports_feature_id."
+        });
+    };
+
+    let Some(supported_feature) = find_feature(manifest, supported_feature_id) else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_supported_feature",
+            "feature_id": feature_id,
+            "related_feature_id": supported_feature_id,
+            "measured": {
+                "supported_feature_id": supported_feature_id
+            },
+            "message": "Standoff boss supports_feature_id does not match any declared feature."
+        });
+    };
+
+    let supported_kind = string_field(supported_feature, "kind").unwrap_or("<missing>");
+    if !matches!(supported_kind, "clearance_hole" | "heat_set_insert_pocket") {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "unsupported_standoff_support_kind",
+            "feature_id": feature_id,
+            "related_feature_id": supported_feature_id,
+            "measured": {
+                "supported_feature_id": supported_feature_id,
+                "supported_feature_kind": supported_kind
+            },
+            "required": {
+                "supported_feature_kind_any": ["clearance_hole", "heat_set_insert_pocket"]
+            },
+            "message": "Standoff boss support-link checks currently compare clearance holes and heat-set insert pockets."
+        });
+    }
+
+    let Some(boss_center) = feature
+        .get("boss_center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .or_else(|| {
+            feature
+                .get("center_mm")
+                .and_then(number_array)
+                .and_then(Vec3::from_values)
+        })
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_center",
+            "feature_id": feature_id,
+            "related_feature_id": supported_feature_id,
+            "message": "Standoff boss boss_center_mm or center_mm is required for support-link checking."
+        });
+    };
+    let Some(boss_axis) = feature
+        .get("axis")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .and_then(Vec3::normalized)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_axis",
+            "feature_id": feature_id,
+            "related_feature_id": supported_feature_id,
+            "message": "Standoff boss axis is required for support-link checking."
+        });
+    };
+    let Some(supported_center) = supported_feature
+        .get("center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_center",
+            "feature_id": feature_id,
+            "related_feature_id": supported_feature_id,
+            "message": "Supported feature center_mm is required for support-link checking."
+        });
+    };
+    let Some(supported_axis) = supported_feature
+        .get("axis")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .and_then(Vec3::normalized)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_axis",
+            "feature_id": feature_id,
+            "related_feature_id": supported_feature_id,
+            "message": "Supported feature axis is required for support-link checking."
+        });
+    };
+
+    let Some(boss_diameter) = number_field(feature, "boss_diameter_mm")
+        .or_else(|| number_field(feature, "support_diameter_mm"))
+        .or_else(|| number_field(feature, "outer_diameter_mm"))
+        .filter(|value| *value > 0.0)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_standoff_boss_diameter",
+            "feature_id": feature_id,
+            "related_feature_id": supported_feature_id,
+            "message": "Standoff boss boss_diameter_mm is required for support-link checking."
+        });
+    };
+    let Some(supported_diameter) = number_field(supported_feature, "support_diameter_mm")
+        .or_else(|| number_field(supported_feature, "boss_diameter_mm"))
+        .or_else(|| number_field(supported_feature, "outer_diameter_mm"))
+        .or_else(|| number_field(supported_feature, "diameter_mm"))
+        .or_else(|| number_field(supported_feature, "pocket_diameter_mm"))
+        .filter(|value| *value > 0.0)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_supported_feature_diameter",
+            "feature_id": feature_id,
+            "related_feature_id": supported_feature_id,
+            "measured": {
+                "supported_feature_id": supported_feature_id,
+                "supported_feature_kind": supported_kind
+            },
+            "message": "Supported feature needs support_diameter_mm, diameter_mm, or pocket_diameter_mm for support-link checking."
+        });
+    };
+
+    let centerline_tolerance = number_field(rule, "centerline_tolerance_mm")
+        .unwrap_or(0.25)
+        .max(0.0);
+    let diameter_tolerance = number_field(rule, "support_diameter_tolerance_mm")
+        .or_else(|| number_field(rule, "diameter_tolerance_mm"))
+        .unwrap_or(0.05)
+        .max(0.0);
+    let axis_dot_min = number_field(rule, "axis_dot_min")
+        .unwrap_or(0.99)
+        .clamp(0.0, 1.0);
+
+    let centerline_distance = boss_center.sub(supported_center).length();
+    let axis_dot = boss_axis.dot(supported_axis).abs();
+    let support_diameter_delta = (boss_diameter - supported_diameter).abs();
+    let pass = centerline_distance <= centerline_tolerance
+        && axis_dot >= axis_dot_min
+        && support_diameter_delta <= diameter_tolerance;
+    let margin = centerline_tolerance - centerline_distance;
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "standoff_boss_support_mismatch" },
+        "feature_id": feature_id,
+        "related_feature_id": supported_feature_id,
+        "measured": {
+            "supported_feature_id": supported_feature_id,
+            "supported_feature_kind": supported_kind,
+            "centerline_distance_mm": round(centerline_distance),
+            "axis_dot": round(axis_dot),
+            "boss_diameter_mm": round(boss_diameter),
+            "supported_support_diameter_mm": round(supported_diameter),
+            "support_diameter_delta_mm": round(support_diameter_delta)
+        },
+        "required": {
+            "centerline_tolerance_mm": round(centerline_tolerance),
+            "axis_dot_min": round(axis_dot_min),
+            "support_diameter_tolerance_mm": round(diameter_tolerance)
+        },
+        "margin_mm": round(margin),
+        "repair": {
+            "action": "align_standoff_boss_to_supported_feature",
+            "target_feature_id": feature_id_string,
+            "related_feature_id": supported_feature_id,
+            "value_paths": [
+                format!("features[id={feature_id_string}].center_mm"),
+                format!("features[id={feature_id_string}].boss_center_mm"),
+                format!("features[id={feature_id_string}].top_center_mm")
+            ]
+        },
+        "message": if pass {
+            "Standoff boss is aligned with the feature it supports.".to_string()
+        } else {
+            format!(
+                "Standoff boss is offset from supported feature by {} mm.",
+                trim_float(round(centerline_distance))
+            )
         }
     })
 }
@@ -4107,6 +4472,14 @@ fn find_part<'a>(manifest: &'a Value, part_id: &str) -> Option<&'a Value> {
         .find(|part| string_field(part, "id") == Some(part_id))
 }
 
+fn find_feature<'a>(manifest: &'a Value, feature_id: &str) -> Option<&'a Value> {
+    manifest
+        .get("features")?
+        .as_array()?
+        .iter()
+        .find(|feature| string_field(feature, "id") == Some(feature_id))
+}
+
 fn find_artifact<'a>(manifest: &'a Value, kind: &str) -> Option<&'a Value> {
     manifest
         .get("artifacts")?
@@ -4480,7 +4853,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.8.0")
+            Some("0.9.0")
         );
     }
 
@@ -5217,6 +5590,117 @@ mod tests {
             .iter()
             .flatten()
             .any(|line| line.contains("Measured support wall: 1.3 mm")));
+    }
+
+    #[test]
+    fn standoff_boss_support_link_requires_aligned_supported_feature() {
+        let temp = tempfile::tempdir().unwrap();
+        let source_path = temp.path().join("source.py");
+        let step_path = temp.path().join("part.step");
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(&step_path, "ISO-10303-21;\nEND-ISO-10303-21;\n").unwrap();
+
+        let manifest = json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "support-link-fixture",
+            "artifact_version": "0.1.0",
+            "artifact_type": "support_link_fixture",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": sha256_file(&source_path).unwrap()
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": sha256_file(&step_path).unwrap()
+                }
+            ],
+            "features": [
+                {
+                    "id": "m3_good_boss",
+                    "kind": "standoff_boss",
+                    "intent": "mechanical_interface",
+                    "fastener": "M3",
+                    "boss_diameter_mm": 8.0,
+                    "boss_height_mm": 5.0,
+                    "center_mm": [0.0, 0.0, 6.5],
+                    "boss_center_mm": [0.0, 0.0, 6.5],
+                    "top_center_mm": [0.0, 0.0, 9.0],
+                    "axis": [0.0, 0.0, 1.0],
+                    "role": "pcb_standoff",
+                    "supports_feature_id": "m3_supported_mount"
+                },
+                {
+                    "id": "m3_bad_boss",
+                    "kind": "standoff_boss",
+                    "intent": "mechanical_interface",
+                    "fastener": "M3",
+                    "boss_diameter_mm": 8.0,
+                    "boss_height_mm": 5.0,
+                    "center_mm": [0.8, 0.0, 6.5],
+                    "boss_center_mm": [0.8, 0.0, 6.5],
+                    "top_center_mm": [0.8, 0.0, 9.0],
+                    "axis": [0.0, 0.0, 1.0],
+                    "role": "pcb_standoff",
+                    "supports_feature_id": "m3_supported_mount"
+                },
+                {
+                    "id": "m3_supported_mount",
+                    "kind": "clearance_hole",
+                    "intent": "reference",
+                    "fastener": "M3",
+                    "diameter_mm": 3.4,
+                    "support_diameter_mm": 8.0,
+                    "center_mm": [0.0, 0.0, 6.5],
+                    "axis": [0.0, 0.0, 1.0],
+                    "role": "bossed_mount"
+                }
+            ]
+        });
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "support_link_fixture",
+            "version": "0.1.0",
+            "artifact_type": "support_link_fixture",
+            "rules": [
+                {
+                    "id": "standoff_support_link",
+                    "kind": "standoff_boss_support_link",
+                    "applies_to": {
+                        "kind": "standoff_boss",
+                        "intent_any": ["mechanical_interface"]
+                    },
+                    "centerline_tolerance_mm": 0.25,
+                    "support_diameter_tolerance_mm": 0.05,
+                    "axis_dot_min": 0.99
+                }
+            ]
+        });
+
+        let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "feature_id") == Some("m3_good_boss")
+                && string_field(check, "reason") == Some("ok")
+                && string_field(check, "related_feature_id") == Some("m3_supported_mount")
+        }));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "feature_id") == Some("m3_bad_boss")
+                && string_field(check, "reason") == Some("standoff_boss_support_mismatch")
+                && string_field(check, "related_feature_id") == Some("m3_supported_mount")
+                && check
+                    .pointer("/measured/centerline_distance_mm")
+                    .and_then(Value::as_f64)
+                    == Some(0.8)
+                && check.pointer("/repair/action").and_then(Value::as_str)
+                    == Some("align_standoff_boss_to_supported_feature")
+        }));
+        assert!(format_receipt_diagnostics(&receipt)
+            .iter()
+            .flatten()
+            .any(|line| line.contains("Measured centerline offset: 0.8 mm")));
     }
 
     #[test]
@@ -6300,7 +6784,20 @@ mod tests {
                     "boss_height_mm": 5.0,
                     "center_mm": [0.0, 0.0, 6.5],
                     "axis": [0.0, 0.0, 1.0],
-                    "role": "pcb_standoff"
+                    "role": "pcb_standoff",
+                    "supports_feature_id": "m3_bossed_mount"
+                },
+                {
+                    "id": "m3_bossed_mount",
+                    "part": "housing",
+                    "kind": "clearance_hole",
+                    "intent": "reference",
+                    "fastener": "M3",
+                    "diameter_mm": 3.4,
+                    "support_diameter_mm": 8.0,
+                    "center_mm": [0.0, 0.0, 6.5],
+                    "axis": [0.0, 0.0, 1.0],
+                    "role": "bossed_mount"
                 }
             ]
         })

@@ -1,7 +1,7 @@
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "artifact_type": "actuator_mount",
   "process_kind": "FDM",
   "rules": [
@@ -140,6 +140,20 @@
       "centerline_tolerance_mm": 0.25,
       "boss_center_tolerance_mm": 0.5,
       "top_plane_tolerance_mm": 0.25,
+      "axis_dot_min": 0.99
+    },
+    {
+      "id": "m3_standoff_boss_support_link",
+      "kind": "standoff_boss_support_link",
+      "description": "Declared M3 standoff bosses must align with the hole or insert they claim to support.",
+      "applies_to": {
+        "kind": "standoff_boss",
+        "fastener": "M3",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["pcb_standoff", "fastener_support", "bossed_mount"]
+      },
+      "centerline_tolerance_mm": 0.25,
+      "support_diameter_tolerance_mm": 0.05,
       "axis_dot_min": 0.99
     }
   ]
