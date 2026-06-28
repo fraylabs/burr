@@ -54,6 +54,9 @@ design.write(DESIGN_DATA_FILE)
 The helper creates CAD geometry and records design intent into
 `burr-design-data.json`.
 
+Counterbore helpers record both the smaller bore and the larger head recess, so
+Burr can check STEP presence and edge material around the recess itself.
+
 ## CLI Loop
 
 ```bash

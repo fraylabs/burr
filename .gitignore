@@ -25,6 +25,8 @@ examples/build123d-bearing-seat/*/bearing-seat.step
 examples/build123d-bearing-seat/*/burr-design-data.json
 examples/build123d-counterbore/*/counterbore.step
 examples/build123d-counterbore/*/burr-design-data.json
+examples/build123d-counterbore-edge-distance/*/counterbore-edge.step
+examples/build123d-counterbore-edge-distance/*/burr-design-data.json
 examples/build123d-heat-set-insert-pocket/*/insert-pocket.step
 examples/build123d-heat-set-insert-pocket/*/burr-design-data.json
 examples/build123d-straight-slot/*/slot.step

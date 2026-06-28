@@ -36,6 +36,18 @@ export const galleryExamples = [
     designData: "edge-safe-slot-mount.design-data.json",
   },
   {
+    slug: "edge-safe-counterbore-mount",
+    title: "Edge-Safe Counterbore Mount",
+    expectation: "pass",
+    group: "functional-good",
+    dir: "examples/build123d-counterbore-edge-distance/good",
+    design: "examples/build123d-counterbore-edge-distance/good/design.py",
+    step: "examples/build123d-counterbore-edge-distance/good/counterbore-edge.step",
+    preview: "edge-safe-counterbore-mount.png",
+    receipt: "edge-safe-counterbore-mount.receipt.json",
+    designData: "edge-safe-counterbore-mount.design-data.json",
+  },
+  {
     slug: "electronics-standoff-deck",
     title: "Electronics Standoff Deck",
     expectation: "pass",
@@ -193,6 +205,24 @@ export const galleryExamples = [
     expectedFailures: [
       {
         rule_id: "actuator_mount:mechanical_slot_edge_distance",
+        reason: "insufficient_feature_edge_distance",
+      },
+    ],
+  },
+  {
+    slug: "bad-counterbore-near-edge",
+    title: "Bad Counterbore Near Edge",
+    expectation: "fail",
+    group: "mistake-caught",
+    dir: "examples/build123d-counterbore-edge-distance/bad",
+    design: "examples/build123d-counterbore-edge-distance/bad/design.py",
+    step: "examples/build123d-counterbore-edge-distance/bad/counterbore-edge.step",
+    preview: "bad-counterbore-near-edge.png",
+    receipt: "bad-counterbore-near-edge.receipt.json",
+    designData: "bad-counterbore-near-edge.design-data.json",
+    expectedFailures: [
+      {
+        rule_id: "actuator_mount:counterbore_edge_distance",
         reason: "insufficient_feature_edge_distance",
       },
     ],

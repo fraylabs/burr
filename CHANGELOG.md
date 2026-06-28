@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Added default actuator rulepack coverage for counterbore edge material:
+  mechanical counterbores now check the larger `counterbore_diameter_mm`
+  envelope against free edges instead of trusting only the through-hole.
+- Bumped the default `actuator_mount` rulepack to `0.11.0`; mechanical
+  counterbores selected by that rulepack now need at least 3 mm of material
+  around the head recess.
+- Added good/bad build123d and gallery proofs for a counterbore that is safe
+  when inset and fails when the head recess is too close to a free edge.
+
 ## 0.24.0
 
 - Added `feature_edge_distance`, which checks a declared feature envelope

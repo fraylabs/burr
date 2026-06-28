@@ -156,6 +156,13 @@ uv sync --all-packages
 npm run check:counterbore
 ```
 
+Run the counterbore edge-material proof:
+
+```bash
+uv sync --all-packages
+npm run check:counterbore-edge-distance
+```
+
 Run the fastener support wall proof:
 
 ```bash
@@ -446,17 +453,17 @@ mechanical rulepacks.
 ## Rulepacks
 
 The included actuator mount rulepack checks loaded M3 clearance-hole edge
-distance, whole-slot edge material, minimum wall thickness around M3 clearance
-holes, whether declared M3 clearance holes exist as matching cylindrical
-geometry in the exported STEP, and whether declared straight slots,
-counterbores, heat-set insert pockets, and bearing seats exist as matching STEP
-cylinder/plane evidence:
+distance, whole-slot edge material, counterbore head-recess edge material,
+minimum wall thickness around M3 clearance holes, whether declared M3 clearance
+holes exist as matching cylindrical geometry in the exported STEP, and whether
+declared straight slots, counterbores, heat-set insert pockets, and bearing
+seats exist as matching STEP cylinder/plane evidence:
 
 ```json
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -478,6 +485,16 @@ cylinder/plane evidence:
         "intent_any": ["mechanical_interface"]
       },
       "min_wall_thickness_mm": 2.0
+    },
+    {
+      "id": "counterbore_edge_distance",
+      "kind": "feature_edge_distance",
+      "applies_to": {
+        "kind": "counterbore",
+        "intent_any": ["mechanical_interface"]
+      },
+      "diameter_field": "counterbore_diameter_mm",
+      "min_wall_to_edge_mm": 3.0
     },
     {
       "id": "m3_clearance_hole_step_presence",
@@ -601,7 +618,7 @@ Receipts include all three:
   "schema_version": "burr.receipt.v1",
   "burr_version": "0.24.0",
   "artifact_version": "0.1.0",
-  "rulepack_version": "0.10.0",
+  "rulepack_version": "0.11.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"

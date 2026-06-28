@@ -10,7 +10,7 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "artifact_type": "actuator_mount",
   "rules": [
     {
@@ -31,10 +31,25 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
         "intent_any": ["mechanical_interface"]
       },
       "min_wall_to_edge_mm": 3.0
+    },
+    {
+      "id": "counterbore_edge_distance",
+      "kind": "feature_edge_distance",
+      "applies_to": {
+        "kind": "counterbore",
+        "intent_any": ["mechanical_interface"]
+      },
+      "diameter_field": "counterbore_diameter_mm",
+      "min_wall_to_edge_mm": 3.0
     }
   ]
 }
 ```
+
+`feature_edge_distance` defaults to `diameter_mm` for circular envelopes.
+Counterbore rules should override `diameter_field` to
+`counterbore_diameter_mm` so Burr checks the larger screw-head recess, not only
+the smaller bore.
 
 ## Selection
 

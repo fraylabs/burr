@@ -1,7 +1,7 @@
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "artifact_type": "actuator_mount",
   "process_kind": "FDM",
   "rules": [
@@ -37,6 +37,18 @@
         "intent_any": ["mechanical_interface"],
         "role_any": ["loaded_mount", "adjustable_mount", "housing_mount"]
       },
+      "min_wall_to_edge_mm": 3.0
+    },
+    {
+      "id": "counterbore_edge_distance",
+      "kind": "feature_edge_distance",
+      "description": "Mechanical counterbores in printed actuator mounts need enough edge material around the larger counterbore recess, not only the smaller through-hole.",
+      "applies_to": {
+        "kind": "counterbore",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["loaded_mount", "mount", "housing_mount"]
+      },
+      "diameter_field": "counterbore_diameter_mm",
       "min_wall_to_edge_mm": 3.0
     },
     {
