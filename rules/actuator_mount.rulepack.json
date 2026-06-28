@@ -1,7 +1,7 @@
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "artifact_type": "actuator_mount",
   "process_kind": "FDM",
   "rules": [
@@ -27,6 +27,17 @@
         "intent_any": ["mechanical_interface"]
       },
       "min_wall_thickness_mm": 2.0
+    },
+    {
+      "id": "mechanical_slot_edge_distance",
+      "kind": "feature_edge_distance",
+      "description": "Mechanical straight slots in printed actuator mounts need enough edge material around the whole slot envelope.",
+      "applies_to": {
+        "kind": "straight_slot",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["loaded_mount", "adjustable_mount", "housing_mount"]
+      },
+      "min_wall_to_edge_mm": 3.0
     },
     {
       "id": "m3_bossed_mount_support_wall_thickness",

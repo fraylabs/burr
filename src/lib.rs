@@ -224,6 +224,7 @@ pub fn lint_design_data(
                     | Some("standoff_boss_support_link")
                     | Some("feature_presence")
                     | Some("feature_count")
+                    | Some("feature_edge_distance")
                     | Some("feature_pair_spacing")
                     | Some("numeric_range")
             ) {
@@ -286,6 +287,11 @@ pub fn lint_design_data(
                     }
                     Some("standoff_boss_support_link") => {
                         checks.push(check_standoff_boss_support_link(
+                            manifest, rulepack, rule, feature,
+                        ));
+                    }
+                    Some("feature_edge_distance") => {
+                        checks.push(check_feature_edge_distance(
                             manifest, rulepack, rule, feature,
                         ));
                     }
@@ -554,6 +560,39 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
             );
             Some(lines)
         }
+        Some("insufficient_feature_edge_distance") => {
+            let feature_label = string_field(check, "feature_id")
+                .map(|id| format!(" {id}"))
+                .unwrap_or_default();
+            let measured = check
+                .pointer("/measured/wall_to_edge_mm")
+                .and_then(Value::as_f64);
+            let required = check
+                .pointer("/required/min_wall_to_edge_mm")
+                .and_then(Value::as_f64);
+            let short_by = number_field(check, "margin_mm").map(|value| round(value.abs()));
+            let mut lines = vec![format!("Feature{feature_label} is too close to the edge.")];
+            if let Some(value) = measured {
+                lines.push(format!(
+                    "Measured feature-to-edge: {} mm",
+                    trim_float(value)
+                ));
+            }
+            if let Some(value) = required {
+                lines.push(format!(
+                    "Required feature-to-edge: {} mm",
+                    trim_float(value)
+                ));
+            }
+            if let Some(value) = short_by {
+                lines.push(format!("Short by: {} mm", trim_float(value)));
+            }
+            lines.push(
+                "Try moving the feature inward, shortening it, or increasing the surrounding part size."
+                    .to_string(),
+            );
+            Some(lines)
+        }
         Some("insufficient_wall_thickness") => {
             let feature_label = string_field(check, "feature_id")
                 .map(|id| format!(" {id}"))
@@ -807,6 +846,7 @@ fn explanation_category(reason: &str) -> &'static str {
         | "missing_rulepack_schema" => "unsupported metadata",
         "missing_declared_feature" | "step_geometry_unreadable" => "missing geometry",
         "insufficient_edge_distance"
+        | "insufficient_feature_edge_distance"
         | "insufficient_feature_pair_spacing"
         | "insufficient_wall_thickness"
         | "insufficient_fastener_support_wall"
@@ -823,6 +863,9 @@ fn explanation_category(reason: &str) -> &'static str {
         | "missing_fastener_support_diameter"
         | "missing_feature_center"
         | "missing_feature_axis"
+        | "missing_feature_edge_geometry"
+        | "missing_feature_part_bbox"
+        | "invalid_feature_edge_rule_clearance"
         | "invalid_pair_spacing_rule_clearance"
         | "invalid_counterbore_dimensions" => "unsafe dimension",
         "feature_count_out_of_range" | "numeric_value_out_of_range" | "missing_numeric_value" => {
@@ -867,6 +910,7 @@ fn explanation_rank_for_reason(reason: &str) -> u8 {
         | "missing_rulepack_schema" => 0,
         "missing_declared_feature" | "step_geometry_unreadable" => 1,
         "insufficient_edge_distance"
+        | "insufficient_feature_edge_distance"
         | "insufficient_feature_pair_spacing"
         | "insufficient_wall_thickness"
         | "insufficient_fastener_support_wall"
@@ -883,6 +927,9 @@ fn explanation_rank_for_reason(reason: &str) -> u8 {
         | "missing_fastener_support_diameter"
         | "missing_feature_center"
         | "missing_feature_axis"
+        | "missing_feature_edge_geometry"
+        | "missing_feature_part_bbox"
+        | "invalid_feature_edge_rule_clearance"
         | "invalid_pair_spacing_rule_clearance"
         | "invalid_counterbore_dimensions" => 2,
         "feature_count_out_of_range" | "numeric_value_out_of_range" | "missing_numeric_value" => 3,
@@ -891,7 +938,7 @@ fn explanation_rank_for_reason(reason: &str) -> u8 {
 }
 
 fn feature_kind_from_rule(rule_id: &str) -> &'static str {
-    if rule_id.contains("straight_slot") {
+    if rule_id.contains("straight_slot") || rule_id.contains("_slot") {
         "straight slot"
     } else if rule_id.contains("counterbore") {
         "counterbore"
@@ -912,6 +959,9 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
     match reason {
         "insufficient_edge_distance" => {
             "the loaded M3 hole is too close to a free edge.".to_string()
+        }
+        "insufficient_feature_edge_distance" => {
+            format!("the declared {feature_kind} is too close to a free edge.")
         }
         "insufficient_feature_pair_spacing" => {
             "two declared features leave too little material between them.".to_string()
@@ -957,6 +1007,15 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
         "missing_hole_diameter" => "the feature is missing a valid hole diameter.".to_string(),
         "missing_pair_spacing_geometry" => {
             "a feature in a pair-spacing rule is missing center_mm or diameter_mm.".to_string()
+        }
+        "missing_feature_edge_geometry" => {
+            "the feature is missing a checkable edge-distance envelope.".to_string()
+        }
+        "missing_feature_part_bbox" => {
+            "the feature's part is missing a bbox_mm free-edge envelope.".to_string()
+        }
+        "invalid_feature_edge_rule_clearance" => {
+            "the edge-distance rule is missing a valid min_wall_to_edge_mm.".to_string()
         }
         "invalid_pair_spacing_rule_clearance" => {
             "the pair-spacing rule is missing a valid min_clearance_mm.".to_string()
@@ -1004,6 +1063,21 @@ fn explanation_evidence(check: &Value, reason: &str) -> Vec<String> {
                 check,
                 "/required/center_to_edge_mm",
                 "Required center-to-edge",
+            );
+            push_margin(&mut lines, check);
+        }
+        "insufficient_feature_edge_distance" => {
+            push_measure(
+                &mut lines,
+                check,
+                "/measured/wall_to_edge_mm",
+                "Measured feature-to-edge",
+            );
+            push_measure(
+                &mut lines,
+                check,
+                "/required/min_wall_to_edge_mm",
+                "Required feature-to-edge",
             );
             push_margin(&mut lines, check);
         }
@@ -1217,6 +1291,9 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
         "insufficient_edge_distance" => {
             "thin edge material can crack, delaminate, or fail when the fastener is loaded."
         }
+        "insufficient_feature_edge_distance" => {
+            "thin edge material can crack, delaminate, warp, or disappear around functional cuts."
+        }
         "insufficient_feature_pair_spacing" => {
             "thin ligaments between holes can crack, delaminate, or disappear during printing."
         }
@@ -1255,6 +1332,9 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
 fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
     match reason {
         "insufficient_edge_distance" => "move the hole inward or make the surrounding part larger.",
+        "insufficient_feature_edge_distance" => {
+            "move the feature inward, shorten the feature, or make the surrounding part larger."
+        }
         "insufficient_feature_pair_spacing" => "move the features farther apart, reduce their diameters, or remove one feature.",
         "insufficient_wall_thickness" => "move the hole inward, reduce the hole size, or increase the local wall.",
         "insufficient_fastener_support_wall" => "increase support_diameter_mm or boss_diameter_mm, reduce the inner hole/pocket size, or change the support intent.",
@@ -1282,6 +1362,13 @@ fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
         "missing_hole_diameter" => "add a positive diameter_mm to the feature metadata.",
         "missing_pair_spacing_geometry" => {
             "add center_mm and diameter_mm to every feature selected by the pair-spacing rule."
+        }
+        "missing_feature_edge_geometry" => {
+            "add center_mm plus diameter_mm, slot width/length/span_axis, or spacing_envelope metadata."
+        }
+        "missing_feature_part_bbox" => "add part and parts[].bbox_mm metadata for the feature's host part.",
+        "invalid_feature_edge_rule_clearance" => {
+            "set min_wall_to_edge_mm to the minimum material between the feature envelope and a free edge."
         }
         "invalid_pair_spacing_rule_clearance" => {
             "set min_clearance_mm to the minimum material bridge this rule should require."
@@ -2044,6 +2131,215 @@ fn check_numeric_range(manifest: &Value, rulepack: &Value, rule: &Value) -> Valu
             format!("Numeric design value {} is outside declared range.", trim_float(round(value)))
         }
     })
+}
+
+#[derive(Debug, Clone)]
+struct EdgeDistanceCandidate {
+    axis: &'static str,
+    side: &'static str,
+    wall_to_edge_mm: f64,
+}
+
+fn check_feature_edge_distance(
+    manifest: &Value,
+    rulepack: &Value,
+    rule: &Value,
+    feature: &Value,
+) -> Value {
+    let full_rule_id = format!(
+        "{}:{}",
+        string_field(rulepack, "id").unwrap_or("<missing>"),
+        string_field(rule, "id").unwrap_or("<missing>")
+    );
+    let min_wall_to_edge = number_field(rule, "min_wall_to_edge_mm");
+    if !min_wall_to_edge.is_some_and(|value| value >= 0.0) {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "invalid_feature_edge_rule_clearance",
+            "feature_id": feature.get("id").cloned().unwrap_or(Value::Null),
+            "message": "feature_edge_distance rules must declare min_wall_to_edge_mm as a non-negative number."
+        });
+    }
+    let min_wall_to_edge = min_wall_to_edge.unwrap();
+
+    let center_field = string_field(rule, "center_field").unwrap_or("center_mm");
+    let diameter_field = string_field(rule, "diameter_field").unwrap_or("diameter_mm");
+    let width_field = string_field(rule, "width_field").unwrap_or("width_mm");
+    let length_field = string_field(rule, "length_field").unwrap_or("length_mm");
+    let span_axis_field = string_field(rule, "span_axis_field").unwrap_or("span_axis");
+    let Some(shape) = pair_spacing_shape(
+        feature,
+        center_field,
+        diameter_field,
+        width_field,
+        length_field,
+        span_axis_field,
+    ) else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_edge_geometry",
+            "feature_id": feature.get("id").cloned().unwrap_or(Value::Null),
+            "measured": {
+                "center_field": center_field,
+                "diameter_field": diameter_field,
+                "width_field": width_field,
+                "length_field": length_field,
+                "span_axis_field": span_axis_field,
+                "center_present": feature.get(center_field).is_some(),
+                "diameter_present": feature.get(diameter_field).is_some(),
+                "width_present": feature.get(width_field).is_some(),
+                "length_present": feature.get(length_field).is_some(),
+                "span_axis_present": feature.get(span_axis_field).is_some(),
+                "spacing_envelope_present": feature.get("spacing_envelope").is_some()
+            },
+            "required": {
+                "circle": "center_mm and diameter_mm > 0",
+                "slot_capsule": "straight_slot with center_mm, width_mm > 0, length_mm >= width_mm, and span_axis",
+                "spacing_envelope": "optional circle or capsule spacing_envelope"
+            },
+            "message": "Feature edge-distance checks require circle or slot/capsule geometry metadata."
+        });
+    };
+
+    let Some(through_axis) = feature
+        .get("axis")
+        .and_then(number_array)
+        .and_then(axis_index_from_vector)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_axis",
+            "feature_id": feature.get("id").cloned().unwrap_or(Value::Null),
+            "message": "Feature edge-distance checks require an axis-aligned axis."
+        });
+    };
+
+    let Some(part) = string_field(feature, "part").and_then(|part_id| find_part(manifest, part_id))
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_part_bbox",
+            "feature_id": feature.get("id").cloned().unwrap_or(Value::Null),
+            "message": "Feature edge-distance checks require feature.part to reference a part with bbox_mm."
+        });
+    };
+    let bbox_min = part.pointer("/bbox_mm/min").and_then(number_array);
+    let bbox_max = part.pointer("/bbox_mm/max").and_then(number_array);
+    let Some(closest) =
+        bbox_min
+            .as_deref()
+            .zip(bbox_max.as_deref())
+            .and_then(|(bbox_min, bbox_max)| {
+                feature_edge_distance_to_bbox(&shape, bbox_min, bbox_max, through_axis)
+            })
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_feature_part_bbox",
+            "feature_id": feature.get("id").cloned().unwrap_or(Value::Null),
+            "message": "Feature edge-distance checks require parts[feature.part].bbox_mm min/max vectors."
+        });
+    };
+
+    let margin = closest.wall_to_edge_mm - min_wall_to_edge;
+    let pass = margin >= 0.0;
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "insufficient_feature_edge_distance" },
+        "feature_id": feature.get("id").cloned().unwrap_or(Value::Null),
+        "measured": {
+            "feature_shape": shape.kind,
+            "wall_to_edge_mm": round(closest.wall_to_edge_mm),
+            "closest_edge": {
+                "axis": closest.axis,
+                "side": closest.side
+            },
+            "source": "parts[feature.part].bbox_mm minus feature envelope"
+        },
+        "required": {
+            "min_wall_to_edge_mm": round(min_wall_to_edge),
+            "center_field": center_field,
+            "diameter_field": diameter_field,
+            "width_field": width_field,
+            "length_field": length_field,
+            "span_axis_field": span_axis_field
+        },
+        "margin_mm": round(margin),
+        "message": if pass {
+            "Feature edge distance passes rule.".to_string()
+        } else {
+            format!("Feature edge distance is short by {} mm.", trim_float(round(margin.abs())))
+        }
+    })
+}
+
+fn feature_edge_distance_to_bbox(
+    shape: &PairSpacingShape,
+    bbox_min: &[f64],
+    bbox_max: &[f64],
+    through_axis: usize,
+) -> Option<EdgeDistanceCandidate> {
+    if bbox_min.len() != 3 || bbox_max.len() != 3 || through_axis > 2 {
+        return None;
+    }
+
+    let mut closest: Option<EdgeDistanceCandidate> = None;
+    for axis in 0..3 {
+        if axis == through_axis {
+            continue;
+        }
+        let segment_min = shape
+            .segment_start
+            .coordinate(axis)
+            .min(shape.segment_end.coordinate(axis));
+        let segment_max = shape
+            .segment_start
+            .coordinate(axis)
+            .max(shape.segment_end.coordinate(axis));
+        let envelope_min = segment_min - shape.radius_mm;
+        let envelope_max = segment_max + shape.radius_mm;
+        let candidates = [
+            EdgeDistanceCandidate {
+                axis: axis_label(axis),
+                side: "min",
+                wall_to_edge_mm: envelope_min - bbox_min[axis],
+            },
+            EdgeDistanceCandidate {
+                axis: axis_label(axis),
+                side: "max",
+                wall_to_edge_mm: bbox_max[axis] - envelope_max,
+            },
+        ];
+
+        for candidate in candidates {
+            if !candidate.wall_to_edge_mm.is_finite() {
+                continue;
+            }
+            if closest
+                .as_ref()
+                .is_none_or(|closest| candidate.wall_to_edge_mm < closest.wall_to_edge_mm)
+            {
+                closest = Some(candidate);
+            }
+        }
+    }
+    closest
+}
+
+fn axis_label(axis: usize) -> &'static str {
+    match axis {
+        0 => "x",
+        1 => "y",
+        2 => "z",
+        _ => "<invalid>",
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -3874,6 +4170,15 @@ impl Vec3 {
         }
     }
 
+    fn coordinate(self, axis: usize) -> f64 {
+        match axis {
+            0 => self.x,
+            1 => self.y,
+            2 => self.z,
+            _ => f64::NAN,
+        }
+    }
+
     fn distance_to_line(self, line_point: Self, line_axis: Self) -> f64 {
         self.sub(line_point).cross(line_axis).length()
     }
@@ -4853,7 +5158,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.9.0")
+            Some("0.10.0")
         );
     }
 
@@ -5393,6 +5698,109 @@ mod tests {
 
         let mut passing_manifest = manifest.clone();
         passing_manifest["features"][1]["center_mm"] = json!([0.0, 0.0, 8.0]);
+        let passing = lint_design_data(&passing_manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&passing, "status"), Some("pass"));
+    }
+
+    #[test]
+    fn feature_edge_distance_checks_slot_envelopes() {
+        let temp = tempfile::tempdir().unwrap();
+        let source_path = temp.path().join("source.py");
+        let step_path = temp.path().join("part.step");
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(&step_path, "ISO-10303-21;\nEND-ISO-10303-21;\n").unwrap();
+
+        let manifest = json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "slot-edge-part",
+            "artifact_version": "0.1.0",
+            "artifact_type": "actuator_mount",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": sha256_file(&source_path).unwrap()
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": sha256_file(&step_path).unwrap()
+                }
+            ],
+            "parts": [
+                {
+                    "id": "housing",
+                    "bbox_mm": {
+                        "min": [-35.0, -21.0, -10.0],
+                        "max": [35.0, 21.0, 10.0]
+                    }
+                }
+            ],
+            "features": [
+                {
+                    "id": "motor_adjust_slot",
+                    "part": "housing",
+                    "kind": "straight_slot",
+                    "intent": "mechanical_interface",
+                    "role": "loaded_mount",
+                    "center_mm": [0.0, -10.0, 0.0],
+                    "axis": [1.0, 0.0, 0.0],
+                    "span_axis": [0.0, 1.0, 0.0],
+                    "width_mm": 4.0,
+                    "length_mm": 18.0
+                }
+            ]
+        });
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "actuator_mount",
+            "version": "0.10.0",
+            "artifact_type": "actuator_mount",
+            "rules": [
+                {
+                    "id": "mechanical_slot_edge_distance",
+                    "kind": "feature_edge_distance",
+                    "applies_to": {
+                        "kind": "straight_slot",
+                        "intent_any": ["mechanical_interface"],
+                        "role_any": ["loaded_mount"]
+                    },
+                    "min_wall_to_edge_mm": 3.0
+                }
+            ]
+        });
+
+        let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        let check = receipt["checks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|check| {
+                string_field(check, "rule_id")
+                    == Some("actuator_mount:mechanical_slot_edge_distance")
+            })
+            .unwrap();
+        assert_eq!(
+            string_field(check, "reason"),
+            Some("insufficient_feature_edge_distance")
+        );
+        assert_eq!(
+            check
+                .pointer("/measured/wall_to_edge_mm")
+                .and_then(Value::as_f64),
+            Some(2.0)
+        );
+        assert_eq!(
+            check
+                .pointer("/required/min_wall_to_edge_mm")
+                .and_then(Value::as_f64),
+            Some(3.0)
+        );
+        assert_eq!(number_field(check, "margin_mm"), Some(-1.0));
+
+        let mut passing_manifest = manifest.clone();
+        passing_manifest["features"][0]["center_mm"] = json!([0.0, -7.0, 0.0]);
         let passing = lint_design_data(&passing_manifest, &rulepack, temp.path(), None);
         assert_eq!(string_field(&passing, "status"), Some("pass"));
     }
@@ -6529,8 +6937,8 @@ mod tests {
                 {
                     "id": "housing",
                     "bbox_mm": {
-                        "min": [-20.0, -10.0, 0.0],
-                        "max": [20.0, 10.0, 16.0]
+                        "min": [-20.0, -14.0, 0.0],
+                        "max": [20.0, 14.0, 16.0]
                     }
                 }
             ],
@@ -6573,8 +6981,8 @@ mod tests {
                 {
                     "id": "housing",
                     "bbox_mm": {
-                        "min": [-20.0, -10.0, 0.0],
-                        "max": [20.0, 10.0, 16.0]
+                        "min": [-20.0, -14.0, 0.0],
+                        "max": [20.0, 14.0, 16.0]
                     }
                 }
             ],

@@ -35,6 +35,8 @@ checked, but the receipts are the proof.
 
 - `shaft-bearing-bracket`: bearing seat plus loaded M3 side mounts.
 - `slotted-motor-plate`: adjustable straight slot plus counterbored fasteners.
+- `edge-safe-slot-mount`: mechanical straight slot with enough material between
+  the full slot envelope and the nearest free edge.
 - `electronics-standoff-deck`: heat-set insert pockets plus clearance holes.
 - `boss-supported-m3-mount`: boss-supported M3 mount with enough radial
   material around the fastener.
@@ -52,6 +54,8 @@ checked, but the receipts are the proof.
   spacing-envelope ligament rules.
 - `t-slot-linear-slider-loose-clearance`: negative fixture for numeric clearance
   rules.
+- `bad-slot-near-edge`: negative fixture proving Burr checks the whole slot
+  envelope, not only a point at the slot center.
 - `bad-boss-support-too-thin`: negative fixture for boss radial wall checks
   around a fastener.
 - `bad-standoff-boss-missing-step`: negative fixture proving declared standoff

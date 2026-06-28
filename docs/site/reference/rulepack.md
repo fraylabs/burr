@@ -10,16 +10,27 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "artifact_type": "actuator_mount",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
       "kind": "hole_edge_distance",
-      "feature_kind": "clearance_hole",
-      "fastener": "M3",
-      "role": "loaded_mount",
-      "min_center_to_edge_mm": 10.2
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3",
+        "role_any": ["loaded_mount"]
+      },
+      "min_center_to_edge_diameter_multiple": 3.0
+    },
+    {
+      "id": "mechanical_slot_edge_distance",
+      "kind": "feature_edge_distance",
+      "applies_to": {
+        "kind": "straight_slot",
+        "intent_any": ["mechanical_interface"]
+      },
+      "min_wall_to_edge_mm": 3.0
     }
   ]
 }
@@ -46,6 +57,7 @@ burr check --rulepack rules/printed_plate.rulepack.json .
 
 ```txt
 hole_edge_distance             -> hole center has enough distance to a free edge
+feature_edge_distance          -> feature envelope has enough material to a free edge
 minimum_wall_thickness         -> hole leaves enough printable wall
 fastener_support_wall_thickness -> boss/support leaves enough radial material
 standoff_boss_support_link     -> boss references and aligns with the hole or insert it supports

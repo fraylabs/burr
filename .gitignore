@@ -29,6 +29,8 @@ examples/build123d-heat-set-insert-pocket/*/insert-pocket.step
 examples/build123d-heat-set-insert-pocket/*/burr-design-data.json
 examples/build123d-straight-slot/*/slot.step
 examples/build123d-straight-slot/*/burr-design-data.json
+examples/build123d-feature-edge-distance/*/feature-edge-distance.step
+examples/build123d-feature-edge-distance/*/burr-design-data.json
 examples/gallery/*/*.step
 examples/gallery/*/burr-design-data.json
 *.log
