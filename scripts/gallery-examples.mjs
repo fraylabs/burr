@@ -24,6 +24,18 @@ export const galleryExamples = [
     designData: "slotted-motor-plate.design-data.json",
   },
   {
+    slug: "edge-safe-slot-mount",
+    title: "Edge-Safe Slot Mount",
+    expectation: "pass",
+    group: "functional-good",
+    dir: "examples/build123d-feature-edge-distance/good",
+    design: "examples/build123d-feature-edge-distance/good/design.py",
+    step: "examples/build123d-feature-edge-distance/good/feature-edge-distance.step",
+    preview: "edge-safe-slot-mount.png",
+    receipt: "edge-safe-slot-mount.receipt.json",
+    designData: "edge-safe-slot-mount.design-data.json",
+  },
+  {
     slug: "electronics-standoff-deck",
     title: "Electronics Standoff Deck",
     expectation: "pass",
@@ -164,6 +176,24 @@ export const galleryExamples = [
       {
         rule_id: "captured_slider:head_side_clearance_window",
         reason: "numeric_value_out_of_range",
+      },
+    ],
+  },
+  {
+    slug: "bad-slot-near-edge",
+    title: "Bad Slot Near Edge",
+    expectation: "fail",
+    group: "mistake-caught",
+    dir: "examples/build123d-feature-edge-distance/bad",
+    design: "examples/build123d-feature-edge-distance/bad/design.py",
+    step: "examples/build123d-feature-edge-distance/bad/feature-edge-distance.step",
+    preview: "bad-slot-near-edge.png",
+    receipt: "bad-slot-near-edge.receipt.json",
+    designData: "bad-slot-near-edge.design-data.json",
+    expectedFailures: [
+      {
+        rule_id: "actuator_mount:mechanical_slot_edge_distance",
+        reason: "insufficient_feature_edge_distance",
       },
     ],
   },

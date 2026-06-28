@@ -184,6 +184,13 @@ uv sync --all-packages
 npm run check:slots
 ```
 
+Run the generic feature edge-distance proof:
+
+```bash
+uv sync --all-packages
+npm run check:feature-edge-distance
+```
+
 Run the printable example gallery:
 
 ```bash
@@ -439,16 +446,17 @@ mechanical rulepacks.
 ## Rulepacks
 
 The included actuator mount rulepack checks loaded M3 clearance-hole edge
-distance, minimum wall thickness around M3 clearance holes, whether declared M3
-clearance holes exist as matching cylindrical geometry in the exported STEP, and
-whether declared straight slots, counterbores, heat-set insert pockets, and
-bearing seats exist as matching STEP cylinder/plane evidence:
+distance, whole-slot edge material, minimum wall thickness around M3 clearance
+holes, whether declared M3 clearance holes exist as matching cylindrical
+geometry in the exported STEP, and whether declared straight slots,
+counterbores, heat-set insert pockets, and bearing seats exist as matching STEP
+cylinder/plane evidence:
 
 ```json
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -561,6 +569,7 @@ Supported rule kinds include:
 
 ```txt
 hole_edge_distance       -> feature center is far enough from a free edge
+feature_edge_distance    -> feature envelope keeps material to a free edge
 minimum_wall_thickness   -> enough material remains around a declared hole
 feature_presence         -> declared feature has matching STEP evidence
 feature_count            -> enough matching declared features exist
@@ -568,11 +577,12 @@ numeric_range            -> declared measurement is inside an allowed range
 feature_pair_spacing     -> declared slots, holes, or cutouts keep a minimum metadata-based ligament
 ```
 
-`feature_count`, `numeric_range`, and `feature_pair_spacing` are useful for
-parts that are not mostly mechanical interfaces: dense plates, captured sliders,
-clearance windows, repeated relief holes or slots, and other cases where the
-source emits bounded measurements Burr can check directly. These are declared
-design-rule checks, not automatic CAD constraint solving or stress analysis.
+`feature_edge_distance`, `feature_count`, `numeric_range`, and
+`feature_pair_spacing` are useful beyond simple screw holes: slots, dense
+plates, captured sliders, clearance windows, repeated relief holes or slots,
+and other cases where the source emits bounded measurements Burr can check
+directly. These are declared design-rule checks, not automatic CAD constraint
+solving or stress analysis.
 
 ## Versioning
 
@@ -591,7 +601,7 @@ Receipts include all three:
   "schema_version": "burr.receipt.v1",
   "burr_version": "0.23.0",
   "artifact_version": "0.1.0",
-  "rulepack_version": "0.9.0",
+  "rulepack_version": "0.10.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Added `feature_edge_distance`, which checks a declared feature envelope
+  against its host part bounding box instead of only checking circular hole
+  center distance.
+- Bumped the default `actuator_mount` rulepack to `0.10.0`; mechanical straight
+  slots selected by that rulepack now need at least 3 mm of edge material around
+  the full slot envelope.
+- Added good/bad build123d and gallery proofs for a mechanical straight slot
+  that is safe when inset and fails when placed too close to a free edge.
+
 ## 0.23.0
 
 - Added `standoff_boss_support_link`, which checks that declared M3 standoff
