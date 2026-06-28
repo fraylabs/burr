@@ -5,7 +5,7 @@ Burr ships as a Rust CLI named `burr`.
 Install:
 
 ```bash
-cargo install burr --version 0.22.0
+cargo install burr --version 0.23.0
 ```
 
 ## Commands

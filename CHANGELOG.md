@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.23.0
+
 - Added `standoff_boss_support_link`, which checks that declared M3 standoff
   bosses name the hole or insert they support and align to its centerline, axis,
   and support diameter.
