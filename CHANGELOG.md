@@ -8,6 +8,9 @@
 - Bumped the default `actuator_mount` rulepack to `0.9.0`; mechanical
   `standoff_boss` features selected by that rulepack now need
   `supports_feature_id`.
+- Added boss-supported M3 mount gallery proof cases, including a passing boss
+  support example, a thin boss support-wall failure, and a missing standoff boss
+  STEP-presence failure.
 
 ## 0.22.0
 
