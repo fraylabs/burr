@@ -47,6 +47,10 @@ burr-gallery-v0.26.0/
     slotted-motor-plate.png
     slotted-motor-plate.receipt.json
     slotted-motor-plate.design-data.json
+  edge-safe-bearing-seat/
+    edge-safe-bearing-seat.png
+    edge-safe-bearing-seat.receipt.json
+    edge-safe-bearing-seat.design-data.json
   electronics-standoff-deck/
     electronics-standoff-deck.png
     electronics-standoff-deck.receipt.json
@@ -59,6 +63,10 @@ burr-gallery-v0.26.0/
     bad-bearing-seat-missing-shoulder.png
     bad-bearing-seat-missing-shoulder.receipt.json
     bad-bearing-seat-missing-shoulder.design-data.json
+  bad-bearing-seat-near-edge/
+    bad-bearing-seat-near-edge.png
+    bad-bearing-seat-near-edge.receipt.json
+    bad-bearing-seat-near-edge.design-data.json
   bad-counterbore-missing-recess/
     bad-counterbore-missing-recess.png
     bad-counterbore-missing-recess.receipt.json

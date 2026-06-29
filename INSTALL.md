@@ -82,6 +82,7 @@ npm run check:build123d
 npm run check:ocp
 npm run check:mixed-intent
 npm run check:bearing-seat
+npm run check:bearing-seat-edge-distance
 npm run check:counterbore
 npm run check:insert-pocket
 npm run check:slots

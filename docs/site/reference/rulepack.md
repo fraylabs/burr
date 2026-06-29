@@ -10,7 +10,7 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "artifact_type": "actuator_mount",
   "rules": [
     {
@@ -43,6 +43,17 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
       "min_wall_to_edge_mm": 3.0
     },
     {
+      "id": "bearing_seat_edge_distance",
+      "kind": "feature_edge_distance",
+      "applies_to": {
+        "kind": "bearing_seat",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["loaded_bearing_support", "shaft_support"]
+      },
+      "diameter_field": "seat_diameter_mm",
+      "min_wall_to_edge_mm": 3.0
+    },
+    {
       "id": "m3_insert_pocket_back_wall_thickness",
       "kind": "blind_pocket_back_wall_thickness",
       "applies_to": {
@@ -60,6 +71,9 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
 Counterbore rules should override `diameter_field` to
 `counterbore_diameter_mm` so Burr checks the larger screw-head recess, not only
 the smaller bore.
+Bearing-seat edge rules should override `diameter_field` to
+`seat_diameter_mm` so Burr checks the bearing support envelope, not a smaller
+shaft or pilot hole.
 
 ## Selection
 

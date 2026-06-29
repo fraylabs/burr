@@ -60,6 +60,18 @@ export const galleryExamples = [
     designData: "back-wall-safe-insert-pocket.design-data.json",
   },
   {
+    slug: "edge-safe-bearing-seat",
+    title: "Edge-Safe Bearing Seat",
+    expectation: "pass",
+    group: "functional-good",
+    dir: "examples/build123d-bearing-seat-edge-distance/good",
+    design: "examples/build123d-bearing-seat-edge-distance/good/design.py",
+    step: "examples/build123d-bearing-seat-edge-distance/good/bearing-seat-edge.step",
+    preview: "edge-safe-bearing-seat.png",
+    receipt: "edge-safe-bearing-seat.receipt.json",
+    designData: "edge-safe-bearing-seat.design-data.json",
+  },
+  {
     slug: "electronics-standoff-deck",
     title: "Electronics Standoff Deck",
     expectation: "pass",
@@ -254,6 +266,24 @@ export const galleryExamples = [
       {
         rule_id: "actuator_mount:m3_insert_pocket_back_wall_thickness",
         reason: "insufficient_blind_pocket_back_wall",
+      },
+    ],
+  },
+  {
+    slug: "bad-bearing-seat-near-edge",
+    title: "Bad Bearing Seat Near Edge",
+    expectation: "fail",
+    group: "mistake-caught",
+    dir: "examples/build123d-bearing-seat-edge-distance/bad",
+    design: "examples/build123d-bearing-seat-edge-distance/bad/design.py",
+    step: "examples/build123d-bearing-seat-edge-distance/bad/bearing-seat-edge.step",
+    preview: "bad-bearing-seat-near-edge.png",
+    receipt: "bad-bearing-seat-near-edge.receipt.json",
+    designData: "bad-bearing-seat-near-edge.design-data.json",
+    expectedFailures: [
+      {
+        rule_id: "actuator_mount:bearing_seat_edge_distance",
+        reason: "insufficient_feature_edge_distance",
       },
     ],
   },

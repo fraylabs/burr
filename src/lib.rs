@@ -5410,7 +5410,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.12.0")
+            Some("0.13.0")
         );
     }
 
@@ -6006,7 +6006,7 @@ mod tests {
         let rulepack = json!({
             "schema_version": "burr.rulepack.v1",
             "id": "actuator_mount",
-            "version": "0.12.0",
+            "version": "0.13.0",
             "artifact_type": "actuator_mount",
             "rules": [
                 {

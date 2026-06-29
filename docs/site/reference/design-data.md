@@ -102,3 +102,9 @@ For `kind: "heat_set_insert_pocket"`, `part` should reference a part with
 `bbox_mm`, `pocket_center_mm` locates the blind pocket cylinder, and
 `bottom_center_mm` locates the pocket bottom. Back-wall rules measure from that
 bottom point to the host part bbox face in the pocket-bottom direction.
+
+For `kind: "bearing_seat"`, `part` should reference a part with `bbox_mm`,
+`center_mm` and `axis` locate the seat, and `seat_diameter_mm` describes the
+bearing support envelope. Edge-material rules use that diameter so a bearing
+seat can fail when the seat is too close to a free edge even if the STEP seat
+geometry exists.

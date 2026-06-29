@@ -56,6 +56,9 @@ The helper creates CAD geometry and records design intent into
 
 Counterbore helpers record both the smaller bore and the larger head recess, so
 Burr can check STEP presence and edge material around the recess itself.
+Bearing-seat helpers record the seat diameter and shoulder, so Burr can check
+that the bearing seat exists in STEP and still has enough host material around
+the loaded support envelope.
 
 ## CLI Loop
 
