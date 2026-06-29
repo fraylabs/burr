@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.27.0
+
 - Added default actuator rulepack coverage for loaded bearing-seat edge
   material, using `seat_diameter_mm` to check the bearing seat envelope against
   free edges.
