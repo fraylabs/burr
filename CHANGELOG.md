@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.28.0
+
 - Added default actuator rulepack coverage for M3 standoff boss edge material
   and M3 heat-set insert pocket edge material, using explicit boss and pocket
   envelope fields instead of the default hole diameter fields.

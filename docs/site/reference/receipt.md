@@ -9,7 +9,7 @@ The receipt is the final trust signal. Preview images are visual context only.
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.27.0",
+  "burr_version": "0.28.0",
   "artifact_id": "actuator-mount",
   "artifact_type": "actuator_mount",
   "artifact_version": "0.1.0",
