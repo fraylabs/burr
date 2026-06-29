@@ -5410,7 +5410,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.13.0")
+            Some("0.14.0")
         );
     }
 
@@ -6006,7 +6006,7 @@ mod tests {
         let rulepack = json!({
             "schema_version": "burr.rulepack.v1",
             "id": "actuator_mount",
-            "version": "0.13.0",
+            "version": "0.14.0",
             "artifact_type": "actuator_mount",
             "rules": [
                 {
@@ -7554,6 +7554,7 @@ mod tests {
                     "boss_diameter_mm": 8.0,
                     "boss_height_mm": 5.0,
                     "center_mm": [0.0, 0.0, 6.5],
+                    "boss_center_mm": [0.0, 0.0, 6.5],
                     "axis": [0.0, 0.0, 1.0],
                     "role": "pcb_standoff",
                     "supports_feature_id": "m3_bossed_mount"

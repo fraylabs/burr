@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Added default actuator rulepack coverage for M3 standoff boss edge material
+  and M3 heat-set insert pocket edge material, using explicit boss and pocket
+  envelope fields instead of the default hole diameter fields.
+- Bumped the default `actuator_mount` rulepack to `0.14.0`; selected M3
+  standoff bosses and selected mechanical M3 insert pockets now need at least
+  3 mm of edge material around the declared boss or pocket envelope.
+- Added Mistake Library V1 gallery proofs for tight captured-slider clearance,
+  missing and shallow capture lips, excessive cosmetic relief holes, thin
+  hole-to-slot ligaments, insert pockets near a free edge, and standoff bosses
+  near a free edge.
+
 ## 0.27.0
 
 - Added default actuator rulepack coverage for loaded bearing-seat edge
