@@ -54,6 +54,16 @@ checked, but the receipts are the proof.
   spacing envelope and enough ligament to pass.
 - `t-slot-linear-slider`: two-part captured slider with declared clearance
   windows and capture lips.
+- `practical-insert-fit-good`: M3 insert pocket with a declared fit clearance
+  and depth margin.
+- `practical-driver-access-good`: service screw with a declared driver-access
+  envelope.
+- `practical-mount-pattern-good`: four-hole mount pattern with declared pitch
+  consistency.
+- `practical-snap-hook-good`: printable snap-hook pair with declared thickness
+  and engagement.
+- `practical-boss-support-good`: raised M3 boss with declared ratio and support
+  ribs.
 - actuator repair proof: before/after actuator mount receipts showing bad CAD,
   ordered repair guidance, and the fixed CAD pass.
 - `dense-random-hole-plate-too-few-reliefs`: negative fixture for feature-count
@@ -72,6 +82,16 @@ checked, but the receipts are the proof.
   relief inventories can be bounded without treating every hole as mechanical.
 - `hole-slot-thin-ligament`: negative fixture proving declared hole-to-slot
   ligaments can be checked from metadata.
+- `bad-practical-insert-fit-tight`: negative fixture proving a visible insert
+  pocket still needs a declared fit window.
+- `bad-practical-driver-access-blocked`: negative fixture proving a screw hole
+  also needs tool access.
+- `bad-practical-mount-pattern-shifted`: negative fixture proving a four-hole
+  pattern can fail by declared pitch error even when all holes exist.
+- `bad-practical-snap-hook-thin`: negative fixture proving printable retention
+  tabs need enough declared thickness.
+- `bad-practical-boss-support-unsupported`: negative fixture proving a tall boss
+  needs declared support ribs and a sane height-to-diameter ratio.
 - `bad-slot-near-edge`: negative fixture proving Burr checks the whole slot
   envelope, not only a point at the slot center.
 - `bad-counterbore-near-edge`: negative fixture proving Burr checks the larger

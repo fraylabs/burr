@@ -140,6 +140,41 @@
       "content_type": "application/json"
     },
     {
+      "source_path": "rules/hardware_fit.rulepack.json",
+      "bundle_path": "reference/rules/hardware_fit.rulepack.json",
+      "title": "Hardware Fit Rulepack",
+      "kind": "rulepack",
+      "content_type": "application/json"
+    },
+    {
+      "source_path": "rules/tool_access.rulepack.json",
+      "bundle_path": "reference/rules/tool_access.rulepack.json",
+      "title": "Tool Access Rulepack",
+      "kind": "rulepack",
+      "content_type": "application/json"
+    },
+    {
+      "source_path": "rules/mount_pattern.rulepack.json",
+      "bundle_path": "reference/rules/mount_pattern.rulepack.json",
+      "title": "Mount Pattern Rulepack",
+      "kind": "rulepack",
+      "content_type": "application/json"
+    },
+    {
+      "source_path": "rules/printable_retention.rulepack.json",
+      "bundle_path": "reference/rules/printable_retention.rulepack.json",
+      "title": "Printable Retention Rulepack",
+      "kind": "rulepack",
+      "content_type": "application/json"
+    },
+    {
+      "source_path": "rules/boss_support.rulepack.json",
+      "bundle_path": "reference/rules/boss_support.rulepack.json",
+      "title": "Boss Support Rulepack",
+      "kind": "rulepack",
+      "content_type": "application/json"
+    },
+    {
       "source_path": "LICENSE",
       "bundle_path": "reference/LICENSE",
       "title": "MIT License",

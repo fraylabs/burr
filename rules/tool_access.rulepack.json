@@ -1,0 +1,34 @@
+{
+  "schema_version": "burr.rulepack.v1",
+  "id": "tool_access",
+  "version": "0.1.0",
+  "artifact_type": "tool_access_mount",
+  "process_kind": "FDM",
+  "rules": [
+    {
+      "id": "driver_access_envelope_inventory",
+      "kind": "feature_count",
+      "description": "A tool-access mount must declare the access envelope being checked.",
+      "applies_to": {
+        "kind": "tool_access_envelope",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["assembly_access"]
+      },
+      "min_count": 1
+    },
+    {
+      "id": "m3_driver_access_diameter",
+      "kind": "numeric_range",
+      "description": "M3 socket screws need a declared driver-access envelope, not only a screw hole.",
+      "path": "measurements.driver_access_diameter_mm",
+      "min": 6.0
+    },
+    {
+      "id": "m3_driver_side_clearance",
+      "kind": "numeric_range",
+      "description": "A screw close to a wall needs enough declared side clearance for the tool body.",
+      "path": "measurements.driver_side_clearance_mm",
+      "min": 1.5
+    }
+  ]
+}

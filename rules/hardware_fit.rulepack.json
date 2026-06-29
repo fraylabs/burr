@@ -1,0 +1,37 @@
+{
+  "schema_version": "burr.rulepack.v1",
+  "id": "hardware_fit",
+  "version": "0.1.0",
+  "artifact_type": "hardware_fit_plate",
+  "process_kind": "FDM",
+  "rules": [
+    {
+      "id": "m3_insert_pocket_inventory",
+      "kind": "feature_count",
+      "description": "A hardware-fit plate must declare the insert pocket being checked.",
+      "applies_to": {
+        "kind": "heat_set_insert_pocket",
+        "insert": "M3x5.7",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["threaded_mount"]
+      },
+      "min_count": 1
+    },
+    {
+      "id": "m3_insert_pocket_radial_clearance",
+      "kind": "numeric_range",
+      "description": "M3 heat-set insert pockets need a declared fit clearance window, not just a visible hole.",
+      "path": "measurements.insert_pocket_radial_clearance_mm",
+      "min": 0.1,
+      "max": 0.25
+    },
+    {
+      "id": "m3_insert_pocket_depth_margin",
+      "kind": "numeric_range",
+      "description": "Blind insert pockets need enough declared depth margin for the insert to seat before the tool bottoms out.",
+      "path": "measurements.insert_pocket_depth_margin_mm",
+      "min": 0.4,
+      "max": 1.5
+    }
+  ]
+}

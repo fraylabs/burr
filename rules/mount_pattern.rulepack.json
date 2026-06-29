@@ -1,0 +1,29 @@
+{
+  "schema_version": "burr.rulepack.v1",
+  "id": "mount_pattern",
+  "version": "0.1.0",
+  "artifact_type": "mount_pattern_plate",
+  "process_kind": "FDM",
+  "rules": [
+    {
+      "id": "m3_mount_pattern_inventory",
+      "kind": "feature_count",
+      "description": "A declared four-hole mount pattern should have all four holes.",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["pattern_mount"]
+      },
+      "min_count": 4,
+      "max_count": 4
+    },
+    {
+      "id": "m3_mount_pattern_max_pitch_error",
+      "kind": "numeric_range",
+      "description": "Mount pattern holes need declared center consistency within the chosen tolerance.",
+      "path": "measurements.mount_pattern_max_pitch_error_mm",
+      "max": 0.25
+    }
+  ]
+}
