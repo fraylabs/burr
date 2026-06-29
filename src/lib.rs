@@ -221,6 +221,7 @@ pub fn lint_design_data(
                 Some("hole_edge_distance")
                     | Some("minimum_wall_thickness")
                     | Some("fastener_support_wall_thickness")
+                    | Some("blind_pocket_back_wall_thickness")
                     | Some("standoff_boss_support_link")
                     | Some("feature_presence")
                     | Some("feature_count")
@@ -283,6 +284,11 @@ pub fn lint_design_data(
                     Some("fastener_support_wall_thickness") => {
                         checks.push(check_fastener_support_wall_thickness(
                             rulepack, rule, feature,
+                        ));
+                    }
+                    Some("blind_pocket_back_wall_thickness") => {
+                        checks.push(check_blind_pocket_back_wall_thickness(
+                            manifest, rulepack, rule, feature,
                         ));
                     }
                     Some("standoff_boss_support_link") => {
@@ -647,6 +653,35 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
             );
             Some(lines)
         }
+        Some("insufficient_blind_pocket_back_wall") => {
+            let feature_label = string_field(check, "feature_id")
+                .map(|id| format!(" {id}"))
+                .unwrap_or_default();
+            let measured = check
+                .pointer("/measured/back_wall_thickness_mm")
+                .and_then(Value::as_f64);
+            let required = check
+                .pointer("/required/min_back_wall_thickness_mm")
+                .and_then(Value::as_f64);
+            let short_by = number_field(check, "margin_mm").map(|value| round(value.abs()));
+            let mut lines = vec![format!(
+                "Blind pocket{feature_label} leaves too little back wall."
+            )];
+            if let Some(value) = measured {
+                lines.push(format!("Measured back wall: {} mm", trim_float(value)));
+            }
+            if let Some(value) = required {
+                lines.push(format!("Required back wall: {} mm", trim_float(value)));
+            }
+            if let Some(value) = short_by {
+                lines.push(format!("Short by: {} mm", trim_float(value)));
+            }
+            lines.push(
+                "Try making the host deeper, reducing pocket depth, or moving the pocket shallower."
+                    .to_string(),
+            );
+            Some(lines)
+        }
         Some("standoff_boss_support_mismatch") => {
             let feature_label = string_field(check, "feature_id")
                 .map(|id| format!(" {id}"))
@@ -850,6 +885,7 @@ fn explanation_category(reason: &str) -> &'static str {
         | "insufficient_feature_pair_spacing"
         | "insufficient_wall_thickness"
         | "insufficient_fastener_support_wall"
+        | "insufficient_blind_pocket_back_wall"
         | "standoff_boss_support_mismatch"
         | "missing_edge_measurement"
         | "missing_hole_diameter"
@@ -861,10 +897,13 @@ fn explanation_category(reason: &str) -> &'static str {
         | "missing_supported_feature_diameter"
         | "missing_fastener_support_inner_diameter"
         | "missing_fastener_support_diameter"
+        | "missing_blind_pocket_back_wall_geometry"
         | "missing_feature_center"
         | "missing_feature_axis"
         | "missing_feature_edge_geometry"
         | "missing_feature_part_bbox"
+        | "unsupported_blind_pocket_axis"
+        | "invalid_rule_min_back_wall_thickness"
         | "invalid_feature_edge_rule_clearance"
         | "invalid_pair_spacing_rule_clearance"
         | "invalid_counterbore_dimensions" => "unsafe dimension",
@@ -914,6 +953,7 @@ fn explanation_rank_for_reason(reason: &str) -> u8 {
         | "insufficient_feature_pair_spacing"
         | "insufficient_wall_thickness"
         | "insufficient_fastener_support_wall"
+        | "insufficient_blind_pocket_back_wall"
         | "standoff_boss_support_mismatch"
         | "missing_edge_measurement"
         | "missing_hole_diameter"
@@ -925,10 +965,13 @@ fn explanation_rank_for_reason(reason: &str) -> u8 {
         | "missing_supported_feature_diameter"
         | "missing_fastener_support_inner_diameter"
         | "missing_fastener_support_diameter"
+        | "missing_blind_pocket_back_wall_geometry"
         | "missing_feature_center"
         | "missing_feature_axis"
         | "missing_feature_edge_geometry"
         | "missing_feature_part_bbox"
+        | "unsupported_blind_pocket_axis"
+        | "invalid_rule_min_back_wall_thickness"
         | "invalid_feature_edge_rule_clearance"
         | "invalid_pair_spacing_rule_clearance"
         | "invalid_counterbore_dimensions" => 2,
@@ -972,6 +1015,9 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
         "insufficient_fastener_support_wall" => {
             "the fastener support or boss leaves too little radial material around the hole."
                 .to_string()
+        }
+        "insufficient_blind_pocket_back_wall" => {
+            "the blind insert pocket leaves too little material behind its bottom.".to_string()
         }
         "standoff_boss_support_mismatch" => {
             "the standoff boss is not aligned with the hole or insert it claims to support."
@@ -1026,6 +1072,16 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
         }
         "missing_fastener_support_diameter" => {
             "the feature is missing the declared support or boss outer diameter.".to_string()
+        }
+        "missing_blind_pocket_back_wall_geometry" => {
+            "the pocket is missing part, axis, pocket_center_mm, bottom_center_mm, or bbox metadata."
+                .to_string()
+        }
+        "unsupported_blind_pocket_axis" => {
+            "the blind pocket bottom direction is not aligned to a supported bbox axis.".to_string()
+        }
+        "invalid_rule_min_back_wall_thickness" => {
+            "the rule is missing a valid min_back_wall_thickness_mm.".to_string()
         }
         "missing_feature_center" => "the feature is missing center_mm.".to_string(),
         "missing_feature_axis" => "the feature is missing axis.".to_string(),
@@ -1141,6 +1197,21 @@ fn explanation_evidence(check: &Value, reason: &str) -> Vec<String> {
                 check,
                 "/required/wall_thickness_mm",
                 "Required support wall",
+            );
+            push_margin(&mut lines, check);
+        }
+        "insufficient_blind_pocket_back_wall" => {
+            push_measure(
+                &mut lines,
+                check,
+                "/measured/back_wall_thickness_mm",
+                "Measured back wall",
+            );
+            push_measure(
+                &mut lines,
+                check,
+                "/required/min_back_wall_thickness_mm",
+                "Required back wall",
             );
             push_margin(&mut lines, check);
         }
@@ -1303,6 +1374,9 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
         "insufficient_fastener_support_wall" => {
             "a boss or local support with too little radial material can split around the fastener or insert."
         }
+        "insufficient_blind_pocket_back_wall" => {
+            "too little material behind a blind insert pocket can crack, bulge, or break through during insert installation."
+        }
         "standoff_boss_support_mismatch" => {
             "a boss only supports a fastener if its centerline and axis line up with the fastener feature."
         }
@@ -1343,6 +1417,7 @@ fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
         "insufficient_feature_pair_spacing" => "move the features farther apart, reduce their diameters, or remove one feature.",
         "insufficient_wall_thickness" => "move the hole inward, reduce the hole size, or increase the local wall.",
         "insufficient_fastener_support_wall" => "increase support_diameter_mm or boss_diameter_mm, reduce the inner hole/pocket size, or change the support intent.",
+        "insufficient_blind_pocket_back_wall" => "make the host deeper, reduce pocket_depth_mm, or move the pocket shallower.",
         "standoff_boss_support_mismatch" => "align the standoff boss center_mm, boss_center_mm, and top_center_mm to the supported feature center, or correct supports_feature_id.",
         "missing_standoff_support_link" => "set supports_feature_id on the standoff_boss feature.",
         "missing_supported_feature" => "declare the supported hole or insert feature, or correct supports_feature_id.",
@@ -1808,6 +1883,178 @@ fn check_fastener_support_wall_thickness(rulepack: &Value, rule: &Value, feature
             "Fastener support wall thickness passes rule.".to_string()
         } else {
             format!("Fastener support wall thickness is short by {} mm.", trim_float(round(margin.abs())))
+        }
+    })
+}
+
+fn check_blind_pocket_back_wall_thickness(
+    manifest: &Value,
+    rulepack: &Value,
+    rule: &Value,
+    feature: &Value,
+) -> Value {
+    let full_rule_id = format!(
+        "{}:{}",
+        string_field(rulepack, "id").unwrap_or("<missing>"),
+        string_field(rule, "id").unwrap_or("<missing>")
+    );
+    let feature_id = feature.get("id").cloned().unwrap_or(Value::Null);
+
+    let required_back_wall = number_field(rule, "min_back_wall_thickness_mm");
+    if !required_back_wall.is_some_and(|value| value > 0.0) {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "invalid_rule_min_back_wall_thickness",
+            "feature_id": feature_id,
+            "message": "Rule min_back_wall_thickness_mm must be a positive number."
+        });
+    }
+    let required_back_wall = required_back_wall.unwrap();
+
+    let part = string_field(feature, "part").and_then(|part_id| find_part(manifest, part_id));
+    let bbox_min = part
+        .and_then(|part| part.pointer("/bbox_mm/min"))
+        .and_then(number_array)
+        .and_then(Vec3::from_values);
+    let bbox_max = part
+        .and_then(|part| part.pointer("/bbox_mm/max"))
+        .and_then(number_array)
+        .and_then(Vec3::from_values);
+    let axis = feature
+        .get("axis")
+        .and_then(number_array)
+        .and_then(Vec3::from_values)
+        .and_then(Vec3::normalized);
+    let pocket_center = feature
+        .get("pocket_center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values);
+    let bottom_center = feature
+        .get("bottom_center_mm")
+        .and_then(number_array)
+        .and_then(Vec3::from_values);
+
+    let (Some(bbox_min), Some(bbox_max), Some(axis), Some(pocket_center), Some(bottom_center)) =
+        (bbox_min, bbox_max, axis, pocket_center, bottom_center)
+    else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_blind_pocket_back_wall_geometry",
+            "feature_id": feature_id,
+            "measured": {
+                "part": feature.get("part").cloned().unwrap_or(Value::Null),
+                "has_bbox": part.is_some(),
+                "has_axis": feature.get("axis").is_some(),
+                "has_pocket_center_mm": feature.get("pocket_center_mm").is_some(),
+                "has_bottom_center_mm": feature.get("bottom_center_mm").is_some()
+            },
+            "required": {
+                "min_back_wall_thickness_mm": round(required_back_wall)
+            },
+            "message": "Blind-pocket back-wall checks require feature.part, parts[].bbox_mm, axis, pocket_center_mm, and bottom_center_mm."
+        });
+    };
+
+    let Some(bottom_direction) = bottom_center.sub(pocket_center).normalized() else {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "missing_blind_pocket_back_wall_geometry",
+            "feature_id": feature_id,
+            "measured": {
+                "pocket_center_mm": pocket_center.to_json(),
+                "bottom_center_mm": bottom_center.to_json()
+            },
+            "required": {
+                "min_back_wall_thickness_mm": round(required_back_wall)
+            },
+            "message": "Blind pocket bottom_center_mm must be offset from pocket_center_mm."
+        });
+    };
+
+    let axis_dot = axis.dot(bottom_direction).abs();
+    let components = [
+        (
+            "x",
+            bottom_direction.x,
+            bottom_center.x,
+            bbox_min.x,
+            bbox_max.x,
+        ),
+        (
+            "y",
+            bottom_direction.y,
+            bottom_center.y,
+            bbox_min.y,
+            bbox_max.y,
+        ),
+        (
+            "z",
+            bottom_direction.z,
+            bottom_center.z,
+            bbox_min.z,
+            bbox_max.z,
+        ),
+    ];
+    let Some((axis_name, direction, bottom_position, bbox_low, bbox_high)) = components
+        .into_iter()
+        .max_by(|left, right| left.1.abs().total_cmp(&right.1.abs()))
+    else {
+        unreachable!();
+    };
+    if direction.abs() < 0.99 || axis_dot < 0.99 {
+        return json!({
+            "rule_id": full_rule_id,
+            "status": "fail",
+            "reason": "unsupported_blind_pocket_axis",
+            "feature_id": feature_id,
+            "measured": {
+                "axis": axis.to_json(),
+                "bottom_direction": bottom_direction.to_json(),
+                "axis_dot": round(axis_dot)
+            },
+            "required": {
+                "axis_dot_min": 0.99,
+                "bottom_direction_axis_aligned_min": 0.99
+            },
+            "message": "Blind-pocket back-wall checks currently require an axis-aligned pocket bottom direction."
+        });
+    }
+
+    let (side, back_wall_thickness) = if direction >= 0.0 {
+        ("max", bbox_high - bottom_position)
+    } else {
+        ("min", bottom_position - bbox_low)
+    };
+    let margin = back_wall_thickness - required_back_wall;
+    let pass = margin >= 0.0;
+
+    json!({
+        "rule_id": full_rule_id,
+        "status": if pass { "pass" } else { "fail" },
+        "reason": if pass { "ok" } else { "insufficient_blind_pocket_back_wall" },
+        "feature_id": feature_id,
+        "measured": {
+            "pocket_center_mm": pocket_center.to_json(),
+            "bottom_center_mm": bottom_center.to_json(),
+            "bottom_direction": bottom_direction.to_json(),
+            "back_wall_thickness_mm": round(back_wall_thickness),
+            "back_face": {
+                "axis": axis_name,
+                "side": side
+            },
+            "source": "parts[feature.part].bbox_mm minus bottom_center_mm"
+        },
+        "required": {
+            "min_back_wall_thickness_mm": round(required_back_wall)
+        },
+        "margin_mm": round(margin),
+        "message": if pass {
+            "Blind pocket back-wall thickness passes rule.".to_string()
+        } else {
+            format!("Blind pocket back-wall thickness is short by {} mm.", trim_float(round(margin.abs())))
         }
     })
 }
@@ -5163,7 +5410,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.11.0")
+            Some("0.12.0")
         );
     }
 
@@ -5759,7 +6006,7 @@ mod tests {
         let rulepack = json!({
             "schema_version": "burr.rulepack.v1",
             "id": "actuator_mount",
-            "version": "0.11.0",
+            "version": "0.12.0",
             "artifact_type": "actuator_mount",
             "rules": [
                 {
@@ -6003,6 +6250,117 @@ mod tests {
             .iter()
             .flatten()
             .any(|line| line.contains("Measured support wall: 1.3 mm")));
+    }
+
+    #[test]
+    fn blind_pocket_back_wall_thickness_checks_remaining_host_material() {
+        let temp = tempfile::tempdir().unwrap();
+        let source_path = temp.path().join("source.py");
+        let step_path = temp.path().join("part.step");
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(&step_path, "ISO-10303-21;\nEND-ISO-10303-21;\n").unwrap();
+
+        let manifest = json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "insert-pocket-back-wall-fixture",
+            "artifact_version": "0.1.0",
+            "artifact_type": "insert_pocket_back_wall_fixture",
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": sha256_file(&source_path).unwrap()
+            },
+            "artifacts": [
+                {
+                    "kind": "step",
+                    "path": "part.step",
+                    "sha256": sha256_file(&step_path).unwrap()
+                }
+            ],
+            "parts": [
+                {
+                    "id": "good_housing",
+                    "bbox_mm": {
+                        "min": [-4.35, -12.0, -8.0],
+                        "max": [4.35, 12.0, 8.0]
+                    }
+                },
+                {
+                    "id": "bad_housing",
+                    "bbox_mm": {
+                        "min": [-3.35, -12.0, -8.0],
+                        "max": [3.35, 12.0, 8.0]
+                    }
+                }
+            ],
+            "features": [
+                {
+                    "id": "good_insert_pocket",
+                    "part": "good_housing",
+                    "kind": "heat_set_insert_pocket",
+                    "intent": "mechanical_interface",
+                    "role": "threaded_mount",
+                    "insert": "M3x5.7",
+                    "pocket_center_mm": [-1.5, 0.0, 0.0],
+                    "bottom_center_mm": [1.35, 0.0, 0.0],
+                    "axis": [1.0, 0.0, 0.0]
+                },
+                {
+                    "id": "bad_insert_pocket",
+                    "part": "bad_housing",
+                    "kind": "heat_set_insert_pocket",
+                    "intent": "mechanical_interface",
+                    "role": "threaded_mount",
+                    "insert": "M3x5.7",
+                    "pocket_center_mm": [-0.5, 0.0, 0.0],
+                    "bottom_center_mm": [2.35, 0.0, 0.0],
+                    "axis": [1.0, 0.0, 0.0]
+                }
+            ]
+        });
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "insert_pocket_back_wall_fixture",
+            "version": "0.1.0",
+            "artifact_type": "insert_pocket_back_wall_fixture",
+            "rules": [
+                {
+                    "id": "insert_back_wall",
+                    "kind": "blind_pocket_back_wall_thickness",
+                    "applies_to": {
+                        "kind": "heat_set_insert_pocket",
+                        "intent_any": ["mechanical_interface"],
+                        "role_any": ["threaded_mount"]
+                    },
+                    "min_back_wall_thickness_mm": 2.0
+                }
+            ]
+        });
+
+        let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&receipt, "status"), Some("fail"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "feature_id") == Some("good_insert_pocket")
+                && string_field(check, "reason") == Some("ok")
+                && check
+                    .pointer("/measured/back_wall_thickness_mm")
+                    .and_then(Value::as_f64)
+                    == Some(3.0)
+                && check.pointer("/margin_mm").and_then(Value::as_f64) == Some(1.0)
+        }));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "feature_id") == Some("bad_insert_pocket")
+                && string_field(check, "reason") == Some("insufficient_blind_pocket_back_wall")
+                && check
+                    .pointer("/measured/back_wall_thickness_mm")
+                    .and_then(Value::as_f64)
+                    == Some(1.0)
+                && check.pointer("/margin_mm").and_then(Value::as_f64) == Some(-1.0)
+        }));
+        assert!(format_receipt_diagnostics(&receipt)
+            .iter()
+            .flatten()
+            .any(|line| line.contains("Measured back wall: 1 mm")));
     }
 
     #[test]

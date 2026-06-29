@@ -1,7 +1,7 @@
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "artifact_type": "actuator_mount",
   "process_kind": "FDM",
   "rules": [
@@ -73,6 +73,18 @@
         "role_any": ["bossed_insert", "fastener_support"]
       },
       "min_wall_thickness_mm": 2.0
+    },
+    {
+      "id": "m3_insert_pocket_back_wall_thickness",
+      "kind": "blind_pocket_back_wall_thickness",
+      "description": "Mechanical M3 heat-set insert pockets need enough material behind the blind pocket bottom.",
+      "applies_to": {
+        "kind": "heat_set_insert_pocket",
+        "insert": "M3x5.7",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["threaded_mount", "pcb_standoff", "bossed_insert", "fastener_support"]
+      },
+      "min_back_wall_thickness_mm": 2.0
     },
     {
       "id": "m3_clearance_hole_step_presence",

@@ -48,6 +48,18 @@ export const galleryExamples = [
     designData: "edge-safe-counterbore-mount.design-data.json",
   },
   {
+    slug: "back-wall-safe-insert-pocket",
+    title: "Back-Wall Safe Insert Pocket",
+    expectation: "pass",
+    group: "functional-good",
+    dir: "examples/build123d-insert-pocket-back-wall/good",
+    design: "examples/build123d-insert-pocket-back-wall/good/design.py",
+    step: "examples/build123d-insert-pocket-back-wall/good/insert-pocket-back-wall.step",
+    preview: "back-wall-safe-insert-pocket.png",
+    receipt: "back-wall-safe-insert-pocket.receipt.json",
+    designData: "back-wall-safe-insert-pocket.design-data.json",
+  },
+  {
     slug: "electronics-standoff-deck",
     title: "Electronics Standoff Deck",
     expectation: "pass",
@@ -224,6 +236,24 @@ export const galleryExamples = [
       {
         rule_id: "actuator_mount:counterbore_edge_distance",
         reason: "insufficient_feature_edge_distance",
+      },
+    ],
+  },
+  {
+    slug: "bad-insert-pocket-thin-back-wall",
+    title: "Bad Insert Pocket Thin Back Wall",
+    expectation: "fail",
+    group: "mistake-caught",
+    dir: "examples/build123d-insert-pocket-back-wall/bad",
+    design: "examples/build123d-insert-pocket-back-wall/bad/design.py",
+    step: "examples/build123d-insert-pocket-back-wall/bad/insert-pocket-back-wall.step",
+    preview: "bad-insert-pocket-thin-back-wall.png",
+    receipt: "bad-insert-pocket-thin-back-wall.receipt.json",
+    designData: "bad-insert-pocket-thin-back-wall.design-data.json",
+    expectedFailures: [
+      {
+        rule_id: "actuator_mount:m3_insert_pocket_back_wall_thickness",
+        reason: "insufficient_blind_pocket_back_wall",
       },
     ],
   },

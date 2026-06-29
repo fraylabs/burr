@@ -10,7 +10,7 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "artifact_type": "actuator_mount",
   "rules": [
     {
@@ -41,6 +41,16 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
       },
       "diameter_field": "counterbore_diameter_mm",
       "min_wall_to_edge_mm": 3.0
+    },
+    {
+      "id": "m3_insert_pocket_back_wall_thickness",
+      "kind": "blind_pocket_back_wall_thickness",
+      "applies_to": {
+        "kind": "heat_set_insert_pocket",
+        "insert": "M3x5.7",
+        "intent_any": ["mechanical_interface"]
+      },
+      "min_back_wall_thickness_mm": 2.0
     }
   ]
 }
@@ -75,6 +85,7 @@ hole_edge_distance             -> hole center has enough distance to a free edge
 feature_edge_distance          -> feature envelope has enough material to a free edge
 minimum_wall_thickness         -> hole leaves enough printable wall
 fastener_support_wall_thickness -> boss/support leaves enough radial material
+blind_pocket_back_wall_thickness -> blind pocket leaves enough material behind its bottom
 standoff_boss_support_link     -> boss references and aligns with the hole or insert it supports
 feature_presence               -> declared feature exists in the exported STEP
 feature_count                  -> declared feature inventory count is in range

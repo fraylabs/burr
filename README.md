@@ -454,16 +454,17 @@ mechanical rulepacks.
 
 The included actuator mount rulepack checks loaded M3 clearance-hole edge
 distance, whole-slot edge material, counterbore head-recess edge material,
-minimum wall thickness around M3 clearance holes, whether declared M3 clearance
-holes exist as matching cylindrical geometry in the exported STEP, and whether
-declared straight slots, counterbores, heat-set insert pockets, and bearing
-seats exist as matching STEP cylinder/plane evidence:
+blind insert-pocket back-wall material, minimum wall thickness around M3
+clearance holes, whether declared M3 clearance holes exist as matching
+cylindrical geometry in the exported STEP, and whether declared straight slots,
+counterbores, heat-set insert pockets, and bearing seats exist as matching STEP
+cylinder/plane evidence:
 
 ```json
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -495,6 +496,17 @@ seats exist as matching STEP cylinder/plane evidence:
       },
       "diameter_field": "counterbore_diameter_mm",
       "min_wall_to_edge_mm": 3.0
+    },
+    {
+      "id": "m3_insert_pocket_back_wall_thickness",
+      "kind": "blind_pocket_back_wall_thickness",
+      "applies_to": {
+        "kind": "heat_set_insert_pocket",
+        "insert": "M3x5.7",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["threaded_mount", "pcb_standoff", "bossed_insert"]
+      },
+      "min_back_wall_thickness_mm": 2.0
     },
     {
       "id": "m3_clearance_hole_step_presence",
@@ -618,7 +630,7 @@ Receipts include all three:
   "schema_version": "burr.receipt.v1",
   "burr_version": "0.25.0",
   "artifact_version": "0.1.0",
-  "rulepack_version": "0.11.0",
+  "rulepack_version": "0.12.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"

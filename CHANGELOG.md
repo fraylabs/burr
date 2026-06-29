@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Added `blind_pocket_back_wall_thickness`, which checks remaining host
+  material behind declared blind pockets from `bottom_center_mm` to the host
+  part `bbox_mm`.
+- Bumped the default `actuator_mount` rulepack to `0.12.0`; mechanical M3
+  heat-set insert pockets selected by that rulepack now need at least 2 mm of
+  material behind the blind pocket bottom.
+- Added good/bad build123d and gallery proofs for an insert pocket that has
+  valid STEP blind-pocket geometry but fails because the back wall is too thin.
+
 ## 0.25.0
 
 - Added default actuator rulepack coverage for counterbore edge material:
