@@ -47,7 +47,7 @@ third, then declared measurement issues.
 Install from crates.io:
 
 ```bash
-cargo install burr --version 0.28.0
+cargo install burr --version 0.29.0
 ```
 
 Create and check a build123d starter part:
@@ -203,6 +203,13 @@ Run the generic feature edge-distance proof:
 ```bash
 uv sync --all-packages
 npm run check:feature-edge-distance
+```
+
+Run the practical mechanical lint proof:
+
+```bash
+uv sync --all-packages
+npm run check:practical-mechanical-lint
 ```
 
 Run the printable example gallery:
@@ -673,7 +680,7 @@ Receipts include all three:
 ```json
 {
   "schema_version": "burr.receipt.v1",
-  "burr_version": "0.28.0",
+  "burr_version": "0.29.0",
   "artifact_version": "0.1.0",
   "rulepack_version": "0.14.0",
   "compatibility": {

@@ -1,0 +1,27 @@
+{
+  "schema_version": "burr.rulepack.v1",
+  "id": "boss_support",
+  "version": "0.1.0",
+  "artifact_type": "boss_support_plate",
+  "process_kind": "FDM",
+  "rules": [
+    {
+      "id": "m3_boss_height_to_diameter_ratio",
+      "kind": "numeric_range",
+      "description": "Tall printed bosses need a declared height-to-diameter ratio that is not obviously fragile.",
+      "path": "measurements.boss_height_to_diameter_ratio",
+      "max": 2.5
+    },
+    {
+      "id": "m3_boss_gusset_inventory",
+      "kind": "feature_count",
+      "description": "Tall printed bosses need declared support ribs or gussets.",
+      "applies_to": {
+        "kind": "rib",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["boss_support"]
+      },
+      "min_count": 2
+    }
+  ]
+}

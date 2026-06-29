@@ -1,0 +1,35 @@
+{
+  "schema_version": "burr.rulepack.v1",
+  "id": "printable_retention",
+  "version": "0.1.0",
+  "artifact_type": "printable_retention_clip",
+  "process_kind": "FDM",
+  "rules": [
+    {
+      "id": "snap_hook_inventory",
+      "kind": "feature_count",
+      "description": "A retained printable clip needs the declared hook pair.",
+      "applies_to": {
+        "kind": "snap_hook",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["retention"]
+      },
+      "min_count": 2
+    },
+    {
+      "id": "snap_hook_arm_thickness",
+      "kind": "numeric_range",
+      "description": "Printable snap-hook arms need enough declared thickness for a normal FDM prototype.",
+      "path": "measurements.snap_hook_arm_thickness_mm",
+      "min": 1.2,
+      "max": 3.0
+    },
+    {
+      "id": "snap_hook_engagement",
+      "kind": "numeric_range",
+      "description": "Snap hooks need declared engagement, not only a decorative tab.",
+      "path": "measurements.snap_hook_engagement_mm",
+      "min": 0.8
+    }
+  ]
+}

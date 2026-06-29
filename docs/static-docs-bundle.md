@@ -7,9 +7,9 @@ without checking out the Burr repository or regenerating CAD.
 
 ```txt
 repo: fraylabs/burr
-release_tag: burr-v0.28.0
-asset_name: burr-docs-v0.28.0.zip
-asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.28.0/burr-docs-v0.28.0.zip
+release_tag: burr-v0.29.0
+asset_name: burr-docs-v0.29.0.zip
+asset_url: https://github.com/fraylabs/burr/releases/download/burr-v0.29.0/burr-docs-v0.29.0.zip
 ```
 
 The website should treat Burr release assets as read-only product data.
@@ -28,7 +28,7 @@ folder, writes a generated manifest with hashes, and zips the folder.
 ## Zip Layout
 
 ```txt
-burr-docs-v0.28.0/
+burr-docs-v0.29.0/
   README.md
   manifest.json
   markdown/
@@ -53,6 +53,11 @@ burr-docs-v0.28.0/
       actuator_mount.rulepack.json
       printed_plate.rulepack.json
       captured_slider.rulepack.json
+      hardware_fit.rulepack.json
+      tool_access.rulepack.json
+      mount_pattern.rulepack.json
+      printable_retention.rulepack.json
+      boss_support.rulepack.json
 ```
 
 ## Manifest
@@ -60,7 +65,7 @@ burr-docs-v0.28.0/
 Manifest path:
 
 ```txt
-burr-docs-v0.28.0/manifest.json
+burr-docs-v0.29.0/manifest.json
 ```
 
 Schema:
@@ -68,12 +73,12 @@ Schema:
 ```json
 {
   "schema_version": "burr.docs-artifact.v1",
-  "burr_version": "0.28.0",
-  "artifact_id": "burr-docs-v0.28.0",
+  "burr_version": "0.29.0",
+  "artifact_id": "burr-docs-v0.29.0",
   "generated_at": "ISO-8601 timestamp",
   "source": {
     "repository": "fraylabs/burr",
-    "tag": "burr-v0.28.0"
+    "tag": "burr-v0.29.0"
   },
   "documents": [
     {

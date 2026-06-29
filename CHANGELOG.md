@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.29.0
+
+- Added Practical Mechanical Lint V1: five focused rulepacks for hardware fit
+  windows, tool access, mount-pattern consistency, printable retention tabs, and
+  boss support.
+- Added ten gallery-visible good/bad build123d fixtures proving those mistakes
+  are caught from declared intent metadata and receipts.
+- Added `npm run check:practical-mechanical-lint` and wired it into the
+  aggregate check so the practical fixture set stays release-gated.
+
 ## 0.28.0
 
 - Added default actuator rulepack coverage for M3 standoff boss edge material
