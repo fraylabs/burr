@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.25.0
+
 - Added default actuator rulepack coverage for counterbore edge material:
   mechanical counterbores now check the larger `counterbore_diameter_mm`
   envelope against free edges instead of trusting only the through-hole.
