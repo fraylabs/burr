@@ -38,7 +38,7 @@ expectIncludes(bad.output, "Short by: 1 mm")
 
 const badReceipt = readReceipt(badDir)
 expectEqual(badReceipt.status, "fail", "bad fixture receipt status")
-expectEqual(badReceipt.rulepack_version, "0.11.0", "bad fixture rulepack version")
+expectEqual(badReceipt.rulepack_version, "0.12.0", "bad fixture rulepack version")
 const badCheck = findRuleCheck(badReceipt, ruleId)
 expectEqual(badCheck.status, "fail", "bad fixture edge status")
 expectEqual(badCheck.reason, "insufficient_feature_edge_distance", "bad fixture edge reason")
@@ -57,7 +57,7 @@ expectIncludes(good.output, "PASS examples/build123d-feature-edge-distance/good/
 
 const goodReceipt = readReceipt(goodDir)
 expectEqual(goodReceipt.status, "pass", "good fixture receipt status")
-expectEqual(goodReceipt.rulepack_version, "0.11.0", "good fixture rulepack version")
+expectEqual(goodReceipt.rulepack_version, "0.12.0", "good fixture rulepack version")
 const goodCheck = findRuleCheck(goodReceipt, ruleId)
 expectEqual(goodCheck.status, "pass", "good fixture edge status")
 expectEqual(goodCheck.reason, "ok", "good fixture edge reason")

@@ -15,7 +15,7 @@ The receipt is the final trust signal. Preview images are visual context only.
   "artifact_version": "0.1.0",
   "status": "fail",
   "rulepack_id": "actuator_mount",
-  "rulepack_version": "0.11.0",
+  "rulepack_version": "0.12.0",
   "checks": [
     {
       "rule_id": "actuator_mount:m3_loaded_hole_edge_distance",

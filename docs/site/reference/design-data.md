@@ -97,3 +97,8 @@ For `kind: "counterbore"`, `part` should reference a part with `bbox_mm`,
 describes the larger screw-head recess. Edge-material rules use that larger
 diameter so a counterbore can fail even when the smaller bore would leave enough
 material.
+
+For `kind: "heat_set_insert_pocket"`, `part` should reference a part with
+`bbox_mm`, `pocket_center_mm` locates the blind pocket cylinder, and
+`bottom_center_mm` locates the pocket bottom. Back-wall rules measure from that
+bottom point to the host part bbox face in the pocket-bottom direction.
