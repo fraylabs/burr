@@ -40,6 +40,8 @@
     "examples/build123d-bearing-seat/good/design.py",
     "examples/build123d-counterbore/bad/design.py",
     "examples/build123d-counterbore/good/design.py",
+    "examples/build123d-counterbore-edge-distance/bad/design.py",
+    "examples/build123d-counterbore-edge-distance/good/design.py",
     "examples/build123d-heat-set-insert-pocket/bad/design.py",
     "examples/build123d-heat-set-insert-pocket/good/design.py",
     "examples/build123d-straight-slot/bad/design.py",
@@ -71,6 +73,7 @@
     "check:standoff-boss-support-link": "node scripts/check-build123d-standoff-boss-support-link.mjs",
     "check:bearing-seat": "node scripts/check-build123d-bearing-seat.mjs",
     "check:counterbore": "node scripts/check-build123d-counterbore.mjs",
+    "check:counterbore-edge-distance": "node scripts/check-build123d-counterbore-edge-distance.mjs",
     "check:insert-pocket": "node scripts/check-build123d-heat-set-insert-pocket.mjs",
     "check:slots": "node scripts/check-build123d-straight-slot.mjs",
     "check:breadth-rules": "node scripts/check-breadth-rule-fixtures.mjs",
@@ -91,7 +94,7 @@
     "check:spacing-envelope-agent-repair": "node scripts/check-spacing-envelope-agent-repair.mjs",
     "check:fresh-install": "node scripts/check-fresh-install.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",
-    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init && npm run check:breadth-rules && npm run check:fastener-support && npm run check:feature-edge-distance && npm run check:standoff-boss && npm run check:standoff-boss-support-link && npm run check:explain && npm run check:repair-loop && npm run check:repair-report && npm run check:repair-action-source-loop && npm run check:multi-fixture-source-hint-repair && npm run check:agent-repair-runner && npm run check:spacing-envelope-agent-repair"
+    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init && npm run check:breadth-rules && npm run check:fastener-support && npm run check:feature-edge-distance && npm run check:counterbore-edge-distance && npm run check:standoff-boss && npm run check:standoff-boss-support-link && npm run check:explain && npm run check:repair-loop && npm run check:repair-report && npm run check:repair-action-source-loop && npm run check:multi-fixture-source-hint-repair && npm run check:agent-repair-runner && npm run check:spacing-envelope-agent-repair"
   },
   "keywords": [
     "cad",

@@ -91,3 +91,9 @@ The linked feature should expose `center_mm`, `axis`, and a comparable diameter
 such as `support_diameter_mm`, `diameter_mm`, or `pocket_diameter_mm`. Burr uses
 those fields to check that the boss is centered on the supported feature instead
 of merely existing somewhere nearby.
+
+For `kind: "counterbore"`, `part` should reference a part with `bbox_mm`,
+`center_mm` and `axis` locate the through-hole, and `counterbore_diameter_mm`
+describes the larger screw-head recess. Edge-material rules use that larger
+diameter so a counterbore can fail even when the smaller bore would leave enough
+material.

@@ -1332,9 +1332,14 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
 fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
     match reason {
         "insufficient_edge_distance" => "move the hole inward or make the surrounding part larger.",
-        "insufficient_feature_edge_distance" => {
-            "move the feature inward, shorten the feature, or make the surrounding part larger."
-        }
+        "insufficient_feature_edge_distance" => match feature_kind {
+            "counterbore" => {
+                "move the counterbore inward, reduce the counterbore diameter, or make the surrounding part larger."
+            }
+            _ => {
+                "move the feature inward, shorten the feature, or make the surrounding part larger."
+            }
+        },
         "insufficient_feature_pair_spacing" => "move the features farther apart, reduce their diameters, or remove one feature.",
         "insufficient_wall_thickness" => "move the hole inward, reduce the hole size, or increase the local wall.",
         "insufficient_fastener_support_wall" => "increase support_diameter_mm or boss_diameter_mm, reduce the inner hole/pocket size, or change the support intent.",
@@ -5158,7 +5163,7 @@ mod tests {
         );
         assert_eq!(
             string_field(&good.receipt, "rulepack_version"),
-            Some("0.10.0")
+            Some("0.11.0")
         );
     }
 
@@ -5754,7 +5759,7 @@ mod tests {
         let rulepack = json!({
             "schema_version": "burr.rulepack.v1",
             "id": "actuator_mount",
-            "version": "0.10.0",
+            "version": "0.11.0",
             "artifact_type": "actuator_mount",
             "rules": [
                 {
