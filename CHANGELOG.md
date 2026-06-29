@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Added default actuator rulepack coverage for loaded bearing-seat edge
+  material, using `seat_diameter_mm` to check the bearing seat envelope against
+  free edges.
+- Bumped the default `actuator_mount` rulepack to `0.13.0`; loaded bearing
+  seats selected by that rulepack now need at least 3 mm of material around the
+  seat.
+- Added good/bad build123d and gallery proofs for a 608 bearing seat that has
+  valid STEP seat geometry but fails when the seat is too close to a free edge.
+
 ## 0.26.0
 
 - Added `blind_pocket_back_wall_thickness`, which checks remaining host

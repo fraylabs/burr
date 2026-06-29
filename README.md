@@ -163,6 +163,13 @@ uv sync --all-packages
 npm run check:counterbore-edge-distance
 ```
 
+Run the bearing-seat edge-material proof:
+
+```bash
+uv sync --all-packages
+npm run check:bearing-seat-edge-distance
+```
+
 Run the fastener support wall proof:
 
 ```bash
@@ -454,17 +461,17 @@ mechanical rulepacks.
 
 The included actuator mount rulepack checks loaded M3 clearance-hole edge
 distance, whole-slot edge material, counterbore head-recess edge material,
-blind insert-pocket back-wall material, minimum wall thickness around M3
-clearance holes, whether declared M3 clearance holes exist as matching
-cylindrical geometry in the exported STEP, and whether declared straight slots,
-counterbores, heat-set insert pockets, and bearing seats exist as matching STEP
-cylinder/plane evidence:
+loaded bearing-seat edge material, blind insert-pocket back-wall material,
+minimum wall thickness around M3 clearance holes, whether declared M3 clearance
+holes exist as matching cylindrical geometry in the exported STEP, and whether
+declared straight slots, counterbores, heat-set insert pockets, and bearing
+seats exist as matching STEP cylinder/plane evidence:
 
 ```json
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -495,6 +502,17 @@ cylinder/plane evidence:
         "intent_any": ["mechanical_interface"]
       },
       "diameter_field": "counterbore_diameter_mm",
+      "min_wall_to_edge_mm": 3.0
+    },
+    {
+      "id": "bearing_seat_edge_distance",
+      "kind": "feature_edge_distance",
+      "applies_to": {
+        "kind": "bearing_seat",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["loaded_bearing_support", "shaft_support"]
+      },
+      "diameter_field": "seat_diameter_mm",
       "min_wall_to_edge_mm": 3.0
     },
     {
@@ -630,7 +648,7 @@ Receipts include all three:
   "schema_version": "burr.receipt.v1",
   "burr_version": "0.26.0",
   "artifact_version": "0.1.0",
-  "rulepack_version": "0.12.0",
+  "rulepack_version": "0.13.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"
@@ -757,8 +775,10 @@ declared intent and the geometry fits the declared tolerances.
 Early prototype. Current checks combine design-data rules with narrow STEP
 feature-presence verification for declared M3 clearance holes, declared
 straight slots, declared counterbores, declared heat-set insert pockets, and
-declared bearing seats. Burr does not classify all holes, slots, counterbores,
-pockets, or seats in a model or decide which features matter.
+declared bearing seats. They also check declared edge-material envelopes for
+loaded holes, straight slots, counterbores, and loaded bearing seats. Burr does
+not classify all holes, slots, counterbores, pockets, or seats in a model or
+decide which features matter.
 
 Ligament checks use declared feature metadata selected by a rulepack. Burr does
 not search the whole model for every thin region, infer load paths, or certify
