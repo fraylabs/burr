@@ -10,7 +10,7 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "artifact_type": "actuator_mount",
   "rules": [
     {
@@ -54,6 +54,30 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
       "min_wall_to_edge_mm": 3.0
     },
     {
+      "id": "m3_standoff_boss_edge_distance",
+      "kind": "feature_edge_distance",
+      "applies_to": {
+        "kind": "standoff_boss",
+        "fastener": "M3",
+        "intent_any": ["mechanical_interface"]
+      },
+      "center_field": "boss_center_mm",
+      "diameter_field": "boss_diameter_mm",
+      "min_wall_to_edge_mm": 3.0
+    },
+    {
+      "id": "heat_set_insert_pocket_edge_distance",
+      "kind": "feature_edge_distance",
+      "applies_to": {
+        "kind": "heat_set_insert_pocket",
+        "insert": "M3x5.7",
+        "intent_any": ["mechanical_interface"]
+      },
+      "center_field": "pocket_center_mm",
+      "diameter_field": "pocket_diameter_mm",
+      "min_wall_to_edge_mm": 3.0
+    },
+    {
       "id": "m3_insert_pocket_back_wall_thickness",
       "kind": "blind_pocket_back_wall_thickness",
       "applies_to": {
@@ -74,6 +98,12 @@ the smaller bore.
 Bearing-seat edge rules should override `diameter_field` to
 `seat_diameter_mm` so Burr checks the bearing support envelope, not a smaller
 shaft or pilot hole.
+Standoff-boss edge rules should override `center_field` and `diameter_field` to
+`boss_center_mm` and `boss_diameter_mm` so Burr checks the boss footprint, not
+the smaller supported screw hole.
+Insert-pocket edge rules should override `center_field` and `diameter_field` to
+`pocket_center_mm` and `pocket_diameter_mm` so Burr checks the pocket envelope,
+not an unrelated feature center.
 
 ## Selection
 

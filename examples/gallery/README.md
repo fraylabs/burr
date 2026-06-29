@@ -41,6 +41,10 @@ checked, but the receipts are the proof.
   between the full screw-head recess and the nearest free edge.
 - `edge-safe-bearing-seat`: loaded 608 bearing seat with enough material around
   the full seat envelope.
+- `edge-safe-insert-pocket`: mechanical M3 insert pocket with enough material
+  around the full pocket envelope.
+- `edge-safe-standoff-boss`: M3 standoff boss with enough material around the
+  full boss envelope.
 - `electronics-standoff-deck`: heat-set insert pockets plus clearance holes.
 - `boss-supported-m3-mount`: boss-supported M3 mount with enough radial
   material around the fastener.
@@ -58,12 +62,26 @@ checked, but the receipts are the proof.
   spacing-envelope ligament rules.
 - `t-slot-linear-slider-loose-clearance`: negative fixture for numeric clearance
   rules.
+- `t-slot-linear-slider-tight-clearance`: negative fixture for captured-slider
+  clearance that is too tight for the declared fit window.
+- `t-slot-linear-slider-missing-capture-lip`: negative fixture proving a slider
+  needs declared capture lips to avoid lift-off.
+- `t-slot-linear-slider-shallow-capture-lip`: negative fixture proving capture
+  lips need enough declared engagement.
+- `dense-random-hole-plate-too-many-reliefs`: negative fixture proving cosmetic
+  relief inventories can be bounded without treating every hole as mechanical.
+- `hole-slot-thin-ligament`: negative fixture proving declared hole-to-slot
+  ligaments can be checked from metadata.
 - `bad-slot-near-edge`: negative fixture proving Burr checks the whole slot
   envelope, not only a point at the slot center.
 - `bad-counterbore-near-edge`: negative fixture proving Burr checks the larger
   counterbore recess envelope, not only the smaller through-hole.
 - `bad-bearing-seat-near-edge`: negative fixture proving Burr checks loaded
   bearing seat edge material, not only whether the STEP seat exists.
+- `bad-insert-pocket-near-edge`: negative fixture proving Burr checks the full
+  insert pocket envelope against the host part edge.
+- `bad-standoff-boss-near-edge`: negative fixture proving Burr checks the full
+  boss footprint against the host part edge.
 - `bad-boss-support-too-thin`: negative fixture for boss radial wall checks
   around a fastener.
 - `bad-standoff-boss-missing-step`: negative fixture proving declared standoff

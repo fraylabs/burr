@@ -102,6 +102,15 @@ For `kind: "heat_set_insert_pocket"`, `part` should reference a part with
 `bbox_mm`, `pocket_center_mm` locates the blind pocket cylinder, and
 `bottom_center_mm` locates the pocket bottom. Back-wall rules measure from that
 bottom point to the host part bbox face in the pocket-bottom direction.
+Edge-material rules use `pocket_center_mm` and `pocket_diameter_mm` so an insert
+pocket can fail when the full pocket is too close to a free edge, even if the
+threaded feature exists.
+
+For `kind: "standoff_boss"`, `part` should reference a part with `bbox_mm`,
+`boss_center_mm` locates the raised boss footprint, and `boss_diameter_mm`
+describes the boss envelope. Edge-material rules use those fields so a boss can
+fail when the support cylinder is too close to a free edge, even if the supported
+hole is inset enough.
 
 For `kind: "bearing_seat"`, `part` should reference a part with `bbox_mm`,
 `center_mm` and `axis` locate the seat, and `seat_diameter_mm` describes the

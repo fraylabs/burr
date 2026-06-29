@@ -462,6 +462,7 @@ mechanical rulepacks.
 The included actuator mount rulepack checks loaded M3 clearance-hole edge
 distance, whole-slot edge material, counterbore head-recess edge material,
 loaded bearing-seat edge material, blind insert-pocket back-wall material,
+standoff boss edge material, heat-set insert pocket edge material,
 minimum wall thickness around M3 clearance holes, whether declared M3 clearance
 holes exist as matching cylindrical geometry in the exported STEP, and whether
 declared straight slots, counterbores, heat-set insert pockets, and bearing
@@ -471,7 +472,7 @@ seats exist as matching STEP cylinder/plane evidence:
 {
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -513,6 +514,32 @@ seats exist as matching STEP cylinder/plane evidence:
         "role_any": ["loaded_bearing_support", "shaft_support"]
       },
       "diameter_field": "seat_diameter_mm",
+      "min_wall_to_edge_mm": 3.0
+    },
+    {
+      "id": "m3_standoff_boss_edge_distance",
+      "kind": "feature_edge_distance",
+      "applies_to": {
+        "kind": "standoff_boss",
+        "fastener": "M3",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["pcb_standoff", "fastener_support", "bossed_mount"]
+      },
+      "center_field": "boss_center_mm",
+      "diameter_field": "boss_diameter_mm",
+      "min_wall_to_edge_mm": 3.0
+    },
+    {
+      "id": "heat_set_insert_pocket_edge_distance",
+      "kind": "feature_edge_distance",
+      "applies_to": {
+        "kind": "heat_set_insert_pocket",
+        "insert": "M3x5.7",
+        "intent_any": ["mechanical_interface"],
+        "role_any": ["threaded_mount", "pcb_standoff", "bossed_insert", "fastener_support"]
+      },
+      "center_field": "pocket_center_mm",
+      "diameter_field": "pocket_diameter_mm",
       "min_wall_to_edge_mm": 3.0
     },
     {
@@ -648,7 +675,7 @@ Receipts include all three:
   "schema_version": "burr.receipt.v1",
   "burr_version": "0.27.0",
   "artifact_version": "0.1.0",
-  "rulepack_version": "0.13.0",
+  "rulepack_version": "0.14.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
     "rulepack_schema_version": "burr.rulepack.v1"

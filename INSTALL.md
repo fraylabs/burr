@@ -85,7 +85,10 @@ npm run check:bearing-seat
 npm run check:bearing-seat-edge-distance
 npm run check:counterbore
 npm run check:insert-pocket
+npm run check:insert-pocket-edge-distance
+npm run check:standoff-boss-edge-distance
 npm run check:slots
+npm run check:mistake-library-v1
 npm run check:gallery
 npm run check:gallery:render
 npm run check:gallery:artifact
