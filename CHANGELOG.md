@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.26.0
+
 - Added `blind_pocket_back_wall_thickness`, which checks remaining host
   material behind declared blind pockets from `bottom_center_mm` to the host
   part `bbox_mm`.
