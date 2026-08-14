@@ -3,6 +3,9 @@
   "artifact_id": "linear-actuator-good",
   "artifact_version": "0.1.0",
   "artifact_type": "actuator_mount",
+  "rulepack": {
+    "path": "builtin:actuator_mount"
+  },
   "units": "mm",
   "source": {
     "path": "source.py",

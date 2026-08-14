@@ -81,15 +81,20 @@ fn run_check(args: Vec<String>) -> Result<(), String> {
     };
     let results = lint_targets(&options.inputs, &lint_options)?;
     let mut failures = 0;
+    let mut incompletes = 0;
 
     for result in results {
-        let status = result
+        let outcome = result
             .receipt
-            .get("status")
+            .get("outcome")
+            .or_else(|| result.receipt.get("status"))
             .and_then(serde_json::Value::as_str)
             .unwrap_or("fail");
-        if status == "fail" {
-            failures += 1;
+        match outcome {
+            "fail" => failures += 1,
+            "incomplete" => incompletes += 1,
+            "pass" => {}
+            _ => failures += 1,
         }
         let receipt_label = if options.write_receipt {
             relative_label(&cwd, &result.receipt_path)
@@ -98,10 +103,12 @@ fn run_check(args: Vec<String>) -> Result<(), String> {
         };
         println!(
             "{} {} -> {}",
-            status.to_uppercase(),
+            outcome.to_uppercase(),
             relative_label(&cwd, &result.design_data_path),
             receipt_label
         );
+
+        print_receipt_scope_and_warnings(&result.receipt);
 
         let diagnostics = format_receipt_diagnostics(&result.receipt);
         if !diagnostics.is_empty() {
@@ -123,7 +130,13 @@ fn run_check(args: Vec<String>) -> Result<(), String> {
         }
     }
 
-    std::process::exit(if failures == 0 { 0 } else { 1 });
+    std::process::exit(if failures > 0 {
+        1
+    } else if incompletes > 0 {
+        3
+    } else {
+        0
+    });
 }
 
 fn run_explain(args: Vec<String>) -> Result<(), String> {
@@ -161,24 +174,40 @@ fn run_explain(args: Vec<String>) -> Result<(), String> {
             println!("Source: {source}");
         }
         let status = document
-            .get("status")
+            .get("outcome")
+            .or_else(|| document.get("status"))
             .and_then(serde_json::Value::as_str)
             .unwrap_or("<unknown>");
         println!("Status: {status}");
+        print_receipt_scope_and_warnings(&document);
 
         let explanations = format_receipt_explanations(&document);
         if explanations.is_empty() {
-            println!("No failed checks in this receipt.");
+            if status == "incomplete" {
+                println!(
+                    "No failed or incomplete check records; the incomplete outcome is explained by the scope information or warnings above."
+                );
+            } else {
+                println!("No failed checks in this receipt.");
+            }
             println!();
             continue;
         }
 
         println!();
-        println!(
-            "{} failed check{}:",
-            explanations.len(),
-            if explanations.len() == 1 { "" } else { "s" }
-        );
+        if status == "fail" {
+            println!(
+                "{} failed check{}:",
+                explanations.len(),
+                if explanations.len() == 1 { "" } else { "s" }
+            );
+        } else {
+            println!(
+                "{} check{} requiring attention:",
+                explanations.len(),
+                if explanations.len() == 1 { "" } else { "s" }
+            );
+        }
         for (index, lines) in explanations.iter().enumerate() {
             println!(
                 "{}. {}",
@@ -256,7 +285,7 @@ fn parse_check_args(args: Vec<String>) -> Result<ParsedCheckArgs, String> {
         match arg.as_str() {
             "--rulepack" => {
                 let Some(path) = iter.next() else {
-                    return Err("--rulepack requires a file path.".to_string());
+                    return Err("--rulepack requires a file path or built-in selector.".to_string());
                 };
                 rulepack_path = Some(PathBuf::from(path));
             }
@@ -321,8 +350,102 @@ fn explain_json_packet(document: &serde_json::Value) -> serde_json::Value {
 
 fn print_help() {
     println!(
-        "Usage:\n  burr init <folder>\n  burr check [--rulepack <file>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr explain [--json] <folder|burr-receipt.json|repair-report.json>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n"
+        "Usage:\n  burr init <folder>\n  burr check [--rulepack <file|builtin:actuator_mount>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr explain [--json] <folder|burr-receipt.json|repair-report.json>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n"
     );
+}
+
+fn print_receipt_scope_and_warnings(receipt: &serde_json::Value) {
+    if let Some(scope) = receipt.get("scope") {
+        let declared_rules = scope
+            .pointer("/rules/declared")
+            .and_then(serde_json::Value::as_u64);
+        let evaluated_rules = scope
+            .pointer("/rules/evaluated")
+            .and_then(serde_json::Value::as_u64);
+        let declared_features = scope
+            .pointer("/mechanical_features/declared")
+            .and_then(serde_json::Value::as_u64);
+        let checked_features = scope
+            .pointer("/mechanical_features/checked")
+            .and_then(serde_json::Value::as_u64);
+        if let (
+            Some(declared_rules),
+            Some(evaluated_rules),
+            Some(declared_features),
+            Some(checked_features),
+        ) = (
+            declared_rules,
+            evaluated_rules,
+            declared_features,
+            checked_features,
+        ) {
+            println!(
+                "Scope: {evaluated_rules}/{declared_rules} rules evaluated; {checked_features}/{declared_features} mechanical features checked."
+            );
+        }
+
+        let design_artifact = scope
+            .pointer("/artifact_type/design")
+            .and_then(serde_json::Value::as_str);
+        let rulepack_artifact = scope
+            .pointer("/artifact_type/rulepack")
+            .and_then(serde_json::Value::as_str);
+        let artifact_compatible = scope
+            .pointer("/artifact_type/compatible")
+            .and_then(serde_json::Value::as_bool);
+        if artifact_compatible == Some(false) {
+            println!(
+                "Artifact scope: design={}, rulepack={} (not compatible).",
+                design_artifact.unwrap_or("<missing>"),
+                rulepack_artifact.unwrap_or("<missing>")
+            );
+        }
+
+        let process_restricted = scope
+            .pointer("/process_kind/restricted")
+            .and_then(serde_json::Value::as_bool)
+            == Some(true);
+        let process_compatible = scope
+            .pointer("/process_kind/compatible")
+            .and_then(serde_json::Value::as_bool);
+        if process_restricted && process_compatible == Some(false) {
+            let design_process = scope
+                .pointer("/process_kind/design")
+                .and_then(serde_json::Value::as_str);
+            let rulepack_process = scope
+                .pointer("/process_kind/rulepack")
+                .and_then(serde_json::Value::as_str);
+            println!(
+                "Process scope: design={}, rulepack={} (not compatible).",
+                design_process.unwrap_or("<missing>"),
+                rulepack_process.unwrap_or("<missing>")
+            );
+        }
+    }
+
+    let warnings: Vec<_> = receipt
+        .get("warnings")
+        .and_then(serde_json::Value::as_array)
+        .into_iter()
+        .flatten()
+        .collect();
+    if !warnings.is_empty() {
+        println!("Warnings:");
+        for warning in warnings {
+            let reason = string_field(warning, "reason").unwrap_or("warning");
+            let message = string_field(warning, "message").unwrap_or("No detail provided.");
+            let impact = if warning
+                .get("affects_outcome")
+                .and_then(serde_json::Value::as_bool)
+                == Some(true)
+            {
+                " [incomplete]"
+            } else {
+                ""
+            };
+            println!("  - {reason}{impact}: {message}");
+        }
+    }
 }
 
 fn string_field<'a>(value: &'a serde_json::Value, key: &str) -> Option<&'a str> {

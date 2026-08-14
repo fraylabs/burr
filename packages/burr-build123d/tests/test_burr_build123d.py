@@ -102,6 +102,17 @@ class BurrBuild123dTests(unittest.TestCase):
         self.assertEqual(data["features"][0]["role"], "lift_off_blocker")
         self.assertEqual(data["features"][0]["intent"], "mechanical_interface")
 
+    def test_records_explicit_builtin_rulepack(self):
+        design = BurrDesignData(
+            artifact_id="unit-actuator",
+            artifact_type="actuator_mount",
+        )
+        design.rulepack("builtin:actuator_mount")
+
+        data = design.to_dict()
+
+        self.assertEqual(data["rulepack"]["path"], "builtin:actuator_mount")
+
     def test_rejects_invalid_rulepack_measurement_and_generic_feature(self):
         design = BurrDesignData(
             artifact_id="unit-slider",

@@ -17,6 +17,7 @@
     "packages/burr-ocp/src/burr_ocp/__init__.py",
     "packages/burr-ocp/src/burr_ocp/step_cylinders.py",
     "rules",
+    "schemas",
     "scripts",
     "examples/build123d-actuator/bad/design.py",
     "examples/build123d-actuator/good/design.py",
@@ -71,6 +72,8 @@
   "scripts": {
     "test": "cargo test",
     "test:python": "uv run --package burr-build123d python -m unittest discover -s packages/burr-build123d/tests -p 'test_*.py'",
+    "check:package": "npm pack --dry-run",
+    "check:schemas": "node scripts/check-schemas.mjs",
     "check:init": "node scripts/check-init-starter.mjs",
     "check:build123d": "PYTHON=\"uv run --package burr-build123d python\" node scripts/check-build123d-examples.mjs",
     "check:ocp": "node scripts/check-ocp-step-cylinders.mjs",
@@ -88,6 +91,7 @@
     "check:insert-pocket-back-wall": "node scripts/check-build123d-insert-pocket-back-wall.mjs",
     "check:standoff-boss-edge-distance": "node scripts/check-build123d-standoff-boss-edge-distance.mjs",
     "check:slots": "node scripts/check-build123d-straight-slot.mjs",
+    "check:trust-contract": "node scripts/check-trust-contract.mjs",
     "check:breadth-rules": "node scripts/check-breadth-rule-fixtures.mjs",
     "check:mistake-library-v1": "node scripts/check-mistake-library-v1.mjs",
     "check:practical-mechanical-lint": "node scripts/check-practical-mechanical-lint.mjs",
@@ -108,7 +112,7 @@
     "check:spacing-envelope-agent-repair": "node scripts/check-spacing-envelope-agent-repair.mjs",
     "check:fresh-install": "node scripts/check-fresh-install.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",
-    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:init && npm run check:breadth-rules && npm run check:mistake-library-v1 && npm run check:practical-mechanical-lint && npm run check:fastener-support && npm run check:feature-edge-distance && npm run check:counterbore-edge-distance && npm run check:bearing-seat-edge-distance && npm run check:insert-pocket-edge-distance && npm run check:insert-pocket-back-wall && npm run check:standoff-boss && npm run check:standoff-boss-edge-distance && npm run check:standoff-boss-support-link && npm run check:explain && npm run check:repair-loop && npm run check:repair-report && npm run check:repair-action-source-loop && npm run check:multi-fixture-source-hint-repair && npm run check:agent-repair-runner && npm run check:spacing-envelope-agent-repair"
+    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:package && npm run check:schemas && npm run check:init && npm run check:trust-contract && npm run check:breadth-rules && npm run check:mistake-library-v1 && npm run check:practical-mechanical-lint && npm run check:fastener-support && npm run check:feature-edge-distance && npm run check:counterbore-edge-distance && npm run check:bearing-seat-edge-distance && npm run check:insert-pocket-edge-distance && npm run check:insert-pocket-back-wall && npm run check:standoff-boss && npm run check:standoff-boss-edge-distance && npm run check:standoff-boss-support-link && npm run check:explain && npm run check:repair-loop && npm run check:repair-report && npm run check:repair-action-source-loop && npm run check:multi-fixture-source-hint-repair && npm run check:agent-repair-runner && npm run check:spacing-envelope-agent-repair"
   },
   "keywords": [
     "cad",
@@ -118,6 +122,9 @@
     "mechanical-design"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=20"
   }

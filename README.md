@@ -42,6 +42,30 @@ When a receipt has multiple failures, `burr explain` sorts them by fix order:
 stale artifacts first, missing declared STEP geometry second, unsafe dimensions
 third, then declared measurement issues.
 
+## Trust Contract
+
+Burr receipts have three outcomes:
+
+- `pass`: the explicitly selected rulepack was compatible, evaluated checks
+  passed, and every declared mechanical-interface feature received coverage;
+- `incomplete`: Burr ran but could not establish that pass claim because the
+  selected rulepack was incompatible or required mechanical coverage was
+  missing;
+- `fail`: a checked claim failed or the rulepack contract was invalid.
+
+`burr check` exits `0` for `pass`, `3` for `incomplete`, `1` for `fail`, and `2`
+for invocation or configuration errors. Warnings and checked/unchecked feature
+coverage are printed instead of being hidden behind a successful exit.
+Explicitly non-mechanical unchecked features are still reported, but they do
+not block a pass.
+
+This contract is versioned as `burr.receipt.v2`; consumers of the former v1
+two-state receipt must explicitly add `incomplete` handling before accepting v2.
+
+Rulepack selection is always explicit. Use a design-data selector such as
+`"rulepack": "builtin:actuator_mount"`, a relative `rulepack.path`, or the CLI
+`--rulepack` option. Burr never silently applies a default rulepack.
+
 ## Quickstart
 
 Install from crates.io:
@@ -78,7 +102,7 @@ Use Burr like tests for generated mechanical parts:
 
 ```txt
 write or generate CAD
-  -> emit burr-design-data.json with intended features
+  -> emit burr-design-data.json with intended features and a rulepack selector
   -> export STEP
   -> burr check .
   -> burr explain .
@@ -104,11 +128,10 @@ in the current source and the hint carries `confidence:
 "exact_from_design_data"`. If the exact source text, selector, or design-data
 value path does not match, or the packet has no exact `source_hint` edits left,
 stop and ask for a new generation or human edit instead of guessing. The final
-trust signal is the fresh regenerated passing Burr receipt, including source
-and artifact freshness checks.
+scoped trust signal is the fresh regenerated passing Burr receipt, including
+source and artifact freshness checks and complete declared mechanical coverage.
 
-For Burr 0.14, the gallery explains the same loop as a before/after actuator
-repair proof:
+The gallery preserves the same loop as a before/after actuator repair proof:
 
 ```txt
 bad CAD -> Burr check -> explain fix order -> fixed CAD passes
@@ -118,7 +141,19 @@ Burr is not a constraint solver, FEA engine, slicer, or universal CAD brain.
 It checks specific declared mechanical claims. A ligament rule only checks the
 declared spacing between selected slots, holes, or cutouts; it does not prove
 part strength or find every thin web in the CAD model. Workload/stress survival
-belongs to later FEA/FEM or physical testing.
+belongs to later FEA/FEM or physical testing. A pass is scoped to the named
+rulepack, declared features, and recorded evidence; it is not certification of
+the whole part.
+
+## Public Distribution Surfaces
+
+The `burr` executable is published through crates.io and `burr-build123d`
+through PyPI. The `@fraylabs/burr` package manifest is intentionally retained as
+a future public OSS npm source-tarball surface for Burr source, rules,
+machine-readable schemas, docs, example source, and repository tooling. It is
+not published yet and is not a replacement for the Rust CLI. The manifest pins
+future publication to public access, while `npm run check:package` verifies the
+tarball contents without publishing.
 
 ## Local Development
 
@@ -250,9 +285,10 @@ artifacts/releases/burr-gallery-v<version>/
 artifacts/releases/burr-gallery-v<version>.zip
 ```
 
-The bundle contains PNG previews, passing Burr receipts, stamped design data,
-and a manifest. Burr owns these generated proof artifacts; websites should
-consume the zip or GitHub release asset read-only instead of regenerating CAD.
+The bundle contains PNG previews, receipts with expected passing or failing
+outcomes, stamped design data, and a manifest. Burr owns these generated proof
+artifacts; websites should consume the zip or GitHub release asset read-only
+instead of regenerating CAD.
 See [docs/fray-website-contract.md](docs/fray-website-contract.md) for the
 website ingestion contract.
 
@@ -270,10 +306,10 @@ references indexed by `manifest.json`. See
 [docs/static-docs-bundle.md](docs/static-docs-bundle.md) for the fray-site
 integration contract.
 
-For the Burr 0.14 actuator repair proof, the gallery should read as one loop:
+The actuator repair proof should read as one loop:
 the bad actuator CAD fails with measured evidence, `burr explain` tells the
 repair order, and the fixed actuator CAD passes. The preview is visual context;
-the receipt is the verifier.
+the receipt verifies the selected declared claims within Burr's trust boundary.
 
 Start a build123d part:
 
@@ -289,17 +325,18 @@ burr check .
 ```bash
 burr --version
 burr init <folder>
-burr check <folder|burr-design-data.json>...
+burr check [--rulepack <selector>] <folder|burr-design-data.json>...
 burr explain <folder|burr-receipt.json>...
 burr stamp <folder|burr-design-data.json>...
 ```
 
 `init` creates a minimal build123d project with `design.py`, `pyproject.toml`,
 and `.gitignore`. The generated project depends on `burr-build123d==0.10.0`
-from PyPI.
+from PyPI and explicitly selects `builtin:actuator_mount`.
 
-`check` finds `burr-design-data.json`, runs freshness checks and rulepack
-checks, then writes `burr-receipt.json` beside each design data file.
+`check` finds `burr-design-data.json`, requires an explicit built-in or file
+rulepack selector, runs freshness and rulepack checks, prints warnings and
+coverage, then writes `burr-receipt.json` beside each design data file.
 
 `explain` reads `burr-receipt.json` and expands failed checks into plain
 feature/rule/problem/evidence/why/fix output.
@@ -323,6 +360,7 @@ design = BurrDesignData(
 )
 design.source("design.py")
 design.artifact("actuator.step")
+design.rulepack("builtin:actuator_mount")
 design.part("housing", bbox_min=(-42, -16, 0), bbox_max=(42, 16, 26))
 
 with BuildPart() as housing:
@@ -406,6 +444,12 @@ can write JSON.
   "artifact_version": "0.1.0",
   "artifact_type": "actuator_mount",
   "units": "mm",
+  "process": {
+    "kind": "FDM",
+    "material": "PETG",
+    "nozzle_mm": 0.4
+  },
+  "rulepack": "builtin:actuator_mount",
   "source": {
     "path": "source.py",
     "sha256": "..."
@@ -458,11 +502,19 @@ weight_reduction      -> declared if useful, but not judged by actuator rules
 fluid_or_air_path     -> separate rules, not screw-mount rules
 manufacturing_feature -> process-specific rules only
 cosmetic              -> normally unjudged
+reference             -> linkage/evidence context, not an independent claim
 ```
 
 For legacy design data, missing `intent` is treated as `mechanical_interface`.
 Set `intent` explicitly when a declared feature should not be judged by
-mechanical rulepacks.
+mechanical rulepacks. Every declared mechanical-interface feature must be
+selected by at least one evaluated rule for `pass`; otherwise the receipt is
+`incomplete`. Explicitly non-mechanical unchecked features remain visible in
+coverage but do not block a pass.
+
+Only the documented non-mechanical intents above are coverage-exempt. Unknown
+or misspelled intent values are conservatively coverage-required, so a typo
+such as `mechanical-interface` cannot turn an unchecked feature green.
 
 ## Rulepacks
 
@@ -480,6 +532,8 @@ seats exist as matching STEP cylinder/plane evidence:
   "schema_version": "burr.rulepack.v1",
   "id": "actuator_mount",
   "version": "0.14.0",
+  "artifact_type": "actuator_mount",
+  "process_kind": "FDM",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -633,7 +687,17 @@ seats exist as matching STEP cylinder/plane evidence:
 }
 ```
 
-Design data can also choose a rulepack beside the artifact:
+Design data must choose a built-in rulepack or a rulepack beside the artifact:
+
+```json
+{
+  "schema_version": "burr.design-data.v1",
+  "artifact_type": "actuator_mount",
+  "rulepack": "builtin:actuator_mount"
+}
+```
+
+File selection is relative to the design-data file:
 
 ```json
 {
@@ -643,8 +707,17 @@ Design data can also choose a rulepack beside the artifact:
 }
 ```
 
-The CLI `--rulepack <file>` flag still overrides this when you want to run a
-different rulepack against the same artifact.
+The CLI `--rulepack <selector>` flag overrides the design-data selection. It
+accepts the same built-in selector or a rulepack file. Missing selection is an
+invocation/configuration error; there is no implicit default.
+
+Rulepack `artifact_type` must match the design. Optional `process_kind`, when
+present, must match design-data `process.kind`; incompatibility yields
+`incomplete`, not `pass`. Supported `applies_to` selectors are `id`, `kind`,
+`kind_any`, `fastener`, `insert`, `intent`, `intent_any`, and `role_any`.
+Unknown selectors and unsupported rule kinds fail the rulepack contract rather
+than being ignored. In particular, `insert` is an enforced feature selector,
+so insert-specific rules cannot silently apply to a different insert.
 
 Supported rule kinds include:
 
@@ -679,9 +752,11 @@ Receipts include all three:
 
 ```json
 {
-  "schema_version": "burr.receipt.v1",
+  "schema_version": "burr.receipt.v2",
   "burr_version": "0.29.0",
   "artifact_version": "0.1.0",
+  "outcome": "pass",
+  "status": "pass",
   "rulepack_version": "0.14.0",
   "compatibility": {
     "design_data_schema_version": "burr.design-data.v1",
@@ -690,8 +765,9 @@ Receipts include all three:
 }
 ```
 
-Unsupported design data or rulepack schemas fail lint instead of silently producing
-untrustworthy receipts.
+Unsupported design-data or rulepack schemas and invalid rulepack contracts fail
+lint instead of silently producing untrustworthy receipts. Compatibility or
+coverage gaps use `incomplete`, which is never a weaker form of pass.
 
 Legacy `fray-cad.json` files with schema `fray.cad.artifact.v1` are still read
 for transition, but new integrations should emit `burr-design-data.json`.
@@ -726,13 +802,13 @@ That report links the bad receipt, measured failures, first fix, generated
 receipt/design-data suggestions only; Burr does not auto-edit CAD. Agents and
 websites can render the repair proof without scraping terminal output.
 
-Since Burr 0.16, each action gives the failing feature, action kind, checked
-parameter, suggested feature-center movement, measured/required/margin evidence,
-failure reason, and the fixed after-feature that verifies the suggestion.
+Each action gives the failing feature, action kind, checked parameter, suggested
+feature-center movement, measured/required/margin evidence, failure reason, and
+the fixed after-feature that verifies the suggestion.
 
-In Burr 0.18, the repair action contract also includes a required `source_hint`
-with the source file path, edit kind, selector, exact before/after source text,
-editable value path, before/after design-data values,
+The repair action contract also includes a required `source_hint` with the
+source file path, edit kind, selector, exact before/after source text, editable
+value path, before/after design-data values,
 `exact_from_design_data` confidence, and a short rationale. This is an edit hint
 only; Burr still does not auto-edit CAD. Agent repair runners should iterate
 generate/check/explain-json, apply only exact source hints, and stop when the
@@ -816,7 +892,10 @@ decide which features matter.
 
 Ligament checks use declared feature metadata selected by a rulepack. Burr does
 not search the whole model for every thin region, infer load paths, or certify
-that the remaining material survives use.
+that the remaining material survives use. An incompatible rulepack, zero
+evaluated mechanical-rule coverage, an unchecked mechanical-interface feature,
+or a pair-spacing claim with fewer than two candidates is `incomplete`, not
+`pass`.
 
 By default, the Rust CLI reads simple analytic STEP cylinder entities directly.
 For stronger local verification, install the optional Python/OCP workspace and

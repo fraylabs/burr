@@ -17,10 +17,16 @@ The generated CAD artifacts are ignored by git. The source files are the stable
 CAD contract; the receipts are regenerated to prove that Burr can connect the
 declared mechanical intent to exported STEP geometry.
 
-## Burr 0.14 Repair Story
+Gallery receipts use Burr's three-state trust contract. A functional-good card
+must be `pass`, and an intentional negative fixture must be `fail` for the
+declared mistake. `incomplete` means the selected rulepack did not establish
+required mechanical coverage; it is neither a passing example nor proof that a
+negative fixture was caught. Unchecked explicitly non-mechanical features may
+appear in a passing receipt and remain visible in its coverage summary.
 
-The 0.14 gallery narrative should explain the actuator repair loop in simple
-terms:
+## Actuator Repair Story
+
+The gallery explains the actuator repair loop in simple terms:
 
 ```txt
 bad CAD -> Burr check -> explain fix order -> fixed CAD passes
@@ -28,8 +34,9 @@ bad CAD -> Burr check -> explain fix order -> fixed CAD passes
 
 The bad actuator is the before state: Burr catches a declared mechanical mistake
 and reports measured evidence. The fixed actuator is the after state: the same
-intent is repaired and the receipt passes. Gallery previews show what was
-checked, but the receipts are the proof.
+intent is repaired and the receipt passes. Gallery previews show visual context;
+the receipts prove only the rulepack-selected declared claims and evidence they
+name.
 
 ## Parts
 

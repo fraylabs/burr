@@ -11,6 +11,7 @@ const goodExamples = [
   {
     dir: "examples/gallery/practical-driver-access-good",
     design: "examples/gallery/practical-driver-access-good/design.py",
+    rulepackVersion: "0.2.0",
   },
   {
     dir: "examples/gallery/practical-mount-pattern-good",
@@ -23,6 +24,7 @@ const goodExamples = [
   {
     dir: "examples/gallery/practical-boss-support-good",
     design: "examples/gallery/practical-boss-support-good/design.py",
+    rulepackVersion: "0.2.0",
   },
 ]
 
@@ -40,6 +42,7 @@ const caughtMistakes = [
   {
     dir: "examples/gallery/practical-driver-access-blocked",
     design: "examples/gallery/practical-driver-access-blocked/design.py",
+    rulepackVersion: "0.2.0",
     expectedFailures: [
       {
         rule_id: "tool_access:m3_driver_access_diameter",
@@ -74,6 +77,7 @@ const caughtMistakes = [
   {
     dir: "examples/gallery/practical-boss-support-unsupported",
     design: "examples/gallery/practical-boss-support-unsupported/design.py",
+    rulepackVersion: "0.2.0",
     expectedFailures: [
       {
         rule_id: "boss_support:m3_boss_height_to_diameter_ratio",
@@ -96,7 +100,11 @@ for (const example of goodExamples) {
   expectIncludes(result.output, `PASS ${example.dir}/burr-design-data.json`)
   const receipt = readReceipt(example.dir)
   expectEqual(receipt.status, "pass", `${example.dir} receipt status`)
-  expectEqual(receipt.rulepack_version, "0.1.0", `${example.dir} rulepack version`)
+  expectEqual(
+    receipt.rulepack_version,
+    example.rulepackVersion ?? "0.1.0",
+    `${example.dir} rulepack version`,
+  )
   expectEqual(receipt.summary.failures, 0, `${example.dir} failures`)
 }
 
@@ -104,7 +112,11 @@ for (const example of caughtMistakes) {
   run("cargo", ["run", "--quiet", "--", "check", example.dir], { expectFailure: true })
   const receipt = readReceipt(example.dir)
   expectEqual(receipt.status, "fail", `${example.dir} receipt status`)
-  expectEqual(receipt.rulepack_version, "0.1.0", `${example.dir} rulepack version`)
+  expectEqual(
+    receipt.rulepack_version,
+    example.rulepackVersion ?? "0.1.0",
+    `${example.dir} rulepack version`,
+  )
   for (const failure of example.expectedFailures) {
     findRuleCheck(receipt, failure.rule_id, failure.reason)
   }

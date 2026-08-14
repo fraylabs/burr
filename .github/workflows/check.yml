@@ -38,7 +38,7 @@ jobs:
       - name: Sync Python workspace
         run: uv sync --all-packages
 
-      - name: Check
+      - name: Check core, package, and trust contract
         run: npm run check
 
   build123d:

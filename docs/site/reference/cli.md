@@ -30,6 +30,9 @@ uv run python design.py
 burr check .
 ```
 
+The generated design data explicitly selects `builtin:actuator_mount`; the
+starter does not depend on an implicit default.
+
 ## `burr check`
 
 Runs the linter:
@@ -38,13 +41,34 @@ Runs the linter:
 find burr-design-data.json
   -> verify supported schema versions
   -> verify source and artifact hashes
-  -> load selected rulepack
+  -> require and load an explicitly selected rulepack
+  -> validate rulepack compatibility and contract
   -> check declared features
+  -> report warnings and checked/unchecked coverage
   -> write burr-receipt.json
 ```
 
-Use `--no-write-receipt` when a caller only wants terminal output. Use
-`--rulepack <file>` to override the rulepack declared by design data.
+Use `--no-write-receipt` when a caller only wants terminal output. Select a
+rulepack in design data or with `--rulepack`; Burr has no implicit fallback.
+Both built-in and file selectors are supported:
+
+```bash
+burr check --rulepack builtin:actuator_mount .
+burr check --rulepack rules/printed_plate.rulepack.json .
+```
+
+The command prints receipt warnings and checked/unchecked feature coverage. Its
+exit code follows the trust outcome:
+
+| Outcome | Exit | Meaning |
+| --- | ---: | --- |
+| `pass` | `0` | The selected rulepack was compatible and evaluated checks passed with complete required mechanical coverage. |
+| `fail` | `1` | A checked claim failed or the rulepack contract is invalid. |
+| invocation/configuration error | `2` | Burr could not read or select the requested inputs. |
+| `incomplete` | `3` | Burr ran, but could not establish complete required mechanical coverage. |
+
+For multiple targets, any `fail` produces exit `1`; otherwise any `incomplete`
+produces exit `3`. Invocation and read errors remain exit `2`.
 
 ## `burr explain`
 
@@ -55,7 +79,10 @@ burr explain .
 burr explain --json .
 ```
 
-Human output is for review. JSON output is for agent repair loops.
+Human output is for review. JSON output is for agent repair loops. For an
+`incomplete` receipt, both forms retain scope warnings; the JSON repair packet
+also includes `scope`, `warnings`, and normalized `incomplete_reasons` so a
+caller does not mistake an empty failure list for a passing result.
 
 ## `burr stamp`
 

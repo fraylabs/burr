@@ -22,6 +22,7 @@ design = BurrDesignData(
     artifact_version="0.1.0",
     process={"kind": "FDM", "material": "PETG", "nozzle_mm": 0.4},
 )
+design.rulepack("builtin:actuator_mount")
 design.source("design.py")
 design.artifact(STEP_FILE)
 design.part(

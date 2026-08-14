@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+- Added the `burr.receipt.v2` three-state trust contract: `pass` means the selected
+  rulepack was compatible and evaluated checks passed with complete required
+  mechanical coverage, `incomplete` means Burr could not establish that
+  coverage, and `fail` means a checked claim or the rulepack contract is invalid.
+  The schema-version bump makes the new `incomplete` state explicit to existing
+  receipt consumers instead of extending the old two-state v1 contract in place.
+- Required explicit rulepack selection instead of silently falling back to a
+  default rulepack. Artifact/process incompatibility, zero applied-rule
+  coverage, unchecked mechanical features, and insufficient candidates for a
+  pair-spacing claim now produce `incomplete` receipts and a nonzero exit.
+  Multi-target checks now defer every receipt write until all inputs can be
+  read and configured, preventing a later invocation error from leaving silent
+  partial proof artifacts.
+- Tightened rulepack validation for duplicate ids, unsupported rule kinds,
+  unknown selectors, missing rule bounds, and `process_kind` and `insert`
+  selector contracts.
+- Bumped the printed-plate, tool-access, and boss-support rulepacks to `0.2.0`
+  and added STEP-presence rules for declared adjustable slots, service-screw
+  holes, and standoff bosses, closing previously unchecked gallery features
+  exposed by the stricter coverage contract.
+- Made warnings and checked/unchecked feature coverage visible in CLI output so
+  a successful command cannot hide skipped mechanical intent. Explicitly
+  non-mechanical unchecked features remain allowed in a passing receipt, while
+  unknown or misspelled intent values conservatively remain coverage-required.
+- Preserved `@fraylabs/burr` as an intentional public open-source npm
+  distribution surface for a future publish, pinned future npm publication to
+  public access, and added a dry-run package check that includes the
+  machine-readable contract schemas.
+
 ## 0.29.0
 
 - Added Practical Mechanical Lint V1: five focused rulepacks for hardware fit

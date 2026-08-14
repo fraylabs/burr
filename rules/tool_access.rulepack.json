@@ -1,7 +1,7 @@
 {
   "schema_version": "burr.rulepack.v1",
   "id": "tool_access",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "artifact_type": "tool_access_mount",
   "process_kind": "FDM",
   "rules": [
@@ -15,6 +15,25 @@
         "role_any": ["assembly_access"]
       },
       "min_count": 1
+    },
+    {
+      "id": "m3_service_screw_step_presence",
+      "kind": "feature_presence",
+      "description": "The declared service screw hole must exist in the exported STEP artifact.",
+      "applies_to": {
+        "kind": "clearance_hole",
+        "fastener": "M3",
+        "intent_any": [
+          "mechanical_interface"
+        ],
+        "role_any": [
+          "housing_mount"
+        ]
+      },
+      "artifact_kind": "step",
+      "diameter_tolerance_mm": 0.05,
+      "centerline_tolerance_mm": 0.25,
+      "axis_dot_min": 0.99
     },
     {
       "id": "m3_driver_access_diameter",

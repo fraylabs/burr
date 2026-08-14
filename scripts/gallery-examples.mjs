@@ -130,7 +130,7 @@ export const galleryExamples = [
     preview: "dense-random-hole-plate.png",
     receipt: "dense-random-hole-plate.receipt.json",
     designData: "dense-random-hole-plate.design-data.json",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
   },
   {
     slug: "relief-envelope-plate",
@@ -143,7 +143,7 @@ export const galleryExamples = [
     preview: "relief-envelope-plate.png",
     receipt: "relief-envelope-plate.receipt.json",
     designData: "relief-envelope-plate.design-data.json",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
   },
   {
     slug: "t-slot-linear-slider",
@@ -182,7 +182,7 @@ export const galleryExamples = [
     preview: "practical-driver-access-good.png",
     receipt: "practical-driver-access-good.receipt.json",
     designData: "practical-driver-access-good.design-data.json",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
   },
   {
     slug: "practical-mount-pattern-good",
@@ -221,7 +221,7 @@ export const galleryExamples = [
     preview: "practical-boss-support-good.png",
     receipt: "practical-boss-support-good.receipt.json",
     designData: "practical-boss-support-good.design-data.json",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
   },
   {
     slug: "fixed-actuator-housing",
@@ -258,7 +258,7 @@ export const galleryExamples = [
     preview: "bad-dense-plate-too-few-reliefs.png",
     receipt: "bad-dense-plate-too-few-reliefs.receipt.json",
     designData: "bad-dense-plate-too-few-reliefs.design-data.json",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
     expectedFailures: [
       {
         rule_id: "printed_plate:cosmetic_relief_inventory",
@@ -277,7 +277,7 @@ export const galleryExamples = [
     preview: "bad-relief-envelope-thin-ligament.png",
     receipt: "bad-relief-envelope-thin-ligament.receipt.json",
     designData: "bad-relief-envelope-thin-ligament.design-data.json",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
     expectedFailures: [
       {
         rule_id: "printed_plate:cosmetic_relief_ligament",
@@ -372,7 +372,7 @@ export const galleryExamples = [
     preview: "bad-dense-plate-too-many-reliefs.png",
     receipt: "bad-dense-plate-too-many-reliefs.receipt.json",
     designData: "bad-dense-plate-too-many-reliefs.design-data.json",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
     expectedFailures: [
       {
         rule_id: "printed_plate:cosmetic_relief_inventory",
@@ -391,7 +391,7 @@ export const galleryExamples = [
     preview: "bad-hole-slot-thin-ligament.png",
     receipt: "bad-hole-slot-thin-ligament.receipt.json",
     designData: "bad-hole-slot-thin-ligament.design-data.json",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
     expectedFailures: [
       {
         rule_id: "printed_plate:cosmetic_relief_ligament",
@@ -429,7 +429,7 @@ export const galleryExamples = [
     preview: "bad-practical-driver-access-blocked.png",
     receipt: "bad-practical-driver-access-blocked.receipt.json",
     designData: "bad-practical-driver-access-blocked.design-data.json",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
     expectedFailures: [
       {
         rule_id: "tool_access:m3_driver_access_diameter",
@@ -490,7 +490,7 @@ export const galleryExamples = [
     preview: "bad-practical-boss-support-unsupported.png",
     receipt: "bad-practical-boss-support-unsupported.receipt.json",
     designData: "bad-practical-boss-support-unsupported.design-data.json",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
     expectedFailures: [
       {
         rule_id: "boss_support:m3_boss_height_to_diameter_ratio",

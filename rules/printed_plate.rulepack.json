@@ -1,7 +1,7 @@
 {
   "schema_version": "burr.rulepack.v1",
   "id": "printed_plate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "artifact_type": "printed_plate",
   "rules": [
     {
@@ -25,6 +25,24 @@
         "role_any": ["mount", "loaded_mount", "alignment"]
       },
       "min_wall_thickness_mm": 1.2
+    },
+    {
+      "id": "mechanical_slot_step_presence",
+      "kind": "feature_presence",
+      "applies_to": {
+        "kind": "straight_slot",
+        "intent_any": [
+          "mechanical_interface"
+        ],
+        "role_any": [
+          "adjustable_mount"
+        ]
+      },
+      "artifact_kind": "step",
+      "axis_dot_min": 0.999,
+      "width_tolerance_mm": 0.15,
+      "endpoint_tolerance_mm": 0.15,
+      "side_plane_tolerance_mm": 0.15
     },
     {
       "id": "cosmetic_relief_inventory",
