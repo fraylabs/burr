@@ -88,14 +88,13 @@ effect of Burr's local npm scripts.
 
 ## Local Development Checkout
 
-Clone and install:
+Clone and set up:
 
 ```bash
 git clone https://github.com/fraylabs/burr.git
 cd burr
-npm install
 uv sync --all-packages
-cargo test
+cargo test --locked
 ```
 
 Run checks:
@@ -118,6 +117,7 @@ npm run check:gallery:render
 npm run check:gallery:artifact
 npm run check:docs:artifact
 npm run check:explain
+npm run check:release-candidate
 npm run check:fresh-install
 ```
 

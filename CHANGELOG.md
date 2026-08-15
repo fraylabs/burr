@@ -30,6 +30,10 @@
   distribution surface for a future publish, pinned future npm publication to
   public access, and added a dry-run package check that includes the
   machine-readable contract schemas.
+- Split CI into static, core, CAD-proof, and release-candidate lanes with locked
+  dependency checks, strict Clippy, stale-run cancellation, and timeouts. The
+  release-candidate lane installs the packaged Rust CLI and both locally built
+  Python wheels before accepting the change.
 
 ## 0.29.0
 

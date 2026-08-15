@@ -3283,8 +3283,8 @@ fn check_feature_count(manifest: &Value, rulepack: &Value, rule: &Value) -> Valu
             "message": "feature_count rules must declare min_count, max_count, or both."
         });
     }
-    let min_pass = min_count.map_or(true, |value| count >= value);
-    let max_pass = max_count.map_or(true, |value| count <= value);
+    let min_pass = min_count.is_none_or(|value| count >= value);
+    let max_pass = max_count.is_none_or(|value| count <= value);
     let pass = min_pass && max_pass;
     let feature_ids: Vec<Value> = features
         .iter()
@@ -3345,8 +3345,8 @@ fn check_numeric_range(manifest: &Value, rulepack: &Value, rule: &Value) -> Valu
         });
     };
 
-    let min_pass = min.map_or(true, |minimum| value >= minimum);
-    let max_pass = max.map_or(true, |maximum| value <= maximum);
+    let min_pass = min.is_none_or(|minimum| value >= minimum);
+    let max_pass = max.is_none_or(|maximum| value <= maximum);
     let pass = min_pass && max_pass;
 
     json!({
@@ -8863,15 +8863,15 @@ mod tests {
         write_step_cylinders(path, &[(point, axis, radius)]);
     }
 
-    fn write_step_cylinders(path: &Path, cylinders: &[((f64, f64, f64), (f64, f64, f64), f64)]) {
+    type StepVector = (f64, f64, f64);
+    type StepCylinder = (StepVector, StepVector, f64);
+    type StepPlane = (StepVector, StepVector);
+
+    fn write_step_cylinders(path: &Path, cylinders: &[StepCylinder]) {
         write_step_surfaces(path, cylinders, &[]);
     }
 
-    fn write_step_surfaces(
-        path: &Path,
-        cylinders: &[((f64, f64, f64), (f64, f64, f64), f64)],
-        planes: &[((f64, f64, f64), (f64, f64, f64))],
-    ) {
+    fn write_step_surfaces(path: &Path, cylinders: &[StepCylinder], planes: &[StepPlane]) {
         let mut data = String::from("ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\n");
         let mut base = 1;
         for (point, axis, radius) in cylinders {

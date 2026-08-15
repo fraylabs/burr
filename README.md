@@ -158,9 +158,9 @@ tarball contents without publishing.
 ## Local Development
 
 ```bash
-npm install
 uv sync --all-packages
 npm run check
+npm run check:release-candidate
 ```
 
 Run the build123d adapter examples:

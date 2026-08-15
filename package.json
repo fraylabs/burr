@@ -70,10 +70,12 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "cargo test",
+    "test": "cargo test --locked",
     "test:python": "uv run --package burr-build123d python -m unittest discover -s packages/burr-build123d/tests -p 'test_*.py'",
+    "check:node-syntax": "node scripts/check-node-syntax.mjs",
     "check:package": "npm pack --dry-run",
     "check:schemas": "node scripts/check-schemas.mjs",
+    "check:release-candidate": "node scripts/check-release-candidate.mjs",
     "check:init": "node scripts/check-init-starter.mjs",
     "check:build123d": "PYTHON=\"uv run --package burr-build123d python\" node scripts/check-build123d-examples.mjs",
     "check:ocp": "node scripts/check-ocp-step-cylinders.mjs",
@@ -112,7 +114,9 @@
     "check:spacing-envelope-agent-repair": "node scripts/check-spacing-envelope-agent-repair.mjs",
     "check:fresh-install": "node scripts/check-fresh-install.mjs",
     "publish:python:local": "node scripts/publish-python-local.mjs",
-    "check": "cargo fmt --check && cargo test && cargo run --quiet -- --version && npm run test:python && npm run check:package && npm run check:schemas && npm run check:init && npm run check:trust-contract && npm run check:breadth-rules && npm run check:mistake-library-v1 && npm run check:practical-mechanical-lint && npm run check:fastener-support && npm run check:feature-edge-distance && npm run check:counterbore-edge-distance && npm run check:bearing-seat-edge-distance && npm run check:insert-pocket-edge-distance && npm run check:insert-pocket-back-wall && npm run check:standoff-boss && npm run check:standoff-boss-edge-distance && npm run check:standoff-boss-support-link && npm run check:explain && npm run check:repair-loop && npm run check:repair-report && npm run check:repair-action-source-loop && npm run check:multi-fixture-source-hint-repair && npm run check:agent-repair-runner && npm run check:spacing-envelope-agent-repair"
+    "check:static": "cargo fmt --check && cargo clippy --locked --all-targets --all-features -- -D warnings && uv lock --check && npm run check:node-syntax && npm run check:package && npm run check:schemas && npm run check:docs:artifact && npm run check:fray-website-contract",
+    "check:core": "cargo test --locked && cargo run --locked --quiet -- --version && npm run test:python && npm run check:init && npm run check:trust-contract && npm run check:breadth-rules && npm run check:mistake-library-v1 && npm run check:practical-mechanical-lint && npm run check:fastener-support && npm run check:feature-edge-distance && npm run check:counterbore-edge-distance && npm run check:bearing-seat-edge-distance && npm run check:insert-pocket-edge-distance && npm run check:insert-pocket-back-wall && npm run check:standoff-boss && npm run check:standoff-boss-edge-distance && npm run check:standoff-boss-support-link && npm run check:explain && npm run check:repair-loop && npm run check:repair-report && npm run check:repair-action-source-loop && npm run check:multi-fixture-source-hint-repair && npm run check:agent-repair-runner && npm run check:spacing-envelope-agent-repair",
+    "check": "npm run check:static && npm run check:core"
   },
   "keywords": [
     "cad",
