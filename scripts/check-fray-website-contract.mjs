@@ -22,13 +22,20 @@ if (urlMatch[1] !== expectedUrl) {
   );
 }
 
-const release = JSON.parse(
-  spawnSync(
-    "gh",
-    ["release", "view", tag, "--repo", "fraylabs/burr", "--json", "assets"],
-    { encoding: "utf8" },
-  ).stdout,
+const releaseResult = spawnSync(
+  "gh",
+  ["release", "view", tag, "--repo", "fraylabs/burr", "--json", "assets"],
+  { encoding: "utf8" },
 );
+if (releaseResult.error) {
+  throw releaseResult.error;
+}
+if (releaseResult.status !== 0) {
+  throw new Error(
+    `Could not read GitHub release ${tag}.\n${releaseResult.stderr}`,
+  );
+}
+const release = JSON.parse(releaseResult.stdout);
 const asset = release.assets.find((item) => item.name === assetName);
 if (!asset) {
   throw new Error(`GitHub release is missing ${assetName}`);
