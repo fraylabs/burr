@@ -6416,6 +6416,95 @@ fn normalize_path(path: &Path) -> PathBuf {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::{BTreeMap, BTreeSet};
+
+    #[test]
+    fn rulepack_schema_rule_fields_match_runtime_allowlists() {
+        let schema: Value =
+            serde_json::from_str(include_str!("../schemas/burr.rulepack.v1.schema.json")).unwrap();
+        let branches = schema
+            .pointer("/$defs/rule/oneOf")
+            .and_then(Value::as_array)
+            .unwrap();
+        let mut schema_fields_by_kind = BTreeMap::new();
+
+        for branch in branches {
+            let branch = resolve_local_schema_ref(&schema, branch);
+            assert_eq!(
+                branch.get("unevaluatedProperties").and_then(Value::as_bool),
+                Some(false),
+                "rule schema branch must reject fields outside its declared contract"
+            );
+            let kind = schema_rule_kind(&schema, branch)
+                .expect("every rule schema branch must declare one kind const");
+            let mut fields = BTreeSet::new();
+            collect_rule_schema_fields(&schema, branch, &mut fields);
+            assert!(
+                schema_fields_by_kind
+                    .insert(kind.to_string(), fields)
+                    .is_none(),
+                "rule schema kind {kind} is declared more than once"
+            );
+        }
+
+        let runtime_kinds: BTreeSet<_> = SUPPORTED_RULE_KINDS.into_iter().collect();
+        let schema_kinds: BTreeSet<_> = schema_fields_by_kind.keys().map(String::as_str).collect();
+        assert_eq!(
+            schema_kinds, runtime_kinds,
+            "rule kinds differ between the runtime and rulepack schema"
+        );
+
+        for kind in SUPPORTED_RULE_KINDS {
+            let runtime_fields: BTreeSet<_> = allowed_rule_fields(kind).into_iter().collect();
+            let schema_fields: BTreeSet<_> = schema_fields_by_kind[kind]
+                .iter()
+                .map(String::as_str)
+                .collect();
+            assert_eq!(
+                schema_fields, runtime_fields,
+                "accepted fields differ for rule kind {kind}"
+            );
+        }
+    }
+
+    fn resolve_local_schema_ref<'a>(schema: &'a Value, node: &'a Value) -> &'a Value {
+        let Some(reference) = node.get("$ref").and_then(Value::as_str) else {
+            return node;
+        };
+        let pointer = reference
+            .strip_prefix('#')
+            .expect("rulepack schema refs must be local");
+        schema
+            .pointer(pointer)
+            .unwrap_or_else(|| panic!("rulepack schema ref does not resolve: {reference}"))
+    }
+
+    fn schema_rule_kind<'a>(schema: &'a Value, node: &'a Value) -> Option<&'a str> {
+        let node = resolve_local_schema_ref(schema, node);
+        node.pointer("/properties/kind/const")
+            .and_then(Value::as_str)
+            .or_else(|| {
+                node.get("allOf")
+                    .and_then(Value::as_array)
+                    .and_then(|branches| {
+                        branches
+                            .iter()
+                            .find_map(|branch| schema_rule_kind(schema, branch))
+                    })
+            })
+    }
+
+    fn collect_rule_schema_fields(schema: &Value, node: &Value, fields: &mut BTreeSet<String>) {
+        let node = resolve_local_schema_ref(schema, node);
+        if let Some(properties) = node.get("properties").and_then(Value::as_object) {
+            fields.extend(properties.keys().cloned());
+        }
+        if let Some(branches) = node.get("allOf").and_then(Value::as_array) {
+            for branch in branches {
+                collect_rule_schema_fields(schema, branch, fields);
+            }
+        }
+    }
 
     #[test]
     fn actuator_examples_match_expected_results() {

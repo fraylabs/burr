@@ -38,6 +38,9 @@
   dependency checks, strict Clippy, stale-run cancellation, and timeouts. The
   release-candidate lane installs the packaged Rust CLI and both locally built
   Python wheels before accepting the change.
+- Added a CI parity test that compares every rule kind's Rust field allowlist
+  with its closed JSON Schema branch, preventing either contract from drifting
+  independently.
 
 ## 0.29.0
 
