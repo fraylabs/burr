@@ -77,7 +77,7 @@ class BurrDesignData:
 
     def rulepack(self, path: str) -> None:
         if not path:
-            raise ValueError("rulepack path must be a non-empty string.")
+            raise ValueError("rulepack selector must be a non-empty string.")
         self.rulepack_ref = {"path": path}
 
     def measurement(self, name: str, value: float) -> None:

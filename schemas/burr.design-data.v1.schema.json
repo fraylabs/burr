@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Burr design data v1",
+  "type": "object",
+  "required": ["schema_version", "artifact_id", "artifact_type", "units", "features"],
+  "properties": {
+    "schema_version": { "const": "burr.design-data.v1" },
+    "artifact_id": { "$ref": "#/$defs/nonempty_string" },
+    "artifact_version": { "$ref": "#/$defs/nonempty_string" },
+    "artifact_type": { "$ref": "#/$defs/nonempty_string" },
+    "units": { "const": "mm" },
+    "process": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/nonempty_string" }
+      },
+      "additionalProperties": true
+    },
+    "source": { "$ref": "#/$defs/file_ref" },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/file_ref" }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/file_ref" }
+    },
+    "parts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "$ref": "#/$defs/nonempty_string" },
+          "bbox_mm": {
+            "type": "object",
+            "required": ["min", "max"],
+            "properties": {
+              "min": { "$ref": "#/$defs/vector3" },
+              "max": { "$ref": "#/$defs/vector3" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind"],
+        "properties": {
+          "id": { "$ref": "#/$defs/nonempty_string" },
+          "kind": { "$ref": "#/$defs/nonempty_string" },
+          "intent": {
+            "oneOf": [
+              { "$ref": "#/$defs/nonempty_string" },
+              {
+                "type": "array",
+                "minItems": 1,
+                "items": { "$ref": "#/$defs/nonempty_string" }
+              }
+            ]
+          },
+          "role": {
+            "oneOf": [
+              { "$ref": "#/$defs/nonempty_string" },
+              {
+                "type": "array",
+                "minItems": 1,
+                "items": { "$ref": "#/$defs/nonempty_string" }
+              }
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "rulepack": {
+      "oneOf": [
+        { "$ref": "#/$defs/nonempty_string" },
+        {
+          "type": "object",
+          "required": ["path"],
+          "properties": {
+            "path": { "$ref": "#/$defs/nonempty_string" }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "measurements": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "nonempty_string": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "vector3": {
+      "type": "array",
+      "prefixItems": [
+        { "type": "number" },
+        { "type": "number" },
+        { "type": "number" }
+      ],
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "file_ref": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/nonempty_string" },
+        "path": { "$ref": "#/$defs/nonempty_string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 18446744073709551615
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

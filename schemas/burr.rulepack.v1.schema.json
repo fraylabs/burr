@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Burr rulepack v1",
+  "type": "object",
+  "required": ["schema_version", "id", "version", "artifact_type", "rules"],
+  "properties": {
+    "schema_version": { "const": "burr.rulepack.v1" },
+    "id": { "$ref": "#/$defs/nonempty_string" },
+    "version": { "$ref": "#/$defs/nonempty_string" },
+    "artifact_type": { "$ref": "#/$defs/nonempty_string" },
+    "process_kind": { "$ref": "#/$defs/nonempty_string" },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/rule" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonempty_string": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "nonnegative_integer": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615
+    },
+    "nonnegative_number": {
+      "type": "number",
+      "minimum": 0
+    },
+    "positive_number": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "string_list": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/nonempty_string" },
+      "uniqueItems": true
+    },
+    "applies_to": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/nonempty_string" },
+        "kind": { "$ref": "#/$defs/nonempty_string" },
+        "kind_any": { "$ref": "#/$defs/string_list" },
+        "fastener": { "$ref": "#/$defs/nonempty_string" },
+        "insert": { "$ref": "#/$defs/nonempty_string" },
+        "intent": { "$ref": "#/$defs/nonempty_string" },
+        "intent_any": { "$ref": "#/$defs/string_list" },
+        "role_any": { "$ref": "#/$defs/string_list" }
+      },
+      "additionalProperties": false
+    },
+    "rule_identity": {
+      "type": "object",
+      "required": ["id", "kind"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonempty_string" },
+        "kind": {
+          "enum": [
+            "hole_edge_distance",
+            "minimum_wall_thickness",
+            "fastener_support_wall_thickness",
+            "blind_pocket_back_wall_thickness",
+            "standoff_boss_support_link",
+            "feature_presence",
+            "feature_count",
+            "feature_edge_distance",
+            "feature_pair_spacing",
+            "numeric_range"
+          ]
+        },
+        "description": { "type": "string" }
+      }
+    },
+    "selectable_rule": {
+      "type": "object",
+      "properties": {
+        "applies_to": { "$ref": "#/$defs/applies_to" }
+      }
+    },
+    "hole_edge_distance_rule": {
+      "allOf": [
+        { "$ref": "#/$defs/rule_identity" },
+        { "$ref": "#/$defs/selectable_rule" },
+        {
+          "type": "object",
+          "required": ["min_center_to_edge_diameter_multiple"],
+          "properties": {
+            "kind": { "const": "hole_edge_distance" },
+            "min_center_to_edge_diameter_multiple": { "$ref": "#/$defs/positive_number" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "minimum_wall_thickness_rule": {
+      "allOf": [
+        { "$ref": "#/$defs/rule_identity" },
+        { "$ref": "#/$defs/selectable_rule" },
+        {
+          "type": "object",
+          "required": ["min_wall_thickness_mm"],
+          "properties": {
+            "kind": { "const": "minimum_wall_thickness" },
+            "min_wall_thickness_mm": { "$ref": "#/$defs/positive_number" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "fastener_support_wall_thickness_rule": {
+      "allOf": [
+        { "$ref": "#/$defs/rule_identity" },
+        { "$ref": "#/$defs/selectable_rule" },
+        {
+          "type": "object",
+          "required": ["min_wall_thickness_mm"],
+          "properties": {
+            "kind": { "const": "fastener_support_wall_thickness" },
+            "min_wall_thickness_mm": { "$ref": "#/$defs/positive_number" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "blind_pocket_back_wall_thickness_rule": {
+      "allOf": [
+        { "$ref": "#/$defs/rule_identity" },
+        { "$ref": "#/$defs/selectable_rule" },
+        {
+          "type": "object",
+          "required": ["min_back_wall_thickness_mm"],
+          "properties": {
+            "kind": { "const": "blind_pocket_back_wall_thickness" },
+            "min_back_wall_thickness_mm": { "$ref": "#/$defs/positive_number" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "standoff_boss_support_link_rule": {
+      "allOf": [
+        { "$ref": "#/$defs/rule_identity" },
+        { "$ref": "#/$defs/selectable_rule" },
+        {
+          "type": "object",
+          "properties": {
+            "kind": { "const": "standoff_boss_support_link" },
+            "axis_dot_min": { "type": "number", "minimum": 0, "maximum": 1 },
+            "centerline_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "diameter_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "support_diameter_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "feature_presence_rule": {
+      "allOf": [
+        { "$ref": "#/$defs/rule_identity" },
+        { "$ref": "#/$defs/selectable_rule" },
+        {
+          "type": "object",
+          "properties": {
+            "kind": { "const": "feature_presence" },
+            "artifact_kind": { "$ref": "#/$defs/nonempty_string" },
+            "axis_dot_min": { "type": "number", "minimum": 0, "maximum": 1 },
+            "diameter_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "centerline_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "width_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "endpoint_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "side_plane_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "bore_diameter_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "counterbore_diameter_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "counterbore_center_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "shoulder_plane_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "plane_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "pocket_diameter_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "pilot_diameter_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "pocket_center_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "bottom_plane_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "boss_diameter_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "boss_center_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "top_plane_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "seat_diameter_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" },
+            "seat_center_tolerance_mm": { "$ref": "#/$defs/nonnegative_number" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "feature_count_rule": {
+      "allOf": [
+        { "$ref": "#/$defs/rule_identity" },
+        { "$ref": "#/$defs/selectable_rule" },
+        {
+          "type": "object",
+          "properties": {
+            "kind": { "const": "feature_count" },
+            "min_count": { "$ref": "#/$defs/nonnegative_integer" },
+            "max_count": { "$ref": "#/$defs/nonnegative_integer" }
+          },
+          "anyOf": [
+            { "required": ["min_count"] },
+            { "required": ["max_count"] }
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "feature_edge_distance_rule": {
+      "allOf": [
+        { "$ref": "#/$defs/rule_identity" },
+        { "$ref": "#/$defs/selectable_rule" },
+        {
+          "type": "object",
+          "required": ["min_wall_to_edge_mm"],
+          "properties": {
+            "kind": { "const": "feature_edge_distance" },
+            "center_field": { "$ref": "#/$defs/nonempty_string" },
+            "diameter_field": { "$ref": "#/$defs/nonempty_string" },
+            "width_field": { "$ref": "#/$defs/nonempty_string" },
+            "length_field": { "$ref": "#/$defs/nonempty_string" },
+            "span_axis_field": { "$ref": "#/$defs/nonempty_string" },
+            "min_wall_to_edge_mm": { "$ref": "#/$defs/nonnegative_number" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "feature_pair_spacing_rule": {
+      "allOf": [
+        { "$ref": "#/$defs/rule_identity" },
+        { "$ref": "#/$defs/selectable_rule" },
+        {
+          "type": "object",
+          "required": ["min_clearance_mm"],
+          "properties": {
+            "kind": { "const": "feature_pair_spacing" },
+            "center_field": { "$ref": "#/$defs/nonempty_string" },
+            "diameter_field": { "$ref": "#/$defs/nonempty_string" },
+            "width_field": { "$ref": "#/$defs/nonempty_string" },
+            "length_field": { "$ref": "#/$defs/nonempty_string" },
+            "span_axis_field": { "$ref": "#/$defs/nonempty_string" },
+            "min_clearance_mm": { "$ref": "#/$defs/nonnegative_number" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "numeric_range_rule": {
+      "allOf": [
+        { "$ref": "#/$defs/rule_identity" },
+        {
+          "type": "object",
+          "required": ["path"],
+          "properties": {
+            "kind": { "const": "numeric_range" },
+            "path": { "$ref": "#/$defs/nonempty_string" },
+            "min": { "type": "number" },
+            "max": { "type": "number" }
+          },
+          "anyOf": [
+            { "required": ["min"] },
+            { "required": ["max"] }
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "rule": {
+      "oneOf": [
+        { "$ref": "#/$defs/hole_edge_distance_rule" },
+        { "$ref": "#/$defs/minimum_wall_thickness_rule" },
+        { "$ref": "#/$defs/fastener_support_wall_thickness_rule" },
+        { "$ref": "#/$defs/blind_pocket_back_wall_thickness_rule" },
+        { "$ref": "#/$defs/standoff_boss_support_link_rule" },
+        { "$ref": "#/$defs/feature_presence_rule" },
+        { "$ref": "#/$defs/feature_count_rule" },
+        { "$ref": "#/$defs/feature_edge_distance_rule" },
+        { "$ref": "#/$defs/feature_pair_spacing_rule" },
+        { "$ref": "#/$defs/numeric_range_rule" }
+      ]
+    }
+  }
+}

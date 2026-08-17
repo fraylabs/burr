@@ -24,6 +24,11 @@ The website should treat Burr release assets as read-only product data.
 - Burr receipts are the proof artifacts.
 - A passing gallery card should be based on receipt `status: "pass"`, not on
   image appearance.
+- Receipt outcomes are `pass`, `incomplete`, or `fail`. `incomplete` is never a
+  weaker pass and must not be rendered as verified.
+- Render receipt warnings and checked/unchecked coverage so the scope of a pass
+  remains visible. Explicitly non-mechanical unchecked features may coexist
+  with `pass`; unchecked mechanical-interface features produce `incomplete`.
 - A failing gallery card is allowed when `expectation: "fail"` and the receipt
   has at least one failed check. These are intentional negative fixtures.
 - A before/after repair proof is a pair of receipt-backed states: the before
@@ -156,9 +161,16 @@ the Burr receipt. The receipt remains the source of proof if the website needs
 more detail. `failed_rules` is a display summary copied from failed receipt
 checks for intentional negative fixtures.
 
-## Burr 0.14 Repair Narrative
+For trust-contract rendering, read the v2 receipt's canonical `outcome`
+(`status` mirrors it only as a field-name bridge within v2) and its `scope`
+object. Show
+`scope.artifact_type`, `scope.process_kind`, declared/evaluated rule counts, and
+`scope.mechanical_features`, including any unchecked feature ids. Do not infer
+coverage from the preview or manifest display summaries alone.
 
-For Burr 0.14, render the actuator repair proof as one simple loop:
+## Actuator Repair Narrative
+
+Render the actuator repair proof as one simple loop:
 
 ```txt
 bad CAD -> Burr check -> explain fix order -> fixed CAD passes
@@ -181,12 +193,12 @@ caught. For the fixed actuator card, use `status: "pass"` to say the declared
 actuator checks now pass. Do not imply that Burr designed the repair; Burr
 checked the before state, explained the fix order, and checked the after state.
 
-## Burr 0.16 Repair Reports
+## Repair Reports
 
-Burr 0.16 repair reports include portable `repair_actions[]` in the same gallery
-artifact. A report is not a new verifier. It is a receipt-backed summary of the
-before/after loop, with suggested actions derived from the bad/fixed receipts and
-design data only.
+Repair reports include portable `repair_actions[]` in the same gallery artifact.
+A report is not a new verifier. It is a receipt-backed summary of the
+before/after loop, with suggested actions derived from the bad/fixed receipts
+and design data only.
 
 Report JSON schema:
 
@@ -249,12 +261,11 @@ Report JSON schema:
 The website should render report Markdown or selected report JSON fields only
 when `manifest.repair_reports[]` declares the files. Do not infer report paths.
 
-## Burr 0.18 Repair Action Contract V3
+## Repair Action Contract V3
 
-Burr 0.18 adds required source-text fields to `source_hint` objects in
-`repair_actions[]`. Repair
-actions remain machine-readable suggestions derived from the bad/fixed receipts
-and design data. They are not automatic CAD edits.
+The contract requires source-text fields in `source_hint` objects in
+`repair_actions[]`. Repair actions remain machine-readable suggestions derived
+from the bad/fixed receipts and design data. They are not automatic CAD edits.
 
 Every `move_feature` repair action must map to one failed before-receipt check
 by `rule_id` and `feature_id`. A supplemental action may describe a source edit
@@ -302,6 +313,11 @@ from measured geometry alone, or treat the repair report as the verifier. The
 verifier is the regenerated Burr receipt after the exact source edit. If the
 packet has no exact source edits left, or any exact-text/value-path guard fails,
 the runner must stop rather than guess.
+
+Consumers must require `burr.repair-packet.v2` (or
+`burr.repair-packet-list.v2` for multi-input output). Version 2 carries the
+three-state receipt outcome plus scope, warnings, and normalized incomplete
+reasons; an unknown packet version must not be treated as repairable.
 
 Example action:
 
@@ -376,6 +392,7 @@ For each `examples[]` entry, render:
 - PNG at `preview`
 - receipt `status`
 - `expectation`
+- receipt warnings
 - checked feature count and names
 - unchecked feature count and names
 - failed rule summaries when `status: "fail"`
@@ -398,7 +415,17 @@ Proof: Burr caught the declared mistake
 Visual: generated STEP preview
 ```
 
-Do not call a preview "verified" by itself. Call the receipt verified.
+For an incomplete receipt:
+
+```txt
+Status: incomplete
+Proof: incomplete — required rulepack compatibility or mechanical coverage was not established
+Visual: generated STEP preview
+```
+
+Do not call a preview "verified" by itself. Call only a `pass` receipt verified,
+and keep that claim scoped to the selected rulepack and declared features. An
+`incomplete` receipt should surface its warnings and coverage gaps.
 
 ## Update Policy
 

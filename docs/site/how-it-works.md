@@ -31,6 +31,7 @@ design = BurrDesignData(
 
 design.source("design.py")
 design.artifact("actuator.step")
+design.rulepack("builtin:actuator_mount")
 design.part("housing", bbox_min=(-42, -16, 0), bbox_max=(42, 16, 26))
 
 with BuildPart() as housing:
@@ -70,12 +71,30 @@ burr explain .
 
 `burr check .` reads `burr-design-data.json`, checks source and artifact
 freshness, runs the selected rulepack, and writes `burr-receipt.json`.
+Rulepack selection is explicit: design data can name a built-in selector such as
+`builtin:actuator_mount` or a rulepack file, and `--rulepack` can select one at
+the command line. Burr does not silently choose a default rulepack.
+
+The terminal output includes warnings and checked/unchecked feature coverage.
+The receipt outcome is `pass`, `incomplete`, or `fail`:
+
+- `pass` means the selected rulepack was compatible, at least one rule was
+  evaluated, evaluated checks passed, and all declared mechanical-interface
+  features received coverage;
+- `incomplete` means Burr could not establish that trust claim, such as when the
+  rulepack is incompatible, no rule was evaluated, or mechanical coverage is
+  missing;
+- `fail` means a checked claim failed or the rulepack contract is invalid.
+
+Explicitly non-mechanical unchecked features do not block a pass.
 
 `burr explain .` reads the receipt and returns human-readable repair guidance.
 Agents can use `burr explain --json .` for structured repair packets.
 
 ## Boundary
 
-Burr is not image verification, FEA, or general STEP understanding. It is
-unit-test-style design-rule checking over declared CAD intent, with measurable
-receipts that humans and agents can use to repair generated CAD.
+Burr is not image verification, FEA, a constraint solver, or general STEP
+understanding. It is unit-test-style design-rule checking over declared CAD
+intent. A pass applies only to the selected rulepack, declared features, and
+evidence named in the receipt; it does not certify the whole part or find every
+possible mechanical defect.

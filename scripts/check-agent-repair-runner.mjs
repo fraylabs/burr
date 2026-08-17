@@ -38,6 +38,11 @@ function proveNotRepairableWithoutExactEdits() {
     false,
     "not-repairable exact edit availability",
   );
+  expectEqual(
+    runnerReceipt.repair_packet.schema_version,
+    "burr.repair-packet.v2",
+    "not-repairable packet schema",
+  );
   expectEqual(readText(path.join(targetDir, "design.py")), beforeSource, "not-repairable source unchanged");
   expectEqual(
     readJson(path.join(targetDir, "burr-agent-repair-receipt.json")).status,
@@ -82,6 +87,11 @@ function proveRepairWithExactPacket() {
   expectEqual(runnerReceipt.status, "repaired", "repairable runner status");
   expectEqual(runnerReceipt.before.status, "fail", "repairable before status");
   expectEqual(runnerReceipt.after.status, "pass", "repairable after status");
+  expectEqual(
+    runnerReceipt.repair_packet.schema_version,
+    "burr.repair-packet.v2",
+    "repairable packet schema",
+  );
   expectEqual(runnerReceipt.applied_edits.length, 5, "repairable applied edit count");
 
   const finalReceipt = readJson(path.join(targetDir, receiptFile));

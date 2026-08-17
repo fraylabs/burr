@@ -10,13 +10,51 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: check-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  core:
-    name: Core
+  static:
+    name: Static Checks
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Check formatting, lint, locks, schemas, and artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run check:static
+
+      - name: Confirm checks did not modify tracked files
+        run: git diff --exit-code
+
+  core:
+    name: Core
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -32,21 +70,21 @@ jobs:
       - name: Setup Python
         run: uv python install 3.11
 
-      - name: Install
-        run: npm install
-
       - name: Sync Python workspace
-        run: uv sync --all-packages
+        run: uv sync --locked --all-packages
 
-      - name: Check
-        run: npm run check
+      - name: Check core and trust contract
+        run: npm run check:core
 
   build123d:
     name: Build123d Examples
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -62,11 +100,8 @@ jobs:
       - name: Setup Python
         run: uv python install 3.11
 
-      - name: Install Node dependencies
-        run: npm install
-
       - name: Sync Python workspace
-        run: uv sync --all-packages
+        run: uv sync --locked --all-packages
 
       - name: Check build123d examples
         run: npm run check:build123d
@@ -89,26 +124,28 @@ jobs:
       - name: Check straight-slot CAD proof
         run: npm run check:slots
 
-      - name: Check receipt explanations
-        run: npm run check:explain
-
       - name: Check printable gallery
         run: npm run check:gallery
 
       - name: Check gallery render proof
         run: npm run check:gallery:render
 
+      - name: Check gallery release artifact
+        run: npm run check:gallery:artifact
+
       - name: Confirm generated artifacts are untracked
         run: |
           test -z "$(git status --short --untracked-files=no)"
 
-  fresh-install:
-    name: Fresh Install
-    if: github.event_name == 'workflow_dispatch'
+  release-candidate:
+    name: Release Candidate
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -124,8 +161,33 @@ jobs:
       - name: Setup Python
         run: uv python install 3.11
 
-      - name: Install Node dependencies
-        run: npm install
+      - name: Build and install candidate artifacts
+        run: npm run check:release-candidate
+
+  fresh-install:
+    name: Fresh Install
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Setup Python
+        run: uv python install 3.11
 
       - name: Check published install and starter fix loop
         run: npm run check:fresh-install

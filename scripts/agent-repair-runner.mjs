@@ -48,6 +48,7 @@ function runRepairLoop({ targetDir, options }) {
   const repairPacket = options.packet
     ? readJson(path.resolve(options.packet))
     : runExplainJson(targetDir);
+  assertRepairPacketVersion(repairPacket);
   const exactActions = exactRepairActions(repairPacket);
 
   if (exactActions.length === 0) {
@@ -139,6 +140,14 @@ function exactRepairActions(packet) {
       hint.confidence === "exact_from_design_data"
     );
   });
+}
+
+function assertRepairPacketVersion(packet) {
+  if (packet?.schema_version !== "burr.repair-packet.v2") {
+    throw new Error(
+      `Unsupported repair packet schema: ${JSON.stringify(packet?.schema_version)}; expected burr.repair-packet.v2`,
+    );
+  }
 }
 
 function applyExactActions({ targetDir, designData, sourceFile, actions }) {

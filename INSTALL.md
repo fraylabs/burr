@@ -1,6 +1,6 @@
 # Install Burr
 
-Burr has two pieces:
+Burr has three runtime pieces:
 
 ```txt
 burr             Rust CLI and linter
@@ -8,7 +8,9 @@ burr-build123d   Python helper that emits burr-design-data.json from build123d
 burr-ocp        Optional Python/OpenCascade STEP geometry extractor
 ```
 
-The CLI is Rust-first. The Python helper is managed with uv.
+The CLI is Rust-first. The Python helper is managed with uv. Burr's public npm
+package is a separate open-source distribution surface described below; it does
+not replace the Rust CLI.
 
 ## Rust CLI From crates.io
 
@@ -29,6 +31,14 @@ Run it on a folder containing `burr-design-data.json`:
 ```bash
 burr check path/to/design-folder
 ```
+
+The design data must select a rulepack with a built-in string such as
+`"builtin:actuator_mount"` or a `rulepack.path`, or the command must receive
+`--rulepack <selector>`. Burr does not silently choose a default rulepack.
+
+`burr check` exits `0` for `pass`, `3` for `incomplete`, `1` for `fail`, and `2`
+when invocation, input reading, or rulepack selection prevents a receipt-backed
+run. Treat `incomplete` as a blocked trust claim, not as a successful check.
 
 Start a build123d part:
 
@@ -62,16 +72,29 @@ cargo install published Burr
   -> burr check passes
 ```
 
+## Public npm Distribution
+
+`@fraylabs/burr` is intentionally prepared as a future public open-source npm
+distribution. Its package manifest defines a source tarball containing Burr's
+source, rulepacks, machine-readable schemas, documentation, example source, and
+Node-based development and artifact tooling. It is not published yet and is not
+the executable installation path: install the `burr` CLI from crates.io and the
+optional build123d helper from PyPI.
+
+The manifest sets `publishConfig.access` to `public`. `npm run check:package`
+runs `npm pack --dry-run` to verify the future tarball without publishing it.
+That future surface is an OSS distribution contract, not an accidental side
+effect of Burr's local npm scripts.
+
 ## Local Development Checkout
 
-Clone and install:
+Clone and set up:
 
 ```bash
 git clone https://github.com/fraylabs/burr.git
 cd burr
-npm install
 uv sync --all-packages
-cargo test
+cargo test --locked
 ```
 
 Run checks:
@@ -94,6 +117,7 @@ npm run check:gallery:render
 npm run check:gallery:artifact
 npm run check:docs:artifact
 npm run check:explain
+npm run check:release-candidate
 npm run check:fresh-install
 ```
 
@@ -172,6 +196,7 @@ from burr_build123d import BurrDesignData, m3_clearance_hole
 ```txt
 Rust CLI: published to crates.io as burr
 PyPI package: burr-build123d==0.10.0
+Planned public npm package: @fraylabs/burr (not published yet)
 uv local workspace install: supported
 ```
 

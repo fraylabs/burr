@@ -4,6 +4,9 @@ A rulepack selects which declared design features Burr checks.
 
 Rulepacks are JSON files with schema `burr.rulepack.v1`.
 
+The source and future public npm tarball include the machine-readable contract
+at `schemas/burr.rulepack.v1.schema.json`.
+
 ## Shape
 
 ```json
@@ -12,6 +15,7 @@ Rulepacks are JSON files with schema `burr.rulepack.v1`.
   "id": "actuator_mount",
   "version": "0.14.0",
   "artifact_type": "actuator_mount",
+  "process_kind": "FDM",
   "rules": [
     {
       "id": "m3_loaded_hole_edge_distance",
@@ -107,7 +111,16 @@ not an unrelated feature center.
 
 ## Selection
 
-Design data can choose a rulepack:
+Rulepack selection is required. Design data can select a bundled rulepack:
+
+```json
+{
+  "schema_version": "burr.design-data.v1",
+  "rulepack": "builtin:actuator_mount"
+}
+```
+
+Or it can select a rulepack file relative to the design data:
 
 ```json
 {
@@ -119,8 +132,44 @@ Design data can choose a rulepack:
 The CLI can override that choice:
 
 ```bash
+burr check --rulepack builtin:actuator_mount .
 burr check --rulepack rules/printed_plate.rulepack.json .
 ```
+
+Burr does not fall back to a default rulepack when neither form is present.
+
+## Compatibility
+
+`artifact_type` targets the matching design-data field. A mismatch produces an
+`incomplete` receipt because the chosen rulepack was not applicable.
+
+`process_kind` is optional. When present, it targets `process.kind` in the
+design data. A missing or different design process produces `incomplete`;
+omitting `process_kind` from the rulepack leaves process unrestricted.
+
+## Selectors and Validation
+
+The rulepack contract requires non-empty `id`, `version`, and `artifact_type`
+fields plus at least one rule. `process_kind` is optional. Unknown top-level or
+rule-specific fields fail validation so a misspelling cannot silently weaken
+the check.
+
+The supported `applies_to` selector keys are:
+
+```txt
+id  kind  kind_any  fastener  insert  intent  intent_any  role_any
+```
+
+`insert` matches the declared feature's `insert` value, so a rule for
+`M3x5.7` pockets does not silently apply to other insert types. An unknown
+selector key is a rulepack contract failure, not an ignored filter.
+
+Rule ids must be unique. Unsupported rule kinds, duplicate ids, unknown
+selectors, and missing required rule parameters fail the receipt. Rules that
+define a numeric or count range must include at least one bound. This is
+different from an incompatibility or coverage gap: invalid rulepack syntax is
+`fail`, while an otherwise valid rulepack that cannot establish coverage is
+`incomplete`.
 
 ## Supported Rule Kinds
 
@@ -157,4 +206,8 @@ numeric_range                  -> declared measurement is in range
 ## Boundary
 
 Rulepacks are design-rule checks, not constraint solvers. A rulepack only checks
-declared features and measurements it selects.
+declared features and measurements it selects. A passing receipt means that the
+selected rulepack was compatible, at least one rule was evaluated, and evaluated
+checks passed with complete declared mechanical-feature coverage. Zero evaluated
+rule coverage is `incomplete`; a pass does not certify undeclared geometry or the
+whole part.

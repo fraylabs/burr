@@ -119,6 +119,27 @@
       "content_type": "application/json"
     },
     {
+      "source_path": "schemas/burr.design-data.v1.schema.json",
+      "bundle_path": "reference/schemas/burr.design-data.v1.schema.json",
+      "title": "Burr Design Data v1 JSON Schema",
+      "kind": "json_schema",
+      "content_type": "application/schema+json"
+    },
+    {
+      "source_path": "schemas/burr.rulepack.v1.schema.json",
+      "bundle_path": "reference/schemas/burr.rulepack.v1.schema.json",
+      "title": "Burr Rulepack v1 JSON Schema",
+      "kind": "json_schema",
+      "content_type": "application/schema+json"
+    },
+    {
+      "source_path": "schemas/burr.receipt.v2.schema.json",
+      "bundle_path": "reference/schemas/burr.receipt.v2.schema.json",
+      "title": "Burr Receipt v2 JSON Schema",
+      "kind": "json_schema",
+      "content_type": "application/schema+json"
+    },
+    {
       "source_path": "rules/actuator_mount.rulepack.json",
       "bundle_path": "reference/rules/actuator_mount.rulepack.json",
       "title": "Actuator Mount Rulepack",

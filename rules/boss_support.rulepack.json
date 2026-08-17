@@ -1,7 +1,7 @@
 {
   "schema_version": "burr.rulepack.v1",
   "id": "boss_support",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "artifact_type": "boss_support_plate",
   "process_kind": "FDM",
   "rules": [
@@ -22,6 +22,27 @@
         "role_any": ["boss_support"]
       },
       "min_count": 2
+    },
+    {
+      "id": "m3_boss_step_presence",
+      "kind": "feature_presence",
+      "description": "The declared M3 boss must exist as matching boss and top-plane geometry in STEP.",
+      "applies_to": {
+        "kind": "standoff_boss",
+        "fastener": "M3",
+        "intent_any": [
+          "mechanical_interface"
+        ],
+        "role_any": [
+          "bossed_mount"
+        ]
+      },
+      "artifact_kind": "step",
+      "boss_diameter_tolerance_mm": 0.05,
+      "centerline_tolerance_mm": 0.25,
+      "boss_center_tolerance_mm": 0.5,
+      "top_plane_tolerance_mm": 0.25,
+      "axis_dot_min": 0.99
     }
   ]
 }

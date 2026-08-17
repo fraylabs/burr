@@ -5,6 +5,9 @@
 It can be emitted by `burr-build123d`, CadQuery, OpenSCAD, JavaScript CAD, Rust
 CAD, Fusion scripts, or any tool that can write JSON.
 
+The source and future public npm tarball include the machine-readable contract
+at `schemas/burr.design-data.v1.schema.json`.
+
 ## Minimal Shape
 
 ```json
@@ -14,6 +17,12 @@ CAD, Fusion scripts, or any tool that can write JSON.
   "artifact_version": "0.1.0",
   "artifact_type": "actuator_mount",
   "units": "mm",
+  "process": {
+    "kind": "FDM",
+    "material": "PETG",
+    "nozzle_mm": 0.4
+  },
+  "rulepack": "builtin:actuator_mount",
   "source": {
     "path": "design.py",
     "sha256": "..."
@@ -59,12 +68,32 @@ CAD, Fusion scripts, or any tool that can write JSON.
 | `artifact_version` | Optional design version. |
 | `artifact_type` | Selects rulepack compatibility, such as `actuator_mount`. |
 | `units` | Must be `mm`. |
+| `process` | Optional manufacturing context. `process.kind` is checked when the selected rulepack declares `process_kind`. |
 | `source` | Source file path and hash used for freshness checks. |
 | `artifacts` | Generated outputs, usually STEP, with hashes. |
 | `parts` | Declared part envelopes or named bodies. |
 | `features` | Declared design intent Burr can check. |
-| `rulepack` | Optional rulepack path selected by the design data. |
+| `rulepack` | Required unless the CLI receives `--rulepack`; accepts a built-in selector or rulepack file reference. |
 | `measurements` | Optional named measurements for custom rulepacks. |
+
+## Explicit Rulepack Selection
+
+Burr never silently chooses a default rulepack. Select the bundled actuator
+rulepack directly:
+
+```json
+{ "rulepack": "builtin:actuator_mount" }
+```
+
+Or select a file relative to `burr-design-data.json`:
+
+```json
+{ "rulepack": { "path": "rules/my-part.rulepack.json" } }
+```
+
+`burr check --rulepack <selector>` overrides the design-data selection. Missing
+selection is an invocation/configuration error rather than a receipt-backed
+result.
 
 ## Feature Intent
 
@@ -80,7 +109,19 @@ weight_reduction      -> declared if useful, but not judged by mount rules
 fluid_or_air_path     -> separate rules, not screw-mount rules
 manufacturing_feature -> process-specific rules only
 cosmetic              -> normally unjudged
+reference             -> linkage/evidence context, not an independent claim
 ```
+
+Missing `intent` is treated as `mechanical_interface` for compatibility.
+A passing receipt requires at least one evaluated rule, and every declared
+mechanical-interface feature must be selected by an evaluated rule. Zero
+evaluated rule coverage or an unchecked mechanical feature makes the outcome
+`incomplete`; explicitly non-mechanical unchecked features are reported but do
+not block a pass.
+
+Only these documented non-mechanical values are coverage-exempt. Burr treats
+an unknown or misspelled intent as coverage-required, preserving support for
+custom rule selectors without allowing a typo to bypass mechanical coverage.
 
 ## Standoff Boss Links
 

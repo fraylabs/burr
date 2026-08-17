@@ -58,6 +58,10 @@ burr-docs-v0.29.0/
       mount_pattern.rulepack.json
       printable_retention.rulepack.json
       boss_support.rulepack.json
+    schemas/
+      burr.design-data.v1.schema.json
+      burr.rulepack.v1.schema.json
+      burr.receipt.v2.schema.json
 ```
 
 ## Manifest

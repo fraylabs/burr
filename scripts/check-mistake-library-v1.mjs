@@ -12,12 +12,12 @@ const goodExamples = [
   {
     dir: "examples/gallery/dense-random-hole-plate",
     design: "examples/gallery/dense-random-hole-plate/design.py",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
   },
   {
     dir: "examples/gallery/relief-envelope-plate",
     design: "examples/gallery/relief-envelope-plate/design.py",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
   },
 ];
 
@@ -52,7 +52,7 @@ const caughtMistakes = [
   {
     dir: "examples/gallery/dense-random-hole-plate-too-many-reliefs",
     design: "examples/gallery/dense-random-hole-plate-too-many-reliefs/design.py",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
     expectedFailure: {
       rule_id: "printed_plate:cosmetic_relief_inventory",
       reason: "feature_count_out_of_range",
@@ -61,7 +61,7 @@ const caughtMistakes = [
   {
     dir: "examples/gallery/hole-slot-thin-ligament",
     design: "examples/gallery/hole-slot-thin-ligament/design.py",
-    rulepackVersion: "0.1.0",
+    rulepackVersion: "0.2.0",
     expectedFailure: {
       rule_id: "printed_plate:cosmetic_relief_ligament",
       reason: "insufficient_feature_pair_spacing",

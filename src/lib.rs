@@ -11,10 +11,42 @@ pub const LEGACY_DESIGN_DATA_FILE_NAMES: [&str; 1] = ["fray-cad.json"];
 pub const SUPPORTED_DESIGN_DATA_SCHEMA_VERSIONS: [&str; 1] = ["burr.design-data.v1"];
 pub const SUPPORTED_LEGACY_DESIGN_DATA_SCHEMA_VERSIONS: [&str; 1] = ["fray.cad.artifact.v1"];
 pub const SUPPORTED_RULEPACK_SCHEMA_VERSIONS: [&str; 1] = ["burr.rulepack.v1"];
-pub const RECEIPT_SCHEMA_VERSION: &str = "burr.receipt.v1";
+pub const RECEIPT_SCHEMA_VERSION: &str = "burr.receipt.v2";
+pub const REPAIR_PACKET_SCHEMA_VERSION: &str = "burr.repair-packet.v2";
+pub const REPAIR_PACKET_LIST_SCHEMA_VERSION: &str = "burr.repair-packet-list.v2";
 pub const BURR_BUILD123D_PYPI_DEPENDENCY: &str = "burr-build123d==0.10.0";
 
 const DEFAULT_RULEPACK: &str = include_str!("../rules/actuator_mount.rulepack.json");
+const BUILTIN_ACTUATOR_RULEPACK: &str = "builtin:actuator_mount";
+const SUPPORTED_RULE_KINDS: [&str; 10] = [
+    "hole_edge_distance",
+    "minimum_wall_thickness",
+    "fastener_support_wall_thickness",
+    "blind_pocket_back_wall_thickness",
+    "standoff_boss_support_link",
+    "feature_presence",
+    "feature_count",
+    "feature_edge_distance",
+    "feature_pair_spacing",
+    "numeric_range",
+];
+const SUPPORTED_APPLIES_TO_SELECTORS: [&str; 8] = [
+    "id",
+    "kind",
+    "kind_any",
+    "fastener",
+    "insert",
+    "intent",
+    "intent_any",
+    "role_any",
+];
+const KNOWN_NON_MECHANICAL_INTENTS: [&str; 5] = [
+    "cosmetic",
+    "weight_reduction",
+    "fluid_or_air_path",
+    "manufacturing_feature",
+    "reference",
+];
 const SKIP_DIRS: [&str; 7] = [
     ".git",
     ".jj",
@@ -93,6 +125,16 @@ pub fn default_rulepack() -> Result<Value, String> {
     read_json_str(DEFAULT_RULEPACK)
 }
 
+fn read_rulepack_selection(path: &Path) -> Result<Value, String> {
+    match path.to_str() {
+        Some(BUILTIN_ACTUATOR_RULEPACK) => default_rulepack(),
+        Some(selector) if selector.starts_with("builtin:") => {
+            Err(format!("Unknown built-in rulepack selector: {selector}"))
+        }
+        _ => read_json_file(path),
+    }
+}
+
 pub fn sha256_file(path: impl AsRef<Path>) -> Result<String, String> {
     let bytes = fs::read(path.as_ref())
         .map_err(|error| format!("Failed to read {}: {error}", path.as_ref().display()))?;
@@ -140,20 +182,33 @@ pub fn lint_targets(inputs: &[String], options: &LintOptions) -> Result<Vec<Lint
     if paths.is_empty() {
         return Err(format!("No {DESIGN_DATA_FILE_NAME} files found."));
     }
-    paths
+    let mut preflight_options = options.clone();
+    preflight_options.write_receipt = false;
+    let results: Vec<LintResult> = paths
         .iter()
-        .map(|path| lint_design_data_file(path, options))
-        .collect()
+        .map(|path| lint_design_data_file(path, &preflight_options))
+        .collect::<Result<_, _>>()?;
+
+    if options.write_receipt {
+        write_lint_receipts_staged(&results)?;
+    }
+
+    Ok(results)
 }
 
 pub fn lint_design_data_file(path: &Path, options: &LintOptions) -> Result<LintResult, String> {
     let manifest = read_json_file(path)?;
     let manifest_dir = path.parent().unwrap_or_else(|| Path::new("."));
     let rulepack = match &options.rulepack_path {
-        Some(path) => read_json_file(path)?,
+        Some(path) => read_rulepack_selection(path)?,
         None => match design_data_rulepack_path(&manifest, manifest_dir)? {
-            Some(path) => read_json_file(&path)?,
-            None => default_rulepack()?,
+            Some(path) => read_rulepack_selection(&path)?,
+            None => {
+                return Err(format!(
+                    "No rulepack selected for {}. Pass --rulepack <selector> or add rulepack.path to {DESIGN_DATA_FILE_NAME}.",
+                    path.display()
+                ))
+            }
         },
     };
     let source_manifest = relative_label(&options.cwd, path);
@@ -177,37 +232,86 @@ pub fn lint_design_data(
 ) -> Value {
     let mut checks = Vec::new();
     let mut warnings = Vec::new();
+    let mut evaluated_rule_ids = Vec::new();
 
-    checks.extend(check_schema_versions(manifest, rulepack));
+    let schema_checks = check_schema_versions(manifest, rulepack);
+    let design_schema_valid = schema_checks.iter().all(|check| {
+        string_field(check, "rule_id") != Some("burr_design_data:schema_version_supported")
+            || string_field(check, "status") == Some("pass")
+    });
+    let rulepack_schema_valid = schema_checks.iter().all(|check| {
+        string_field(check, "rule_id") != Some("burr_rulepack:schema_version_supported")
+            || string_field(check, "status") == Some("pass")
+    });
+    checks.extend(schema_checks);
+
+    let design_contract_checks = validate_design_data_contract(manifest);
+    let design_contract_valid = design_schema_valid
+        && design_contract_checks
+            .iter()
+            .all(|check| string_field(check, "status") == Some("pass"));
+    checks.extend(design_contract_checks);
+
+    let contract_checks = validate_rulepack_contract(rulepack);
+    let rulepack_contract_valid = rulepack_schema_valid
+        && contract_checks
+            .iter()
+            .all(|check| string_field(check, "status") == Some("pass"));
+    checks.extend(contract_checks);
     checks.extend(check_file_hashes(manifest, manifest_dir));
 
-    if string_field(manifest, "units").is_some_and(|units| units != "mm") {
-        checks.push(json!({
-            "rule_id": format!("{}:design_data_units_mm", string_field(rulepack, "id").unwrap_or("<missing>")),
-            "status": "fail",
-            "reason": "unsupported_units",
-            "message": "Burr currently expects millimeter design data.",
-            "measured": { "units": string_field(manifest, "units").unwrap_or("") },
-            "required": { "units": "mm" }
+    let target_artifact_type = string_field(rulepack, "artifact_type");
+    let design_artifact_type = string_field(manifest, "artifact_type");
+    let contracts_valid = design_contract_valid && rulepack_contract_valid;
+    let artifact_type_compatible =
+        target_artifact_type.is_some_and(|target| design_artifact_type == Some(target));
+    if contracts_valid && !artifact_type_compatible {
+        warnings.push(json!({
+            "rule_id": format!("{}:artifact_type", string_field(rulepack, "id").unwrap_or("<missing>")),
+            "status": "warn",
+            "affects_outcome": true,
+            "reason": "artifact_type_not_targeted",
+            "measured": { "artifact_type": design_artifact_type },
+            "required": { "artifact_type": target_artifact_type },
+            "message": format!("Rulepack does not target artifact_type {}. Mechanical rules were not evaluated.", design_artifact_type.unwrap_or("<missing>"))
         }));
     }
 
-    if let Some(artifact_type) = string_field(rulepack, "artifact_type") {
-        if string_field(manifest, "artifact_type") != Some(artifact_type) {
+    let target_process_kind = string_field(rulepack, "process_kind");
+    let process_kind_restricted = rulepack.get("process_kind").is_some();
+    let design_process_kind = manifest.pointer("/process/kind").and_then(Value::as_str);
+    let process_kind_compatible = if process_kind_restricted {
+        target_process_kind.is_some_and(|target| design_process_kind == Some(target))
+    } else {
+        true
+    };
+    if contracts_valid && !process_kind_compatible {
+        if design_process_kind.is_none() {
             warnings.push(json!({
-                "rule_id": format!("{}:artifact_type", string_field(rulepack, "id").unwrap_or("<missing>")),
+                "rule_id": format!("{}:process_kind", string_field(rulepack, "id").unwrap_or("<missing>")),
                 "status": "warn",
-                "reason": "artifact_type_not_targeted",
-                "message": format!("Skipping artifact_type {}.", string_field(manifest, "artifact_type").unwrap_or("<missing>"))
+                "affects_outcome": true,
+                "reason": "design_process_kind_missing",
+                "measured": { "process_kind": Value::Null },
+                "required": { "process_kind": target_process_kind },
+                "message": "Rulepack declares a process_kind, but design data process.kind is missing. Mechanical rules were not evaluated."
+            }));
+        } else {
+            warnings.push(json!({
+                "rule_id": format!("{}:process_kind", string_field(rulepack, "id").unwrap_or("<missing>")),
+                "status": "warn",
+                "affects_outcome": true,
+                "reason": "process_kind_not_targeted",
+                "measured": { "process_kind": design_process_kind },
+                "required": { "process_kind": target_process_kind },
+                "message": format!("Rulepack does not target process.kind {}. Mechanical rules were not evaluated.", design_process_kind.unwrap_or("<missing>"))
             }));
         }
     }
 
-    if warnings.is_empty()
-        || !warnings
-            .iter()
-            .any(|warning| string_field(warning, "reason") == Some("artifact_type_not_targeted"))
-    {
+    let scope_compatible = artifact_type_compatible && process_kind_compatible;
+
+    if contracts_valid && scope_compatible {
         for rule in rulepack
             .get("rules")
             .and_then(Value::as_array)
@@ -215,40 +319,26 @@ pub fn lint_design_data(
             .flatten()
         {
             let rule_kind = string_field(rule, "kind");
-
-            if !matches!(
-                rule_kind,
-                Some("hole_edge_distance")
-                    | Some("minimum_wall_thickness")
-                    | Some("fastener_support_wall_thickness")
-                    | Some("blind_pocket_back_wall_thickness")
-                    | Some("standoff_boss_support_link")
-                    | Some("feature_presence")
-                    | Some("feature_count")
-                    | Some("feature_edge_distance")
-                    | Some("feature_pair_spacing")
-                    | Some("numeric_range")
-            ) {
-                warnings.push(json!({
-                    "rule_id": format!("{}:{}", string_field(rulepack, "id").unwrap_or("<missing>"), string_field(rule, "id").unwrap_or("<missing>")),
-                    "status": "warn",
-                    "reason": "unsupported_rule_kind",
-                    "message": format!("Unsupported rule kind {}.", rule_kind.unwrap_or("<missing>"))
-                }));
-                continue;
-            }
+            let rule_id = string_field(rule, "id").unwrap_or("<missing>");
+            let full_rule_id = format!(
+                "{}:{rule_id}",
+                string_field(rulepack, "id").unwrap_or("<missing>")
+            );
 
             if rule_kind == Some("feature_count") {
+                evaluated_rule_ids.push(full_rule_id);
                 checks.push(check_feature_count(manifest, rulepack, rule));
                 continue;
             }
 
             if rule_kind == Some("numeric_range") {
+                evaluated_rule_ids.push(full_rule_id);
                 checks.push(check_numeric_range(manifest, rulepack, rule));
                 continue;
             }
 
             if rule_kind == Some("feature_pair_spacing") {
+                evaluated_rule_ids.push(full_rule_id);
                 checks.push(check_feature_pair_spacing(manifest, rulepack, rule));
                 continue;
             }
@@ -263,56 +353,88 @@ pub fn lint_design_data(
 
             if features.is_empty() {
                 warnings.push(json!({
-                    "rule_id": format!("{}:{}", string_field(rulepack, "id").unwrap_or("<missing>"), string_field(rule, "id").unwrap_or("<missing>")),
+                    "rule_id": full_rule_id,
                     "status": "warn",
+                    "affects_outcome": false,
                     "reason": "no_applicable_features",
                     "message": "No applicable features were found for this rule."
                 }));
                 continue;
             }
 
+            evaluated_rule_ids.push(full_rule_id.clone());
             for feature in features {
-                match rule_kind {
+                let check = match rule_kind {
                     Some("hole_edge_distance") => {
-                        checks.push(check_hole_edge_distance(manifest, rulepack, rule, feature));
+                        check_hole_edge_distance(manifest, rulepack, rule, feature)
                     }
                     Some("minimum_wall_thickness") => {
-                        checks.push(check_minimum_wall_thickness(
-                            manifest, rulepack, rule, feature,
-                        ));
+                        check_minimum_wall_thickness(manifest, rulepack, rule, feature)
                     }
                     Some("fastener_support_wall_thickness") => {
-                        checks.push(check_fastener_support_wall_thickness(
-                            rulepack, rule, feature,
-                        ));
+                        check_fastener_support_wall_thickness(rulepack, rule, feature)
                     }
                     Some("blind_pocket_back_wall_thickness") => {
-                        checks.push(check_blind_pocket_back_wall_thickness(
-                            manifest, rulepack, rule, feature,
-                        ));
+                        check_blind_pocket_back_wall_thickness(manifest, rulepack, rule, feature)
                     }
                     Some("standoff_boss_support_link") => {
-                        checks.push(check_standoff_boss_support_link(
-                            manifest, rulepack, rule, feature,
-                        ));
+                        check_standoff_boss_support_link(manifest, rulepack, rule, feature)
                     }
                     Some("feature_edge_distance") => {
-                        checks.push(check_feature_edge_distance(
-                            manifest, rulepack, rule, feature,
-                        ));
+                        check_feature_edge_distance(manifest, rulepack, rule, feature)
                     }
                     Some("feature_presence") => {
-                        checks.push(check_feature_presence(
-                            manifest,
-                            manifest_dir,
-                            rulepack,
-                            rule,
-                            feature,
-                        ));
+                        check_feature_presence(manifest, manifest_dir, rulepack, rule, feature)
                     }
-                    _ => unreachable!(),
-                }
+                    other => json!({
+                        "rule_id": full_rule_id.clone(),
+                        "status": "fail",
+                        "reason": "unhandled_rule_kind",
+                        "message": format!(
+                            "Rule kind {} is declared supported but has no evaluator.",
+                            other.unwrap_or("<missing>")
+                        )
+                    }),
+                };
+                checks.push(check);
             }
+        }
+    }
+
+    let feature_summary = summarize_features(manifest, &checks);
+    let unchecked_mechanical_feature_ids = feature_summary
+        .get("unchecked_mechanical_feature_ids")
+        .and_then(Value::as_array)
+        .cloned()
+        .unwrap_or_default();
+    let unchecked_mechanical_features = feature_summary
+        .get("mechanical_unchecked")
+        .and_then(Value::as_u64)
+        .unwrap_or(0);
+
+    let mut coverage_incomplete = false;
+    if contracts_valid && scope_compatible {
+        if evaluated_rule_ids.is_empty() {
+            warnings.push(json!({
+                "rule_id": "burr_scope:mechanical_rules_evaluated",
+                "status": "warn",
+                "affects_outcome": true,
+                "reason": "no_evaluated_mechanical_rules",
+                "message": "No mechanical rule was applied or evaluated for this design."
+            }));
+            coverage_incomplete = true;
+        }
+
+        if unchecked_mechanical_features > 0 {
+            warnings.push(json!({
+                "rule_id": "burr_scope:mechanical_features_checked",
+                "status": "warn",
+                "affects_outcome": true,
+                "reason": "unchecked_mechanical_features",
+                "feature_ids": unchecked_mechanical_feature_ids,
+                "message": "One or more coverage-required features were not checked by an evaluated rule."
+            }));
+            coverage_incomplete = true;
         }
     }
 
@@ -320,33 +442,82 @@ pub fn lint_design_data(
         .iter()
         .filter(|check| string_field(check, "status") == Some("fail"))
         .count();
-    let feature_summary = summarize_features(manifest, &checks);
+    let incomplete_checks = checks
+        .iter()
+        .filter(|check| string_field(check, "status") == Some("incomplete"))
+        .count();
+    let scope_incomplete =
+        contracts_valid && (!scope_compatible || coverage_incomplete || incomplete_checks > 0);
+    let outcome = if failures > 0 {
+        "fail"
+    } else if scope_incomplete {
+        "incomplete"
+    } else {
+        "pass"
+    };
+    let declared_rules = rulepack
+        .get("rules")
+        .and_then(Value::as_array)
+        .map_or(0, Vec::len);
 
     json!({
         "schema_version": RECEIPT_SCHEMA_VERSION,
         "burr_version": BURR_VERSION,
-        "status": if failures == 0 { "pass" } else { "fail" },
-        "artifact_id": manifest.get("artifact_id").cloned().unwrap_or(Value::Null),
-        "artifact_version": manifest.get("artifact_version").cloned().unwrap_or(Value::Null),
-        "artifact_type": manifest.get("artifact_type").cloned().unwrap_or(Value::Null),
-        "rulepack_id": rulepack.get("id").cloned().unwrap_or(Value::Null),
-        "rulepack_version": rulepack.get("version").cloned().unwrap_or(Value::Null),
+        "outcome": outcome,
+        "status": outcome,
+        "artifact_id": optional_string_value(manifest, "artifact_id"),
+        "artifact_version": optional_string_value(manifest, "artifact_version"),
+        "artifact_type": optional_string_value(manifest, "artifact_type"),
+        "rulepack_id": optional_string_value(rulepack, "id"),
+        "rulepack_version": optional_string_value(rulepack, "version"),
+        // The manifest_* and source_manifest aliases preserve the field names
+        // emitted by receipt v1. Keep them for v2 consumers migrating at their
+        // own pace; remove them only in a future receipt schema version.
         "compatibility": {
-            "design_data_schema_version": manifest.get("schema_version").cloned().unwrap_or(Value::Null),
+            "design_data_schema_version": optional_string_value(manifest, "schema_version"),
             "supported_design_data_schema_versions": supported_manifest_schema_versions(),
-            "manifest_schema_version": manifest.get("schema_version").cloned().unwrap_or(Value::Null),
+            "manifest_schema_version": optional_string_value(manifest, "schema_version"),
             "supported_manifest_schema_versions": supported_manifest_schema_versions(),
-            "rulepack_schema_version": rulepack.get("schema_version").cloned().unwrap_or(Value::Null),
+            "rulepack_schema_version": optional_string_value(rulepack, "schema_version"),
             "supported_rulepack_schema_versions": SUPPORTED_RULEPACK_SCHEMA_VERSIONS
         },
         "source_design_data": source_manifest.clone().map(Value::String).unwrap_or(Value::Null),
         "source_manifest": source_manifest.map(Value::String).unwrap_or(Value::Null),
         "checks": checks,
         "warnings": warnings,
+        "scope": {
+            "artifact_type": {
+                "design": design_artifact_type,
+                "rulepack": target_artifact_type,
+                "compatible": artifact_type_compatible
+            },
+            "process_kind": {
+                "design": design_process_kind,
+                "rulepack": target_process_kind,
+                "restricted": process_kind_restricted,
+                "compatible": process_kind_compatible
+            },
+            "rules": {
+                "declared": declared_rules,
+                "evaluated": evaluated_rule_ids.len(),
+                "evaluated_rule_ids": evaluated_rule_ids
+            },
+            "mechanical_features": {
+                "declared": feature_summary.get("mechanical_declared").cloned().unwrap_or(json!(0)),
+                "checked": feature_summary.get("mechanical_checked").cloned().unwrap_or(json!(0)),
+                "unchecked": feature_summary.get("mechanical_unchecked").cloned().unwrap_or(json!(0)),
+                "unchecked_feature_ids": feature_summary.get("unchecked_mechanical_feature_ids").cloned().unwrap_or_else(|| json!([]))
+            }
+        },
         "summary": {
             "checks": checks.len(),
             "failures": failures,
+            "incomplete_checks": incomplete_checks,
             "warnings": warnings.len(),
+            "rules": {
+                "declared": declared_rules,
+                "evaluated": evaluated_rule_ids.len()
+            },
             "features": feature_summary
         }
     })
@@ -421,6 +592,45 @@ pub fn format_receipt_explanations(receipt: &Value) -> Vec<Vec<String>> {
 }
 
 pub fn build_receipt_repair_packet(receipt: &Value) -> Value {
+    let warnings: Vec<Value> = receipt
+        .get("warnings")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .cloned()
+        .collect();
+    let mut incomplete_reasons: Vec<Value> = receipt
+        .get("checks")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter(|check| string_field(check, "status") == Some("incomplete"))
+        .map(|check| {
+            json!({
+                "source": "check",
+                "rule_id": check.get("rule_id").cloned().unwrap_or(Value::Null),
+                "reason": check.get("reason").cloned().unwrap_or(Value::Null),
+                "message": check.get("message").cloned().unwrap_or(Value::Null),
+                "feature_id": check.get("feature_id").cloned().unwrap_or(Value::Null),
+                "feature_ids": check.get("feature_ids").cloned().unwrap_or(Value::Null)
+            })
+        })
+        .collect();
+    incomplete_reasons.extend(
+        warnings
+            .iter()
+            .filter(|warning| warning.get("affects_outcome").and_then(Value::as_bool) == Some(true))
+            .map(|warning| {
+                json!({
+                    "source": "warning",
+                    "rule_id": warning.get("rule_id").cloned().unwrap_or(Value::Null),
+                    "reason": warning.get("reason").cloned().unwrap_or(Value::Null),
+                    "message": warning.get("message").cloned().unwrap_or(Value::Null),
+                    "feature_ids": warning.get("feature_ids").cloned().unwrap_or(Value::Null)
+                })
+            }),
+    );
+
     let mut failures: Vec<_> = receipt
         .get("checks")
         .and_then(Value::as_array)
@@ -479,17 +689,22 @@ pub fn build_receipt_repair_packet(receipt: &Value) -> Value {
         .count();
 
     json!({
-        "schema_version": "burr.repair-packet.v1",
+        "schema_version": REPAIR_PACKET_SCHEMA_VERSION,
         "burr_version": BURR_VERSION,
         "source_kind": "receipt",
         "source_design_data": receipt.get("source_design_data").cloned().unwrap_or(Value::Null),
         "status": receipt.get("status").and_then(Value::as_str).unwrap_or("<unknown>"),
+        "outcome": receipt.get("outcome").or_else(|| receipt.get("status")).cloned().unwrap_or(Value::Null),
         "summary": {
             "failure_count": failures.len(),
+            "incomplete_reason_count": incomplete_reasons.len(),
             "exact_source_edit_count": exact_source_edits,
             "exact_source_edits_available": exact_source_edits > 0
         },
-        "failures": failures
+        "failures": failures,
+        "incomplete_reasons": incomplete_reasons,
+        "warnings": warnings,
+        "scope": receipt.get("scope").cloned().unwrap_or(Value::Null)
     })
 }
 
@@ -514,7 +729,7 @@ pub fn build_repair_report_packet(report: &Value) -> Value {
         .count();
 
     json!({
-        "schema_version": "burr.repair-packet.v1",
+        "schema_version": REPAIR_PACKET_SCHEMA_VERSION,
         "burr_version": BURR_VERSION,
         "source_kind": "repair_report",
         "repair_report_id": report.get("report_id").or_else(|| report.get("id")).cloned().unwrap_or(Value::Null),
@@ -533,7 +748,7 @@ pub fn build_repair_report_packet(report: &Value) -> Value {
 }
 
 fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
-    if string_field(check, "status") != Some("fail") {
+    if !matches!(string_field(check, "status"), Some("fail" | "incomplete")) {
         return None;
     }
 
@@ -831,7 +1046,7 @@ fn format_check_diagnostic(check: &Value) -> Option<Vec<String>> {
 }
 
 fn format_check_explanation(check: &Value) -> Option<Vec<String>> {
-    if string_field(check, "status") != Some("fail") {
+    if !matches!(string_field(check, "status"), Some("fail" | "incomplete")) {
         return None;
     }
 
@@ -910,6 +1125,7 @@ fn explanation_category(reason: &str) -> &'static str {
         "feature_count_out_of_range" | "numeric_value_out_of_range" | "missing_numeric_value" => {
             "declared measurement"
         }
+        "insufficient_pair_spacing_candidates" => "incomplete scope",
         _ => "other",
     }
 }
@@ -928,6 +1144,7 @@ fn explanation_headline(reason: &str, feature_kind: &str) -> &'static str {
         },
         2 => "Fix dimension: move or resize unsafe geometry.",
         3 => "Fix declared measurement: update the CAD or rule range.",
+        4 => "Complete rule scope: declare enough features for the check.",
         _ => "Fix check input: inspect the failed rule.",
     }
 }
@@ -976,6 +1193,7 @@ fn explanation_rank_for_reason(reason: &str) -> u8 {
         | "invalid_pair_spacing_rule_clearance"
         | "invalid_counterbore_dimensions" => 2,
         "feature_count_out_of_range" | "numeric_value_out_of_range" | "missing_numeric_value" => 3,
+        "insufficient_pair_spacing_candidates" => 4,
         _ => 9,
     }
 }
@@ -1053,6 +1271,10 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
         "missing_hole_diameter" => "the feature is missing a valid hole diameter.".to_string(),
         "missing_pair_spacing_geometry" => {
             "a feature in a pair-spacing rule is missing center_mm or diameter_mm.".to_string()
+        }
+        "insufficient_pair_spacing_candidates" => {
+            "the pair-spacing rule selected fewer than two declared features, so no pair could be checked."
+                .to_string()
         }
         "missing_feature_edge_geometry" => {
             "the feature is missing a checkable edge-distance envelope.".to_string()
@@ -1348,6 +1570,20 @@ fn explanation_evidence(check: &Value, reason: &str) -> Vec<String> {
             push_measure(&mut lines, check, "/required/min", "Minimum value");
             push_measure(&mut lines, check, "/required/max", "Maximum value");
         }
+        "insufficient_pair_spacing_candidates" => {
+            push_count(
+                &mut lines,
+                check,
+                "/measured/candidate_count",
+                "Matching candidates",
+            );
+            push_count(
+                &mut lines,
+                check,
+                "/required/min_candidates",
+                "Required candidates",
+            );
+        }
         _ => {
             if let Some(message) = string_field(check, "message") {
                 lines.push(format!("Evidence: {message}"));
@@ -1398,6 +1634,9 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
         }
         "numeric_value_out_of_range" | "missing_numeric_value" => {
             "Burr cannot trust a clearance, engagement, or other derived claim unless the source declares it in range."
+        }
+        "insufficient_pair_spacing_candidates" => {
+            "a pair-spacing claim needs at least two matching features before Burr can measure the closest pair."
         }
         _ => "Burr cannot trust this mechanical claim until the failing rule is fixed.",
     }
@@ -1467,6 +1706,9 @@ fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
         "numeric_value_out_of_range" | "missing_numeric_value" => {
             "fix the CAD dimensions or emit the expected measurement in burr-design-data.json."
         }
+        "insufficient_pair_spacing_candidates" => {
+            "declare at least two matching features, or narrow or remove the pair-spacing rule if no pair is intended."
+        }
         "step_geometry_unreadable" => "export a valid STEP artifact and make sure the design data points to it.",
         "invalid_counterbore_dimensions" => {
             "make counterbore_diameter_mm greater than bore_diameter_mm and use positive depths."
@@ -1502,6 +1744,767 @@ fn push_bool_evidence(check: &Value, lines: &mut Vec<String>, key: &str, label: 
         .and_then(Value::as_bool)
     {
         lines.push(format!("Evidence: {label} = {value}."));
+    }
+}
+
+fn validate_design_data_contract(manifest: &Value) -> Vec<Value> {
+    let mut failures = Vec::new();
+    let Some(_object) = manifest.as_object() else {
+        return vec![design_data_contract_failure(
+            "invalid_design_data",
+            "Design data must be a JSON object.",
+            json!({}),
+        )];
+    };
+
+    for (field, reason) in [
+        ("artifact_id", "missing_artifact_id"),
+        ("artifact_type", "missing_artifact_type"),
+    ] {
+        if !nonempty_string_field(manifest, field) {
+            failures.push(design_data_contract_failure(
+                reason,
+                &format!("Design data {field} must be a non-empty string."),
+                json!({ "field": field }),
+            ));
+        }
+    }
+
+    if string_field(manifest, "units") != Some("mm") {
+        failures.push(design_data_contract_failure(
+            "unsupported_units",
+            "Design data units must be mm.",
+            json!({ "field": "units", "measured": manifest.get("units"), "required": "mm" }),
+        ));
+    }
+
+    if manifest.get("artifact_version").is_some()
+        && !nonempty_string_field(manifest, "artifact_version")
+    {
+        failures.push(design_data_contract_failure(
+            "invalid_artifact_version",
+            "Design data artifact_version must be a non-empty string when declared.",
+            json!({ "field": "artifact_version" }),
+        ));
+    }
+
+    if let Some(process) = manifest.get("process") {
+        if let Some(process) = process.as_object() {
+            if process
+                .get("kind")
+                .and_then(Value::as_str)
+                .is_none_or(|kind| kind.trim().is_empty())
+            {
+                failures.push(design_data_contract_failure(
+                    "invalid_process_kind",
+                    "Design data process must contain a non-empty kind.",
+                    json!({ "field": "process.kind" }),
+                ));
+            }
+        } else {
+            failures.push(design_data_contract_failure(
+                "invalid_process",
+                "Design data process must be an object when declared.",
+                json!({ "field": "process" }),
+            ));
+        }
+    }
+
+    if let Some(source) = manifest.get("source") {
+        validate_design_file_ref(source, "source", &mut failures);
+    }
+    for field in ["sources", "artifacts"] {
+        if let Some(values) = manifest.get(field) {
+            if let Some(values) = values.as_array() {
+                for (index, value) in values.iter().enumerate() {
+                    validate_design_file_ref(value, &format!("{field}[{index}]"), &mut failures);
+                }
+            } else {
+                failures.push(design_data_contract_failure(
+                    "invalid_file_ref_list",
+                    "Design data sources and artifacts must be arrays when declared.",
+                    json!({ "field": field }),
+                ));
+            }
+        }
+    }
+
+    if let Some(parts) = manifest.get("parts") {
+        if let Some(parts) = parts.as_array() {
+            let mut seen_part_ids = HashSet::new();
+            for (index, part) in parts.iter().enumerate() {
+                let Some(part) = part.as_object() else {
+                    failures.push(design_data_contract_failure(
+                        "invalid_part",
+                        "Every design-data part must be an object.",
+                        json!({ "part_index": index }),
+                    ));
+                    continue;
+                };
+                if part
+                    .get("id")
+                    .and_then(Value::as_str)
+                    .is_none_or(|id| id.trim().is_empty())
+                {
+                    failures.push(design_data_contract_failure(
+                        "missing_part_id",
+                        "Every design-data part must have a non-empty id.",
+                        json!({ "part_index": index }),
+                    ));
+                } else if let Some(part_id) = part.get("id").and_then(Value::as_str) {
+                    if !seen_part_ids.insert(part_id.to_string()) {
+                        failures.push(design_data_contract_failure(
+                            "duplicate_part_id",
+                            "Design-data part ids must be unique.",
+                            json!({ "part_index": index, "part_id": part_id }),
+                        ));
+                    }
+                }
+                if let Some(bbox) = part.get("bbox_mm") {
+                    let bbox_valid = bbox.as_object().is_some_and(|bbox| {
+                        bbox.keys().all(|key| matches!(key.as_str(), "min" | "max"))
+                            && bbox.get("min").is_some_and(valid_vector3)
+                            && bbox.get("max").is_some_and(valid_vector3)
+                    });
+                    if !bbox_valid {
+                        failures.push(design_data_contract_failure(
+                            "invalid_part_bbox",
+                            "Part bbox_mm must contain only numeric three-value min and max vectors.",
+                            json!({ "part_index": index, "field": "bbox_mm" }),
+                        ));
+                    }
+                }
+            }
+        } else {
+            failures.push(design_data_contract_failure(
+                "invalid_parts",
+                "Design data parts must be an array when declared.",
+                json!({ "field": "parts" }),
+            ));
+        }
+    }
+
+    let Some(features) = manifest.get("features").and_then(Value::as_array) else {
+        failures.push(design_data_contract_failure(
+            "missing_features",
+            "Design data features must be an array.",
+            json!({ "field": "features" }),
+        ));
+        return failures;
+    };
+    let mut seen_feature_ids = HashSet::new();
+    for (index, feature) in features.iter().enumerate() {
+        let Some(feature) = feature.as_object() else {
+            failures.push(design_data_contract_failure(
+                "invalid_feature",
+                "Every design-data feature must be an object.",
+                json!({ "feature_index": index }),
+            ));
+            continue;
+        };
+        if let Some(feature_id) = feature
+            .get("id")
+            .and_then(Value::as_str)
+            .filter(|id| !id.trim().is_empty())
+        {
+            if !seen_feature_ids.insert(feature_id.to_string()) {
+                failures.push(design_data_contract_failure(
+                    "duplicate_feature_id",
+                    "Design-data feature ids must be unique.",
+                    json!({ "feature_index": index, "feature_id": feature_id }),
+                ));
+            }
+        }
+        for (field, reason) in [
+            ("id", "missing_feature_id"),
+            ("kind", "missing_feature_kind"),
+        ] {
+            if feature
+                .get(field)
+                .and_then(Value::as_str)
+                .is_none_or(|value| value.trim().is_empty())
+            {
+                failures.push(design_data_contract_failure(
+                    reason,
+                    &format!("Every design-data feature must have a non-empty {field}."),
+                    json!({ "feature_index": index, "field": field }),
+                ));
+            }
+        }
+        for field in ["intent", "role"] {
+            if feature
+                .get(field)
+                .is_some_and(|value| !valid_string_or_list(value))
+            {
+                failures.push(design_data_contract_failure(
+                    if field == "intent" {
+                        "invalid_feature_intent"
+                    } else {
+                        "invalid_feature_role"
+                    },
+                    "Feature intent and role must be a non-empty string or non-empty string array when declared.",
+                    json!({ "feature_index": index, "field": field }),
+                ));
+            }
+        }
+    }
+
+    if let Some(rulepack) = manifest.get("rulepack") {
+        let valid = rulepack
+            .as_str()
+            .is_some_and(|path| !path.trim().is_empty())
+            || rulepack.as_object().is_some_and(|rulepack| {
+                rulepack.len() == 1
+                    && rulepack
+                        .get("path")
+                        .and_then(Value::as_str)
+                        .is_some_and(|path| !path.trim().is_empty())
+            });
+        if !valid {
+            failures.push(design_data_contract_failure(
+                "invalid_rulepack_selection",
+                "Design data rulepack must be a non-empty selector or an object containing only a non-empty path.",
+                json!({ "field": "rulepack" }),
+            ));
+        }
+    }
+
+    if let Some(measurements) = manifest.get("measurements") {
+        let valid = measurements.as_object().is_some_and(|measurements| {
+            measurements.values().all(|value| value.as_f64().is_some())
+        });
+        if !valid {
+            failures.push(design_data_contract_failure(
+                "invalid_measurements",
+                "Design data measurements must be an object containing only numbers.",
+                json!({ "field": "measurements" }),
+            ));
+        }
+    }
+
+    if failures.is_empty() {
+        let profile = if string_field(manifest, "schema_version")
+            .is_some_and(|version| SUPPORTED_LEGACY_DESIGN_DATA_SCHEMA_VERSIONS.contains(&version))
+        {
+            "legacy_transition"
+        } else {
+            "v1"
+        };
+        vec![json!({
+            "rule_id": "burr_design_data:contract_valid",
+            "status": "pass",
+            "reason": "ok",
+            "message": "Design-data contract is valid.",
+            "context": { "profile": profile }
+        })]
+    } else {
+        failures
+    }
+}
+
+fn design_data_contract_failure(reason: &str, message: &str, context: Value) -> Value {
+    json!({
+        "rule_id": "burr_design_data:contract_valid",
+        "status": "fail",
+        "reason": reason,
+        "message": message,
+        "context": context
+    })
+}
+
+fn validate_design_file_ref(value: &Value, field: &str, failures: &mut Vec<Value>) {
+    let Some(file_ref) = value.as_object() else {
+        failures.push(design_data_contract_failure(
+            "invalid_file_ref",
+            "Design-data file references must be objects.",
+            json!({ "field": field }),
+        ));
+        return;
+    };
+    if file_ref
+        .get("path")
+        .and_then(Value::as_str)
+        .is_none_or(|path| path.trim().is_empty())
+    {
+        failures.push(design_data_contract_failure(
+            "invalid_file_ref",
+            "Design-data file references require a non-empty path.",
+            json!({ "field": field, "property": "path" }),
+        ));
+    }
+    if file_ref.get("kind").is_some()
+        && file_ref
+            .get("kind")
+            .and_then(Value::as_str)
+            .is_none_or(|kind| kind.trim().is_empty())
+    {
+        failures.push(design_data_contract_failure(
+            "invalid_file_ref",
+            "Design-data file-reference kind must be a non-empty string when declared.",
+            json!({ "field": field, "property": "kind" }),
+        ));
+    }
+    if file_ref.get("sha256").is_some()
+        && !file_ref
+            .get("sha256")
+            .and_then(Value::as_str)
+            .is_some_and(is_sha256)
+    {
+        failures.push(design_data_contract_failure(
+            "invalid_file_ref",
+            "Design-data file-reference sha256 must be lowercase 64-character hex when declared.",
+            json!({ "field": field, "property": "sha256" }),
+        ));
+    }
+    if file_ref.get("size_bytes").is_some()
+        && file_ref.get("size_bytes").and_then(Value::as_u64).is_none()
+    {
+        failures.push(design_data_contract_failure(
+            "invalid_file_ref",
+            "Design-data file-reference size_bytes must be a non-negative integer when declared.",
+            json!({ "field": field, "property": "size_bytes" }),
+        ));
+    }
+}
+
+fn valid_vector3(value: &Value) -> bool {
+    value.as_array().is_some_and(|values| {
+        values.len() == 3 && values.iter().all(|value| value.as_f64().is_some())
+    })
+}
+
+fn valid_string_or_list(value: &Value) -> bool {
+    value.as_str().is_some_and(|value| !value.trim().is_empty())
+        || value.as_array().is_some_and(|values| {
+            !values.is_empty()
+                && values
+                    .iter()
+                    .all(|value| value.as_str().is_some_and(|value| !value.trim().is_empty()))
+        })
+}
+
+fn validate_rulepack_contract(rulepack: &Value) -> Vec<Value> {
+    let mut failures = Vec::new();
+    let Some(rulepack_object) = rulepack.as_object() else {
+        return vec![rulepack_contract_failure(
+            "invalid_rulepack",
+            "Rulepack must be a JSON object.",
+            json!({}),
+        )];
+    };
+
+    let allowed_top_level: HashSet<&str> = [
+        "schema_version",
+        "id",
+        "version",
+        "artifact_type",
+        "process_kind",
+        "rules",
+    ]
+    .into_iter()
+    .collect();
+    for field in rulepack_object.keys() {
+        if !allowed_top_level.contains(field.as_str()) {
+            failures.push(rulepack_contract_failure(
+                "unknown_rulepack_field",
+                "Rulepack contains an unknown top-level field.",
+                json!({ "field": field }),
+            ));
+        }
+    }
+
+    for (field, reason, label) in [
+        ("id", "missing_rulepack_id", "id"),
+        ("version", "missing_rulepack_version", "version"),
+        (
+            "artifact_type",
+            "missing_rulepack_artifact_type",
+            "artifact_type",
+        ),
+    ] {
+        if !nonempty_string_field(rulepack, field) {
+            failures.push(rulepack_contract_failure(
+                reason,
+                &format!("Rulepack {label} must be a non-empty string."),
+                json!({ "field": field }),
+            ));
+        }
+    }
+
+    if rulepack.get("process_kind").is_some() && !nonempty_string_field(rulepack, "process_kind") {
+        failures.push(rulepack_contract_failure(
+            "invalid_rulepack_process_kind",
+            "Rulepack process_kind must be a non-empty string when declared.",
+            json!({ "field": "process_kind" }),
+        ));
+    }
+
+    let Some(rules) = rulepack.get("rules").and_then(Value::as_array) else {
+        failures.push(rulepack_contract_failure(
+            "missing_rulepack_rules",
+            "Rulepack rules must be a non-empty array.",
+            json!({ "field": "rules" }),
+        ));
+        return failures;
+    };
+    if rules.is_empty() {
+        failures.push(rulepack_contract_failure(
+            "empty_rulepack_rules",
+            "Rulepack rules must contain at least one rule.",
+            json!({ "field": "rules" }),
+        ));
+    }
+
+    let mut seen_rule_ids = HashSet::new();
+    for (index, rule) in rules.iter().enumerate() {
+        let Some(rule_object) = rule.as_object() else {
+            failures.push(rulepack_contract_failure(
+                "invalid_rulepack_rule",
+                "Every rulepack rule must be a JSON object.",
+                json!({ "rule_index": index }),
+            ));
+            continue;
+        };
+        let rule_id = string_field(rule, "id").filter(|id| !id.trim().is_empty());
+        if let Some(rule_id_value) = rule_id {
+            if !seen_rule_ids.insert(rule_id_value.to_string()) {
+                failures.push(rulepack_contract_failure(
+                    "duplicate_rule_id",
+                    "Rulepack rule ids must be unique.",
+                    json!({ "rule_index": index, "rule_id": rule_id }),
+                ));
+            }
+        } else {
+            failures.push(rulepack_contract_failure(
+                "missing_rule_id",
+                "Every rulepack rule must have a non-empty id.",
+                json!({ "rule_index": index }),
+            ));
+        }
+
+        let rule_kind = string_field(rule, "kind").filter(|kind| !kind.trim().is_empty());
+        if let Some(rule_kind_value) = rule_kind {
+            if !SUPPORTED_RULE_KINDS.contains(&rule_kind_value) {
+                failures.push(rulepack_contract_failure(
+                    "unsupported_rule_kind",
+                    "Rulepack rule kind is not supported by this Burr version.",
+                    json!({ "rule_index": index, "rule_id": rule_id, "kind": rule_kind }),
+                ));
+            }
+        } else {
+            failures.push(rulepack_contract_failure(
+                "missing_rule_kind",
+                "Every rulepack rule must have a non-empty kind.",
+                json!({ "rule_index": index, "rule_id": rule_id }),
+            ));
+        }
+
+        if let Some(kind) = rule_kind.filter(|kind| SUPPORTED_RULE_KINDS.contains(kind)) {
+            let allowed_fields = allowed_rule_fields(kind);
+            for field in rule_object.keys() {
+                if !allowed_fields.contains(field.as_str()) {
+                    failures.push(rulepack_contract_failure(
+                        "unknown_rule_field",
+                        "Rule contains a field that is not supported for its kind.",
+                        json!({ "rule_index": index, "rule_id": rule_id, "kind": kind, "field": field }),
+                    ));
+                }
+            }
+            validate_rule_bounds(rule, kind, index, rule_id, &mut failures);
+            validate_optional_rule_fields(rule, index, rule_id, &mut failures);
+        }
+
+        if let Some(applies_to) = rule.get("applies_to") {
+            let Some(applies_to) = applies_to.as_object() else {
+                failures.push(rulepack_contract_failure(
+                    "invalid_applies_to",
+                    "Rule applies_to must be a JSON object when declared.",
+                    json!({ "rule_index": index, "rule_id": rule_id }),
+                ));
+                continue;
+            };
+            for (selector, value) in applies_to {
+                if !SUPPORTED_APPLIES_TO_SELECTORS.contains(&selector.as_str()) {
+                    failures.push(rulepack_contract_failure(
+                        "unknown_applies_to_selector",
+                        "Rule applies_to contains an unknown selector.",
+                        json!({ "rule_index": index, "rule_id": rule_id, "selector": selector }),
+                    ));
+                    continue;
+                }
+                let valid = match selector.as_str() {
+                    "kind_any" | "intent_any" | "role_any" => {
+                        value.as_array().is_some_and(|values| {
+                            let unique: HashSet<&str> =
+                                values.iter().filter_map(Value::as_str).collect();
+                            !values.is_empty()
+                                && values.iter().all(|value| {
+                                    value.as_str().is_some_and(|value| !value.trim().is_empty())
+                                })
+                                && unique.len() == values.len()
+                        })
+                    }
+                    _ => value.as_str().is_some_and(|value| !value.trim().is_empty()),
+                };
+                if !valid {
+                    failures.push(rulepack_contract_failure(
+                        "invalid_applies_to_selector",
+                        "Rule applies_to selector value has an invalid shape.",
+                        json!({ "rule_index": index, "rule_id": rule_id, "selector": selector }),
+                    ));
+                }
+            }
+        }
+    }
+
+    if failures.is_empty() {
+        vec![json!({
+            "rule_id": "burr_rulepack:contract_valid",
+            "status": "pass",
+            "reason": "ok",
+            "message": "Rulepack contract is valid."
+        })]
+    } else {
+        failures
+    }
+}
+
+fn nonempty_string_field(value: &Value, field: &str) -> bool {
+    string_field(value, field).is_some_and(|value| !value.trim().is_empty())
+}
+
+fn rulepack_contract_failure(reason: &str, message: &str, context: Value) -> Value {
+    json!({
+        "rule_id": "burr_rulepack:contract_valid",
+        "status": "fail",
+        "reason": reason,
+        "message": message,
+        "context": context
+    })
+}
+
+fn allowed_rule_fields(kind: &str) -> HashSet<&'static str> {
+    let mut fields: HashSet<&'static str> = ["id", "kind", "description"].into_iter().collect();
+    if kind != "numeric_range" {
+        fields.insert("applies_to");
+    }
+    let kind_fields: &[&'static str] = match kind {
+        "hole_edge_distance" => &["min_center_to_edge_diameter_multiple"],
+        "minimum_wall_thickness" | "fastener_support_wall_thickness" => &["min_wall_thickness_mm"],
+        "blind_pocket_back_wall_thickness" => &["min_back_wall_thickness_mm"],
+        "standoff_boss_support_link" => &[
+            "axis_dot_min",
+            "centerline_tolerance_mm",
+            "diameter_tolerance_mm",
+            "support_diameter_tolerance_mm",
+        ],
+        "feature_presence" => &[
+            "artifact_kind",
+            "axis_dot_min",
+            "diameter_tolerance_mm",
+            "centerline_tolerance_mm",
+            "width_tolerance_mm",
+            "endpoint_tolerance_mm",
+            "side_plane_tolerance_mm",
+            "bore_diameter_tolerance_mm",
+            "counterbore_diameter_tolerance_mm",
+            "counterbore_center_tolerance_mm",
+            "shoulder_plane_tolerance_mm",
+            "plane_tolerance_mm",
+            "pocket_diameter_tolerance_mm",
+            "pilot_diameter_tolerance_mm",
+            "pocket_center_tolerance_mm",
+            "bottom_plane_tolerance_mm",
+            "boss_diameter_tolerance_mm",
+            "boss_center_tolerance_mm",
+            "top_plane_tolerance_mm",
+            "seat_diameter_tolerance_mm",
+            "seat_center_tolerance_mm",
+        ],
+        "feature_count" => &["min_count", "max_count"],
+        "feature_edge_distance" => &[
+            "center_field",
+            "diameter_field",
+            "width_field",
+            "length_field",
+            "span_axis_field",
+            "min_wall_to_edge_mm",
+        ],
+        "feature_pair_spacing" => &[
+            "center_field",
+            "diameter_field",
+            "width_field",
+            "length_field",
+            "span_axis_field",
+            "min_clearance_mm",
+        ],
+        "numeric_range" => &["path", "min", "max"],
+        _ => &[],
+    };
+    fields.extend(kind_fields.iter().copied());
+    fields
+}
+
+fn validate_optional_rule_fields(
+    rule: &Value,
+    rule_index: usize,
+    rule_id: Option<&str>,
+    failures: &mut Vec<Value>,
+) {
+    for field in [
+        "artifact_kind",
+        "path",
+        "center_field",
+        "diameter_field",
+        "width_field",
+        "length_field",
+        "span_axis_field",
+    ] {
+        if rule.get(field).is_some() && !nonempty_string_field(rule, field) {
+            failures.push(rulepack_contract_failure(
+                "invalid_rule_field",
+                "Rule string fields must be non-empty when declared.",
+                json!({ "rule_index": rule_index, "rule_id": rule_id, "field": field }),
+            ));
+        }
+    }
+    if rule.get("description").is_some() && !rule.get("description").is_some_and(Value::is_string) {
+        failures.push(rulepack_contract_failure(
+            "invalid_rule_field",
+            "Rule description must be a string when declared.",
+            json!({ "rule_index": rule_index, "rule_id": rule_id, "field": "description" }),
+        ));
+    }
+
+    for field in [
+        "diameter_tolerance_mm",
+        "centerline_tolerance_mm",
+        "support_diameter_tolerance_mm",
+        "width_tolerance_mm",
+        "endpoint_tolerance_mm",
+        "side_plane_tolerance_mm",
+        "bore_diameter_tolerance_mm",
+        "counterbore_diameter_tolerance_mm",
+        "counterbore_center_tolerance_mm",
+        "shoulder_plane_tolerance_mm",
+        "pocket_diameter_tolerance_mm",
+        "pocket_center_tolerance_mm",
+        "bottom_plane_tolerance_mm",
+        "boss_diameter_tolerance_mm",
+        "boss_center_tolerance_mm",
+        "top_plane_tolerance_mm",
+        "seat_diameter_tolerance_mm",
+        "seat_center_tolerance_mm",
+        "pilot_diameter_tolerance_mm",
+        "plane_tolerance_mm",
+    ] {
+        if rule.get(field).is_some() && !number_field(rule, field).is_some_and(|value| value >= 0.0)
+        {
+            failures.push(rulepack_contract_failure(
+                "invalid_rule_field",
+                "Rule tolerance fields must be non-negative numbers.",
+                json!({ "rule_index": rule_index, "rule_id": rule_id, "field": field }),
+            ));
+        }
+    }
+    if rule.get("axis_dot_min").is_some()
+        && !number_field(rule, "axis_dot_min").is_some_and(|value| (0.0..=1.0).contains(&value))
+    {
+        failures.push(rulepack_contract_failure(
+            "invalid_rule_field",
+            "Rule axis_dot_min must be between 0 and 1.",
+            json!({ "rule_index": rule_index, "rule_id": rule_id, "field": "axis_dot_min" }),
+        ));
+    }
+}
+
+fn validate_rule_bounds(
+    rule: &Value,
+    kind: &str,
+    rule_index: usize,
+    rule_id: Option<&str>,
+    failures: &mut Vec<Value>,
+) {
+    let mut require_number = |field: &str, positive: bool, reason: &str| {
+        let valid = number_field(rule, field).is_some_and(|value| {
+            if positive {
+                value > 0.0
+            } else {
+                value >= 0.0
+            }
+        });
+        if !valid {
+            failures.push(rulepack_contract_failure(
+                reason,
+                &format!(
+                    "Rule kind {kind} requires {field} to be a {} number.",
+                    if positive { "positive" } else { "non-negative" }
+                ),
+                json!({ "rule_index": rule_index, "rule_id": rule_id, "kind": kind, "field": field }),
+            ));
+        }
+    };
+
+    match kind {
+        "hole_edge_distance" => require_number(
+            "min_center_to_edge_diameter_multiple",
+            true,
+            "invalid_hole_edge_distance_rule_multiple",
+        ),
+        "minimum_wall_thickness" | "fastener_support_wall_thickness" => require_number(
+            "min_wall_thickness_mm",
+            true,
+            "invalid_rule_min_wall_thickness",
+        ),
+        "blind_pocket_back_wall_thickness" => require_number(
+            "min_back_wall_thickness_mm",
+            true,
+            "invalid_rule_min_back_wall_thickness",
+        ),
+        "feature_edge_distance" => require_number(
+            "min_wall_to_edge_mm",
+            false,
+            "invalid_feature_edge_rule_clearance",
+        ),
+        "feature_pair_spacing" => require_number(
+            "min_clearance_mm",
+            false,
+            "invalid_pair_spacing_rule_clearance",
+        ),
+        "feature_count" => {
+            let min = rule.get("min_count").and_then(Value::as_u64);
+            let max = rule.get("max_count").and_then(Value::as_u64);
+            let present_values_valid = rule.get("min_count").is_none_or(|_| min.is_some())
+                && rule.get("max_count").is_none_or(|_| max.is_some());
+            if (min.is_none() && max.is_none())
+                || !present_values_valid
+                || min.zip(max).is_some_and(|(min, max)| min > max)
+            {
+                failures.push(rulepack_contract_failure(
+                    "invalid_feature_count_rule_bounds",
+                    "feature_count requires valid min_count, max_count, or both, with min_count <= max_count.",
+                    json!({ "rule_index": rule_index, "rule_id": rule_id, "kind": kind }),
+                ));
+            }
+        }
+        "numeric_range" => {
+            let min = number_field(rule, "min");
+            let max = number_field(rule, "max");
+            let present_values_valid = rule.get("min").is_none_or(|_| min.is_some())
+                && rule.get("max").is_none_or(|_| max.is_some());
+            if (min.is_none() && max.is_none())
+                || !present_values_valid
+                || min.zip(max).is_some_and(|(min, max)| min > max)
+                || !nonempty_string_field(rule, "path")
+            {
+                failures.push(rulepack_contract_failure(
+                    "invalid_numeric_range_rule_bounds",
+                    "numeric_range requires a non-empty path and valid min, max, or both, with min <= max.",
+                    json!({ "rule_index": rule_index, "rule_id": rule_id, "kind": kind }),
+                ));
+            }
+        }
+        _ => {}
     }
 }
 
@@ -2301,8 +3304,8 @@ fn check_feature_count(manifest: &Value, rulepack: &Value, rule: &Value) -> Valu
             "message": "feature_count rules must declare min_count, max_count, or both."
         });
     }
-    let min_pass = min_count.map_or(true, |value| count >= value);
-    let max_pass = max_count.map_or(true, |value| count <= value);
+    let min_pass = min_count.is_none_or(|value| count >= value);
+    let max_pass = max_count.is_none_or(|value| count <= value);
     let pass = min_pass && max_pass;
     let feature_ids: Vec<Value> = features
         .iter()
@@ -2363,8 +3366,8 @@ fn check_numeric_range(manifest: &Value, rulepack: &Value, rule: &Value) -> Valu
         });
     };
 
-    let min_pass = min.map_or(true, |minimum| value >= minimum);
-    let max_pass = max.map_or(true, |maximum| value <= maximum);
+    let min_pass = min.is_none_or(|minimum| value >= minimum);
+    let max_pass = max.is_none_or(|maximum| value <= maximum);
     let pass = min_pass && max_pass;
 
     json!({
@@ -2705,17 +3708,19 @@ fn check_feature_pair_spacing(manifest: &Value, rulepack: &Value, rule: &Value) 
             .collect();
         return json!({
             "rule_id": full_rule_id,
-            "status": "pass",
-            "reason": "ok",
+            "status": "incomplete",
+            "reason": "insufficient_pair_spacing_candidates",
             "feature_ids": feature_ids,
             "measured": {
                 "pair_count": 0,
+                "candidate_count": checked_features.len(),
                 "closest_pair": Value::Null
             },
             "required": {
+                "min_candidates": 2,
                 "min_clearance_mm": round(min_clearance)
             },
-            "message": "Fewer than two matching features; no pair spacing to check."
+            "message": "Pair-spacing scope is incomplete because fewer than two matching features were declared."
         });
     }
 
@@ -4312,17 +5317,37 @@ fn summarize_features(manifest: &Value, checks: &[Value]) -> Value {
     }
     let mut checked = Vec::new();
     let mut unchecked = Vec::new();
+    let mut checked_mechanical = Vec::new();
+    let mut unchecked_mechanical = Vec::new();
+    let mut mechanical_declared = 0usize;
+    let mut mechanical_checked = 0usize;
     let mut intent_counts: HashMap<String, usize> = HashMap::new();
 
     for feature in declared_features {
-        for intent in feature_intents(feature) {
+        let intents = feature_intents(feature);
+        let is_mechanical = intents
+            .iter()
+            .any(|intent| !KNOWN_NON_MECHANICAL_INTENTS.contains(&intent.as_str()));
+        for intent in intents {
             *intent_counts.entry(intent).or_insert(0) += 1;
         }
         let feature_id = string_field(feature, "id");
-        if feature_id.is_some_and(|id| checked_feature_ids.contains(id)) {
+        let is_checked = feature_id.is_some_and(|id| checked_feature_ids.contains(id));
+        if is_checked {
             checked.push(Value::String(feature_id.unwrap().to_string()));
         } else if let Some(id) = feature_id {
             unchecked.push(Value::String(id.to_string()));
+        }
+        if is_mechanical {
+            mechanical_declared += 1;
+            if is_checked {
+                mechanical_checked += 1;
+                if let Some(id) = feature_id {
+                    checked_mechanical.push(Value::String(id.to_string()));
+                }
+            } else if let Some(id) = feature_id {
+                unchecked_mechanical.push(Value::String(id.to_string()));
+            }
         }
     }
 
@@ -4346,6 +5371,11 @@ fn summarize_features(manifest: &Value, checks: &[Value]) -> Value {
         "unchecked": unchecked.len(),
         "checked_feature_ids": checked,
         "unchecked_feature_ids": unchecked,
+        "mechanical_declared": mechanical_declared,
+        "mechanical_checked": mechanical_checked,
+        "mechanical_unchecked": mechanical_declared - mechanical_checked,
+        "checked_mechanical_feature_ids": checked_mechanical,
+        "unchecked_mechanical_feature_ids": unchecked_mechanical,
         "intent_counts": intent_values,
         "step_candidate_cylinders_considered": candidate_cylinders_considered
     })
@@ -4864,6 +5894,9 @@ fn design_data_rulepack_path(
     if path.is_empty() {
         return Err("Manifest rulepack path must be a non-empty string.".to_string());
     }
+    if path.starts_with("builtin:") {
+        return Ok(Some(PathBuf::from(path)));
+    }
     Ok(Some(normalize_path(&manifest_dir.join(path))))
 }
 
@@ -4910,6 +5943,11 @@ fn feature_applies(feature: &Value, applies_to: Option<&Value>) -> bool {
     }
     if let Some(fastener) = string_field(applies_to, "fastener") {
         if string_field(feature, "fastener") != Some(fastener) {
+            return false;
+        }
+    }
+    if let Some(insert) = string_field(applies_to, "insert") {
+        if string_field(feature, "insert") != Some(insert) {
             return false;
         }
     }
@@ -5135,6 +6173,7 @@ design = BurrDesignData(
     artifact_type="actuator_mount",
     process={{"kind": "FDM", "material": "PETG", "nozzle_mm": 0.4}},
 )
+design.rulepack("{BUILTIN_ACTUATOR_RULEPACK}")
 design.source("design.py")
 design.artifact(STEP_FILE)
 design.part(
@@ -5177,6 +6216,45 @@ fn read_json_str(text: &str) -> Result<Value, String> {
 }
 
 fn write_json_file(path: &Path, value: &Value) -> Result<(), String> {
+    let tmp_path = stage_json_file(path, value)?;
+    if let Err(error) = fs::rename(&tmp_path, path) {
+        let _ = fs::remove_file(&tmp_path);
+        return Err(format!("Failed to replace {}: {error}", path.display()));
+    }
+    Ok(())
+}
+
+fn write_lint_receipts_staged(results: &[LintResult]) -> Result<(), String> {
+    let mut staged = Vec::with_capacity(results.len());
+    for result in results {
+        match stage_json_file(&result.receipt_path, &result.receipt) {
+            Ok(tmp_path) => staged.push((tmp_path, result.receipt_path.clone())),
+            Err(error) => {
+                for (tmp_path, _) in &staged {
+                    let _ = fs::remove_file(tmp_path);
+                }
+                return Err(format!(
+                    "{error}. No receipt files were replaced because every output is staged first."
+                ));
+            }
+        }
+    }
+
+    for (index, (tmp_path, receipt_path)) in staged.iter().enumerate() {
+        if let Err(error) = fs::rename(tmp_path, receipt_path) {
+            for (remaining_tmp_path, _) in staged.iter().skip(index) {
+                let _ = fs::remove_file(remaining_tmp_path);
+            }
+            return Err(format!(
+                "Failed to replace {}: {error}. {index} receipt(s) were already replaced; remaining final receipts were not changed.",
+                receipt_path.display()
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn stage_json_file(path: &Path, value: &Value) -> Result<PathBuf, String> {
     let tmp_path = path.with_extension(format!(
         "{}tmp",
         path.extension()
@@ -5187,8 +6265,7 @@ fn write_json_file(path: &Path, value: &Value) -> Result<(), String> {
     let text = serde_json::to_string_pretty(value).map_err(|error| error.to_string())? + "\n";
     fs::write(&tmp_path, text)
         .map_err(|error| format!("Failed to write {}: {error}", tmp_path.display()))?;
-    fs::rename(&tmp_path, path)
-        .map_err(|error| format!("Failed to replace {}: {error}", path.display()))
+    Ok(tmp_path)
 }
 
 fn is_design_data_file_name(name: &str) -> bool {
@@ -5254,6 +6331,12 @@ fn supported_manifest_schema_versions() -> Vec<&'static str> {
 
 fn string_field<'a>(value: &'a Value, field: &str) -> Option<&'a str> {
     value.get(field).and_then(Value::as_str)
+}
+
+fn optional_string_value(value: &Value, field: &str) -> Value {
+    string_field(value, field)
+        .map(|value| Value::String(value.to_string()))
+        .unwrap_or(Value::Null)
 }
 
 fn number_field(value: &Value, field: &str) -> Option<f64> {
@@ -5432,6 +6515,7 @@ mod tests {
 
         let design = fs::read_to_string(project.join("design.py")).unwrap();
         assert!(design.contains("artifact_id=\"my-starter-part\""));
+        assert!(design.contains("design.rulepack(\"builtin:actuator_mount\")"));
         assert!(design.contains("m3_clearance_hole"));
 
         let error = init_project(&project).unwrap_err();
@@ -5491,7 +6575,8 @@ mod tests {
             ],
             "measurements": {
                 "clearance_mm": 0.25
-            }
+            },
+            "features": []
         });
         let rulepack = json!({
             "schema_version": "burr.rulepack.v1",
@@ -5570,6 +6655,657 @@ mod tests {
         write_json_file(&manifest_path, &manifest).unwrap();
         let error = lint_design_data_file(&manifest_path, &options).unwrap_err();
         assert!(error.contains("Manifest rulepack path must be a non-empty string"));
+    }
+
+    #[test]
+    fn file_lint_requires_explicit_rulepack_and_accepts_builtin_selector() {
+        let temp = tempfile::tempdir().unwrap();
+        let manifest_path = temp.path().join(DESIGN_DATA_FILE_NAME);
+        let mut manifest = trust_contract_manifest(
+            temp.path(),
+            "actuator_mount",
+            json!([{
+                "id": "m3_mount",
+                "kind": "clearance_hole",
+                "intent": "mechanical_interface",
+                "fastener": "M3",
+                "diameter_mm": 3.4,
+                "center_mm": [0.0, 0.0, 0.0],
+                "axis": [1.0, 0.0, 0.0]
+            }]),
+        );
+        manifest["process"] = json!({ "kind": "FDM" });
+        write_json_file(&manifest_path, &manifest).unwrap();
+
+        let options = LintOptions {
+            cwd: temp.path().to_path_buf(),
+            write_receipt: false,
+            rulepack_path: None,
+        };
+        let error = lint_design_data_file(&manifest_path, &options).unwrap_err();
+        assert!(error.contains("No rulepack selected"));
+        assert!(error.contains("--rulepack <selector>"));
+
+        manifest["rulepack"] = json!({ "path": BUILTIN_ACTUATOR_RULEPACK });
+        write_json_file(&manifest_path, &manifest).unwrap();
+        let result = lint_design_data_file(&manifest_path, &options).unwrap();
+        assert_eq!(
+            string_field(&result.receipt, "rulepack_id"),
+            Some("actuator_mount")
+        );
+        assert_eq!(
+            design_data_rulepack_path(&manifest, temp.path()).unwrap(),
+            Some(PathBuf::from(BUILTIN_ACTUATOR_RULEPACK))
+        );
+    }
+
+    #[test]
+    fn multi_target_lint_does_not_write_partial_receipts_on_preflight_error() {
+        let temp = tempfile::tempdir().unwrap();
+        let valid_dir = temp.path().join("valid");
+        let missing_rulepack_dir = temp.path().join("missing-rulepack");
+        fs::create_dir_all(&valid_dir).unwrap();
+        fs::create_dir_all(&missing_rulepack_dir).unwrap();
+
+        let mut valid_manifest = trust_contract_manifest(&valid_dir, "fixture", json!([]));
+        valid_manifest["rulepack"] = json!({ "path": "fixture.rulepack.json" });
+        write_json_file(
+            &valid_dir.join("fixture.rulepack.json"),
+            &json!({
+                "schema_version": "burr.rulepack.v1",
+                "id": "fixture",
+                "version": "0.1.0",
+                "artifact_type": "fixture",
+                "rules": [{ "id": "inventory", "kind": "feature_count", "min_count": 0 }]
+            }),
+        )
+        .unwrap();
+        write_json_file(&valid_dir.join(DESIGN_DATA_FILE_NAME), &valid_manifest).unwrap();
+
+        let missing_rulepack_manifest =
+            trust_contract_manifest(&missing_rulepack_dir, "fixture", json!([]));
+        write_json_file(
+            &missing_rulepack_dir.join(DESIGN_DATA_FILE_NAME),
+            &missing_rulepack_manifest,
+        )
+        .unwrap();
+
+        let error = lint_targets(
+            &[
+                valid_dir.to_string_lossy().to_string(),
+                missing_rulepack_dir.to_string_lossy().to_string(),
+            ],
+            &LintOptions {
+                cwd: temp.path().to_path_buf(),
+                write_receipt: true,
+                rulepack_path: None,
+            },
+        )
+        .unwrap_err();
+        assert!(error.contains("No rulepack selected"));
+        assert!(!valid_dir.join("burr-receipt.json").exists());
+        assert!(!missing_rulepack_dir.join("burr-receipt.json").exists());
+    }
+
+    #[test]
+    fn multi_target_receipts_are_staged_before_any_replacement() {
+        let temp = tempfile::tempdir().unwrap();
+        let first_path = temp.path().join("first-receipt.json");
+        let second_path = temp.path().join("second-receipt.json");
+        write_json_file(&first_path, &json!({ "generation": "old" })).unwrap();
+        write_json_file(&second_path, &json!({ "generation": "old" })).unwrap();
+
+        let blocking_tmp_path = second_path.with_extension("json.tmp");
+        fs::create_dir(&blocking_tmp_path).unwrap();
+        let results = vec![
+            LintResult {
+                receipt: json!({ "generation": "new" }),
+                receipt_path: first_path.clone(),
+                design_data_path: temp.path().join("first-design-data.json"),
+            },
+            LintResult {
+                receipt: json!({ "generation": "new" }),
+                receipt_path: second_path.clone(),
+                design_data_path: temp.path().join("second-design-data.json"),
+            },
+        ];
+
+        let error = write_lint_receipts_staged(&results).unwrap_err();
+        assert!(error.contains("No receipt files were replaced"));
+        assert_eq!(read_json_file(&first_path).unwrap()["generation"], "old");
+        assert_eq!(read_json_file(&second_path).unwrap()["generation"], "old");
+        assert!(!first_path.with_extension("json.tmp").exists());
+    }
+
+    #[test]
+    fn invalid_rulepack_contract_stops_rule_evaluation() {
+        let temp = tempfile::tempdir().unwrap();
+        let manifest = trust_contract_manifest(temp.path(), "fixture", json!([]));
+        let cases = [
+            (
+                "unsupported_rule_kind",
+                json!([{
+                    "id": "unsupported",
+                    "kind": "imaginary_rule"
+                }]),
+            ),
+            (
+                "duplicate_rule_id",
+                json!([
+                    { "id": "duplicate", "kind": "feature_count", "min_count": 0 },
+                    { "id": "duplicate", "kind": "feature_count", "min_count": 0 }
+                ]),
+            ),
+            (
+                "unknown_applies_to_selector",
+                json!([{
+                    "id": "unknown_selector",
+                    "kind": "feature_count",
+                    "applies_to": { "material": "PETG" },
+                    "min_count": 0
+                }]),
+            ),
+            (
+                "unknown_rule_field",
+                json!([{
+                    "id": "wrong_kind_field",
+                    "kind": "numeric_range",
+                    "path": "measurements.clearance_mm",
+                    "min": 0.0,
+                    "min_count": 1
+                }]),
+            ),
+            (
+                "unknown_rule_field",
+                json!([{
+                    "id": "ignored_selector",
+                    "kind": "numeric_range",
+                    "path": "measurements.clearance_mm",
+                    "min": 0.0,
+                    "applies_to": { "kind": "clearance_hole" }
+                }]),
+            ),
+        ];
+
+        for (reason, rules) in cases {
+            let rulepack = json!({
+                "schema_version": "burr.rulepack.v1",
+                "id": "fixture",
+                "version": "0.1.0",
+                "artifact_type": "fixture",
+                "rules": rules
+            });
+            let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+            assert_eq!(string_field(&receipt, "outcome"), Some("fail"));
+            assert_eq!(
+                receipt
+                    .pointer("/scope/rules/evaluated")
+                    .and_then(Value::as_u64),
+                Some(0)
+            );
+            assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+                string_field(check, "rule_id") == Some("burr_rulepack:contract_valid")
+                    && string_field(check, "reason") == Some(reason)
+            }));
+            assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
+                string_field(check, "rule_id")
+                    .is_some_and(|rule_id| rule_id.starts_with("fixture:"))
+            }));
+        }
+    }
+
+    #[test]
+    fn invalid_design_data_contract_stops_rule_evaluation() {
+        let temp = tempfile::tempdir().unwrap();
+        let base_manifest = trust_contract_manifest(temp.path(), "fixture", json!([]));
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "fixture",
+            "version": "0.1.0",
+            "artifact_type": "fixture",
+            "rules": [{ "id": "inventory", "kind": "feature_count", "min_count": 0 }]
+        });
+        let mut cases = Vec::new();
+
+        let mut missing_id = base_manifest.clone();
+        missing_id.as_object_mut().unwrap().remove("artifact_id");
+        cases.push(("missing_artifact_id", missing_id));
+
+        let mut missing_units = base_manifest.clone();
+        missing_units.as_object_mut().unwrap().remove("units");
+        cases.push(("unsupported_units", missing_units));
+
+        let mut missing_artifact_type = base_manifest.clone();
+        missing_artifact_type
+            .as_object_mut()
+            .unwrap()
+            .remove("artifact_type");
+        cases.push(("missing_artifact_type", missing_artifact_type));
+
+        let mut invalid_features = base_manifest.clone();
+        invalid_features["features"] = json!({});
+        cases.push(("missing_features", invalid_features));
+
+        let mut invalid_process = base_manifest.clone();
+        invalid_process["process"] = json!({});
+        cases.push(("invalid_process_kind", invalid_process));
+
+        let mut invalid_measurements = base_manifest.clone();
+        invalid_measurements["measurements"] = json!({ "clearance_mm": "unknown" });
+        cases.push(("invalid_measurements", invalid_measurements));
+
+        let mut invalid_feature = base_manifest.clone();
+        invalid_feature["features"] = json!([{ "id": "missing-kind" }]);
+        cases.push(("missing_feature_kind", invalid_feature));
+
+        let mut duplicate_feature = base_manifest.clone();
+        duplicate_feature["features"] = json!([
+            { "id": "duplicate", "kind": "clearance_hole", "intent": "mechanical_interface" },
+            { "id": "duplicate", "kind": "counterbore", "intent": "mechanical_interface" }
+        ]);
+        cases.push(("duplicate_feature_id", duplicate_feature));
+
+        let mut duplicate_part = base_manifest.clone();
+        duplicate_part["parts"] = json!([
+            { "id": "housing" },
+            { "id": "housing" }
+        ]);
+        cases.push(("duplicate_part_id", duplicate_part));
+
+        for (reason, manifest) in cases {
+            let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+            assert_eq!(string_field(&receipt, "outcome"), Some("fail"));
+            assert_eq!(
+                receipt
+                    .pointer("/scope/rules/evaluated")
+                    .and_then(Value::as_u64),
+                Some(0)
+            );
+            assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+                string_field(check, "rule_id") == Some("burr_design_data:contract_valid")
+                    && string_field(check, "reason") == Some(reason)
+            }));
+            assert!(!receipt["checks"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|check| { string_field(check, "rule_id") == Some("fixture:inventory") }));
+        }
+
+        let mut malformed_identity = base_manifest.clone();
+        malformed_identity["artifact_id"] = json!(42);
+        malformed_identity["artifact_version"] = json!([]);
+        let malformed_receipt = lint_design_data(&malformed_identity, &rulepack, temp.path(), None);
+        assert!(malformed_receipt["artifact_id"].is_null());
+        assert!(malformed_receipt["artifact_version"].is_null());
+        assert_eq!(
+            malformed_receipt
+                .pointer("/scope/artifact_type/compatible")
+                .and_then(Value::as_bool),
+            Some(true)
+        );
+
+        let mut malformed_rulepack = rulepack.clone();
+        malformed_rulepack["id"] = json!(42);
+        malformed_rulepack["version"] = json!({});
+        malformed_rulepack["artifact_type"] = json!(42);
+        malformed_rulepack["process_kind"] = json!(42);
+        let malformed_rulepack_receipt =
+            lint_design_data(&base_manifest, &malformed_rulepack, temp.path(), None);
+        assert!(malformed_rulepack_receipt["rulepack_id"].is_null());
+        assert!(malformed_rulepack_receipt["rulepack_version"].is_null());
+        assert_eq!(
+            malformed_rulepack_receipt
+                .pointer("/scope/artifact_type/compatible")
+                .and_then(Value::as_bool),
+            Some(false)
+        );
+        assert_eq!(
+            malformed_rulepack_receipt
+                .pointer("/scope/process_kind/restricted")
+                .and_then(Value::as_bool),
+            Some(true)
+        );
+        assert_eq!(
+            malformed_rulepack_receipt
+                .pointer("/scope/process_kind/compatible")
+                .and_then(Value::as_bool),
+            Some(false)
+        );
+    }
+
+    #[test]
+    fn legacy_design_data_uses_the_explicit_transition_contract() {
+        let temp = tempfile::tempdir().unwrap();
+        let mut manifest = trust_contract_manifest(
+            temp.path(),
+            "fixture",
+            json!([{ "id": "legacy_hole", "kind": "clearance_hole" }]),
+        );
+        manifest["schema_version"] = json!("fray.cad.artifact.v1");
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "fixture",
+            "version": "0.1.0",
+            "artifact_type": "fixture",
+            "rules": [{
+                "id": "inventory",
+                "kind": "feature_count",
+                "applies_to": { "kind": "clearance_hole" },
+                "min_count": 1
+            }]
+        });
+
+        let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&receipt, "outcome"), Some("pass"));
+        assert!(receipt["checks"].as_array().unwrap().iter().any(|check| {
+            string_field(check, "rule_id") == Some("burr_design_data:contract_valid")
+                && check.pointer("/context/profile").and_then(Value::as_str)
+                    == Some("legacy_transition")
+        }));
+    }
+
+    #[test]
+    fn repair_packet_preserves_incomplete_scope_and_reasons() {
+        let receipt = json!({
+            "schema_version": RECEIPT_SCHEMA_VERSION,
+            "status": "incomplete",
+            "outcome": "incomplete",
+            "source_design_data": "fixture/burr-design-data.json",
+            "checks": [{
+                "rule_id": "fixture:spacing",
+                "status": "incomplete",
+                "reason": "insufficient_pair_spacing_candidates",
+                "message": "Need two candidates."
+            }],
+            "warnings": [{
+                "rule_id": "fixture:artifact_type",
+                "status": "warn",
+                "affects_outcome": true,
+                "reason": "artifact_type_not_targeted",
+                "message": "Artifact type is outside scope."
+            }],
+            "scope": {
+                "rules": { "declared": 1, "evaluated": 0 },
+                "mechanical_features": { "declared": 1, "checked": 0, "unchecked": 1 }
+            }
+        });
+
+        let packet = build_receipt_repair_packet(&receipt);
+        assert_eq!(
+            string_field(&packet, "schema_version"),
+            Some(REPAIR_PACKET_SCHEMA_VERSION)
+        );
+        assert_eq!(string_field(&packet, "outcome"), Some("incomplete"));
+        assert_eq!(
+            packet
+                .pointer("/summary/incomplete_reason_count")
+                .and_then(Value::as_u64),
+            Some(2)
+        );
+        assert_eq!(
+            packet["warnings"].as_array().unwrap(),
+            receipt["warnings"].as_array().unwrap()
+        );
+        assert_eq!(packet["scope"], receipt["scope"]);
+        assert!(packet["incomplete_reasons"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|reason| {
+                string_field(reason, "source") == Some("warning")
+                    && string_field(reason, "reason") == Some("artifact_type_not_targeted")
+            }));
+    }
+
+    #[test]
+    fn artifact_and_declared_process_scope_mismatches_are_incomplete() {
+        let temp = tempfile::tempdir().unwrap();
+        let manifest = trust_contract_manifest(temp.path(), "fixture", json!([]));
+        let base_rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "fixture",
+            "version": "0.1.0",
+            "artifact_type": "fixture",
+            "rules": [{ "id": "inventory", "kind": "feature_count", "min_count": 0 }]
+        });
+
+        let unrestricted = lint_design_data(&manifest, &base_rulepack, temp.path(), None);
+        assert_eq!(string_field(&unrestricted, "outcome"), Some("pass"));
+
+        let mut process_restricted = base_rulepack.clone();
+        process_restricted["process_kind"] = json!("FDM");
+        let missing_process = lint_design_data(&manifest, &process_restricted, temp.path(), None);
+        assert_eq!(
+            string_field(&missing_process, "outcome"),
+            Some("incomplete")
+        );
+        assert!(missing_process["warnings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|warning| {
+                string_field(warning, "reason") == Some("design_process_kind_missing")
+            }));
+
+        let mut wrong_process_manifest = manifest.clone();
+        wrong_process_manifest["process"] = json!({ "kind": "CNC" });
+        let wrong_process = lint_design_data(
+            &wrong_process_manifest,
+            &process_restricted,
+            temp.path(),
+            None,
+        );
+        assert_eq!(string_field(&wrong_process, "outcome"), Some("incomplete"));
+        assert!(wrong_process["warnings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|warning| {
+                string_field(warning, "reason") == Some("process_kind_not_targeted")
+            }));
+
+        let mut wrong_artifact_rulepack = base_rulepack.clone();
+        wrong_artifact_rulepack["artifact_type"] = json!("other_fixture");
+        let wrong_artifact =
+            lint_design_data(&manifest, &wrong_artifact_rulepack, temp.path(), None);
+        assert_eq!(string_field(&wrong_artifact, "outcome"), Some("incomplete"));
+        assert!(wrong_artifact["warnings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|warning| {
+                string_field(warning, "reason") == Some("artifact_type_not_targeted")
+            }));
+    }
+
+    #[test]
+    fn coverage_and_pair_spacing_cannot_pass_vacuously() {
+        let temp = tempfile::tempdir().unwrap();
+        let mechanical_manifest = trust_contract_manifest(
+            temp.path(),
+            "fixture",
+            json!([{
+                "id": "insert_a",
+                "kind": "heat_set_insert_pocket",
+                "intent": "mechanical_interface",
+                "insert": "M3x5.7",
+                "center_mm": [0.0, 0.0, 0.0],
+                "diameter_mm": 4.6
+            }]),
+        );
+        let pair_rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "fixture",
+            "version": "0.1.0",
+            "artifact_type": "fixture",
+            "rules": [{
+                "id": "insert_spacing",
+                "kind": "feature_pair_spacing",
+                "applies_to": { "insert": "M3x5.7" },
+                "min_clearance_mm": 1.0
+            }]
+        });
+        let pair_receipt =
+            lint_design_data(&mechanical_manifest, &pair_rulepack, temp.path(), None);
+        assert_eq!(string_field(&pair_receipt, "outcome"), Some("incomplete"));
+        assert!(pair_receipt["checks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|check| {
+                string_field(check, "reason") == Some("insufficient_pair_spacing_candidates")
+                    && check
+                        .pointer("/measured/candidate_count")
+                        .and_then(Value::as_u64)
+                        == Some(1)
+            }));
+        let explanation = format_receipt_explanations(&pair_receipt)
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>()
+            .join("\n");
+        assert!(explanation.contains("Category: incomplete scope"));
+        assert!(explanation.contains("Matching candidates = 1"));
+        assert!(explanation.contains("Required candidates = 2"));
+        assert!(explanation.contains("declare at least two matching features"));
+
+        let no_match_rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "fixture",
+            "version": "0.1.0",
+            "artifact_type": "fixture",
+            "rules": [{
+                "id": "other_features",
+                "kind": "feature_presence",
+                "applies_to": { "kind": "counterbore" }
+            }]
+        });
+        let unchecked =
+            lint_design_data(&mechanical_manifest, &no_match_rulepack, temp.path(), None);
+        assert_eq!(string_field(&unchecked, "outcome"), Some("incomplete"));
+        for reason in [
+            "no_evaluated_mechanical_rules",
+            "unchecked_mechanical_features",
+        ] {
+            assert!(unchecked["warnings"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|warning| string_field(warning, "reason") == Some(reason)));
+        }
+
+        let cosmetic_manifest = trust_contract_manifest(
+            temp.path(),
+            "fixture",
+            json!([{ "id": "relief", "kind": "counterbore", "intent": "cosmetic" }]),
+        );
+        let cosmetic = lint_design_data(&cosmetic_manifest, &no_match_rulepack, temp.path(), None);
+        assert!(!cosmetic["warnings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|warning| {
+                string_field(warning, "reason") == Some("unchecked_mechanical_features")
+            }));
+    }
+
+    #[test]
+    fn unknown_or_mixed_unknown_intents_require_coverage() {
+        let temp = tempfile::tempdir().unwrap();
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "fixture",
+            "version": "0.1.0",
+            "artifact_type": "fixture",
+            "rules": [{
+                "id": "clearance_window",
+                "kind": "numeric_range",
+                "path": "measurements.clearance_mm",
+                "min": 0.2,
+                "max": 0.3
+            }]
+        });
+
+        // "cosmtic" is deliberately misspelled: unknown intent values must stay
+        // coverage-required instead of being silently treated as cosmetic.
+        for intent in [json!("cosmtic"), json!(["cosmetic", "custom_unknown"])] {
+            let manifest = trust_contract_manifest(
+                temp.path(),
+                "fixture",
+                json!([{ "id": "relief", "kind": "clearance_hole", "intent": intent }]),
+            );
+            let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+            assert_eq!(string_field(&receipt, "outcome"), Some("incomplete"));
+            assert_eq!(
+                receipt
+                    .pointer("/scope/mechanical_features/declared")
+                    .and_then(Value::as_u64),
+                Some(1)
+            );
+            assert!(receipt["warnings"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|warning| {
+                    string_field(warning, "reason") == Some("unchecked_mechanical_features")
+                }));
+        }
+
+        let non_mechanical = trust_contract_manifest(
+            temp.path(),
+            "fixture",
+            json!([{
+                "id": "relief",
+                "kind": "clearance_hole",
+                "intent": ["cosmetic", "weight_reduction", "reference"]
+            }]),
+        );
+        let receipt = lint_design_data(&non_mechanical, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&receipt, "outcome"), Some("pass"));
+        assert_eq!(
+            receipt
+                .pointer("/scope/mechanical_features/declared")
+                .and_then(Value::as_u64),
+            Some(0)
+        );
+    }
+
+    #[test]
+    fn insert_selector_checks_matching_features() {
+        let temp = tempfile::tempdir().unwrap();
+        let manifest = trust_contract_manifest(
+            temp.path(),
+            "fixture",
+            json!([{
+                "id": "insert_a",
+                "kind": "heat_set_insert_pocket",
+                "intent": "mechanical_interface",
+                "insert": "M3x5.7"
+            }]),
+        );
+        let rulepack = json!({
+            "schema_version": "burr.rulepack.v1",
+            "id": "fixture",
+            "version": "0.1.0",
+            "artifact_type": "fixture",
+            "rules": [{
+                "id": "insert_inventory",
+                "kind": "feature_count",
+                "applies_to": { "insert": "M3x5.7" },
+                "min_count": 1,
+                "max_count": 1
+            }]
+        });
+
+        let receipt = lint_design_data(&manifest, &rulepack, temp.path(), None);
+        assert_eq!(string_field(&receipt, "outcome"), Some("pass"));
+        assert_eq!(
+            receipt
+                .pointer("/scope/mechanical_features/checked")
+                .and_then(Value::as_u64),
+            Some(1)
+        );
     }
 
     #[test]
@@ -5855,7 +7591,14 @@ mod tests {
         let mut passing_manifest = manifest.clone();
         passing_manifest["features"][1]["center_mm"] = json!([0.0, 5.0, 0.0]);
         let passing = lint_design_data(&passing_manifest, &rulepack, temp.path(), None);
-        assert_eq!(string_field(&passing, "status"), Some("pass"));
+        assert_eq!(string_field(&passing, "status"), Some("incomplete"));
+        assert!(passing["warnings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|warning| {
+                string_field(warning, "reason") == Some("unchecked_mechanical_features")
+            }));
     }
 
     #[test]
@@ -5968,6 +7711,7 @@ mod tests {
             "artifact_version": "0.1.0",
             "artifact_type": "actuator_mount",
             "units": "mm",
+            "process": { "kind": "FDM" },
             "source": {
                 "path": "source.py",
                 "sha256": sha256_file(&source_path).unwrap()
@@ -6956,7 +8700,7 @@ mod tests {
         );
         let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
 
-        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert_eq!(string_field(&receipt, "status"), Some("incomplete"));
         assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
             string_field(check, "rule_id")
                 .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
@@ -6985,7 +8729,7 @@ mod tests {
         );
         let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
 
-        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert_eq!(string_field(&receipt, "status"), Some("incomplete"));
         assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
             string_field(check, "rule_id")
                 .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
@@ -7011,7 +8755,7 @@ mod tests {
         );
         let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
 
-        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert_eq!(string_field(&receipt, "status"), Some("incomplete"));
         assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
             string_field(check, "rule_id")
                 .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
@@ -7037,7 +8781,7 @@ mod tests {
         );
         let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
 
-        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert_eq!(string_field(&receipt, "status"), Some("incomplete"));
         assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
             string_field(check, "rule_id")
                 .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
@@ -7063,7 +8807,7 @@ mod tests {
         );
         let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
 
-        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert_eq!(string_field(&receipt, "status"), Some("incomplete"));
         assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
             string_field(check, "rule_id")
                 .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
@@ -7119,7 +8863,7 @@ mod tests {
         manifest["features"][0]["intent"] = json!("weight_reduction");
         let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
 
-        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert_eq!(string_field(&receipt, "status"), Some("incomplete"));
         assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
             string_field(check, "rule_id")
                 .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
@@ -7153,7 +8897,7 @@ mod tests {
         manifest["features"] = json!([]);
         let receipt = lint_design_data(&manifest, &default_rulepack().unwrap(), temp.path(), None);
 
-        assert_eq!(string_field(&receipt, "status"), Some("pass"));
+        assert_eq!(string_field(&receipt, "status"), Some("incomplete"));
         assert!(!receipt["checks"].as_array().unwrap().iter().any(|check| {
             string_field(check, "rule_id")
                 .is_some_and(|rule_id| rule_id.starts_with("actuator_mount:"))
@@ -7223,15 +8967,15 @@ mod tests {
         write_step_cylinders(path, &[(point, axis, radius)]);
     }
 
-    fn write_step_cylinders(path: &Path, cylinders: &[((f64, f64, f64), (f64, f64, f64), f64)]) {
+    type StepVector = (f64, f64, f64);
+    type StepCylinder = (StepVector, StepVector, f64);
+    type StepPlane = (StepVector, StepVector);
+
+    fn write_step_cylinders(path: &Path, cylinders: &[StepCylinder]) {
         write_step_surfaces(path, cylinders, &[]);
     }
 
-    fn write_step_surfaces(
-        path: &Path,
-        cylinders: &[((f64, f64, f64), (f64, f64, f64), f64)],
-        planes: &[((f64, f64, f64), (f64, f64, f64))],
-    ) {
+    fn write_step_surfaces(path: &Path, cylinders: &[StepCylinder], planes: &[StepPlane]) {
         let mut data = String::from("ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\n");
         let mut base = 1;
         for (point, axis, radius) in cylinders {
@@ -7277,6 +9021,35 @@ mod tests {
         fs::write(path, data).unwrap();
     }
 
+    fn trust_contract_manifest(manifest_dir: &Path, artifact_type: &str, features: Value) -> Value {
+        let source_path = manifest_dir.join("source.py");
+        let artifact_path = manifest_dir.join("part.step");
+        fs::write(&source_path, "print('source')\n").unwrap();
+        fs::write(
+            &artifact_path,
+            "ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+        )
+        .unwrap();
+        json!({
+            "schema_version": "burr.design-data.v1",
+            "artifact_id": "trust-contract-fixture",
+            "artifact_version": "0.1.0",
+            "artifact_type": artifact_type,
+            "units": "mm",
+            "source": {
+                "path": "source.py",
+                "sha256": sha256_file(&source_path).unwrap()
+            },
+            "artifacts": [{
+                "kind": "step",
+                "path": "part.step",
+                "sha256": sha256_file(&artifact_path).unwrap()
+            }],
+            "measurements": { "clearance_mm": 0.25 },
+            "features": features
+        })
+    }
+
     fn test_manifest(source_sha: String, artifact_sha: String) -> Value {
         json!({
             "schema_version": "burr.design-data.v1",
@@ -7284,6 +9057,7 @@ mod tests {
             "artifact_version": "0.1.0",
             "artifact_type": "actuator_mount",
             "units": "mm",
+            "process": { "kind": "FDM" },
             "source": {
                 "path": "source.py",
                 "sha256": source_sha,
@@ -7328,6 +9102,7 @@ mod tests {
             "artifact_version": "0.1.0",
             "artifact_type": "actuator_mount",
             "units": "mm",
+            "process": { "kind": "FDM" },
             "source": {
                 "path": "source.py",
                 "sha256": source_sha,
@@ -7378,6 +9153,7 @@ mod tests {
             "artifact_version": "0.1.0",
             "artifact_type": "actuator_mount",
             "units": "mm",
+            "process": { "kind": "FDM" },
             "source": {
                 "path": "source.py",
                 "sha256": source_sha,
@@ -7429,6 +9205,7 @@ mod tests {
             "artifact_version": "0.1.0",
             "artifact_type": "actuator_mount",
             "units": "mm",
+            "process": { "kind": "FDM" },
             "source": {
                 "path": "source.py",
                 "sha256": source_sha,
@@ -7476,6 +9253,7 @@ mod tests {
             "artifact_version": "0.1.0",
             "artifact_type": "actuator_mount",
             "units": "mm",
+            "process": { "kind": "FDM" },
             "source": {
                 "path": "source.py",
                 "sha256": source_sha,
@@ -7523,6 +9301,7 @@ mod tests {
             "artifact_version": "0.1.0",
             "artifact_type": "actuator_mount",
             "units": "mm",
+            "process": { "kind": "FDM" },
             "source": {
                 "path": "source.py",
                 "sha256": source_sha,
