@@ -10,6 +10,9 @@ at `schemas/burr.receipt.v2.schema.json`.
 
 ## Shape
 
+The `checks` array below is abbreviated to one representative failure. The
+summary and scope counts describe the complete receipt from which it was taken.
+
 ```json
 {
   "schema_version": "burr.receipt.v2",
@@ -90,7 +93,7 @@ outcomes; it must never interpret an unknown schema or outcome as `pass`.
 
 | Outcome | Meaning |
 | --- | --- |
-| `pass` | The selected rulepack was compatible, evaluated checks passed, and every declared mechanical-interface feature received coverage. |
+| `pass` | The selected rulepack was compatible, at least one rule was evaluated, evaluated checks passed, and every declared mechanical-interface feature received coverage. |
 | `incomplete` | Burr ran but could not establish the pass claim because compatibility, rule coverage, mechanical-feature coverage, or pair-spacing evidence was incomplete. |
 | `fail` | A checked claim failed, metadata is stale/invalid, or the rulepack contract is invalid. |
 
@@ -108,9 +111,10 @@ counts. `scope.mechanical_features` reports required mechanical coverage and
 names any unchecked feature ids. The same feature detail remains available in
 `summary.features`, alongside coverage for explicitly non-mechanical features.
 
-Warnings carry `affects_outcome`. A warning with `true` explains why the result
-is `incomplete`; a warning with `false`, such as an optional rule with no
-applicable features, remains visible without independently blocking a pass.
+Warnings carry `affects_outcome`. A warning with `true` blocks a pass and
+explains an `incomplete` result unless a failed check takes precedence. A
+warning with `false`, such as an optional rule with no applicable features,
+remains visible without independently blocking a pass.
 
 ## Check Evidence
 

@@ -66,6 +66,18 @@ try {
     ["--schemafile", "schemas/burr.receipt.v2.schema.json", receiptFixture],
     "receipt v2 contract fixture",
   );
+
+  const vacuousPassFixture = path.join(tempDir, "vacuous-pass-v2.json");
+  const vacuousPass = minimalReceiptV2();
+  vacuousPass.scope.rules.evaluated = 0;
+  vacuousPass.scope.rules.evaluated_rule_ids = [];
+  vacuousPass.summary.rules.evaluated = 0;
+  fs.writeFileSync(vacuousPassFixture, `${JSON.stringify(vacuousPass, null, 2)}\n`);
+  runCheck(
+    ["--schemafile", "schemas/burr.receipt.v2.schema.json", vacuousPassFixture],
+    "vacuous pass rejection",
+    { expectFailure: true },
+  );
 } finally {
   fs.rmSync(tempDir, { recursive: true, force: true });
 }
@@ -103,7 +115,7 @@ function assertFiles(label, files) {
   }
 }
 
-function runCheck(arguments_, label) {
+function runCheck(arguments_, label, options = {}) {
   const result = spawnSync(
     "uvx",
     [
@@ -120,6 +132,12 @@ function runCheck(arguments_, label) {
   );
   if (result.error) {
     throw new Error(`failed to run ${label}: ${result.error.message}`);
+  }
+  if (options.expectFailure) {
+    if (result.status === 0) {
+      throw new Error(`${label} unexpectedly passed`);
+    }
+    return;
   }
   if (result.status !== 0) {
     if (result.stdout) process.stdout.write(result.stdout);
@@ -163,7 +181,14 @@ function minimalReceiptV2() {
     },
     source_design_data: null,
     source_manifest: null,
-    checks: [],
+    checks: [
+      {
+        rule_id: "schema_check:inventory",
+        status: "pass",
+        reason: "ok",
+        message: "Schema fixture rule passed.",
+      },
+    ],
     warnings: [],
     scope: {
       artifact_type: {
@@ -178,9 +203,9 @@ function minimalReceiptV2() {
         compatible: true,
       },
       rules: {
-        declared: 0,
-        evaluated: 0,
-        evaluated_rule_ids: [],
+        declared: 1,
+        evaluated: 1,
+        evaluated_rule_ids: ["schema_check:inventory"],
       },
       mechanical_features: {
         declared: 0,
@@ -190,11 +215,11 @@ function minimalReceiptV2() {
       },
     },
     summary: {
-      checks: 0,
+      checks: 1,
       failures: 0,
       incomplete_checks: 0,
       warnings: 0,
-      rules: { declared: 0, evaluated: 0 },
+      rules: { declared: 1, evaluated: 1 },
       features: emptyCoverage,
     },
   };

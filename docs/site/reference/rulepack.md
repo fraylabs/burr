@@ -207,6 +207,7 @@ numeric_range                  -> declared measurement is in range
 
 Rulepacks are design-rule checks, not constraint solvers. A rulepack only checks
 declared features and measurements it selects. A passing receipt means that the
-selected rulepack was compatible and evaluated checks passed with complete
-declared mechanical-feature coverage; it does not certify undeclared geometry
-or the whole part.
+selected rulepack was compatible, at least one rule was evaluated, and evaluated
+checks passed with complete declared mechanical-feature coverage. Zero evaluated
+rule coverage is `incomplete`; a pass does not certify undeclared geometry or the
+whole part.

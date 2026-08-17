@@ -12,6 +12,8 @@ pub const SUPPORTED_DESIGN_DATA_SCHEMA_VERSIONS: [&str; 1] = ["burr.design-data.
 pub const SUPPORTED_LEGACY_DESIGN_DATA_SCHEMA_VERSIONS: [&str; 1] = ["fray.cad.artifact.v1"];
 pub const SUPPORTED_RULEPACK_SCHEMA_VERSIONS: [&str; 1] = ["burr.rulepack.v1"];
 pub const RECEIPT_SCHEMA_VERSION: &str = "burr.receipt.v2";
+pub const REPAIR_PACKET_SCHEMA_VERSION: &str = "burr.repair-packet.v2";
+pub const REPAIR_PACKET_LIST_SCHEMA_VERSION: &str = "burr.repair-packet-list.v2";
 pub const BURR_BUILD123D_PYPI_DEPENDENCY: &str = "burr-build123d==0.10.0";
 
 const DEFAULT_RULEPACK: &str = include_str!("../rules/actuator_mount.rulepack.json");
@@ -188,9 +190,7 @@ pub fn lint_targets(inputs: &[String], options: &LintOptions) -> Result<Vec<Lint
         .collect::<Result<_, _>>()?;
 
     if options.write_receipt {
-        for result in &results {
-            write_json_file(&result.receipt_path, &result.receipt)?;
-        }
+        write_lint_receipts_staged(&results)?;
     }
 
     Ok(results)
@@ -205,7 +205,7 @@ pub fn lint_design_data_file(path: &Path, options: &LintOptions) -> Result<LintR
             Some(path) => read_rulepack_selection(&path)?,
             None => {
                 return Err(format!(
-                    "No rulepack selected for {}. Pass --rulepack <file> or add rulepack.path to {DESIGN_DATA_FILE_NAME}.",
+                    "No rulepack selected for {}. Pass --rulepack <selector> or add rulepack.path to {DESIGN_DATA_FILE_NAME}.",
                     path.display()
                 ))
             }
@@ -362,48 +362,41 @@ pub fn lint_design_data(
                 continue;
             }
 
-            evaluated_rule_ids.push(full_rule_id);
+            evaluated_rule_ids.push(full_rule_id.clone());
             for feature in features {
-                match rule_kind {
+                let check = match rule_kind {
                     Some("hole_edge_distance") => {
-                        checks.push(check_hole_edge_distance(manifest, rulepack, rule, feature));
+                        check_hole_edge_distance(manifest, rulepack, rule, feature)
                     }
                     Some("minimum_wall_thickness") => {
-                        checks.push(check_minimum_wall_thickness(
-                            manifest, rulepack, rule, feature,
-                        ));
+                        check_minimum_wall_thickness(manifest, rulepack, rule, feature)
                     }
                     Some("fastener_support_wall_thickness") => {
-                        checks.push(check_fastener_support_wall_thickness(
-                            rulepack, rule, feature,
-                        ));
+                        check_fastener_support_wall_thickness(rulepack, rule, feature)
                     }
                     Some("blind_pocket_back_wall_thickness") => {
-                        checks.push(check_blind_pocket_back_wall_thickness(
-                            manifest, rulepack, rule, feature,
-                        ));
+                        check_blind_pocket_back_wall_thickness(manifest, rulepack, rule, feature)
                     }
                     Some("standoff_boss_support_link") => {
-                        checks.push(check_standoff_boss_support_link(
-                            manifest, rulepack, rule, feature,
-                        ));
+                        check_standoff_boss_support_link(manifest, rulepack, rule, feature)
                     }
                     Some("feature_edge_distance") => {
-                        checks.push(check_feature_edge_distance(
-                            manifest, rulepack, rule, feature,
-                        ));
+                        check_feature_edge_distance(manifest, rulepack, rule, feature)
                     }
                     Some("feature_presence") => {
-                        checks.push(check_feature_presence(
-                            manifest,
-                            manifest_dir,
-                            rulepack,
-                            rule,
-                            feature,
-                        ));
+                        check_feature_presence(manifest, manifest_dir, rulepack, rule, feature)
                     }
-                    _ => unreachable!(),
-                }
+                    other => json!({
+                        "rule_id": full_rule_id.clone(),
+                        "status": "fail",
+                        "reason": "unhandled_rule_kind",
+                        "message": format!(
+                            "Rule kind {} is declared supported but has no evaluator.",
+                            other.unwrap_or("<missing>")
+                        )
+                    }),
+                };
+                checks.push(check);
             }
         }
     }
@@ -477,6 +470,9 @@ pub fn lint_design_data(
         "artifact_type": optional_string_value(manifest, "artifact_type"),
         "rulepack_id": optional_string_value(rulepack, "id"),
         "rulepack_version": optional_string_value(rulepack, "version"),
+        // The manifest_* and source_manifest aliases preserve the field names
+        // emitted by receipt v1. Keep them for v2 consumers migrating at their
+        // own pace; remove them only in a future receipt schema version.
         "compatibility": {
             "design_data_schema_version": optional_string_value(manifest, "schema_version"),
             "supported_design_data_schema_versions": supported_manifest_schema_versions(),
@@ -693,7 +689,7 @@ pub fn build_receipt_repair_packet(receipt: &Value) -> Value {
         .count();
 
     json!({
-        "schema_version": "burr.repair-packet.v1",
+        "schema_version": REPAIR_PACKET_SCHEMA_VERSION,
         "burr_version": BURR_VERSION,
         "source_kind": "receipt",
         "source_design_data": receipt.get("source_design_data").cloned().unwrap_or(Value::Null),
@@ -733,7 +729,7 @@ pub fn build_repair_report_packet(report: &Value) -> Value {
         .count();
 
     json!({
-        "schema_version": "burr.repair-packet.v1",
+        "schema_version": REPAIR_PACKET_SCHEMA_VERSION,
         "burr_version": BURR_VERSION,
         "source_kind": "repair_report",
         "repair_report_id": report.get("report_id").or_else(|| report.get("id")).cloned().unwrap_or(Value::Null),
@@ -1129,6 +1125,7 @@ fn explanation_category(reason: &str) -> &'static str {
         "feature_count_out_of_range" | "numeric_value_out_of_range" | "missing_numeric_value" => {
             "declared measurement"
         }
+        "insufficient_pair_spacing_candidates" => "incomplete scope",
         _ => "other",
     }
 }
@@ -1147,6 +1144,7 @@ fn explanation_headline(reason: &str, feature_kind: &str) -> &'static str {
         },
         2 => "Fix dimension: move or resize unsafe geometry.",
         3 => "Fix declared measurement: update the CAD or rule range.",
+        4 => "Complete rule scope: declare enough features for the check.",
         _ => "Fix check input: inspect the failed rule.",
     }
 }
@@ -1195,6 +1193,7 @@ fn explanation_rank_for_reason(reason: &str) -> u8 {
         | "invalid_pair_spacing_rule_clearance"
         | "invalid_counterbore_dimensions" => 2,
         "feature_count_out_of_range" | "numeric_value_out_of_range" | "missing_numeric_value" => 3,
+        "insufficient_pair_spacing_candidates" => 4,
         _ => 9,
     }
 }
@@ -1272,6 +1271,10 @@ fn explanation_problem(check: &Value, reason: &str, feature_kind: &str) -> Strin
         "missing_hole_diameter" => "the feature is missing a valid hole diameter.".to_string(),
         "missing_pair_spacing_geometry" => {
             "a feature in a pair-spacing rule is missing center_mm or diameter_mm.".to_string()
+        }
+        "insufficient_pair_spacing_candidates" => {
+            "the pair-spacing rule selected fewer than two declared features, so no pair could be checked."
+                .to_string()
         }
         "missing_feature_edge_geometry" => {
             "the feature is missing a checkable edge-distance envelope.".to_string()
@@ -1567,6 +1570,20 @@ fn explanation_evidence(check: &Value, reason: &str) -> Vec<String> {
             push_measure(&mut lines, check, "/required/min", "Minimum value");
             push_measure(&mut lines, check, "/required/max", "Maximum value");
         }
+        "insufficient_pair_spacing_candidates" => {
+            push_count(
+                &mut lines,
+                check,
+                "/measured/candidate_count",
+                "Matching candidates",
+            );
+            push_count(
+                &mut lines,
+                check,
+                "/required/min_candidates",
+                "Required candidates",
+            );
+        }
         _ => {
             if let Some(message) = string_field(check, "message") {
                 lines.push(format!("Evidence: {message}"));
@@ -1617,6 +1634,9 @@ fn explanation_why(reason: &str, feature_kind: &str) -> &'static str {
         }
         "numeric_value_out_of_range" | "missing_numeric_value" => {
             "Burr cannot trust a clearance, engagement, or other derived claim unless the source declares it in range."
+        }
+        "insufficient_pair_spacing_candidates" => {
+            "a pair-spacing claim needs at least two matching features before Burr can measure the closest pair."
         }
         _ => "Burr cannot trust this mechanical claim until the failing rule is fixed.",
     }
@@ -1685,6 +1705,9 @@ fn explanation_fix(reason: &str, feature_kind: &str) -> &'static str {
         }
         "numeric_value_out_of_range" | "missing_numeric_value" => {
             "fix the CAD dimensions or emit the expected measurement in burr-design-data.json."
+        }
+        "insufficient_pair_spacing_candidates" => {
+            "declare at least two matching features, or narrow or remove the pair-spacing rule if no pair is intended."
         }
         "step_geometry_unreadable" => "export a valid STEP artifact and make sure the design data points to it.",
         "invalid_counterbore_dimensions" => {
@@ -1961,9 +1984,7 @@ fn validate_design_data_contract(manifest: &Value) -> Vec<Value> {
 
     if failures.is_empty() {
         let profile = if string_field(manifest, "schema_version")
-            == SUPPORTED_LEGACY_DESIGN_DATA_SCHEMA_VERSIONS
-                .first()
-                .copied()
+            .is_some_and(|version| SUPPORTED_LEGACY_DESIGN_DATA_SCHEMA_VERSIONS.contains(&version))
         {
             "legacy_transition"
         } else {
@@ -6195,6 +6216,45 @@ fn read_json_str(text: &str) -> Result<Value, String> {
 }
 
 fn write_json_file(path: &Path, value: &Value) -> Result<(), String> {
+    let tmp_path = stage_json_file(path, value)?;
+    if let Err(error) = fs::rename(&tmp_path, path) {
+        let _ = fs::remove_file(&tmp_path);
+        return Err(format!("Failed to replace {}: {error}", path.display()));
+    }
+    Ok(())
+}
+
+fn write_lint_receipts_staged(results: &[LintResult]) -> Result<(), String> {
+    let mut staged = Vec::with_capacity(results.len());
+    for result in results {
+        match stage_json_file(&result.receipt_path, &result.receipt) {
+            Ok(tmp_path) => staged.push((tmp_path, result.receipt_path.clone())),
+            Err(error) => {
+                for (tmp_path, _) in &staged {
+                    let _ = fs::remove_file(tmp_path);
+                }
+                return Err(format!(
+                    "{error}. No receipt files were replaced because every output is staged first."
+                ));
+            }
+        }
+    }
+
+    for (index, (tmp_path, receipt_path)) in staged.iter().enumerate() {
+        if let Err(error) = fs::rename(tmp_path, receipt_path) {
+            for (remaining_tmp_path, _) in staged.iter().skip(index) {
+                let _ = fs::remove_file(remaining_tmp_path);
+            }
+            return Err(format!(
+                "Failed to replace {}: {error}. {index} receipt(s) were already replaced; remaining final receipts were not changed.",
+                receipt_path.display()
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn stage_json_file(path: &Path, value: &Value) -> Result<PathBuf, String> {
     let tmp_path = path.with_extension(format!(
         "{}tmp",
         path.extension()
@@ -6205,8 +6265,7 @@ fn write_json_file(path: &Path, value: &Value) -> Result<(), String> {
     let text = serde_json::to_string_pretty(value).map_err(|error| error.to_string())? + "\n";
     fs::write(&tmp_path, text)
         .map_err(|error| format!("Failed to write {}: {error}", tmp_path.display()))?;
-    fs::rename(&tmp_path, path)
-        .map_err(|error| format!("Failed to replace {}: {error}", path.display()))
+    Ok(tmp_path)
 }
 
 fn is_design_data_file_name(name: &str) -> bool {
@@ -6625,7 +6684,7 @@ mod tests {
         };
         let error = lint_design_data_file(&manifest_path, &options).unwrap_err();
         assert!(error.contains("No rulepack selected"));
-        assert!(error.contains("--rulepack <file>"));
+        assert!(error.contains("--rulepack <selector>"));
 
         manifest["rulepack"] = json!({ "path": BUILTIN_ACTUATOR_RULEPACK });
         write_json_file(&manifest_path, &manifest).unwrap();
@@ -6686,6 +6745,36 @@ mod tests {
         assert!(error.contains("No rulepack selected"));
         assert!(!valid_dir.join("burr-receipt.json").exists());
         assert!(!missing_rulepack_dir.join("burr-receipt.json").exists());
+    }
+
+    #[test]
+    fn multi_target_receipts_are_staged_before_any_replacement() {
+        let temp = tempfile::tempdir().unwrap();
+        let first_path = temp.path().join("first-receipt.json");
+        let second_path = temp.path().join("second-receipt.json");
+        write_json_file(&first_path, &json!({ "generation": "old" })).unwrap();
+        write_json_file(&second_path, &json!({ "generation": "old" })).unwrap();
+
+        let blocking_tmp_path = second_path.with_extension("json.tmp");
+        fs::create_dir(&blocking_tmp_path).unwrap();
+        let results = vec![
+            LintResult {
+                receipt: json!({ "generation": "new" }),
+                receipt_path: first_path.clone(),
+                design_data_path: temp.path().join("first-design-data.json"),
+            },
+            LintResult {
+                receipt: json!({ "generation": "new" }),
+                receipt_path: second_path.clone(),
+                design_data_path: temp.path().join("second-design-data.json"),
+            },
+        ];
+
+        let error = write_lint_receipts_staged(&results).unwrap_err();
+        assert!(error.contains("No receipt files were replaced"));
+        assert_eq!(read_json_file(&first_path).unwrap()["generation"], "old");
+        assert_eq!(read_json_file(&second_path).unwrap()["generation"], "old");
+        assert!(!first_path.with_extension("json.tmp").exists());
     }
 
     #[test]
@@ -6943,6 +7032,10 @@ mod tests {
         });
 
         let packet = build_receipt_repair_packet(&receipt);
+        assert_eq!(
+            string_field(&packet, "schema_version"),
+            Some(REPAIR_PACKET_SCHEMA_VERSION)
+        );
         assert_eq!(string_field(&packet, "outcome"), Some("incomplete"));
         assert_eq!(
             packet
@@ -7067,6 +7160,15 @@ mod tests {
                         .and_then(Value::as_u64)
                         == Some(1)
             }));
+        let explanation = format_receipt_explanations(&pair_receipt)
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>()
+            .join("\n");
+        assert!(explanation.contains("Category: incomplete scope"));
+        assert!(explanation.contains("Matching candidates = 1"));
+        assert!(explanation.contains("Required candidates = 2"));
+        assert!(explanation.contains("declare at least two matching features"));
 
         let no_match_rulepack = json!({
             "schema_version": "burr.rulepack.v1",
@@ -7125,6 +7227,8 @@ mod tests {
             }]
         });
 
+        // "cosmtic" is deliberately misspelled: unknown intent values must stay
+        // coverage-required instead of being silently treated as cosmetic.
         for intent in [json!("cosmtic"), json!(["cosmetic", "custom_unknown"])] {
             let manifest = trust_contract_manifest(
                 temp.path(),

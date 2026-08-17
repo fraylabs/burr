@@ -46,11 +46,12 @@ third, then declared measurement issues.
 
 Burr receipts have three outcomes:
 
-- `pass`: the explicitly selected rulepack was compatible, evaluated checks
-  passed, and every declared mechanical-interface feature received coverage;
+- `pass`: the explicitly selected rulepack was compatible, at least one rule
+  was evaluated, evaluated checks passed, and every declared
+  mechanical-interface feature received coverage;
 - `incomplete`: Burr ran but could not establish that pass claim because the
-  selected rulepack was incompatible or required mechanical coverage was
-  missing;
+  selected rulepack was incompatible, no rule was evaluated, or required
+  mechanical coverage was missing;
 - `fail`: a checked claim failed or the rulepack contract was invalid.
 
 `burr check` exits `0` for `pass`, `3` for `incomplete`, `1` for `fail`, and `2`

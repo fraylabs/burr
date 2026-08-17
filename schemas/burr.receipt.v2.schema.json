@@ -51,7 +51,39 @@
         "required": ["outcome"],
         "properties": { "outcome": { "const": "pass" } }
       },
-      "then": { "properties": { "status": { "const": "pass" } } }
+      "then": {
+        "properties": {
+          "status": { "const": "pass" },
+          "scope": {
+            "properties": {
+              "artifact_type": {
+                "properties": { "compatible": { "const": true } }
+              },
+              "process_kind": {
+                "properties": { "compatible": { "const": true } }
+              },
+              "rules": {
+                "properties": { "evaluated": { "minimum": 1 } }
+              },
+              "mechanical_features": {
+                "properties": { "unchecked": { "const": 0 } }
+              }
+            }
+          },
+          "summary": {
+            "properties": {
+              "failures": { "const": 0 },
+              "incomplete_checks": { "const": 0 },
+              "rules": {
+                "properties": { "evaluated": { "minimum": 1 } }
+              },
+              "features": {
+                "properties": { "mechanical_unchecked": { "const": 0 } }
+              }
+            }
+          }
+        }
+      }
     },
     {
       "if": {

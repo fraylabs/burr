@@ -314,6 +314,11 @@ verifier is the regenerated Burr receipt after the exact source edit. If the
 packet has no exact source edits left, or any exact-text/value-path guard fails,
 the runner must stop rather than guess.
 
+Consumers must require `burr.repair-packet.v2` (or
+`burr.repair-packet-list.v2` for multi-input output). Version 2 carries the
+three-state receipt outcome plus scope, warnings, and normalized incomplete
+reasons; an unknown packet version must not be treated as repairable.
+
 Example action:
 
 ```json

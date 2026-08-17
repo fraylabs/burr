@@ -2,6 +2,7 @@ use burr::{
     build_receipt_repair_packet, build_repair_report_packet, find_design_data_paths,
     format_receipt_diagnostics, format_receipt_explanations, init_project, lint_targets,
     stamp_targets, LintOptions, BURR_VERSION, DESIGN_DATA_FILE_NAME,
+    REPAIR_PACKET_LIST_SCHEMA_VERSION,
 };
 use std::path::PathBuf;
 
@@ -226,7 +227,7 @@ fn run_explain(args: Vec<String>) -> Result<(), String> {
             json_outputs.remove(0)
         } else {
             serde_json::json!({
-                "schema_version": "burr.repair-packet-list.v1",
+                "schema_version": REPAIR_PACKET_LIST_SCHEMA_VERSION,
                 "burr_version": BURR_VERSION,
                 "packets": json_outputs
             })
@@ -350,7 +351,7 @@ fn explain_json_packet(document: &serde_json::Value) -> serde_json::Value {
 
 fn print_help() {
     println!(
-        "Usage:\n  burr init <folder>\n  burr check [--rulepack <file|builtin:actuator_mount>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr explain [--json] <folder|burr-receipt.json|repair-report.json>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n"
+        "Usage:\n  burr init <folder>\n  burr check [--rulepack <selector>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr explain [--json] <folder|burr-receipt.json|repair-report.json>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n\nRulepack selectors may be a file path or builtin:actuator_mount.\n\nExit codes for burr check:\n  0  pass\n  1  fail\n  2  invocation or configuration error\n  3  incomplete\n"
     );
 }
 
@@ -439,7 +440,7 @@ fn print_receipt_scope_and_warnings(receipt: &serde_json::Value) {
                 .and_then(serde_json::Value::as_bool)
                 == Some(true)
             {
-                " [incomplete]"
+                " [affects outcome]"
             } else {
                 ""
             };

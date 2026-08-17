@@ -10,6 +10,12 @@ The Rust CLI remains the authoritative evaluator. The schemas are published
 with Burr's source distributions so editors, generators, and CI integrations
 can validate documents before invoking `burr check`.
 
+`burr.design-data.v1.schema.json` deliberately describes only the current
+`burr.design-data.v1` document shape. The CLI temporarily accepts listed legacy
+schema versions through its `legacy_transition` profile, but those legacy
+documents are not v1-schema-valid and should be regenerated before schema-only
+validation.
+
 Schema validity does not predict a passing receipt. Cross-item and filesystem
 invariants such as unique rule, part, and feature ids, ordered range bounds,
 file freshness, and rulepack compatibility remain CLI checks.

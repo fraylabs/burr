@@ -37,9 +37,11 @@ const m3InventoryRule = {
 };
 
 try {
+  checkCliHelpContract();
   checkExplicitRulepackPass();
   checkMissingRulepackSelection();
   checkArtifactTypeMismatch();
+  checkFailOutcomeUsesNeutralWarningMarker();
   checkProcessKindMismatch();
   checkUnsupportedRuleKind();
   checkUnknownSelectorKey();
@@ -51,11 +53,22 @@ try {
   checkNonMechanicalUncheckedFeature();
   checkInsertSelectorIsolation();
   checkSinglePairSpacingCandidate();
-  checkMultiTargetReceiptWritesAreAtomic();
+  checkMultiTargetReceiptWritesArePreflighted();
   validateRuntimeReceipts();
   console.log("trust contract fixtures passed");
 } finally {
   fs.rmSync(tempRoot, { recursive: true, force: true });
+}
+
+function checkCliHelpContract() {
+  const result = spawnSync("cargo", ["run", "--quiet", "--", "--help"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    maxBuffer: 1024 * 1024 * 32,
+  });
+  expectExitCode(result, 0, "cli-help-contract");
+  expectIncludes(result.stdout, "--rulepack <selector>", "cli-help-contract");
+  expectIncludes(result.stdout, "3  incomplete", "cli-help-contract");
 }
 
 function checkExplicitRulepackPass() {
@@ -78,7 +91,7 @@ function checkMissingRulepackSelection() {
   const result = runCheck(fixture.dir);
   expectExitCode(result, 2, fixture.slug);
   expectIncludes(result.output, "No rulepack selected for", fixture.slug);
-  expectIncludes(result.output, "Pass --rulepack <file> or add rulepack.path", fixture.slug);
+  expectIncludes(result.output, "Pass --rulepack <selector> or add rulepack.path", fixture.slug);
   if (fs.existsSync(fixture.receiptPath)) {
     throw new Error(`${fixture.slug} must not write a receipt for an invocation/configuration error`);
   }
@@ -99,11 +112,12 @@ function checkArtifactTypeMismatch() {
     uncheckedIds: ["m3_insert"],
   }, fixture.slug);
   expectIncludes(result.output, "Warnings:", fixture.slug);
-  expectIncludes(result.output, "artifact_type_not_targeted [incomplete]", fixture.slug);
+  expectIncludes(result.output, "artifact_type_not_targeted [affects outcome]", fixture.slug);
 
   const explanation = runExplainJson(fixture.receiptPath);
   expectExitCode(explanation, 0, `${fixture.slug} explain`);
   const packet = JSON.parse(explanation.stdout);
+  expectEqual(packet.schema_version, "burr.repair-packet.v2", `${fixture.slug} packet schema`);
   expectEqual(packet.outcome, "incomplete", `${fixture.slug} explain outcome`);
   expectEqual(
     packet.scope?.artifact_type?.compatible,
@@ -112,6 +126,23 @@ function checkArtifactTypeMismatch() {
   );
   if (!packet.incomplete_reasons?.some((reason) => reason.reason === "artifact_type_not_targeted")) {
     throw new Error(`${fixture.slug} explain packet omitted artifact_type_not_targeted`);
+  }
+}
+
+function checkFailOutcomeUsesNeutralWarningMarker() {
+  const fixture = writeFixture("fail-with-scope-warning", {
+    designData: {
+      artifact_type: "other_part",
+      source: { path: "design.py", sha256: "0".repeat(64) },
+    },
+  });
+  const result = runCheck(fixture.dir);
+  const receipt = expectReceipt(fixture, result, { exitCode: 1, outcome: "fail" });
+  expectReason(receipt, "artifact_type_not_targeted", fixture.slug);
+  expectReason(receipt, "source_hash_mismatch", fixture.slug);
+  expectIncludes(result.output, "artifact_type_not_targeted [affects outcome]", fixture.slug);
+  if (result.output.includes("artifact_type_not_targeted [incomplete]")) {
+    throw new Error(`${fixture.slug} printed an incomplete marker beneath a failing outcome`);
   }
 }
 
@@ -382,14 +413,14 @@ function checkSinglePairSpacingCandidate() {
   }, fixture.slug);
 }
 
-function checkMultiTargetReceiptWritesAreAtomic() {
+function checkMultiTargetReceiptWritesArePreflighted() {
   const valid = writeFixture("multi-target-valid");
   const invalid = writeFixture("multi-target-missing-selection", {
     includeRulepackSelection: false,
   });
   const result = runCheckInputs([valid.dir, invalid.dir]);
-  expectExitCode(result, 2, "multi-target atomic receipts");
-  expectIncludes(result.output, "No rulepack selected for", "multi-target atomic receipts");
+  expectExitCode(result, 2, "multi-target preflighted receipts");
+  expectIncludes(result.output, "No rulepack selected for", "multi-target preflighted receipts");
   for (const fixture of [valid, invalid]) {
     if (fs.existsSync(fixture.receiptPath)) {
       throw new Error(`${fixture.slug} wrote a partial receipt before multi-target preflight passed`);

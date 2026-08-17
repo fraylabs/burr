@@ -113,10 +113,11 @@ reference             -> linkage/evidence context, not an independent claim
 ```
 
 Missing `intent` is treated as `mechanical_interface` for compatibility.
-Every declared mechanical-interface feature must be selected by at least one
-evaluated rule for a passing receipt. An unchecked mechanical feature makes the
-outcome `incomplete`; explicitly non-mechanical unchecked features are reported
-but do not block a pass.
+A passing receipt requires at least one evaluated rule, and every declared
+mechanical-interface feature must be selected by an evaluated rule. Zero
+evaluated rule coverage or an unchecked mechanical feature makes the outcome
+`incomplete`; explicitly non-mechanical unchecked features are reported but do
+not block a pass.
 
 Only these documented non-mechanical values are coverage-exempt. Burr treats
 an unknown or misspelled intent as coverage-required, preserving support for

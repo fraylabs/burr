@@ -13,7 +13,7 @@ cargo install burr --version 0.29.0
 ```txt
 burr --version
 burr init <folder>
-burr check [--rulepack <file>] [--no-write-receipt] <folder|burr-design-data.json>...
+burr check [--rulepack <selector>] [--no-write-receipt] <folder|burr-design-data.json>...
 burr explain [--json] <folder|burr-receipt.json|repair-report.json>...
 burr stamp <folder|burr-design-data.json>...
 ```
@@ -82,7 +82,9 @@ burr explain --json .
 Human output is for review. JSON output is for agent repair loops. For an
 `incomplete` receipt, both forms retain scope warnings; the JSON repair packet
 also includes `scope`, `warnings`, and normalized `incomplete_reasons` so a
-caller does not mistake an empty failure list for a passing result.
+caller does not mistake an empty failure list for a passing result. Consumers
+must require `burr.repair-packet.v2`; multi-input JSON uses
+`burr.repair-packet-list.v2`.
 
 ## `burr stamp`
 

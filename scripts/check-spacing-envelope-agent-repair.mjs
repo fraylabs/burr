@@ -47,7 +47,7 @@ try {
   const packetPath = path.join(tmp, "spacing-envelope-repair-packet.json");
   fs.writeFileSync(packetPath, explain.output);
   const packet = JSON.parse(explain.output);
-  expectEqual(packet.schema_version, "burr.repair-packet.v1", "repair packet schema");
+  expectEqual(packet.schema_version, "burr.repair-packet.v2", "repair packet schema");
   expectEqual(packet.source_kind, "repair_report", "repair packet source kind");
   expectEqual(packet.summary?.exact_source_edits_available, true, "exact source edits available");
   expectEqual(packet.summary?.exact_source_edit_count, 1, "exact source edit count");

@@ -12,9 +12,13 @@
   default rulepack. Artifact/process incompatibility, zero applied-rule
   coverage, unchecked mechanical features, and insufficient candidates for a
   pair-spacing claim now produce `incomplete` receipts and a nonzero exit.
-  Multi-target checks now defer every receipt write until all inputs can be
-  read and configured, preventing a later invocation error from leaving silent
-  partial proof artifacts.
+  Multi-target checks now preflight every input and stage every serialized
+  receipt before replacing outputs, preventing configuration or staging errors
+  from leaving partial proof artifacts and reporting any rare replacement-time
+  partial state explicitly.
+- Versioned structured explain output as `burr.repair-packet.v2` (and
+  `burr.repair-packet-list.v2`) because incomplete outcomes add scope, warnings,
+  and normalized incomplete reasons that v1 consumers cannot safely ignore.
 - Tightened rulepack validation for duplicate ids, unsupported rule kinds,
   unknown selectors, missing rule bounds, and `process_kind` and `insert`
   selector contracts.

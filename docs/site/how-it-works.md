@@ -78,10 +78,12 @@ the command line. Burr does not silently choose a default rulepack.
 The terminal output includes warnings and checked/unchecked feature coverage.
 The receipt outcome is `pass`, `incomplete`, or `fail`:
 
-- `pass` means the selected rulepack was compatible, evaluated checks passed,
-  and all declared mechanical-interface features received coverage;
+- `pass` means the selected rulepack was compatible, at least one rule was
+  evaluated, evaluated checks passed, and all declared mechanical-interface
+  features received coverage;
 - `incomplete` means Burr could not establish that trust claim, such as when the
-  rulepack is incompatible or mechanical coverage is missing;
+  rulepack is incompatible, no rule was evaluated, or mechanical coverage is
+  missing;
 - `fail` means a checked claim failed or the rulepack contract is invalid.
 
 Explicitly non-mechanical unchecked features do not block a pass.

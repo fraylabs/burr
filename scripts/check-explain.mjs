@@ -46,7 +46,7 @@ const edgeDistancePacket = run("cargo", [
   "examples/linear-actuator-bad",
 ])
 const edgeDistanceJson = JSON.parse(edgeDistancePacket.output)
-expectEqual(edgeDistanceJson.schema_version, "burr.repair-packet.v1", "receipt packet schema")
+expectEqual(edgeDistanceJson.schema_version, "burr.repair-packet.v2", "receipt packet schema")
 expectEqual(edgeDistanceJson.source_kind, "receipt", "receipt packet source kind")
 expectEqual(edgeDistanceJson.status, "fail", "receipt packet status")
 expectEqual(edgeDistanceJson.summary.exact_source_edits_available, false, "receipt exact edit availability")
@@ -62,6 +62,20 @@ expectEqual(
   "move the hole inward or make the surrounding part larger.",
   "receipt packet fix",
 )
+
+const packetList = JSON.parse(
+  run("cargo", [
+    "run",
+    "--quiet",
+    "--",
+    "explain",
+    "--json",
+    "examples/linear-actuator-bad",
+    "examples/linear-actuator-bad",
+  ]).output,
+)
+expectEqual(packetList.schema_version, "burr.repair-packet-list.v2", "packet list schema")
+expectEqual(packetList.packets.length, 2, "packet list count")
 
 for (const fixture of ["bad", "good"]) {
   run("uv", [
@@ -208,7 +222,7 @@ try {
   )
   const repairPacket = run("cargo", ["run", "--quiet", "--", "explain", "--json", repairReport])
   const repairJson = JSON.parse(repairPacket.output)
-  expectEqual(repairJson.schema_version, "burr.repair-packet.v1", "repair packet schema")
+  expectEqual(repairJson.schema_version, "burr.repair-packet.v2", "repair packet schema")
   expectEqual(repairJson.source_kind, "repair_report", "repair packet source kind")
   expectEqual(repairJson.summary.exact_source_edits_available, true, "repair packet exact edit availability")
   expectEqual(repairJson.summary.exact_source_edit_count, 1, "repair packet exact edit count")
