@@ -63,20 +63,6 @@ expectEqual(
   "receipt packet fix",
 )
 
-const packetList = JSON.parse(
-  run("cargo", [
-    "run",
-    "--quiet",
-    "--",
-    "explain",
-    "--json",
-    "examples/linear-actuator-bad",
-    "examples/linear-actuator-bad",
-  ]).output,
-)
-expectEqual(packetList.schema_version, "burr.repair-packet-list.v2", "packet list schema")
-expectEqual(packetList.packets.length, 2, "packet list count")
-
 for (const fixture of ["bad", "good"]) {
   run("uv", [
     "run",
@@ -109,6 +95,32 @@ expectIncludes(
   missingFeature.output,
   "Fix: regenerate the STEP from the bearing_seat helper or update the declared seat center/diameter/depth.",
 )
+
+const packetList = JSON.parse(
+  run("cargo", [
+    "run",
+    "--quiet",
+    "--",
+    "explain",
+    "--json",
+    "examples/linear-actuator-bad",
+    "examples/build123d-bearing-seat/bad",
+  ]).output,
+)
+expectEqual(packetList.schema_version, "burr.repair-packet-list.v2", "packet list schema")
+expectEqual(packetList.packets.length, 2, "packet list count")
+expectEqual(
+  packetList.packets[0].source_design_data,
+  "examples/linear-actuator-bad/burr-design-data.json",
+  "packet list actuator source",
+)
+expectEqual(
+  packetList.packets[1].source_design_data,
+  "examples/build123d-bearing-seat/bad/burr-design-data.json",
+  "packet list bearing-seat source",
+)
+expectEqual(packetList.packets[0].outcome, "fail", "packet list actuator outcome")
+expectEqual(packetList.packets[1].outcome, "fail", "packet list bearing-seat outcome")
 
 run("cargo", ["run", "--quiet", "--", "check", "examples/build123d-bearing-seat/good"])
 const passing = run("cargo", [
