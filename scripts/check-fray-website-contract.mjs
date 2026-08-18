@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 
 const contract = fs.readFileSync("docs/fray-website-contract.md", "utf8");
 const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
+const published = process.argv.includes("--published");
 const version = packageJson.version;
 const tag = `burr-v${version}`;
 const artifact = `burr-gallery-v${version}`;
@@ -20,6 +21,11 @@ if (urlMatch[1] !== expectedUrl) {
   throw new Error(
     `Contract is not pointing at the current Burr gallery URL.\n${urlMatch[1]}\n${expectedUrl}`,
   );
+}
+
+if (!published) {
+  console.log("Fray website source contract proof passed");
+  process.exit(0);
 }
 
 const releaseResult = spawnSync(
@@ -87,7 +93,7 @@ if (result.status !== 0) {
   );
 }
 
-console.log("Fray website contract proof passed");
+console.log("Fray website published contract proof passed");
 
 function download(url) {
   return new Promise((resolve, reject) => {

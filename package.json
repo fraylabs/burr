@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.29.0",
+  "version": "0.30.0",
   "description": "Design-rule checks for CAD-as-code workflows.",
   "type": "module",
   "files": [
@@ -105,6 +105,7 @@
     "docs:artifact": "node scripts/build-docs-artifact.mjs",
     "check:docs:artifact": "node scripts/check-docs-artifact.mjs",
     "check:fray-website-contract": "node scripts/check-fray-website-contract.mjs",
+    "check:fray-website-contract:published": "node scripts/check-fray-website-contract.mjs --published",
     "check:explain": "node scripts/check-explain.mjs",
     "check:repair-loop": "node scripts/check-repair-loop.mjs",
     "check:repair-report": "node scripts/check-repair-report.mjs",

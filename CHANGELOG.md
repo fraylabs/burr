@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.30.0
+
 - Added the `burr.receipt.v2` three-state trust contract: `pass` means the selected
   rulepack was compatible and evaluated checks passed with complete required
   mechanical coverage, `incomplete` means Burr could not establish that
@@ -38,6 +40,9 @@
   dependency checks, strict Clippy, stale-run cancellation, and timeouts. The
   release-candidate lane installs the packaged Rust CLI and both locally built
   Python wheels before accepting the change.
+- Split the Fray website contract into a PR-safe source check and a published
+  release-asset check in the manual fresh-install lane, so a release candidate
+  no longer depends on its own not-yet-created GitHub release.
 - Added a CI parity test that compares every rule kind's Rust field allowlist
   with its closed JSON Schema branch, preventing either contract from drifting
   independently.
