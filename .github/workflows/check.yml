@@ -191,3 +191,8 @@ jobs:
 
       - name: Check published install and starter fix loop
         run: npm run check:fresh-install
+
+      - name: Check published website artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run check:fray-website-contract:published

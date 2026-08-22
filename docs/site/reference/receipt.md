@@ -16,7 +16,7 @@ summary and scope counts describe the complete receipt from which it was taken.
 ```json
 {
   "schema_version": "burr.receipt.v2",
-  "burr_version": "0.29.0",
+  "burr_version": "0.30.0",
   "artifact_id": "actuator-mount",
   "artifact_type": "actuator_mount",
   "artifact_version": "0.1.0",
