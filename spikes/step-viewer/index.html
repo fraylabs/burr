@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0d0f" />
+    <title>Burr STEP Viewer Spike</title>
+  </head>
+  <body>
+    <div id="app" data-state="loading">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <p class="eyebrow">Burr</p>
+            <h1>STEP viewer spike</h1>
+          </div>
+        </div>
+
+        <div class="privacy-note" aria-label="Privacy status">
+          <span class="privacy-dot" aria-hidden="true"></span>
+          Local only · read-only
+        </div>
+
+        <label class="file-button" for="file-input">
+          Open STEP
+          <input id="file-input" type="file" accept=".step,.stp" />
+        </label>
+      </header>
+
+      <main class="workspace">
+        <section class="viewport" aria-label="3D model viewport">
+          <canvas id="model-canvas"></canvas>
+
+          <div class="model-heading">
+            <span class="format-badge">STEP B-REP</span>
+            <p id="model-name">counterbore.step</p>
+          </div>
+
+          <div class="status-card" role="status" aria-live="polite">
+            <span id="status-spinner" class="spinner" aria-hidden="true"></span>
+            <div>
+              <strong id="status-title">Loading OpenCascade</strong>
+              <p id="status-message">Preparing the local STEP parser…</p>
+            </div>
+          </div>
+
+          <div class="controls-hint" aria-label="Viewport controls">
+            <span>Orbit <kbd>drag</kbd></span>
+            <span>Pan <kbd>right drag</kbd></span>
+            <span>Zoom <kbd>scroll</kbd></span>
+          </div>
+        </section>
+
+        <aside class="inspector" aria-label="Model information">
+          <div>
+            <p class="eyebrow">Inspection</p>
+            <h2>Model summary</h2>
+          </div>
+
+          <dl class="metrics">
+            <div>
+              <dt>Parts</dt>
+              <dd id="parts-count">—</dd>
+            </div>
+            <div>
+              <dt>Triangles</dt>
+              <dd id="triangles-count">—</dd>
+            </div>
+            <div>
+              <dt>Vertices</dt>
+              <dd id="vertices-count">—</dd>
+            </div>
+            <div>
+              <dt>Source size</dt>
+              <dd id="source-size">—</dd>
+            </div>
+          </dl>
+
+          <div class="boundary-note">
+            <span class="boundary-icon" aria-hidden="true">↳</span>
+            <div>
+              <strong>Browser-local parsing</strong>
+              <p>The STEP bytes stay in this tab. This spike has no upload endpoint.</p>
+            </div>
+          </div>
+
+          <button id="fit-view" class="secondary-button" type="button" disabled>
+            Fit model to view
+          </button>
+
+          <p class="spike-note">
+            Scope: one file, one viewport. Folder browsing, watching, and Burr receipts come later.
+          </p>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

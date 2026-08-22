@@ -1,0 +1,17 @@
+{
+  "name": "burr-step-viewer-spike",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "occt-import-js": "0.0.23",
+    "three": "0.185.1"
+  },
+  "devDependencies": {
+    "vite": "8.2.2"
+  }
+}
