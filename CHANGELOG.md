@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add `burr <folder>` (normally `burr .`), a Look-powered local browser for
+  recursively discovered STEP, STL, and GLB files with a collapsible folder
+  tree and automatic active-model refresh.
+
 ## 0.30.0
 
 - Added the `burr.receipt.v2` three-state trust contract: `pass` means the selected

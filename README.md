@@ -1,8 +1,10 @@
 # Burr
 
-Burr is design-rule checking for CAD-as-code.
+Burr is a local CAD model browser and design-rule checker for CAD-as-code.
 
-It gives agents and humans a hard feedback loop before a part becomes a print:
+Run `burr .` to browse the STEP, STL, and GLB files in a project without
+uploading them. Burr also gives agents and humans a hard feedback loop before a
+part becomes a print:
 
 ```txt
 design file -> generated part -> burr-design-data.json -> Burr checks -> receipt
@@ -74,6 +76,17 @@ Install from crates.io:
 ```bash
 cargo install burr --version 0.30.0
 ```
+
+Open the supported models anywhere under the current folder:
+
+```bash
+burr .
+```
+
+The browser shows only `.step`, `.stp`, `.stl`, and `.glb` files, preserves
+nested folders, and refreshes the active model when its source changes. Pass a
+narrower folder such as `burr models` when you want a smaller tree. Rendering is
+powered by [Look](https://github.com/stefangolas/look) and stays on your machine.
 
 Create and check a build123d starter part:
 
@@ -325,11 +338,15 @@ burr check .
 
 ```bash
 burr --version
+burr <folder>
 burr init <folder>
 burr check [--rulepack <selector>] <folder|burr-design-data.json>...
 burr explain <folder|burr-receipt.json>...
 burr stamp <folder|burr-design-data.json>...
 ```
+
+`burr <folder>` opens the local model browser for that folder. `burr .` is the
+normal project-root form.
 
 `init` creates a minimal build123d project with `design.py`, `pyproject.toml`,
 and `.gitignore`. The generated project depends on `burr-build123d==0.10.0`

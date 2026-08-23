@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0d0f" />
+    <title>Burr model browser</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        background: #0b0d0f;
+        color: #edf1f2;
+        font-synthesis: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body,
+      #app {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      #app {
+        display: grid;
+        grid-template-columns: 278px minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr);
+        background: #111418;
+      }
+
+      .sidebar {
+        min-width: 0;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-right: 1px solid #252a2f;
+        background:
+          radial-gradient(circle at 8% 0%, rgba(119, 159, 173, 0.12), transparent 22rem),
+          #0d1012;
+      }
+
+      .sidebar-header {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        min-height: 74px;
+        padding: 14px 17px;
+        border-bottom: 1px solid #252a2f;
+      }
+
+      .eyebrow {
+        margin: 0 0 3px;
+        color: #7e898f;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 190px;
+        margin-bottom: 0;
+        overflow: hidden;
+        color: #edf1f2;
+        font-size: 14px;
+        font-weight: 680;
+        letter-spacing: -0.01em;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .tree-toolbar {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 17px 10px;
+      }
+
+      .tree-toolbar strong {
+        color: #aeb7bb;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .model-count {
+        padding: 3px 7px;
+        border: 1px solid #2d353a;
+        border-radius: 999px;
+        color: #79848a;
+        font-size: 9px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .tree {
+        min-height: 0;
+        flex: 1 1 auto;
+        overflow: auto;
+        padding: 2px 9px 18px;
+        scrollbar-color: #31383d transparent;
+        scrollbar-width: thin;
+      }
+
+      details {
+        margin: 1px 0;
+      }
+
+      summary {
+        min-height: 31px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 5px 8px;
+        border-radius: 6px;
+        color: #929ca1;
+        font-size: 11px;
+        font-weight: 620;
+        cursor: pointer;
+        list-style: none;
+        user-select: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary:hover {
+        background: rgba(255, 255, 255, 0.035);
+        color: #cbd2d5;
+      }
+
+      .folder-caret {
+        width: 11px;
+        color: #667177;
+        font-size: 9px;
+        transition: transform 120ms ease;
+      }
+
+      details[open] > summary .folder-caret {
+        transform: rotate(90deg);
+      }
+
+      .folder-icon {
+        width: 13px;
+        height: 9px;
+        border: 1px solid #56636a;
+        border-radius: 2px;
+        background: #1b2226;
+        position: relative;
+      }
+
+      .folder-icon::before {
+        content: "";
+        position: absolute;
+        top: -4px;
+        left: -1px;
+        width: 6px;
+        height: 3px;
+        border: 1px solid #56636a;
+        border-bottom: 0;
+        border-radius: 2px 2px 0 0;
+        background: #1b2226;
+      }
+
+      .folder-children {
+        margin-left: 9px;
+        padding-left: 8px;
+        border-left: 1px solid #22282c;
+      }
+
+      .model-file {
+        width: 100%;
+        min-height: 34px;
+        display: grid;
+        grid-template-columns: 31px minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
+        margin: 1px 0;
+        padding: 4px 8px;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        background: transparent;
+        color: #9aa4a9;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .model-file:hover {
+        background: rgba(255, 255, 255, 0.035);
+        color: #d8dddf;
+      }
+
+      .model-file[aria-current="true"] {
+        border-color: #33434a;
+        background: #182126;
+        color: #eef2f3;
+      }
+
+      .format-badge {
+        padding: 3px 4px;
+        border-radius: 4px;
+        background: #26343a;
+        color: #a9c5ce;
+        font-size: 8px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-align: center;
+      }
+
+      .file-name {
+        min-width: 0;
+        overflow: hidden;
+        font-size: 11px;
+        font-weight: 570;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .empty-tree {
+        margin: 13px 8px;
+        padding: 17px 14px;
+        border: 1px dashed #2e373c;
+        border-radius: 8px;
+        color: #707b81;
+        font-size: 11px;
+        line-height: 1.55;
+      }
+
+      .sidebar-footer {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 47px;
+        padding: 0 17px;
+        border-top: 1px solid #252a2f;
+        color: #768187;
+        font-size: 10px;
+      }
+
+      .watch-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #73b388;
+        box-shadow: 0 0 0 4px rgba(115, 179, 136, 0.1);
+      }
+
+      .watch-dot.error {
+        background: #d96f68;
+        box-shadow: 0 0 0 4px rgba(217, 111, 104, 0.1);
+      }
+
+      .viewer {
+        position: relative;
+        min-width: 0;
+        min-height: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #111418;
+      }
+
+      #model-viewer {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border: 0;
+        background: #111418;
+      }
+
+      .viewer-state {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 32px;
+        background: #111418;
+        z-index: 2;
+      }
+
+      .viewer-state[hidden] {
+        display: none;
+      }
+
+      .state-content {
+        max-width: 420px;
+        text-align: center;
+      }
+
+      .state-mark {
+        width: 38px;
+        height: 38px;
+        margin: 0 auto 18px;
+        border: 1px solid #344047;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #91adb6;
+        font-size: 18px;
+      }
+
+      .state-content strong {
+        display: block;
+        margin-bottom: 7px;
+        color: #e5eaec;
+        font-size: 14px;
+      }
+
+      .state-content p {
+        margin-bottom: 0;
+        color: #7c878d;
+        font-size: 11px;
+        line-height: 1.6;
+      }
+
+      .loading-ring {
+        width: 23px;
+        height: 23px;
+        border: 2px solid #354047;
+        border-top-color: #acc8d1;
+        border-radius: 50%;
+        animation: spin 800ms linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 720px) {
+        #app {
+          grid-template-columns: 220px minmax(0, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <aside class="sidebar" aria-label="Model files">
+        <header class="sidebar-header">
+          <div>
+            <p class="eyebrow">Burr</p>
+            <h1 id="root-name">Model browser</h1>
+          </div>
+        </header>
+
+        <div class="tree-toolbar">
+          <strong>Models</strong>
+          <span id="model-count" class="model-count">0</span>
+        </div>
+
+        <nav id="tree" class="tree" aria-label="Supported model files"></nav>
+
+        <footer class="sidebar-footer">
+          <span id="watch-dot" class="watch-dot" aria-hidden="true"></span>
+          <span id="watch-status">Watching for model changes</span>
+        </footer>
+      </aside>
+
+      <main class="viewer" aria-label="Selected model viewer">
+        <iframe id="model-viewer" title="Selected 3D model"></iframe>
+
+        <div id="empty-state" class="viewer-state">
+          <div class="state-content">
+            <div class="state-mark" aria-hidden="true">⌁</div>
+            <strong>No supported models found</strong>
+            <p>Add a STEP, STL, or GLB file anywhere inside this folder.</p>
+          </div>
+        </div>
+
+        <div id="loading-state" class="viewer-state" hidden>
+          <div class="state-content">
+            <div class="state-mark" aria-hidden="true">
+              <span class="loading-ring"></span>
+            </div>
+            <strong id="loading-title">Preparing model</strong>
+            <p>Look is tessellating the source file locally.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const rootName = document.querySelector("#root-name");
+      const modelCount = document.querySelector("#model-count");
+      const tree = document.querySelector("#tree");
+      const viewer = document.querySelector("#model-viewer");
+      const emptyState = document.querySelector("#empty-state");
+      const loadingState = document.querySelector("#loading-state");
+      const loadingTitle = document.querySelector("#loading-title");
+      const watchDot = document.querySelector("#watch-dot");
+      const watchStatus = document.querySelector("#watch-status");
+
+      const state = {
+        files: [],
+        selectedPath: null,
+        selectedVersion: null,
+        signature: "",
+        expanded: new Set(),
+        initialized: false,
+        refreshing: false,
+      };
+
+      viewer.addEventListener("load", () => {
+        loadingState.hidden = true;
+      });
+
+      refreshTree();
+      setInterval(refreshTree, 1000);
+
+      async function refreshTree() {
+        if (state.refreshing) return;
+        state.refreshing = true;
+        try {
+          const response = await fetch("/api/tree", { cache: "no-store" });
+          if (!response.ok) throw new Error(`Tree request failed: ${response.status}`);
+          const payload = await response.json();
+          applyTree(payload);
+          watchDot.classList.remove("error");
+          watchStatus.textContent = "Watching for model changes";
+        } catch (error) {
+          watchDot.classList.add("error");
+          watchStatus.textContent = "Could not refresh model files";
+          console.error(error);
+        } finally {
+          state.refreshing = false;
+        }
+      }
+
+      function applyTree(payload) {
+        const files = Array.isArray(payload.files) ? payload.files : [];
+        rootName.textContent = payload.root || "Model browser";
+        rootName.title = payload.root || "Model browser";
+        modelCount.textContent = String(files.length);
+
+        const signature = JSON.stringify(files.map((file) => [file.path, file.version]));
+        const selected = files.find((file) => file.path === state.selectedPath);
+        const selectedChanged = selected && selected.version !== state.selectedVersion;
+        const selectionRemoved = state.selectedPath && !selected;
+
+        state.files = files;
+        if (signature !== state.signature) {
+          state.signature = signature;
+          renderTree(files);
+        }
+
+        if (files.length === 0) {
+          state.selectedPath = null;
+          state.selectedVersion = null;
+          viewer.removeAttribute("src");
+          loadingState.hidden = true;
+          emptyState.hidden = false;
+          return;
+        }
+
+        emptyState.hidden = true;
+        if (!state.selectedPath || selectionRemoved) {
+          selectFile(files[0]);
+        } else if (selectedChanged) {
+          selectFile(selected, true);
+        }
+      }
+
+      function renderTree(files) {
+        const openFolders = new Set(state.expanded);
+        const hierarchy = { folders: new Map(), files: [] };
+        for (const file of files) {
+          const pieces = file.path.split("/");
+          let node = hierarchy;
+          for (const piece of pieces.slice(0, -1)) {
+            if (!node.folders.has(piece)) {
+              node.folders.set(piece, { folders: new Map(), files: [] });
+            }
+            node = node.folders.get(piece);
+          }
+          node.files.push(file);
+        }
+
+        tree.replaceChildren();
+        if (files.length === 0) {
+          const message = document.createElement("div");
+          message.className = "empty-tree";
+          message.textContent = "No .step, .stp, .stl, or .glb files in this folder.";
+          tree.append(message);
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        renderNode(hierarchy, fragment, "", openFolders);
+        tree.append(fragment);
+        state.initialized = true;
+        updateCurrentSelection();
+      }
+
+      function renderNode(node, parent, prefix, openFolders) {
+        const folders = [...node.folders.entries()].sort(([left], [right]) =>
+          left.localeCompare(right, undefined, { sensitivity: "base" }),
+        );
+        for (const [name, child] of folders) {
+          const key = prefix ? `${prefix}/${name}` : name;
+          const details = document.createElement("details");
+          details.dataset.folder = key;
+          details.open = openFolders.has(key);
+          if (details.open) state.expanded.add(key);
+          details.addEventListener("toggle", () => {
+            if (details.open) state.expanded.add(key);
+            else state.expanded.delete(key);
+          });
+
+          const summary = document.createElement("summary");
+          const caret = document.createElement("span");
+          caret.className = "folder-caret";
+          caret.textContent = "▶";
+          const icon = document.createElement("span");
+          icon.className = "folder-icon";
+          icon.setAttribute("aria-hidden", "true");
+          const label = document.createElement("span");
+          label.textContent = name;
+          summary.append(caret, icon, label);
+
+          const children = document.createElement("div");
+          children.className = "folder-children";
+          renderNode(child, children, key, openFolders);
+          details.append(summary, children);
+          parent.append(details);
+        }
+
+        const files = [...node.files].sort((left, right) =>
+          left.name.localeCompare(right.name, undefined, { sensitivity: "base" }),
+        );
+        for (const file of files) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "model-file";
+          button.dataset.path = file.path;
+          button.title = file.path;
+          button.addEventListener("click", () => selectFile(file));
+
+          const badge = document.createElement("span");
+          badge.className = "format-badge";
+          badge.textContent = file.format;
+          const label = document.createElement("span");
+          label.className = "file-name";
+          label.textContent = file.name;
+          button.append(badge, label);
+          parent.append(button);
+        }
+      }
+
+      function selectFile(file, refreshed = false) {
+        state.selectedPath = file.path;
+        state.selectedVersion = file.version;
+        updateCurrentSelection();
+        emptyState.hidden = true;
+        loadingState.hidden = false;
+        loadingTitle.textContent = refreshed ? `Reloading ${file.name}` : `Opening ${file.name}`;
+        const query = new URLSearchParams({ path: file.path, v: file.version });
+        viewer.src = `/viewer?${query}`;
+      }
+
+      function updateCurrentSelection() {
+        for (const button of tree.querySelectorAll(".model-file")) {
+          button.setAttribute(
+            "aria-current",
+            String(button.dataset.path === state.selectedPath),
+          );
+        }
+      }
+    </script>
+  </body>
+</html>

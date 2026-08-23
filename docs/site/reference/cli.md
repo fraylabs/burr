@@ -12,11 +12,26 @@ cargo install burr --version 0.30.0
 
 ```txt
 burr --version
+burr <folder>
 burr init <folder>
 burr check [--rulepack <selector>] [--no-write-receipt] <folder|burr-design-data.json>...
 burr explain [--json] <folder|burr-receipt.json|repair-report.json>...
 burr stamp <folder|burr-design-data.json>...
 ```
+
+## `burr <folder>`
+
+Open a local browser for the STEP, STL, and GLB files below `folder`.
+
+```bash
+burr .
+burr models
+```
+
+The sidebar preserves nested folders while hiding unrelated files and common
+build directories. Burr renders with Look on the local machine and refreshes
+the active model when its source changes. No `models/` convention is required;
+passing `models` simply limits the browser to that subtree.
 
 ## `burr init`
 

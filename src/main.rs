@@ -6,6 +6,8 @@ use burr::{
 };
 use std::path::PathBuf;
 
+mod viewer;
+
 fn main() {
     if let Err(error) = run() {
         eprintln!("{error}");
@@ -34,7 +36,23 @@ fn run() -> Result<(), String> {
         Some("explain") => run_explain(args.collect()),
         Some("stamp") => run_stamp(args.collect()),
         Some("init") => run_init(args.collect()),
-        Some(command) => Err(format!("Unknown command: {command}")),
+        Some(path) => {
+            let path = PathBuf::from(&path);
+            if !path.is_dir() {
+                return Err(format!(
+                    "Unknown command or viewer folder: {}",
+                    path.display()
+                ));
+            }
+            let remaining = args.collect::<Vec<_>>();
+            if !remaining.is_empty() {
+                return Err(format!(
+                    "The model viewer accepts one folder, but received: {}",
+                    remaining.join(" ")
+                ));
+            }
+            viewer::run(path)
+        }
     }
 }
 
@@ -351,7 +369,7 @@ fn explain_json_packet(document: &serde_json::Value) -> serde_json::Value {
 
 fn print_help() {
     println!(
-        "Usage:\n  burr init <folder>\n  burr check [--rulepack <selector>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr explain [--json] <folder|burr-receipt.json|repair-report.json>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n\nRulepack selectors may be a file path or builtin:actuator_mount.\n\nExit codes for burr check:\n  0  pass\n  1  fail\n  2  invocation or configuration error\n  3  incomplete\n"
+        "Usage:\n  burr <folder>\n  burr init <folder>\n  burr check [--rulepack <selector>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr explain [--json] <folder|burr-receipt.json|repair-report.json>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n\nRun `burr .` to open the local STEP, STL, and GLB model browser.\n\nRulepack selectors may be a file path or builtin:actuator_mount.\n\nExit codes for burr check:\n  0  pass\n  1  fail\n  2  invocation or configuration error\n  3  incomplete\n"
     );
 }
 

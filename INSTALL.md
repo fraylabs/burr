@@ -3,7 +3,7 @@
 Burr has three runtime pieces:
 
 ```txt
-burr             Rust CLI and linter
+burr             Rust CLI, local model browser, and linter
 burr-build123d   Python helper that emits burr-design-data.json from build123d
 burr-ocp        Optional Python/OpenCascade STEP geometry extractor
 ```
@@ -25,6 +25,16 @@ Check it:
 ```bash
 burr --version
 ```
+
+Open the STEP, STL, and GLB files below the current folder:
+
+```bash
+burr .
+```
+
+The viewer is local, recursively follows folders, and refreshes changed model
+files. It uses Look's native Rust scene compiler and self-contained browser
+viewer; it does not require a separate JavaScript app or upload models.
 
 Run it on a folder containing `burr-design-data.json`:
 
