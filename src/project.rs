@@ -131,6 +131,10 @@ impl Project {
         self.model_roots.iter().any(|root| path.starts_with(root))
     }
 
+    pub fn relative_path(&self, path: &Path) -> Option<String> {
+        relative_portable_path(&self.root, path)
+    }
+
     pub fn public_state(&self) -> Value {
         let root_name = self
             .root
@@ -140,7 +144,7 @@ impl Project {
         let model_paths = self
             .model_roots
             .iter()
-            .filter_map(|path| relative_portable_path(&self.root, path))
+            .filter_map(|path| self.relative_path(path))
             .collect::<Vec<_>>();
         let packs = self
             .packs
@@ -155,7 +159,7 @@ impl Project {
                     "id": pack.id,
                     "version": pack.version,
                     "source": "local",
-                    "path": relative_portable_path(&self.root, path),
+                    "path": self.relative_path(path),
                 }),
             })
             .collect::<Vec<_>>();
@@ -163,7 +167,7 @@ impl Project {
             "schema_version": "burr.project-state.v1",
             "root": root_name,
             "configured": self.is_configured(),
-            "config_path": self.config_path.as_ref().and_then(|path| relative_portable_path(&self.root, path)),
+            "config_path": self.config_path.as_ref().and_then(|path| self.relative_path(path)),
             "model_paths": model_paths,
             "packs": packs,
         })

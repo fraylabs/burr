@@ -1,4 +1,4 @@
-use crate::project::Project;
+use crate::{checks::CheckReport, project::Project};
 use look::{
     config::{LightingConfig, UpAxis},
     scene::{compile_scene, prepare_source_textures},
@@ -122,6 +122,7 @@ body { background-color: #c9ced0; color: #1b1d1f; }
 
 pub fn run(start: PathBuf) -> Result<(), String> {
     let project = Project::discover(&start)?;
+    let check_report = CheckReport::run(&project);
 
     let requested_port = std::env::var("BURR_VIEWER_PORT")
         .ok()
@@ -146,6 +147,10 @@ pub fn run(start: PathBuf) -> Result<(), String> {
     } else {
         println!("CONFIGURED PACKS 0 (no .burr/config.toml)");
     }
+    match check_report.outcome {
+        Some(outcome) => println!("CHECKS {}", outcome.label()),
+        None => println!("CHECKS NOT RUN (no configured packs)"),
+    }
     println!("OPEN {url}");
     println!("Watching STEP, STL, and GLB files. Press Ctrl-C to stop.");
 
@@ -158,7 +163,7 @@ pub fn run(start: PathBuf) -> Result<(), String> {
 
     let mut cache = HashMap::new();
     for request in server.incoming_requests() {
-        if let Err(error) = handle_request(request, &project, &mut cache) {
+        if let Err(error) = handle_request(request, &project, &check_report, &mut cache) {
             eprintln!("Viewer request failed: {error}");
         }
     }
@@ -168,6 +173,7 @@ pub fn run(start: PathBuf) -> Result<(), String> {
 fn handle_request(
     request: Request,
     project: &Project,
+    check_report: &CheckReport,
     cache: &mut HashMap<(PathBuf, ViewerTheme), CachedViewer>,
 ) -> Result<(), String> {
     if request.method() != &Method::Get {
@@ -199,6 +205,12 @@ fn handle_request(
             200,
             "application/json; charset=utf-8",
             project.public_state().to_string(),
+        ),
+        "/api/checks" => respond(
+            request,
+            200,
+            "application/json; charset=utf-8",
+            check_report.public_state().to_string(),
         ),
         "/api/tree" => match scan_models(project) {
             Ok(files) => {

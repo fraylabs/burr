@@ -106,9 +106,11 @@ id = "builtin:mechanical-fit"
 
 The project contract, local pack envelope, resolution order, and failure
 behaviour are documented in
-[`docs/project-configuration.md`](docs/project-configuration.md). During this
-foundation phase, pack entries are validated and resolved at startup;
-`burr check` remains the command that executes the existing design rules.
+[`docs/project-configuration.md`](docs/project-configuration.md). At startup,
+the configured `builtin:mechanical-fit` pack runs existing declared-intent
+checks read-only and exposes portable results at `GET /api/checks`. Missing
+inputs or unavailable local pack runtimes report `incomplete`, never a false
+pass. `burr check` remains the receipt-writing headless interface.
 
 Create and check a build123d starter part:
 

@@ -17,9 +17,11 @@ const fixture = path.join(
   "enclosure",
   "counterbore.step",
 )
+const mechanicalFitFixture = path.join(repoRoot, "examples", "linear-actuator-good")
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "burr-viewer-check-"))
 const modelDirectory = path.join(tempRoot, "models", "enclosure")
 const modelPath = path.join(modelDirectory, "counterbore.step")
+const checkedModelDirectory = path.join(tempRoot, "models", "z-check")
 const ignoredDirectory = path.join(tempRoot, "notes")
 const unconfiguredModelDirectory = path.join(tempRoot, "archive")
 const burrPackDirectory = path.join(tempRoot, ".burr", "packs")
@@ -27,10 +29,14 @@ const port = await availablePort()
 const baseUrl = `http://127.0.0.1:${port}`
 
 fs.mkdirSync(modelDirectory, { recursive: true })
+fs.mkdirSync(checkedModelDirectory, { recursive: true })
 fs.mkdirSync(ignoredDirectory, { recursive: true })
 fs.mkdirSync(unconfiguredModelDirectory, { recursive: true })
 fs.mkdirSync(burrPackDirectory, { recursive: true })
 fs.copyFileSync(fixture, modelPath)
+for (const file of ["source.py", "actuator.step", "burr-design-data.json"]) {
+  fs.copyFileSync(path.join(mechanicalFitFixture, file), path.join(checkedModelDirectory, file))
+}
 fs.copyFileSync(fixture, path.join(unconfiguredModelDirectory, "not-configured.step"))
 fs.writeFileSync(path.join(ignoredDirectory, "readme.txt"), "not a model\n")
 fs.writeFileSync(
@@ -102,8 +108,50 @@ try {
     "portable local pack path",
   )
 
+  const checks = await getJson("/api/checks")
+  expectEqual(checks.schema_version, "burr.check-results.v1", "check result schema")
+  expectEqual(
+    checks.capability_catalog?.join(","),
+    "mesh,brep,assembly,declared_intent",
+    "shared capability catalog",
+  )
+  expectEqual(checks.outcome, "incomplete", "aggregate check outcome")
+  expectEqual(checks.packs?.length, 2, "executed pack count")
+  const mechanicalFit = checks.packs?.[0]
+  expectEqual(mechanicalFit?.id, "builtin:mechanical-fit", "executed built-in pack")
+  expectEqual(mechanicalFit?.outcome, "pass", "mechanical-fit pack outcome")
+  expectEqual(
+    mechanicalFit?.required_capabilities?.join(","),
+    "declared_intent",
+    "mechanical-fit required capability",
+  )
+  expectEqual(
+    mechanicalFit?.available_capabilities?.join(","),
+    "declared_intent",
+    "mechanical-fit available capability",
+  )
+  expectEqual(mechanicalFit?.targets?.length, 1, "mechanical-fit target count")
+  expectEqual(
+    mechanicalFit?.targets?.[0]?.source_path,
+    "models/z-check/burr-design-data.json",
+    "portable checked source path",
+  )
+  expectEqual(mechanicalFit?.summary?.targets_passed, 1, "passed target count")
+  const localPack = checks.packs?.[1]
+  expectEqual(localPack?.outcome, "incomplete", "unimplemented local pack outcome")
+  expectEqual(
+    localPack?.findings?.[0]?.code,
+    "local_pack_runtime_unavailable",
+    "local pack incomplete reason",
+  )
+  expectEqual(
+    fs.existsSync(path.join(checkedModelDirectory, "burr-receipt.json")),
+    false,
+    "interactive checks do not write receipts",
+  )
+
   const initialTree = await getJson("/api/tree")
-  expectEqual(initialTree.files?.length, 1, "filtered model count")
+  expectEqual(initialTree.files?.length, 2, "filtered model count")
   expectEqual(initialTree.files?.[0]?.path, "models/enclosure/counterbore.step", "model path")
   expectEqual(initialTree.files?.[0]?.format, "STEP", "model format")
   const initialVersion = initialTree.files[0].version
@@ -160,9 +208,10 @@ try {
   expectIncludes(await refreshedViewer.text(), "STEP B-REP", "refreshed Look viewer")
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
   expectIncludes(stdout, "CONFIGURED PACKS 2", "resolved pack startup summary")
+  expectIncludes(stdout, "CHECKS INCOMPLETE", "check startup summary")
 
   console.log(
-    `viewer proof passed (project packs resolved, configured model scope enforced, dark/light Look HTML rendered, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (mechanical-fit executed read-only, incomplete local pack stayed explicit, model scope enforced, Look rendered, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)

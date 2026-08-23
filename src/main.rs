@@ -6,6 +6,7 @@ use burr::{
 };
 use std::path::PathBuf;
 
+mod checks;
 mod project;
 mod viewer;
 
