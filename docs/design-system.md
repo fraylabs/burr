@@ -70,8 +70,18 @@ interaction all change or survive together.
 
 - Folders are collapsed initially and preserve explicit expansion while Burr
   polls for file changes.
+- Models and Checks share one tabbed sidebar. Switching tools must not resize or
+  cover the geometry viewport, and opening a finding must keep its check context
+  visible.
 - The selected model uses the accent only as a narrow edge, never as a large
   fill.
+- Check outcomes use green for `pass`, orange for `incomplete`, and red for
+  `fail`. A project with no enabled packs says “not run”; it never receives a
+  healthy status treatment.
+- Pack cards show outcome and evaluated-target coverage before individual
+  findings. Findings preserve Burr's actionable title, evidence summary, and
+  remediation; model-linked findings behave as buttons rather than making every
+  row look clickable.
 - Interactive controls have visible hover and `:focus-visible` states in both
   themes.
 - Text and meaningful controls target WCAG AA contrast. Decorative logo imagery

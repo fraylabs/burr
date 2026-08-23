@@ -108,9 +108,10 @@ The project contract, local pack envelope, resolution order, and failure
 behaviour are documented in
 [`docs/project-configuration.md`](docs/project-configuration.md). At startup,
 the configured `builtin:mechanical-fit` pack runs existing declared-intent
-checks read-only and exposes portable results at `GET /api/checks`. Missing
-inputs or unavailable local pack runtimes report `incomplete`, never a false
-pass. `burr check` remains the receipt-writing headless interface.
+checks read-only. The Checks tab shows its pack outcomes and findings; the same
+portable results are available at `GET /api/checks`. Missing inputs or
+unavailable local pack runtimes report `incomplete`, never a false pass. `burr
+check` remains the receipt-writing headless interface.
 
 Create and check a build123d starter part:
 

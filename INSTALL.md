@@ -41,9 +41,10 @@ uses the nearest configuration at or above the requested folder; without one,
 the requested folder remains the model root and no project packs are enabled.
 See [`docs/project-configuration.md`](docs/project-configuration.md) for the V1
 contract. A configured `builtin:mechanical-fit` pack runs existing declared
-checks read-only when the workbench starts; its portable results are available
-at `GET /api/checks`. Local pack definitions are resolved but currently report
-`incomplete` because their executable check contract is not implemented yet.
+checks read-only when the workbench starts. Its pack outcomes and findings are
+shown in the Checks tab and available at `GET /api/checks`. Local pack
+definitions are resolved but currently report `incomplete` because their
+executable check contract is not implemented yet.
 
 Run it on a folder containing `burr-design-data.json`:
 

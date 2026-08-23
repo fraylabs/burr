@@ -150,6 +150,14 @@ try {
     "interactive checks do not write receipts",
   )
 
+  const shellResponse = await fetch(baseUrl)
+  expectEqual(shellResponse.status, 200, "workbench shell status")
+  const shellHtml = await shellResponse.text()
+  expectIncludes(shellHtml, 'role="tablist"', "project tools tab list")
+  expectIncludes(shellHtml, 'id="checks-panel"', "visual checks panel")
+  expectIncludes(shellHtml, 'fetch("/api/checks"', "checks API client")
+  expectIncludes(shellHtml, "item.dataset.findingCode", "structured finding rows")
+
   const initialTree = await getJson("/api/tree")
   expectEqual(initialTree.files?.length, 2, "filtered model count")
   expectEqual(initialTree.files?.[0]?.path, "models/enclosure/counterbore.step", "model path")
@@ -211,7 +219,7 @@ try {
   expectIncludes(stdout, "CHECKS INCOMPLETE", "check startup summary")
 
   console.log(
-    `viewer proof passed (mechanical-fit executed read-only, incomplete local pack stayed explicit, model scope enforced, Look rendered, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (checks panel wired, mechanical-fit executed read-only, incomplete local pack stayed explicit, model scope enforced, Look rendered, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)

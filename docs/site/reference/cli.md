@@ -40,10 +40,10 @@ configured built-in or local pack before opening the browser. Missing
 configuration retains the zero-configuration folder behavior and enables no
 packs. Invalid configuration stops startup with an explicit error. The
 configured `builtin:mechanical-fit` pack also runs the existing declared-intent
-checks at startup without writing receipts. `GET /api/checks` exposes the
-portable `burr.check-results.v1` snapshot. An unavailable capability or local
-pack runtime reports `incomplete`; no enabled packs produces a `null` aggregate
-outcome rather than a pass claim.
+checks at startup without writing receipts. The Checks tab renders the result;
+`GET /api/checks` exposes the same portable `burr.check-results.v1` snapshot.
+An unavailable capability or local pack runtime reports `incomplete`; no
+enabled packs produces a `null` aggregate outcome rather than a pass claim.
 
 ## `burr init`
 

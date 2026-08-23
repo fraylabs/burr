@@ -90,12 +90,14 @@ inventing another result shape.
 per-pack outcomes, portable target paths, counts, and unified findings. Findings
 include a stable code, severity, structured evidence, remediation when known,
 and optional model/part/feature/face references for future viewer selection.
-With no enabled packs, the aggregate outcome is `null`, not `pass`.
+The workbench Checks tab renders the same payload, and model-linked findings can
+open their referenced file without leaving the check context. With no enabled
+packs, the aggregate outcome is `null`, not `pass`.
 
 Workbench checks are a read-only startup snapshot. They do not create or update
 `burr-receipt.json`. `burr check` remains the receipt-writing headless interface
 and retains its existing exit-code contract. Automatic check reruns on watched
-file changes and the visual checks panel are separate follow-up work.
+file changes are separate follow-up work.
 
 ## Public project state
 
