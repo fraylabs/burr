@@ -73,13 +73,24 @@ try {
   )
 
   const viewerResponse = await fetch(
-    `${baseUrl}/viewer?path=${encodeURIComponent(initialTree.files[0].path)}`,
+    `${baseUrl}/viewer?path=${encodeURIComponent(initialTree.files[0].path)}&theme=dark`,
   )
   expectEqual(viewerResponse.status, 200, "viewer response status")
   const viewerHtml = await viewerResponse.text()
   expectIncludes(viewerHtml, '<canvas id="gl-canvas">', "Look WebGL canvas")
   expectIncludes(viewerHtml, "STEP B-REP", "STEP format badge")
   expectIncludes(viewerHtml, "counterbore.step", "model label")
+  expectIncludes(viewerHtml, 'data-burr-theme="dark"', "dark viewer theme marker")
+  expectIncludes(viewerHtml, "background-color: #0c0d10", "dark viewer surface")
+
+  const lightViewerResponse = await fetch(
+    `${baseUrl}/viewer?path=${encodeURIComponent(initialTree.files[0].path)}&theme=light`,
+  )
+  expectEqual(lightViewerResponse.status, 200, "light viewer response status")
+  const lightViewerHtml = await lightViewerResponse.text()
+  expectIncludes(lightViewerHtml, 'data-burr-theme="light"', "light viewer theme marker")
+  expectIncludes(lightViewerHtml, "background-color: #c9ced0", "light viewer surface")
+  expectEqual(lightViewerHtml === viewerHtml, false, "theme-specific viewer output")
 
   const traversal = await fetch(`${baseUrl}/viewer?path=..%2FCargo.toml`)
   expectEqual(traversal.status, 422, "path traversal status")
@@ -103,7 +114,7 @@ try {
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
 
   console.log(
-    `viewer proof passed (logo served, 1 filtered model, Look HTML rendered, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (logo served, dark/light Look HTML rendered, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)

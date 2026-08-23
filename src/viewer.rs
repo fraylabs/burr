@@ -44,6 +44,81 @@ struct CachedViewer {
     html: String,
 }
 
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+enum ViewerTheme {
+    Dark,
+    Light,
+}
+
+impl ViewerTheme {
+    fn from_query(value: Option<&str>) -> Self {
+        match value {
+            Some("light") => Self::Light,
+            _ => Self::Dark,
+        }
+    }
+
+    fn name(self) -> &'static str {
+        match self {
+            Self::Dark => "dark",
+            Self::Light => "light",
+        }
+    }
+
+    fn canvas_background(self) -> &'static str {
+        match self {
+            Self::Dark => "#0c0d10",
+            Self::Light => "#c9ced0",
+        }
+    }
+
+    fn lighting(self) -> LightingConfig {
+        let mut lighting = LightingConfig::default();
+        if self == Self::Light {
+            lighting.ambient = 0.22;
+            lighting.intensity = 0.95;
+        }
+        lighting
+    }
+
+    fn viewer_css(self) -> &'static str {
+        match self {
+            Self::Dark => DARK_VIEWER_THEME_CSS,
+            Self::Light => LIGHT_VIEWER_THEME_CSS,
+        }
+    }
+}
+
+const DARK_VIEWER_THEME_CSS: &str = r#"
+body { background-color: #0c0d10; color: #f3f4f5; }
+.header-bar, .toolbar, .legend {
+  background: rgba(17, 18, 21, 0.88);
+  border-color: #2a2d33;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.42);
+}
+.model-title { color: #f3f4f5; }
+.format-badge { background: #405e6d; color: #f7fbfd; }
+.stat-item, .btn { color: #929aa1; }
+.stat-value, .legend kbd { color: #c8cdd1; }
+.btn:hover, .legend kbd { background: #24272c; }
+.legend { color: #747c83; }
+"#;
+
+const LIGHT_VIEWER_THEME_CSS: &str = r#"
+body { background-color: #c9ced0; color: #1b1d1f; }
+.header-bar, .toolbar, .legend {
+  background: rgba(250, 249, 246, 0.9);
+  border-color: #c8c7c1;
+  box-shadow: 0 12px 32px rgba(31, 35, 38, 0.16);
+}
+.model-title { color: #1b1d1f; }
+.format-badge { background: #4f6e7d; color: #ffffff; }
+.stat-item, .btn { color: #687077; }
+.stat-value, .legend kbd { color: #34383c; }
+.btn:hover, .legend kbd { background: #e7e5df; color: #17191b; }
+.legend { color: #6b7277; }
+"#;
+
 pub fn run(root: PathBuf) -> Result<(), String> {
     let root = root
         .canonicalize()
@@ -95,7 +170,7 @@ pub fn run(root: PathBuf) -> Result<(), String> {
 fn handle_request(
     request: Request,
     root: &Path,
-    cache: &mut HashMap<PathBuf, CachedViewer>,
+    cache: &mut HashMap<(PathBuf, ViewerTheme), CachedViewer>,
 ) -> Result<(), String> {
     if request.method() != &Method::Get {
         return respond(
@@ -154,7 +229,8 @@ fn handle_request(
             let Some(relative_path) = query_value(&url, "path") else {
                 return respond_html_error(request, 400, "No model path was provided.");
             };
-            match render_model(root, &relative_path, cache) {
+            let theme = ViewerTheme::from_query(query_value(&url, "theme").as_deref());
+            match render_model(root, &relative_path, theme, cache) {
                 Ok(html) => respond(request, 200, "text/html; charset=utf-8", html),
                 Err(error) => respond_html_error(request, 422, &error),
             }
@@ -171,11 +247,13 @@ fn handle_request(
 fn render_model(
     root: &Path,
     relative_path: &str,
-    cache: &mut HashMap<PathBuf, CachedViewer>,
+    theme: ViewerTheme,
+    cache: &mut HashMap<(PathBuf, ViewerTheme), CachedViewer>,
 ) -> Result<String, String> {
     let path = resolve_model_path(root, relative_path)?;
     let version = file_version(&path)?;
-    if let Some(cached) = cache.get(&path) {
+    let cache_key = (path.clone(), theme);
+    if let Some(cached) = cache.get(&cache_key) {
         if cached.version == version {
             return Ok(cached.html.clone());
         }
@@ -195,23 +273,42 @@ fn render_model(
     // little breathing room for the shorter iframe viewport created by Burr's
     // navigation shell and for models whose diagonal approaches that sphere.
     scene.fit_radius *= VIEWER_FRAMING_MARGIN;
+    let lighting = theme.lighting();
     let html = generate_html_viewer(
         &scene,
         relative_path,
         &scene.statistics,
-        &LightingConfig::default(),
-        "#111418",
+        &lighting,
+        theme.canvas_background(),
     )
     .map_err(|error| format!("Look could not build the viewer for {relative_path}: {error:#}"))?;
+    let html = inject_viewer_theme(html, theme)?;
 
     cache.insert(
-        path,
+        cache_key,
         CachedViewer {
             version,
             html: html.clone(),
         },
     );
     Ok(html)
+}
+
+fn inject_viewer_theme(html: String, theme: ViewerTheme) -> Result<String, String> {
+    let marker = "</head>";
+    let Some(index) = html.find(marker) else {
+        return Err("Look viewer HTML did not contain a head element.".to_string());
+    };
+    let theme_style = format!(
+        "<style id=\"burr-viewer-theme\" data-burr-theme=\"{}\">{}</style>",
+        theme.name(),
+        theme.viewer_css()
+    );
+    let mut themed = String::with_capacity(html.len() + theme_style.len());
+    themed.push_str(&html[..index]);
+    themed.push_str(&theme_style);
+    themed.push_str(&html[index..]);
+    Ok(themed)
 }
 
 fn scan_models(root: &Path) -> Result<Vec<ModelFile>, String> {
@@ -499,5 +596,21 @@ mod tests {
             query_value("/viewer?path=models%2Fmotor%20mount.step&v=1", "path").as_deref(),
             Some("models/motor mount.step")
         );
+    }
+
+    #[test]
+    fn viewer_theme_defaults_dark_and_accepts_light() {
+        assert_eq!(ViewerTheme::from_query(None), ViewerTheme::Dark);
+        assert_eq!(ViewerTheme::from_query(Some("unknown")), ViewerTheme::Dark);
+        assert_eq!(ViewerTheme::from_query(Some("light")), ViewerTheme::Light);
+    }
+
+    #[test]
+    fn viewer_theme_is_injected_into_look_html() {
+        let html = "<!doctype html><html><head></head><body></body></html>".to_string();
+        let themed = inject_viewer_theme(html, ViewerTheme::Light).unwrap();
+        assert!(themed.contains("data-burr-theme=\"light\""));
+        assert!(themed.contains("background-color: #c9ced0"));
+        assert!(themed.contains("</style></head>"));
     }
 }

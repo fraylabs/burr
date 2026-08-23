@@ -171,6 +171,9 @@ not published yet and is not a replacement for the Rust CLI. The manifest pins
 future publication to public access, while `npm run check:package` verifies the
 tarball contents without publishing.
 
+Viewer colours, spacing, interaction states, and the shell-to-Look theme
+contract are defined in [`docs/design-system.md`](docs/design-system.md).
+
 ## Local Development
 
 ```bash

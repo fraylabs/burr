@@ -6,15 +6,66 @@
     <meta name="theme-color" content="#0b0d0f" />
     <link rel="icon" type="image/png" href="/assets/burr-logo.png" />
     <title>Burr model browser</title>
+    <script>
+      (() => {
+        const saved = localStorage.getItem("burr-theme");
+        const theme =
+          saved === "dark" || saved === "light"
+            ? saved
+            : matchMedia("(prefers-color-scheme: light)").matches
+              ? "light"
+              : "dark";
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
     <style>
       :root {
         color-scheme: dark;
+        --canvas: #0c0d10;
+        --sidebar: #111215;
+        --surface: #17191d;
+        --surface-hover: #1d2024;
+        --surface-selected: #24272c;
+        --border: #2a2d33;
+        --border-strong: #3b4047;
+        --text: #f3f4f5;
+        --text-secondary: #b6bbc0;
+        --text-muted: #858c92;
+        --steel: #aebfc8;
+        --steel-surface: #263239;
+        --accent: #f08a32;
+        --success: #6fbd88;
+        --danger: #dd746d;
+        --shadow: rgba(0, 0, 0, 0.42);
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-pill: 999px;
         font-family:
           Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
           "Segoe UI", sans-serif;
-        background: #0b0d0f;
-        color: #edf1f2;
+        background: var(--canvas);
+        color: var(--text);
         font-synthesis: none;
+      }
+
+      :root[data-theme="light"] {
+        color-scheme: light;
+        --canvas: #c9ced0;
+        --sidebar: #f4f3ef;
+        --surface: #fbfaf7;
+        --surface-hover: #e9e7e1;
+        --surface-selected: #ffffff;
+        --border: #d5d2cb;
+        --border-strong: #b9b7b0;
+        --text: #1b1d1f;
+        --text-secondary: #555b60;
+        --text-muted: #777e83;
+        --steel: #4f6671;
+        --steel-surface: #dce4e7;
+        --accent: #d86d16;
+        --success: #3d8a58;
+        --danger: #b94f48;
+        --shadow: rgba(31, 35, 38, 0.16);
       }
 
       * {
@@ -38,7 +89,7 @@
         display: grid;
         grid-template-columns: 278px minmax(0, 1fr);
         grid-template-rows: minmax(0, 1fr);
-        background: #111418;
+        background: var(--canvas);
       }
 
       .sidebar {
@@ -47,10 +98,8 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        border-right: 1px solid #252a2f;
-        background:
-          radial-gradient(circle at 8% 0%, rgba(119, 159, 173, 0.12), transparent 22rem),
-          #0d1012;
+        border-right: 1px solid var(--border);
+        background: var(--sidebar);
       }
 
       .sidebar-header {
@@ -60,7 +109,8 @@
         gap: 11px;
         min-height: 74px;
         padding: 14px 17px;
-        border-bottom: 1px solid #252a2f;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface);
       }
 
       .brand-mark {
@@ -72,7 +122,7 @@
 
       .eyebrow {
         margin: 0 0 3px;
-        color: #7e898f;
+        color: var(--text-muted);
         font-size: 9px;
         font-weight: 800;
         letter-spacing: 0.16em;
@@ -88,7 +138,7 @@
         max-width: 190px;
         margin-bottom: 0;
         overflow: hidden;
-        color: #edf1f2;
+        color: var(--text);
         font-size: 14px;
         font-weight: 680;
         letter-spacing: -0.01em;
@@ -106,7 +156,7 @@
       }
 
       .tree-toolbar strong {
-        color: #aeb7bb;
+        color: var(--text-secondary);
         font-size: 10px;
         letter-spacing: 0.08em;
         text-transform: uppercase;
@@ -114,9 +164,10 @@
 
       .model-count {
         padding: 3px 7px;
-        border: 1px solid #2d353a;
-        border-radius: 999px;
-        color: #79848a;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-pill);
+        background: var(--surface);
+        color: var(--text-muted);
         font-size: 9px;
         font-variant-numeric: tabular-nums;
       }
@@ -126,7 +177,7 @@
         flex: 1 1 auto;
         overflow: auto;
         padding: 2px 9px 18px;
-        scrollbar-color: #31383d transparent;
+        scrollbar-color: var(--border-strong) transparent;
         scrollbar-width: thin;
       }
 
@@ -141,8 +192,8 @@
         align-items: center;
         gap: 7px;
         padding: 5px 8px;
-        border-radius: 6px;
-        color: #929ca1;
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
         font-size: 11px;
         font-weight: 620;
         cursor: pointer;
@@ -155,14 +206,14 @@
       }
 
       summary:hover {
-        background: rgba(255, 255, 255, 0.035);
-        color: #cbd2d5;
+        background: var(--surface-hover);
+        color: var(--text);
       }
 
       .folder-caret {
         flex: 0 0 auto;
         width: 11px;
-        color: #667177;
+        color: var(--text-muted);
         font-size: 9px;
         transition: transform 120ms ease;
       }
@@ -175,9 +226,9 @@
         flex: 0 0 auto;
         width: 13px;
         height: 9px;
-        border: 1px solid #56636a;
+        border: 1px solid var(--steel);
         border-radius: 2px;
-        background: #1b2226;
+        background: var(--steel-surface);
         position: relative;
       }
 
@@ -196,16 +247,16 @@
         left: -1px;
         width: 6px;
         height: 3px;
-        border: 1px solid #56636a;
+        border: 1px solid var(--steel);
         border-bottom: 0;
         border-radius: 2px 2px 0 0;
-        background: #1b2226;
+        background: var(--steel-surface);
       }
 
       .folder-children {
         margin-left: 9px;
         padding-left: 8px;
-        border-left: 1px solid #22282c;
+        border-left: 1px solid var(--border);
       }
 
       .model-file {
@@ -218,29 +269,30 @@
         margin: 1px 0;
         padding: 4px 8px;
         border: 1px solid transparent;
-        border-radius: 7px;
+        border-radius: var(--radius-sm);
         background: transparent;
-        color: #9aa4a9;
+        color: var(--text-secondary);
         text-align: left;
         cursor: pointer;
       }
 
       .model-file:hover {
-        background: rgba(255, 255, 255, 0.035);
-        color: #d8dddf;
+        background: var(--surface-hover);
+        color: var(--text);
       }
 
       .model-file[aria-current="true"] {
-        border-color: #33434a;
-        background: #182126;
-        color: #eef2f3;
+        border-color: var(--border-strong);
+        background: var(--surface-selected);
+        color: var(--text);
+        box-shadow: inset 2px 0 var(--accent);
       }
 
       .format-badge {
         padding: 3px 4px;
         border-radius: 4px;
-        background: #26343a;
-        color: #a9c5ce;
+        background: var(--steel-surface);
+        color: var(--steel);
         font-size: 8px;
         font-weight: 800;
         letter-spacing: 0.05em;
@@ -259,9 +311,9 @@
       .empty-tree {
         margin: 13px 8px;
         padding: 17px 14px;
-        border: 1px dashed #2e373c;
-        border-radius: 8px;
-        color: #707b81;
+        border: 1px dashed var(--border-strong);
+        border-radius: var(--radius-md);
+        color: var(--text-muted);
         font-size: 11px;
         line-height: 1.55;
       }
@@ -273,22 +325,63 @@
         gap: 8px;
         min-height: 47px;
         padding: 0 17px;
-        border-top: 1px solid #252a2f;
-        color: #768187;
+        border-top: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text-muted);
         font-size: 10px;
+      }
+
+      .watch-status-group {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      #watch-status {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .theme-toggle {
+        flex: 0 0 auto;
+        min-width: 48px;
+        margin-left: auto;
+        padding: 5px 8px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-pill);
+        background: var(--sidebar);
+        color: var(--text-secondary);
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        cursor: pointer;
+      }
+
+      .theme-toggle:hover {
+        border-color: var(--border-strong);
+        background: var(--surface-hover);
+        color: var(--text);
+      }
+
+      .theme-toggle:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
       }
 
       .watch-dot {
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: #73b388;
-        box-shadow: 0 0 0 4px rgba(115, 179, 136, 0.1);
+        background: var(--success);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 12%, transparent);
       }
 
       .watch-dot.error {
-        background: #d96f68;
-        box-shadow: 0 0 0 4px rgba(217, 111, 104, 0.1);
+        background: var(--danger);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 12%, transparent);
       }
 
       .viewer {
@@ -297,7 +390,7 @@
         min-height: 0;
         height: 100%;
         overflow: hidden;
-        background: #111418;
+        background: var(--canvas);
       }
 
       #model-viewer {
@@ -305,7 +398,7 @@
         height: 100%;
         display: block;
         border: 0;
-        background: #111418;
+        background: var(--canvas);
       }
 
       .viewer-state {
@@ -314,7 +407,7 @@
         display: grid;
         place-items: center;
         padding: 32px;
-        background: #111418;
+        background: var(--canvas);
         z-index: 2;
       }
 
@@ -331,24 +424,24 @@
         width: 38px;
         height: 38px;
         margin: 0 auto 18px;
-        border: 1px solid #344047;
+        border: 1px solid var(--border-strong);
         border-radius: 50%;
         display: grid;
         place-items: center;
-        color: #91adb6;
+        color: var(--steel);
         font-size: 18px;
       }
 
       .state-content strong {
         display: block;
         margin-bottom: 7px;
-        color: #e5eaec;
+        color: var(--text);
         font-size: 14px;
       }
 
       .state-content p {
         margin-bottom: 0;
-        color: #7c878d;
+        color: var(--text-muted);
         font-size: 11px;
         line-height: 1.6;
       }
@@ -356,8 +449,8 @@
       .loading-ring {
         width: 23px;
         height: 23px;
-        border: 2px solid #354047;
-        border-top-color: #acc8d1;
+        border: 2px solid var(--border-strong);
+        border-top-color: var(--steel);
         border-radius: 50%;
         animation: spin 800ms linear infinite;
       }
@@ -394,8 +487,11 @@
         <nav id="tree" class="tree" aria-label="Supported model files"></nav>
 
         <footer class="sidebar-footer">
-          <span id="watch-dot" class="watch-dot" aria-hidden="true"></span>
-          <span id="watch-status">Watching for model changes</span>
+          <div class="watch-status-group">
+            <span id="watch-dot" class="watch-dot" aria-hidden="true"></span>
+            <span id="watch-status">Watching for model changes</span>
+          </div>
+          <button id="theme-toggle" class="theme-toggle" type="button">Dark</button>
         </footer>
       </aside>
 
@@ -432,6 +528,8 @@
       const loadingTitle = document.querySelector("#loading-title");
       const watchDot = document.querySelector("#watch-dot");
       const watchStatus = document.querySelector("#watch-status");
+      const themeToggle = document.querySelector("#theme-toggle");
+      const themeColor = document.querySelector('meta[name="theme-color"]');
 
       const state = {
         files: [],
@@ -441,12 +539,18 @@
         expanded: new Set(),
         initialized: false,
         refreshing: false,
+        theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
       };
 
       viewer.addEventListener("load", () => {
         loadingState.hidden = true;
       });
 
+      themeToggle.addEventListener("click", () => {
+        setTheme(state.theme === "dark" ? "light" : "dark", true, true);
+      });
+
+      setTheme(state.theme, false, false);
       refreshTree();
       setInterval(refreshTree, 1000);
 
@@ -598,8 +702,30 @@
         emptyState.hidden = true;
         loadingState.hidden = false;
         loadingTitle.textContent = refreshed ? `Reloading ${file.name}` : `Opening ${file.name}`;
-        const query = new URLSearchParams({ path: file.path, v: file.version });
+        const query = new URLSearchParams({
+          path: file.path,
+          v: file.version,
+          theme: state.theme,
+        });
         viewer.src = `/viewer?${query}`;
+      }
+
+      function setTheme(theme, persist, reloadViewer) {
+        state.theme = theme === "light" ? "light" : "dark";
+        document.documentElement.dataset.theme = state.theme;
+        themeColor.content = state.theme === "light" ? "#c9ced0" : "#0c0d10";
+        const label = state.theme === "light" ? "Light" : "Dark";
+        themeToggle.textContent = label;
+        themeToggle.setAttribute("aria-pressed", String(state.theme === "light"));
+        themeToggle.setAttribute(
+          "aria-label",
+          state.theme === "light" ? "Use dark theme" : "Use light theme",
+        );
+        if (persist) localStorage.setItem("burr-theme", state.theme);
+        if (reloadViewer && state.selectedPath) {
+          const selected = state.files.find((file) => file.path === state.selectedPath);
+          if (selected) selectFile(selected, true);
+        }
       }
 
       function updateCurrentSelection() {
