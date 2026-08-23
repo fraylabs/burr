@@ -30,8 +30,15 @@ burr models
 
 The sidebar preserves nested folders while hiding unrelated files and common
 build directories. Burr renders with Look on the local machine and refreshes
-the active model when its source changes. No `models/` convention is required;
-passing `models` simply limits the browser to that subtree.
+the active model when its source changes. Without project configuration, no
+`models/` convention is required; passing `models` simply limits the browser to
+that subtree.
+
+When the nearest project root contains `.burr/config.toml`, Burr scans only the
+declared `project.models` directories and deterministically resolves every
+configured built-in or local pack before opening the browser. Missing
+configuration retains the zero-configuration folder behavior and enables no
+packs. Invalid configuration stops startup with an explicit error.
 
 ## `burr init`
 

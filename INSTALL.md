@@ -36,6 +36,12 @@ The viewer is local, recursively follows folders, and refreshes changed model
 files. It uses Look's native Rust scene compiler and self-contained browser
 viewer; it does not require a separate JavaScript app or upload models.
 
+Projects may declare model roots and enabled packs in `.burr/config.toml`. Burr
+uses the nearest configuration at or above the requested folder; without one,
+the requested folder remains the model root and no project packs are enabled.
+See [`docs/project-configuration.md`](docs/project-configuration.md) for the V1
+contract.
+
 Run it on a folder containing `burr-design-data.json`:
 
 ```bash

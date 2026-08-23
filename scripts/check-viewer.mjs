@@ -21,13 +21,43 @@ const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "burr-viewer-check-"))
 const modelDirectory = path.join(tempRoot, "models", "enclosure")
 const modelPath = path.join(modelDirectory, "counterbore.step")
 const ignoredDirectory = path.join(tempRoot, "notes")
+const unconfiguredModelDirectory = path.join(tempRoot, "archive")
+const burrPackDirectory = path.join(tempRoot, ".burr", "packs")
 const port = await availablePort()
 const baseUrl = `http://127.0.0.1:${port}`
 
 fs.mkdirSync(modelDirectory, { recursive: true })
 fs.mkdirSync(ignoredDirectory, { recursive: true })
+fs.mkdirSync(unconfiguredModelDirectory, { recursive: true })
+fs.mkdirSync(burrPackDirectory, { recursive: true })
 fs.copyFileSync(fixture, modelPath)
+fs.copyFileSync(fixture, path.join(unconfiguredModelDirectory, "not-configured.step"))
 fs.writeFileSync(path.join(ignoredDirectory, "readme.txt"), "not a model\n")
+fs.writeFileSync(
+  path.join(tempRoot, ".burr", "config.toml"),
+  [
+    'schema_version = "burr.project.v1"',
+    "",
+    "[project]",
+    'models = ["models"]',
+    "",
+    "[[packs]]",
+    'id = "builtin:mechanical-fit"',
+    "",
+    "[[packs]]",
+    'path = "packs/product-fit.toml"',
+    "",
+  ].join("\n"),
+)
+fs.writeFileSync(
+  path.join(burrPackDirectory, "product-fit.toml"),
+  [
+    'schema_version = "burr.pack.v1"',
+    'id = "project:product-fit"',
+    'version = "0.1.0"',
+    "",
+  ].join("\n"),
+)
 
 let stdout = ""
 let stderr = ""
@@ -54,6 +84,23 @@ child.stderr.on("data", (chunk) => {
 
 try {
   await waitForServer()
+
+  const project = await getJson("/api/project")
+  expectEqual(project.schema_version, "burr.project-state.v1", "project state schema")
+  expectEqual(project.configured, true, "configured project state")
+  expectEqual(project.config_path, ".burr/config.toml", "portable config path")
+  expectEqual(project.model_paths?.length, 1, "configured model root count")
+  expectEqual(project.model_paths?.[0], "models", "configured model root")
+  expectEqual(project.packs?.length, 2, "resolved pack count")
+  expectEqual(project.packs?.[0]?.id, "builtin:mechanical-fit", "built-in pack id")
+  expectEqual(project.packs?.[0]?.source, "builtin", "built-in pack source")
+  expectEqual(project.packs?.[1]?.id, "project:product-fit", "local pack id")
+  expectEqual(project.packs?.[1]?.source, "local", "local pack source")
+  expectEqual(
+    project.packs?.[1]?.path,
+    ".burr/packs/product-fit.toml",
+    "portable local pack path",
+  )
 
   const initialTree = await getJson("/api/tree")
   expectEqual(initialTree.files?.length, 1, "filtered model count")
@@ -112,9 +159,10 @@ try {
   expectEqual(refreshedViewer.status, 200, "refreshed viewer status")
   expectIncludes(await refreshedViewer.text(), "STEP B-REP", "refreshed Look viewer")
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
+  expectIncludes(stdout, "CONFIGURED PACKS 2", "resolved pack startup summary")
 
   console.log(
-    `viewer proof passed (logo served, dark/light Look HTML rendered, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (project packs resolved, configured model scope enforced, dark/light Look HTML rendered, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)

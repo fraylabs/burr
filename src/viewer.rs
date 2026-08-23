@@ -1,3 +1,4 @@
+use crate::project::Project;
 use look::{
     config::{LightingConfig, UpAxis},
     scene::{compile_scene, prepare_source_textures},
@@ -119,16 +120,8 @@ body { background-color: #c9ced0; color: #1b1d1f; }
 .legend { color: #6b7277; }
 "#;
 
-pub fn run(root: PathBuf) -> Result<(), String> {
-    let root = root
-        .canonicalize()
-        .map_err(|error| format!("Failed to open viewer root {}: {error}", root.display()))?;
-    if !root.is_dir() {
-        return Err(format!(
-            "Viewer root is not a directory: {}",
-            root.display()
-        ));
-    }
+pub fn run(start: PathBuf) -> Result<(), String> {
+    let project = Project::discover(&start)?;
 
     let requested_port = std::env::var("BURR_VIEWER_PORT")
         .ok()
@@ -147,7 +140,12 @@ pub fn run(root: PathBuf) -> Result<(), String> {
         .ok_or_else(|| "Burr viewer did not receive an IP address.".to_string())?;
     let url = format!("http://127.0.0.1:{}/", address.port());
 
-    println!("BURR VIEWER {}", root.display());
+    println!("BURR PROJECT {}", project.root().display());
+    if project.is_configured() {
+        println!("CONFIGURED PACKS {}", project.packs().len());
+    } else {
+        println!("CONFIGURED PACKS 0 (no .burr/config.toml)");
+    }
     println!("OPEN {url}");
     println!("Watching STEP, STL, and GLB files. Press Ctrl-C to stop.");
 
@@ -160,7 +158,7 @@ pub fn run(root: PathBuf) -> Result<(), String> {
 
     let mut cache = HashMap::new();
     for request in server.incoming_requests() {
-        if let Err(error) = handle_request(request, &root, &mut cache) {
+        if let Err(error) = handle_request(request, &project, &mut cache) {
             eprintln!("Viewer request failed: {error}");
         }
     }
@@ -169,7 +167,7 @@ pub fn run(root: PathBuf) -> Result<(), String> {
 
 fn handle_request(
     request: Request,
-    root: &Path,
+    project: &Project,
     cache: &mut HashMap<(PathBuf, ViewerTheme), CachedViewer>,
 ) -> Result<(), String> {
     if request.method() != &Method::Get {
@@ -196,9 +194,16 @@ fn handle_request(
             "application/json; charset=utf-8",
             json!({ "status": "ok" }).to_string(),
         ),
-        "/api/tree" => match scan_models(root) {
+        "/api/project" => respond(
+            request,
+            200,
+            "application/json; charset=utf-8",
+            project.public_state().to_string(),
+        ),
+        "/api/tree" => match scan_models(project) {
             Ok(files) => {
-                let root_name = root
+                let root_name = project
+                    .root()
                     .file_name()
                     .and_then(|name| name.to_str())
                     .unwrap_or("models");
@@ -230,7 +235,7 @@ fn handle_request(
                 return respond_html_error(request, 400, "No model path was provided.");
             };
             let theme = ViewerTheme::from_query(query_value(&url, "theme").as_deref());
-            match render_model(root, &relative_path, theme, cache) {
+            match render_model(project, &relative_path, theme, cache) {
                 Ok(html) => respond(request, 200, "text/html; charset=utf-8", html),
                 Err(error) => respond_html_error(request, 422, &error),
             }
@@ -245,12 +250,12 @@ fn handle_request(
 }
 
 fn render_model(
-    root: &Path,
+    project: &Project,
     relative_path: &str,
     theme: ViewerTheme,
     cache: &mut HashMap<(PathBuf, ViewerTheme), CachedViewer>,
 ) -> Result<String, String> {
-    let path = resolve_model_path(root, relative_path)?;
+    let path = resolve_model_path(project, relative_path)?;
     let version = file_version(&path)?;
     let cache_key = (path.clone(), theme);
     if let Some(cached) = cache.get(&cache_key) {
@@ -311,9 +316,11 @@ fn inject_viewer_theme(html: String, theme: ViewerTheme) -> Result<String, Strin
     Ok(themed)
 }
 
-fn scan_models(root: &Path) -> Result<Vec<ModelFile>, String> {
+fn scan_models(project: &Project) -> Result<Vec<ModelFile>, String> {
     let mut files = Vec::new();
-    collect_models(root, root, &mut files)?;
+    for model_root in project.model_roots() {
+        collect_models(project.root(), model_root, &mut files)?;
+    }
     files.sort_by(|left, right| {
         left.relative_path
             .to_ascii_lowercase()
@@ -380,7 +387,7 @@ fn collect_models(root: &Path, directory: &Path, files: &mut Vec<ModelFile>) -> 
     Ok(())
 }
 
-fn resolve_model_path(root: &Path, relative_path: &str) -> Result<PathBuf, String> {
+fn resolve_model_path(project: &Project, relative_path: &str) -> Result<PathBuf, String> {
     let relative = Path::new(relative_path);
     if relative.as_os_str().is_empty()
         || relative.is_absolute()
@@ -393,12 +400,12 @@ fn resolve_model_path(root: &Path, relative_path: &str) -> Result<PathBuf, Strin
     {
         return Err("Model path must remain inside the viewer root.".to_string());
     }
-    let candidate = root.join(relative);
+    let candidate = project.root().join(relative);
     let canonical = candidate
         .canonicalize()
         .map_err(|error| format!("Model does not exist: {relative_path} ({error})"))?;
-    if !canonical.starts_with(root) {
-        return Err("Model path must remain inside the viewer root.".to_string());
+    if !canonical.starts_with(project.root()) || !project.contains_model(&canonical) {
+        return Err("Model path must remain inside a configured model path.".to_string());
     }
     if !canonical.is_file() || model_format(&canonical).is_none() {
         return Err(format!("Unsupported model file: {relative_path}"));
@@ -555,7 +562,8 @@ mod tests {
         )
         .unwrap();
 
-        let models = scan_models(temp.path()).unwrap();
+        let project = Project::discover(temp.path()).unwrap();
+        let models = scan_models(&project).unwrap();
         assert_eq!(models.len(), 2);
         assert_eq!(models[0].relative_path, "models/enclosure/alpha.STEP");
         assert_eq!(models[0].format, "STEP");
@@ -568,14 +576,15 @@ mod tests {
         let temp = tempdir().unwrap();
         fs::write(temp.path().join("part.step"), "STEP").unwrap();
         fs::write(temp.path().join("notes.txt"), "notes").unwrap();
-        let root = temp.path().canonicalize().unwrap();
+        let project = Project::discover(temp.path()).unwrap();
+        let root = project.root();
 
         assert_eq!(
-            resolve_model_path(&root, "part.step").unwrap(),
+            resolve_model_path(&project, "part.step").unwrap(),
             root.join("part.step")
         );
-        assert!(resolve_model_path(&root, "../outside.step").is_err());
-        assert!(resolve_model_path(&root, "notes.txt").is_err());
+        assert!(resolve_model_path(&project, "../outside.step").is_err());
+        assert!(resolve_model_path(&project, "notes.txt").is_err());
     }
 
     #[test]

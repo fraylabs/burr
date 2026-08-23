@@ -86,9 +86,29 @@ burr .
 ```
 
 The browser shows only `.step`, `.stp`, `.stl`, and `.glb` files, preserves
-nested folders, and refreshes the active model when its source changes. Pass a
-narrower folder such as `burr models` when you want a smaller tree. Rendering is
-powered by [Look](https://github.com/stefangolas/look) and stays on your machine.
+nested folders, and refreshes the active model when its source changes. Without
+a project configuration, pass a narrower folder such as `burr models` when you
+want a smaller tree. Rendering is powered by
+[Look](https://github.com/stefangolas/look) and stays on your machine.
+
+To define a stable model scope and enable project rule packs, add
+`.burr/config.toml`:
+
+```toml
+schema_version = "burr.project.v1"
+
+[project]
+models = ["models"]
+
+[[packs]]
+id = "builtin:mechanical-fit"
+```
+
+The project contract, local pack envelope, resolution order, and failure
+behaviour are documented in
+[`docs/project-configuration.md`](docs/project-configuration.md). During this
+foundation phase, pack entries are validated and resolved at startup;
+`burr check` remains the command that executes the existing design rules.
 
 Create and check a build123d starter part:
 
