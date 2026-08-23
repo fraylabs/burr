@@ -61,6 +61,17 @@ try {
   expectEqual(initialTree.files?.[0]?.format, "STEP", "model format")
   const initialVersion = initialTree.files[0].version
 
+  const logoResponse = await fetch(`${baseUrl}/assets/burr-logo.png`)
+  expectEqual(logoResponse.status, 200, "logo response status")
+  expectEqual(logoResponse.headers.get("content-type"), "image/png", "logo content type")
+  const logoBytes = new Uint8Array(await logoResponse.arrayBuffer())
+  expectEqual(logoBytes.length > 100_000, true, "logo asset size")
+  expectEqual(
+    [...logoBytes.slice(0, 8)].join(","),
+    "137,80,78,71,13,10,26,10",
+    "logo PNG signature",
+  )
+
   const viewerResponse = await fetch(
     `${baseUrl}/viewer?path=${encodeURIComponent(initialTree.files[0].path)}`,
   )
@@ -92,7 +103,7 @@ try {
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
 
   console.log(
-    `viewer proof passed (1 filtered model, Look HTML rendered, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (logo served, 1 filtered model, Look HTML rendered, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)

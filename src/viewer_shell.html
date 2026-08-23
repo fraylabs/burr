@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b0d0f" />
+    <link rel="icon" type="image/png" href="/assets/burr-logo.png" />
     <title>Burr model browser</title>
     <style>
       :root {
@@ -56,9 +57,17 @@
         flex: 0 0 auto;
         display: flex;
         align-items: center;
+        gap: 11px;
         min-height: 74px;
         padding: 14px 17px;
         border-bottom: 1px solid #252a2f;
+      }
+
+      .brand-mark {
+        flex: 0 0 auto;
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
       }
 
       .eyebrow {
@@ -359,6 +368,7 @@
     <div id="app">
       <aside class="sidebar" aria-label="Model files">
         <header class="sidebar-header">
+          <img class="brand-mark" src="/assets/burr-logo.png" alt="" />
           <div>
             <p class="eyebrow">Burr</p>
             <h1 id="root-name">Model browser</h1>

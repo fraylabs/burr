@@ -1,5 +1,7 @@
 # Burr
 
+<img src="assets/burr-logo.png" width="128" alt="Burr logo">
+
 Burr is a local CAD model browser and design-rule checker for CAD-as-code.
 
 Run `burr .` to browse the STEP, STL, and GLB files in a project without

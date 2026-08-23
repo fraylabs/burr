@@ -6,6 +6,7 @@
   "files": [
     "Cargo.toml",
     "Cargo.lock",
+    "assets/burr-logo.png",
     "src",
     "pyproject.toml",
     "packages/burr-build123d/pyproject.toml",

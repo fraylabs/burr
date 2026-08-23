@@ -16,6 +16,7 @@ use std::{
 use tiny_http::{Header, Method, Request, Response, Server, StatusCode};
 
 const SHELL_HTML: &str = include_str!("viewer_shell.html");
+const LOGO_PNG: &[u8] = include_bytes!("../assets/burr-logo.png");
 const VIEWER_FRAMING_MARGIN: f32 = 1.3;
 const SKIP_DIRECTORIES: [&str; 9] = [
     ".git",
@@ -146,6 +147,9 @@ fn handle_request(
             }
             Err(error) => respond_json_error(request, 500, &error),
         },
+        "/assets/burr-logo.png" | "/favicon.ico" => {
+            respond_bytes(request, 200, "image/png", LOGO_PNG.to_vec())
+        }
         "/viewer" => {
             let Some(relative_path) = query_value(&url, "path") else {
                 return respond_html_error(request, 400, "No model path was provided.");
@@ -155,7 +159,6 @@ fn handle_request(
                 Err(error) => respond_html_error(request, 422, &error),
             }
         }
-        "/favicon.ico" => respond(request, 204, "image/x-icon", String::new()),
         _ => respond(
             request,
             404,
@@ -357,13 +360,22 @@ fn query_value(url: &str, wanted: &str) -> Option<String> {
 }
 
 fn respond(request: Request, status: u16, content_type: &str, body: String) -> Result<(), String> {
+    respond_bytes(request, status, content_type, body.into_bytes())
+}
+
+fn respond_bytes(
+    request: Request,
+    status: u16,
+    content_type: &str,
+    body: Vec<u8>,
+) -> Result<(), String> {
     let content_type = Header::from_bytes("Content-Type", content_type)
         .map_err(|_| "Failed to create Content-Type header.".to_string())?;
     let cache_control = Header::from_bytes("Cache-Control", "no-store")
         .map_err(|_| "Failed to create Cache-Control header.".to_string())?;
     request
         .respond(
-            Response::from_string(body)
+            Response::from_data(body)
                 .with_status_code(StatusCode(status))
                 .with_header(content_type)
                 .with_header(cache_control),
