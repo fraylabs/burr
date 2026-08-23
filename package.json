@@ -66,6 +66,7 @@
     "examples/linear-actuator-good/burr-design-data.json",
     "examples/linear-actuator-good/source.py",
     "README.md",
+    "ROADMAP.md",
     "CHANGELOG.md",
     "INSTALL.md",
     "docs",

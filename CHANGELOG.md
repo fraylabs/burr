@@ -5,6 +5,10 @@
 - Add `burr <folder>` (normally `burr .`), a Look-powered local browser for
   recursively discovered STEP, STL, and GLB files with a collapsible folder
   tree and automatic active-model refresh.
+- Keep the new workbench geometry-first: `.burr/config.toml` scopes model
+  folders only, and the published declared-intent checker remains isolated as a
+  legacy compatibility surface. Geometry-native interference checking is the
+  next planned proof.
 
 ## 0.30.0
 

@@ -1,9 +1,10 @@
 # Install Burr
 
-Burr has three runtime pieces:
+Burr's current product surface is the Rust model browser. Version 0.30 also
+ships two helpers for its legacy declared-intent checking workflow:
 
 ```txt
-burr             Rust CLI, local model browser, and linter
+burr             Rust CLI and local model browser; legacy linter commands remain
 burr-build123d   Python helper that emits burr-design-data.json from build123d
 burr-ocp        Optional Python/OpenCascade STEP geometry extractor
 ```
@@ -36,15 +37,13 @@ The viewer is local, recursively follows folders, and refreshes changed model
 files. It uses Look's native Rust scene compiler and self-contained browser
 viewer; it does not require a separate JavaScript app or upload models.
 
-Projects may declare model roots and enabled packs in `.burr/config.toml`. Burr
-uses the nearest configuration at or above the requested folder; without one,
-the requested folder remains the model root and no project packs are enabled.
-See [`docs/project-configuration.md`](docs/project-configuration.md) for the V1
-contract. A configured `builtin:mechanical-fit` pack runs existing declared
-checks read-only when the workbench starts. Its pack outcomes and findings are
-shown in the Checks tab and available at `GET /api/checks`. Local pack
-definitions are resolved but currently report `incomplete` because their
-executable check contract is not implemented yet.
+Projects may declare model roots in `.burr/config.toml`. Burr uses the nearest
+configuration at or above the requested folder; without one, the requested
+folder remains the model root. Check and rulepack configuration is not part of
+the workbench contract. See
+[`docs/project-configuration.md`](docs/project-configuration.md).
+
+## Legacy 0.30 declared-intent checks
 
 Run it on a folder containing `burr-design-data.json`:
 

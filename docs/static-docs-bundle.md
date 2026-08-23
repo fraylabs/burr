@@ -33,6 +33,7 @@ burr-docs-v0.30.0/
   manifest.json
   markdown/
     how-it-works.md
+    roadmap.md
     reference/
       design-data.md
       receipt.md

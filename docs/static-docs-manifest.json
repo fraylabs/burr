@@ -14,6 +14,16 @@
       "nav_order": 20
     },
     {
+      "source_path": "ROADMAP.md",
+      "bundle_path": "markdown/roadmap.md",
+      "title": "Burr Roadmap",
+      "kind": "site_page",
+      "content_type": "text/markdown; charset=utf-8",
+      "slug": "roadmap",
+      "section": "Overview",
+      "nav_order": 30
+    },
+    {
       "source_path": "docs/site/reference/design-data.md",
       "bundle_path": "markdown/reference/design-data.md",
       "title": "Design Data Reference",

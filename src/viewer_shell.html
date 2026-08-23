@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b0d0f" />
     <link rel="icon" type="image/png" href="/assets/burr-logo.png" />
-    <title>Burr workbench</title>
+    <title>Burr model browser</title>
     <script>
       (() => {
         const saved = localStorage.getItem("burr-theme");
@@ -146,95 +146,37 @@
         white-space: nowrap;
       }
 
-      [hidden] {
-        display: none !important;
-      }
-
-      .sidebar-tabs {
+      .tree-toolbar {
         flex: 0 0 auto;
         display: flex;
         align-items: center;
-        gap: 4px;
-        padding: 9px;
-        border-bottom: 1px solid var(--border);
-        background: var(--surface);
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 17px 10px;
       }
 
-      .sidebar-tab {
-        min-width: 0;
-        min-height: 33px;
-        flex: 1 1 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 7px;
-        padding: 6px 9px;
-        border: 1px solid transparent;
-        border-radius: var(--radius-sm);
-        background: transparent;
-        color: var(--text-muted);
-        font-size: 10px;
-        font-weight: 700;
-        cursor: pointer;
-      }
-
-      .sidebar-tab:hover {
-        background: var(--surface-hover);
+      .tree-toolbar strong {
         color: var(--text-secondary);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
 
-      .sidebar-tab[aria-selected="true"] {
-        border-color: var(--border);
-        background: var(--surface-selected);
-        color: var(--text);
-        box-shadow: inset 0 -2px var(--accent);
-      }
-
-      .sidebar-tab:focus-visible,
-      .finding[data-model-path]:focus-visible {
-        outline: 2px solid var(--accent);
-        outline-offset: 2px;
-      }
-
-      .tab-count {
-        min-width: 19px;
-        padding: 2px 6px;
+      .model-count {
+        padding: 3px 7px;
         border: 1px solid var(--border);
         border-radius: var(--radius-pill);
-        background: var(--sidebar);
+        background: var(--surface);
         color: var(--text-muted);
         font-size: 9px;
         font-variant-numeric: tabular-nums;
-        text-align: center;
-      }
-
-      #checks-count[data-outcome="pass"] {
-        border-color: color-mix(in srgb, var(--success) 45%, var(--border));
-        color: var(--success);
-      }
-
-      #checks-count[data-outcome="incomplete"] {
-        border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-        color: var(--accent);
-      }
-
-      #checks-count[data-outcome="fail"] {
-        border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
-        color: var(--danger);
-      }
-
-      .sidebar-panel {
-        min-width: 0;
-        min-height: 0;
-        flex: 1 1 auto;
-        overflow: hidden;
       }
 
       .tree {
-        height: 100%;
         min-height: 0;
+        flex: 1 1 auto;
         overflow: auto;
-        padding: 10px 9px 18px;
+        padding: 2px 9px 18px;
         scrollbar-color: var(--border-strong) transparent;
         scrollbar-width: thin;
       }
@@ -374,236 +316,6 @@
         color: var(--text-muted);
         font-size: 11px;
         line-height: 1.55;
-      }
-
-      .checks-panel {
-        overflow: auto;
-        padding: 10px 9px 18px;
-        scrollbar-color: var(--border-strong) transparent;
-        scrollbar-width: thin;
-      }
-
-      .checks-overview,
-      .pack-card {
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        background: var(--surface);
-      }
-
-      .checks-overview {
-        margin-bottom: 9px;
-        padding: 13px;
-      }
-
-      .outcome-line,
-      .pack-heading {
-        min-width: 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .outcome-dot {
-        flex: 0 0 auto;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--text-muted);
-        box-shadow: 0 0 0 4px color-mix(in srgb, var(--text-muted) 12%, transparent);
-      }
-
-      .outcome-dot[data-outcome="pass"] {
-        background: var(--success);
-        box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 12%, transparent);
-      }
-
-      .outcome-dot[data-outcome="incomplete"] {
-        background: var(--accent);
-        box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
-      }
-
-      .outcome-dot[data-outcome="fail"] {
-        background: var(--danger);
-        box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 12%, transparent);
-      }
-
-      .checks-overview strong {
-        color: var(--text);
-        font-size: 12px;
-        font-weight: 720;
-      }
-
-      .checks-overview p {
-        margin: 8px 0 0 16px;
-        color: var(--text-muted);
-        font-size: 10px;
-        line-height: 1.45;
-      }
-
-      .pack-card {
-        margin-top: 9px;
-        overflow: hidden;
-      }
-
-      .pack-header {
-        padding: 12px;
-        border-bottom: 1px solid var(--border);
-      }
-
-      .pack-heading {
-        justify-content: space-between;
-      }
-
-      .pack-name {
-        min-width: 0;
-        overflow: hidden;
-        color: var(--text);
-        font-size: 11px;
-        font-weight: 680;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .outcome-chip {
-        flex: 0 0 auto;
-        padding: 3px 6px;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-pill);
-        color: var(--text-muted);
-        font-size: 8px;
-        font-weight: 800;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-      }
-
-      .outcome-chip[data-outcome="pass"] {
-        border-color: color-mix(in srgb, var(--success) 42%, var(--border));
-        color: var(--success);
-      }
-
-      .outcome-chip[data-outcome="incomplete"] {
-        border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
-        color: var(--accent);
-      }
-
-      .outcome-chip[data-outcome="fail"] {
-        border-color: color-mix(in srgb, var(--danger) 42%, var(--border));
-        color: var(--danger);
-      }
-
-      .pack-meta {
-        margin: 6px 0 0;
-        overflow: hidden;
-        color: var(--text-muted);
-        font-size: 9px;
-        line-height: 1.4;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .finding-list {
-        display: grid;
-        gap: 1px;
-        padding: 4px;
-      }
-
-      .finding {
-        width: 100%;
-        display: block;
-        padding: 9px 8px;
-        border: 0;
-        border-radius: var(--radius-sm);
-        background: transparent;
-        color: inherit;
-        text-align: left;
-      }
-
-      button.finding {
-        cursor: pointer;
-      }
-
-      button.finding:hover {
-        background: var(--surface-hover);
-      }
-
-      .finding-title {
-        display: flex;
-        align-items: flex-start;
-        gap: 7px;
-        color: var(--text-secondary);
-        font-size: 10px;
-        font-weight: 650;
-        line-height: 1.35;
-      }
-
-      .finding-mark {
-        flex: 0 0 auto;
-        width: 7px;
-        height: 7px;
-        margin-top: 3px;
-        border-radius: 50%;
-        background: var(--text-muted);
-      }
-
-      .finding[data-severity="error"] .finding-mark {
-        background: var(--danger);
-      }
-
-      .finding[data-severity="warning"] .finding-mark {
-        background: var(--accent);
-      }
-
-      .finding-message,
-      .finding-remediation {
-        margin: 5px 0 0 14px;
-        color: var(--text-muted);
-        font-size: 9px;
-        line-height: 1.45;
-      }
-
-      .finding-remediation {
-        color: var(--text-secondary);
-      }
-
-      .finding-model {
-        display: block;
-        margin: 6px 0 0 14px;
-        color: var(--steel);
-        font-size: 8px;
-        font-weight: 750;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-      }
-
-      .pack-empty {
-        padding: 10px 12px 12px;
-        color: var(--text-muted);
-        font-size: 9px;
-        line-height: 1.45;
-      }
-
-      .notice-group {
-        margin: 0;
-        border-top: 1px solid var(--border);
-      }
-
-      .notice-group > summary {
-        min-height: 36px;
-        padding: 8px 12px;
-        border-radius: 0;
-        color: var(--text-muted);
-        font-size: 9px;
-        font-weight: 650;
-      }
-
-      .notice-group > summary .folder-caret {
-        margin-left: auto;
-      }
-
-      .notice-list {
-        display: grid;
-        gap: 1px;
-        padding: 0 4px 4px;
       }
 
       .sidebar-footer {
@@ -758,58 +470,21 @@
   </head>
   <body>
     <div id="app">
-      <aside class="sidebar" aria-label="Burr project sidebar">
+      <aside class="sidebar" aria-label="Model files">
         <header class="sidebar-header">
           <img class="brand-mark" src="/assets/burr-logo.png" alt="" />
           <div>
             <p class="eyebrow">Burr</p>
-            <h1 id="root-name">Burr project</h1>
+            <h1 id="root-name">Model browser</h1>
           </div>
         </header>
 
-        <div class="sidebar-tabs" role="tablist" aria-label="Project tools">
-          <button
-            id="models-tab"
-            class="sidebar-tab"
-            type="button"
-            role="tab"
-            aria-controls="models-panel"
-            aria-selected="true"
-          >
-            Models
-            <span id="model-count" class="tab-count">0</span>
-          </button>
-          <button
-            id="checks-tab"
-            class="sidebar-tab"
-            type="button"
-            role="tab"
-            aria-controls="checks-panel"
-            aria-selected="false"
-          >
-            Checks
-            <span id="checks-count" class="tab-count" data-outcome="none">—</span>
-          </button>
+        <div class="tree-toolbar">
+          <strong>Models</strong>
+          <span id="model-count" class="model-count">0</span>
         </div>
 
-        <section
-          id="models-panel"
-          class="sidebar-panel"
-          role="tabpanel"
-          aria-labelledby="models-tab"
-        >
-          <nav id="tree" class="tree" aria-label="Supported model files"></nav>
-        </section>
-
-        <section
-          id="checks-panel"
-          class="sidebar-panel checks-panel"
-          role="tabpanel"
-          aria-labelledby="checks-tab"
-          hidden
-        >
-          <div class="empty-tree">Loading configured checks…</div>
-        </section>
+        <nav id="tree" class="tree" aria-label="Supported model files"></nav>
 
         <footer class="sidebar-footer">
           <div class="watch-status-group">
@@ -846,11 +521,6 @@
     <script>
       const rootName = document.querySelector("#root-name");
       const modelCount = document.querySelector("#model-count");
-      const checksCount = document.querySelector("#checks-count");
-      const modelsTab = document.querySelector("#models-tab");
-      const checksTab = document.querySelector("#checks-tab");
-      const modelsPanel = document.querySelector("#models-panel");
-      const checksPanel = document.querySelector("#checks-panel");
       const tree = document.querySelector("#tree");
       const viewer = document.querySelector("#model-viewer");
       const emptyState = document.querySelector("#empty-state");
@@ -869,8 +539,6 @@
         expanded: new Set(),
         initialized: false,
         refreshing: false,
-        checks: null,
-        activePanel: "models",
         theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
       };
 
@@ -881,32 +549,10 @@
       themeToggle.addEventListener("click", () => {
         setTheme(state.theme === "dark" ? "light" : "dark", true, true);
       });
-      modelsTab.addEventListener("click", () => setSidebarPanel("models"));
-      checksTab.addEventListener("click", () => setSidebarPanel("checks"));
 
       setTheme(state.theme, false, false);
       refreshTree();
-      refreshChecks();
       setInterval(refreshTree, 1000);
-
-      async function refreshChecks() {
-        try {
-          const response = await fetch("/api/checks", { cache: "no-store" });
-          if (!response.ok) throw new Error(`Checks request failed: ${response.status}`);
-          const payload = await response.json();
-          state.checks = payload;
-          renderChecks(payload);
-        } catch (error) {
-          checksCount.textContent = "!";
-          checksCount.dataset.outcome = "fail";
-          checksPanel.replaceChildren();
-          const message = document.createElement("div");
-          message.className = "empty-tree";
-          message.textContent = "Could not load check results.";
-          checksPanel.append(message);
-          console.error(error);
-        }
-      }
 
       async function refreshTree() {
         if (state.refreshing) return;
@@ -929,8 +575,8 @@
 
       function applyTree(payload) {
         const files = Array.isArray(payload.files) ? payload.files : [];
-        rootName.textContent = payload.root || "Burr project";
-        rootName.title = payload.root || "Burr project";
+        rootName.textContent = payload.root || "Model browser";
+        rootName.title = payload.root || "Model browser";
         modelCount.textContent = String(files.length);
 
         const signature = JSON.stringify(files.map((file) => [file.path, file.version]));
@@ -942,7 +588,6 @@
         if (signature !== state.signature) {
           state.signature = signature;
           renderTree(files);
-          if (state.checks) renderChecks(state.checks);
         }
 
         if (files.length === 0) {
@@ -1063,229 +708,6 @@
           theme: state.theme,
         });
         viewer.src = `/viewer?${query}`;
-      }
-
-      function setSidebarPanel(panel) {
-        state.activePanel = panel === "checks" ? "checks" : "models";
-        const showingChecks = state.activePanel === "checks";
-        modelsTab.setAttribute("aria-selected", String(!showingChecks));
-        checksTab.setAttribute("aria-selected", String(showingChecks));
-        modelsPanel.hidden = showingChecks;
-        checksPanel.hidden = !showingChecks;
-      }
-
-      function renderChecks(payload) {
-        const packs = Array.isArray(payload.packs) ? payload.packs : [];
-        const outcome = normalizeOutcome(payload.outcome);
-        const allFindings = packs.flatMap((pack) =>
-          Array.isArray(pack.findings) ? pack.findings : [],
-        );
-        const actionableCount = allFindings.filter(
-          (finding) => finding.severity !== "notice",
-        ).length;
-        const noticeCount = allFindings.length - actionableCount;
-        checksCount.textContent = String(actionableCount);
-        checksCount.dataset.outcome = outcome;
-        checksCount.title =
-          packs.length === 0
-            ? "No checks enabled"
-            : `${actionableCount} actionable ${pluralize(actionableCount, "finding")} across ${packs.length} ${pluralize(packs.length, "pack")}`;
-
-        const fragment = document.createDocumentFragment();
-        const overview = document.createElement("section");
-        overview.className = "checks-overview";
-        overview.setAttribute("aria-label", "Check summary");
-        const outcomeLine = document.createElement("div");
-        outcomeLine.className = "outcome-line";
-        const dot = document.createElement("span");
-        dot.className = "outcome-dot";
-        dot.dataset.outcome = outcome;
-        dot.setAttribute("aria-hidden", "true");
-        const heading = document.createElement("strong");
-        heading.textContent = packs.length === 0 ? "Checks not run" : `Checks ${outcomeLabel(outcome)}`;
-        outcomeLine.append(dot, heading);
-        const description = document.createElement("p");
-        description.textContent =
-          packs.length === 0
-            ? "No project rule packs are enabled."
-            : [
-                `${packs.length} ${pluralize(packs.length, "pack")}`,
-                `${actionableCount} ${pluralize(actionableCount, "finding")}`,
-                noticeCount > 0 ? `${noticeCount} ${pluralize(noticeCount, "notice")}` : null,
-              ]
-                .filter(Boolean)
-                .join(" · ");
-        overview.append(outcomeLine, description);
-        fragment.append(overview);
-
-        for (const pack of packs) {
-          fragment.append(renderPack(pack));
-        }
-
-        checksPanel.replaceChildren(fragment);
-      }
-
-      function renderPack(pack) {
-        const outcome = normalizeOutcome(pack.outcome);
-        const findings = Array.isArray(pack.findings) ? pack.findings : [];
-        const actionableFindings = findings.filter((finding) => finding.severity !== "notice");
-        const notices = findings.filter((finding) => finding.severity === "notice");
-        const summary = pack.summary || {};
-        const card = document.createElement("section");
-        card.className = "pack-card";
-        card.dataset.packId = pack.id || "unknown";
-
-        const header = document.createElement("header");
-        header.className = "pack-header";
-        const heading = document.createElement("div");
-        heading.className = "pack-heading";
-        const name = document.createElement("span");
-        name.className = "pack-name";
-        name.textContent = formatPackName(pack.id);
-        name.title = pack.id || "Unknown pack";
-        const chip = document.createElement("span");
-        chip.className = "outcome-chip";
-        chip.dataset.outcome = outcome;
-        chip.textContent = outcomeLabel(outcome);
-        heading.append(name, chip);
-
-        const meta = document.createElement("p");
-        meta.className = "pack-meta";
-        const targetCount = Number(summary.targets) || 0;
-        const targetDetail =
-          targetCount === 0
-            ? "no targets evaluated"
-            : `${Number(summary.targets_passed) || 0}/${targetCount} targets passed`;
-        meta.textContent = `${pack.source || "pack"} · v${pack.version || "unknown"} · ${targetDetail}`;
-        header.append(heading, meta);
-        card.append(header);
-
-        if (actionableFindings.length === 0 && notices.length === 0) {
-          const empty = document.createElement("div");
-          empty.className = "pack-empty";
-          empty.textContent =
-            outcome === "pass"
-              ? "All evaluated targets passed with no findings."
-              : "This pack returned no individual findings.";
-          card.append(empty);
-          return card;
-        }
-
-        if (actionableFindings.length > 0) {
-          const list = document.createElement("div");
-          list.className = "finding-list";
-          for (const finding of actionableFindings) {
-            list.append(renderFinding(finding));
-          }
-          card.append(list);
-        }
-
-        if (notices.length > 0) {
-          const group = document.createElement("details");
-          group.className = "notice-group";
-          const summary = document.createElement("summary");
-          const label = document.createElement("span");
-          label.textContent = `${notices.length} ${pluralize(notices.length, "notice")}`;
-          const caret = document.createElement("span");
-          caret.className = "folder-caret";
-          caret.textContent = "▶";
-          summary.append(label, caret);
-          const list = document.createElement("div");
-          list.className = "notice-list";
-          for (const notice of notices) {
-            list.append(renderFinding(notice));
-          }
-          group.append(summary, list);
-          card.append(group);
-        }
-        return card;
-      }
-
-      function renderFinding(finding) {
-        const modelPath = linkedModelPath(finding);
-        const item = document.createElement(modelPath ? "button" : "article");
-        if (modelPath) {
-          item.type = "button";
-          item.dataset.modelPath = modelPath;
-          item.addEventListener("click", () => {
-            const file = state.files.find((candidate) => candidate.path === modelPath);
-            if (file) selectFile(file);
-          });
-        }
-        item.className = "finding";
-        item.dataset.severity = finding.severity || "notice";
-        item.dataset.findingCode = finding.code || "finding";
-
-        const title = document.createElement("div");
-        title.className = "finding-title";
-        const mark = document.createElement("span");
-        mark.className = "finding-mark";
-        mark.setAttribute("aria-hidden", "true");
-        const label = document.createElement("span");
-        label.textContent = finding.title || formatFindingCode(finding.code);
-        title.append(mark, label);
-
-        const message = document.createElement("p");
-        message.className = "finding-message";
-        message.textContent = finding.message || "Burr reported a design finding.";
-        item.append(title, message);
-
-        if (finding.remediation) {
-          const remediation = document.createElement("p");
-          remediation.className = "finding-remediation";
-          remediation.textContent = `Fix: ${finding.remediation}`;
-          item.append(remediation);
-        }
-        if (modelPath) {
-          const model = document.createElement("span");
-          model.className = "finding-model";
-          model.textContent = `Open ${modelPath.split("/").at(-1)} →`;
-          item.append(model);
-        }
-        return item;
-      }
-
-      function linkedModelPath(finding) {
-        const geometry = Array.isArray(finding.geometry) ? finding.geometry : [];
-        for (const reference of geometry) {
-          if (state.files.some((file) => file.path === reference.model_path)) {
-            return reference.model_path;
-          }
-        }
-        return null;
-      }
-
-      function normalizeOutcome(outcome) {
-        return ["pass", "incomplete", "fail"].includes(outcome) ? outcome : "none";
-      }
-
-      function outcomeLabel(outcome) {
-        if (outcome === "pass") return "passed";
-        if (outcome === "incomplete") return "incomplete";
-        if (outcome === "fail") return "failed";
-        return "not run";
-      }
-
-      function formatPackName(id) {
-        const value = typeof id === "string" ? id.replace(/^[^:]+:/, "") : "unknown pack";
-        return value
-          .split(/[-_]/)
-          .filter(Boolean)
-          .map((word) => word[0].toUpperCase() + word.slice(1))
-          .join(" ");
-      }
-
-      function formatFindingCode(code) {
-        if (typeof code !== "string") return "Design finding";
-        return code
-          .split("_")
-          .filter(Boolean)
-          .map((word) => word[0].toUpperCase() + word.slice(1))
-          .join(" ");
-      }
-
-      function pluralize(count, singular) {
-        return count === 1 ? singular : `${singular}s`;
       }
 
       function setTheme(theme, persist, reloadViewer) {

@@ -6,7 +6,6 @@ use burr::{
 };
 use std::path::PathBuf;
 
-mod checks;
 mod project;
 mod viewer;
 
@@ -371,7 +370,7 @@ fn explain_json_packet(document: &serde_json::Value) -> serde_json::Value {
 
 fn print_help() {
     println!(
-        "Usage:\n  burr <folder>\n  burr init <folder>\n  burr check [--rulepack <selector>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr explain [--json] <folder|burr-receipt.json|repair-report.json>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n\nRun `burr .` to open the local STEP, STL, and GLB model browser.\n\nRulepack selectors may be a file path or builtin:actuator_mount.\n\nExit codes for burr check:\n  0  pass\n  1  fail\n  2  invocation or configuration error\n  3  incomplete\n"
+        "Usage:\n  burr <folder>\n\nRun `burr .` to open the local STEP, STL, and GLB model browser.\n\nLegacy 0.30 compatibility commands:\n  burr init <folder>\n  burr check [--rulepack <selector>] [--no-write-receipt] <folder|{DESIGN_DATA_FILE_NAME}>...\n  burr explain [--json] <folder|burr-receipt.json|repair-report.json>...\n  burr stamp <folder|{DESIGN_DATA_FILE_NAME}>...\n\nRulepack selectors may be a file path or builtin:actuator_mount.\n\nExit codes for burr check:\n  0  pass\n  1  fail\n  2  invocation or configuration error\n  3  incomplete\n"
     );
 }
 

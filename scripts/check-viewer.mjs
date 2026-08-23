@@ -17,26 +17,19 @@ const fixture = path.join(
   "enclosure",
   "counterbore.step",
 )
-const mechanicalFitFixture = path.join(repoRoot, "examples", "linear-actuator-good")
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "burr-viewer-check-"))
 const modelDirectory = path.join(tempRoot, "models", "enclosure")
 const modelPath = path.join(modelDirectory, "counterbore.step")
-const checkedModelDirectory = path.join(tempRoot, "models", "z-check")
 const ignoredDirectory = path.join(tempRoot, "notes")
 const unconfiguredModelDirectory = path.join(tempRoot, "archive")
-const burrPackDirectory = path.join(tempRoot, ".burr", "packs")
 const port = await availablePort()
 const baseUrl = `http://127.0.0.1:${port}`
 
 fs.mkdirSync(modelDirectory, { recursive: true })
-fs.mkdirSync(checkedModelDirectory, { recursive: true })
 fs.mkdirSync(ignoredDirectory, { recursive: true })
 fs.mkdirSync(unconfiguredModelDirectory, { recursive: true })
-fs.mkdirSync(burrPackDirectory, { recursive: true })
+fs.mkdirSync(path.join(tempRoot, ".burr"), { recursive: true })
 fs.copyFileSync(fixture, modelPath)
-for (const file of ["source.py", "actuator.step", "burr-design-data.json"]) {
-  fs.copyFileSync(path.join(mechanicalFitFixture, file), path.join(checkedModelDirectory, file))
-}
 fs.copyFileSync(fixture, path.join(unconfiguredModelDirectory, "not-configured.step"))
 fs.writeFileSync(path.join(ignoredDirectory, "readme.txt"), "not a model\n")
 fs.writeFileSync(
@@ -46,21 +39,6 @@ fs.writeFileSync(
     "",
     "[project]",
     'models = ["models"]',
-    "",
-    "[[packs]]",
-    'id = "builtin:mechanical-fit"',
-    "",
-    "[[packs]]",
-    'path = "packs/product-fit.toml"',
-    "",
-  ].join("\n"),
-)
-fs.writeFileSync(
-  path.join(burrPackDirectory, "product-fit.toml"),
-  [
-    'schema_version = "burr.pack.v1"',
-    'id = "project:product-fit"',
-    'version = "0.1.0"',
     "",
   ].join("\n"),
 )
@@ -97,69 +75,10 @@ try {
   expectEqual(project.config_path, ".burr/config.toml", "portable config path")
   expectEqual(project.model_paths?.length, 1, "configured model root count")
   expectEqual(project.model_paths?.[0], "models", "configured model root")
-  expectEqual(project.packs?.length, 2, "resolved pack count")
-  expectEqual(project.packs?.[0]?.id, "builtin:mechanical-fit", "built-in pack id")
-  expectEqual(project.packs?.[0]?.source, "builtin", "built-in pack source")
-  expectEqual(project.packs?.[1]?.id, "project:product-fit", "local pack id")
-  expectEqual(project.packs?.[1]?.source, "local", "local pack source")
-  expectEqual(
-    project.packs?.[1]?.path,
-    ".burr/packs/product-fit.toml",
-    "portable local pack path",
-  )
-
-  const checks = await getJson("/api/checks")
-  expectEqual(checks.schema_version, "burr.check-results.v1", "check result schema")
-  expectEqual(
-    checks.capability_catalog?.join(","),
-    "mesh,brep,assembly,declared_intent",
-    "shared capability catalog",
-  )
-  expectEqual(checks.outcome, "incomplete", "aggregate check outcome")
-  expectEqual(checks.packs?.length, 2, "executed pack count")
-  const mechanicalFit = checks.packs?.[0]
-  expectEqual(mechanicalFit?.id, "builtin:mechanical-fit", "executed built-in pack")
-  expectEqual(mechanicalFit?.outcome, "pass", "mechanical-fit pack outcome")
-  expectEqual(
-    mechanicalFit?.required_capabilities?.join(","),
-    "declared_intent",
-    "mechanical-fit required capability",
-  )
-  expectEqual(
-    mechanicalFit?.available_capabilities?.join(","),
-    "declared_intent",
-    "mechanical-fit available capability",
-  )
-  expectEqual(mechanicalFit?.targets?.length, 1, "mechanical-fit target count")
-  expectEqual(
-    mechanicalFit?.targets?.[0]?.source_path,
-    "models/z-check/burr-design-data.json",
-    "portable checked source path",
-  )
-  expectEqual(mechanicalFit?.summary?.targets_passed, 1, "passed target count")
-  const localPack = checks.packs?.[1]
-  expectEqual(localPack?.outcome, "incomplete", "unimplemented local pack outcome")
-  expectEqual(
-    localPack?.findings?.[0]?.code,
-    "local_pack_runtime_unavailable",
-    "local pack incomplete reason",
-  )
-  expectEqual(
-    fs.existsSync(path.join(checkedModelDirectory, "burr-receipt.json")),
-    false,
-    "interactive checks do not write receipts",
-  )
-
-  const shellResponse = await fetch(baseUrl)
-  expectEqual(shellResponse.status, 200, "workbench shell status")
-  const shellHtml = await shellResponse.text()
-  expectIncludes(shellHtml, 'role="tablist"', "project tools tab list")
-  expectIncludes(shellHtml, 'id="checks-panel"', "visual checks panel")
-  expectIncludes(shellHtml, 'fetch("/api/checks"', "checks API client")
-  expectIncludes(shellHtml, "item.dataset.findingCode", "structured finding rows")
+  expectEqual("packs" in project, false, "project state has no premature pack contract")
 
   const initialTree = await getJson("/api/tree")
-  expectEqual(initialTree.files?.length, 2, "filtered model count")
+  expectEqual(initialTree.files?.length, 1, "filtered model count")
   expectEqual(initialTree.files?.[0]?.path, "models/enclosure/counterbore.step", "model path")
   expectEqual(initialTree.files?.[0]?.format, "STEP", "model format")
   const initialVersion = initialTree.files[0].version
@@ -215,11 +134,9 @@ try {
   expectEqual(refreshedViewer.status, 200, "refreshed viewer status")
   expectIncludes(await refreshedViewer.text(), "STEP B-REP", "refreshed Look viewer")
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
-  expectIncludes(stdout, "CONFIGURED PACKS 2", "resolved pack startup summary")
-  expectIncludes(stdout, "CHECKS INCOMPLETE", "check startup summary")
 
   console.log(
-    `viewer proof passed (checks panel wired, mechanical-fit executed read-only, incomplete local pack stayed explicit, model scope enforced, Look rendered, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (simple model scope enforced, dark/light Look HTML rendered, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)

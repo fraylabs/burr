@@ -35,17 +35,18 @@ the active model when its source changes. Without project configuration, no
 that subtree.
 
 When the nearest project root contains `.burr/config.toml`, Burr scans only the
-declared `project.models` directories and deterministically resolves every
-configured built-in or local pack before opening the browser. Missing
-configuration retains the zero-configuration folder behavior and enables no
-packs. Invalid configuration stops startup with an explicit error. The
-configured `builtin:mechanical-fit` pack also runs the existing declared-intent
-checks at startup without writing receipts. The Checks tab renders the result;
-`GET /api/checks` exposes the same portable `burr.check-results.v1` snapshot.
-An unavailable capability or local pack runtime reports `incomplete`; no
-enabled packs produces a `null` aggregate outcome rather than a pass claim.
+declared `project.models` directories. Missing configuration retains the
+zero-configuration folder behavior. Check and rulepack configuration is not
+part of the workbench contract; invalid configuration stops startup with an
+explicit error.
 
-## `burr init`
+## Legacy 0.30 commands
+
+The following commands remain available for the published declared-intent
+workflow. They are not used by `burr .` and are not the foundation for planned
+geometry-native checks.
+
+### `burr init`
 
 Creates a minimal `build123d` starter project:
 
@@ -60,7 +61,7 @@ burr check .
 The generated design data explicitly selects `builtin:actuator_mount`; the
 starter does not depend on an implicit default.
 
-## `burr check`
+### `burr check`
 
 Runs the linter:
 
@@ -97,7 +98,7 @@ exit code follows the trust outcome:
 For multiple targets, any `fail` produces exit `1`; otherwise any `incomplete`
 produces exit `3`. Invocation and read errors remain exit `2`.
 
-## `burr explain`
+### `burr explain`
 
 Expands failed checks into fix guidance:
 
@@ -113,6 +114,6 @@ caller does not mistake an empty failure list for a passing result. Consumers
 must require `burr.repair-packet.v2`; multi-input JSON uses
 `burr.repair-packet-list.v2`.
 
-## `burr stamp`
+### `burr stamp`
 
 Updates declared source and artifact hashes in `burr-design-data.json`.

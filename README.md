@@ -2,20 +2,29 @@
 
 <img src="assets/burr-logo.png" width="128" alt="Burr logo">
 
-Burr is a local CAD model browser and design-rule checker for CAD-as-code.
+Burr is a fast, local CAD model browser moving toward geometry-native design
+checks.
 
 Run `burr .` to browse the STEP, STL, and GLB files in a project without
-uploading them. Burr also gives agents and humans a hard feedback loop before a
-part becomes a print:
+uploading them or generating sidecar metadata. The current workbench is kept
+deliberately simple: files, folders, themes, and the model viewport.
+
+The next product proof is direct interference detection from STEP assembly
+geometry. See [`ROADMAP.md`](ROADMAP.md) for the sequence and deferred scope.
+
+## Legacy 0.30 design checks
+
+The published `burr check` workflow remains available for compatibility, but it
+is isolated from `burr .` and is not the foundation of the new workbench:
 
 ```txt
 design file -> generated part -> burr-design-data.json -> Burr checks -> receipt
 ```
 
-Burr does not design the part. It verifies declared mechanical intent against
+Burr 0.30 does not design the part. It verifies declared mechanical intent against
 metadata, dimensions, source/artifact freshness, and STEP geometry evidence.
 
-## Why
+### Why
 
 CAD agents can make parts that look plausible while hiding bad edge distances,
 missing holes, stale STEP exports, or decorative holes that should not be judged
@@ -46,7 +55,7 @@ When a receipt has multiple failures, `burr explain` sorts them by fix order:
 stale artifacts first, missing declared STEP geometry second, unsafe dimensions
 third, then declared measurement issues.
 
-## Trust Contract
+### Trust Contract
 
 Burr receipts have three outcomes:
 
@@ -91,27 +100,20 @@ a project configuration, pass a narrower folder such as `burr models` when you
 want a smaller tree. Rendering is powered by
 [Look](https://github.com/stefangolas/look) and stays on your machine.
 
-To define a stable model scope and enable project rule packs, add
-`.burr/config.toml`:
+To define a stable model scope, add `.burr/config.toml`:
 
 ```toml
 schema_version = "burr.project.v1"
 
 [project]
 models = ["models"]
-
-[[packs]]
-id = "builtin:mechanical-fit"
 ```
 
-The project contract, local pack envelope, resolution order, and failure
-behaviour are documented in
-[`docs/project-configuration.md`](docs/project-configuration.md). At startup,
-the configured `builtin:mechanical-fit` pack runs existing declared-intent
-checks read-only. The Checks tab shows its pack outcomes and findings; the same
-portable results are available at `GET /api/checks`. Missing inputs or
-unavailable local pack runtimes report `incomplete`, never a false pass. `burr
-check` remains the receipt-writing headless interface.
+The model-scope contract is documented in
+[`docs/project-configuration.md`](docs/project-configuration.md). Check and
+rulepack configuration is intentionally absent from the workbench contract.
+
+### Legacy checker quickstart
 
 Create and check a build123d starter part:
 
@@ -135,7 +137,7 @@ The fresh-install check also proves the starter failure-to-fix loop: move the M3
 hole too close to the side edge, fail edge distance, explain the measured
 problem, restore the hole, and pass again.
 
-## Product Loop
+## Legacy Product Loop
 
 Use Burr like tests for generated mechanical parts:
 
