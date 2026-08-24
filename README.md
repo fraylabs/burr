@@ -42,7 +42,8 @@ visible.
 
 This first check deliberately does not claim exact Boolean overlap volume,
 clearance, fit, wall thickness, process compliance, or general design
-correctness. Those boundaries are tracked in [ROADMAP.md](ROADMAP.md).
+correctness. Those boundaries are tracked in
+[docs/roadmap.md](docs/roadmap.md).
 
 ## Install
 
@@ -78,6 +79,11 @@ models = ["models"]
 Burr uses the nearest configuration at or above the requested folder. See
 [docs/project-configuration.md](docs/project-configuration.md) for validation
 and path-safety rules.
+
+The complete public documentation starts at
+[docs/index.md](docs/index.md). The Markdown under `docs/` is the canonical
+source consumed by burr.sh; keep it hand-authored, public-facing, and linked
+with relative paths.
 
 ## Local API
 
