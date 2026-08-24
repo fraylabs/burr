@@ -246,7 +246,6 @@ mod tests {
         assert_eq!(state["configured"], true);
         assert_eq!(state["config_path"], ".burr/config.toml");
         assert_eq!(state["model_paths"][0], "models");
-        assert!(state.get("packs").is_none());
     }
 
     #[test]
@@ -263,15 +262,15 @@ mod tests {
     }
 
     #[test]
-    fn check_configuration_is_not_part_of_the_model_scope_contract() {
+    fn unknown_configuration_fields_are_rejected() {
         let temp = tempdir().unwrap();
         fs::create_dir_all(temp.path().join("models")).unwrap();
         write_config(
             temp.path(),
-            "schema_version = \"burr.project.v1\"\n[project]\nmodels = [\"models\"]\n[[packs]]\nid = \"builtin:mechanical-fit\"\n",
+            "schema_version = \"burr.project.v1\"\n[project]\nmodels = [\"models\"]\nunexpected = true\n",
         );
         let error = Project::discover(temp.path()).unwrap_err();
-        assert!(error.contains("unknown field `packs`"));
+        assert!(error.contains("unknown field `unexpected`"));
     }
 
     #[test]

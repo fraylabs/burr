@@ -1,4 +1,9 @@
-"""Generate the small STEP assemblies used by Burr's intersection proof.
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["build123d==0.11.0"]
+# ///
+
+"""Generate the small STEP assemblies used by Burr's interference proof.
 
 The checked-in STEP files are the test inputs. This script records how they
 were produced so a dependency upgrade can regenerate them deliberately.
@@ -9,7 +14,7 @@ from pathlib import Path
 from build123d import Box, Compound, export_step
 
 
-OUTPUT = Path(__file__).parent.parent / "tests" / "fixtures" / "intersections"
+OUTPUT = Path(__file__).parent.parent / "tests" / "fixtures" / "interference"
 TIMESTAMP = "2026-01-01T00:00:00"
 
 

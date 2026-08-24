@@ -2,9 +2,10 @@
 name = "burr"
 version = "0.30.0"
 edition = "2021"
-description = "Local CAD model viewing and design-rule checks for CAD-as-code workflows."
+description = "Fast local browser and assembly interference checker for CAD models."
 license = "MIT"
 repository = "https://github.com/fraylabs/burr"
+publish = false
 
 [dependencies]
 glam = "0.30"
@@ -12,15 +13,12 @@ look = { git = "https://github.com/stefangolas/look.git", rev = "f0ed52edc1f0648
 percent-encoding = "2.3.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-sha2 = "0.10"
 tiny_http = "0.12.0"
 toml = "0.9"
 truck-meshalgo = { git = "https://github.com/stefangolas/truck", rev = "09726a9e", default-features = false, features = ["analyzers", "filters"] }
 
 [dev-dependencies]
 tempfile = "3.12"
-
-[workspace]
 
 [patch.crates-io]
 ruststep = { git = "https://github.com/stefangolas/ruststep", rev = "67f1f7c" }

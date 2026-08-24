@@ -1,5 +1,5 @@
 use crate::{
-    intersections::{self, CheckReport},
+    interference::{self, CheckReport},
     project::Project,
 };
 use look::{
@@ -381,7 +381,7 @@ fn load_model<'a>(
     // navigation shell and for models whose diagonal approaches that sphere.
     scene.fit_radius *= VIEWER_FRAMING_MARGIN;
     let report = if model_format(&path) == Some("STEP") {
-        intersections::analyze_scene(relative_path, &version, &scene)
+        interference::analyze_scene(relative_path, &version, &scene)
     } else {
         CheckReport::unsupported(
             relative_path,

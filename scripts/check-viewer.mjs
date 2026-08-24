@@ -17,7 +17,7 @@ const fixture = path.join(
   "enclosure",
   "counterbore.step",
 )
-const intersectionFixtures = path.join(repoRoot, "tests", "fixtures", "intersections")
+const interferenceFixtures = path.join(repoRoot, "tests", "fixtures", "interference")
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "burr-viewer-check-"))
 const modelDirectory = path.join(tempRoot, "models", "enclosure")
 const modelPath = path.join(modelDirectory, "counterbore.step")
@@ -34,7 +34,7 @@ fs.mkdirSync(unconfiguredModelDirectory, { recursive: true })
 fs.mkdirSync(path.join(tempRoot, ".burr"), { recursive: true })
 fs.copyFileSync(fixture, modelPath)
 for (const name of ["contained.step", "intersecting.step", "separated.step", "touching.step"]) {
-  fs.copyFileSync(path.join(intersectionFixtures, name), path.join(assemblyDirectory, name))
+  fs.copyFileSync(path.join(interferenceFixtures, name), path.join(assemblyDirectory, name))
 }
 fs.copyFileSync(fixture, path.join(unconfiguredModelDirectory, "not-configured.step"))
 fs.writeFileSync(path.join(ignoredDirectory, "readme.txt"), "not a model\n")
@@ -81,7 +81,11 @@ try {
   expectEqual(project.config_path, ".burr/config.toml", "portable config path")
   expectEqual(project.model_paths?.length, 1, "configured model root count")
   expectEqual(project.model_paths?.[0], "models", "configured model root")
-  expectEqual("packs" in project, false, "project state has no premature pack contract")
+  expectEqual(
+    Object.keys(project).sort().join(","),
+    "config_path,configured,model_paths,root,schema_version",
+    "closed project state",
+  )
 
   const initialTree = await getJson("/api/tree")
   expectEqual(initialTree.files?.length, 5, "filtered model count")

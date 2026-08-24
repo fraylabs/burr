@@ -36,19 +36,14 @@ up outside the fixtures.
 
 ## Later
 
-Declared-intent checks such as mechanical fit, process-specific design rules,
-and project-authored rulepacks may return after geometry-native inspection is
-useful on ordinary CAD files. They should add semantic intent where geometry
-alone is insufficient, not become a prerequisite for opening or checking a
-project.
-
-The receipt-based `burr check` workflow from Burr 0.30 remains available as a
-published compatibility surface. It is isolated from the new workbench and is
-not the foundation for geometry-native checks.
+Declared-intent checks such as mechanical fit or process-specific design rules
+may return after geometry-native inspection is useful on ordinary CAD files.
+They should add semantic intent where geometry alone is insufficient, not
+become a prerequisite for opening or checking a project.
 
 ## Not now
 
 - ISO certification claims
 - FEA or stress simulation
 - Exact overlap-volume computation without a proven Boolean geometry backend
-- A generic check framework or pack schema before a second native check needs it
+- A generic check framework before a second native check needs it

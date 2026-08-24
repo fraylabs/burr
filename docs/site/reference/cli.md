@@ -1,22 +1,11 @@
 # CLI Reference
 
-Burr ships as a Rust CLI named `burr`.
-
-Install:
-
-```bash
-cargo install burr --version 0.30.0
-```
-
-## Commands
+Burr ships as one Rust CLI:
 
 ```txt
-burr --version
 burr <folder>
-burr init <folder>
-burr check [--rulepack <selector>] [--no-write-receipt] <folder|burr-design-data.json>...
-burr explain [--json] <folder|burr-receipt.json|repair-report.json>...
-burr stamp <folder|burr-design-data.json>...
+burr --help
+burr --version
 ```
 
 ## `burr <folder>`
@@ -30,18 +19,17 @@ burr models
 
 The sidebar preserves nested folders while hiding unrelated files and common
 build directories. Burr renders with Look on the local machine and refreshes
-the active model when its source changes. Without project configuration, no
-`models/` convention is required; passing `models` simply limits the browser to
-that subtree.
+the active model when its source changes.
+
+The viewport starts in X-ray mode so enclosed or occluded component
+occurrences remain visible. Solid mode is available from the viewport switch.
 
 For STEP assemblies with at least two component occurrences, the Checks tab
-runs Burr's geometry-native `assembly-interference` check. A finding can
-highlight its two components in the viewer. Face-touching pairs are accepted;
-surface crossings, containment, and coincident occurrences fail. Unsupported
-or inconclusive inputs report `incomplete`, not `pass`. The current check does
-not claim exact Boolean overlap volume.
+runs Burr's geometry-native `assembly-interference` check. Face-touching pairs
+are accepted; surface crossings, containment, and coincident occurrences fail.
+Unsupported or inconclusive inputs report `incomplete`, not `pass`.
 
-The selected model's versioned result is also available locally at:
+The selected model's versioned result is available locally at:
 
 ```txt
 GET /api/checks?path=<project-relative-model-path>
@@ -49,84 +37,5 @@ GET /api/checks?path=<project-relative-model-path>
 
 When the nearest project root contains `.burr/config.toml`, Burr scans only the
 declared `project.models` directories. Missing configuration retains the
-zero-configuration folder behavior. Check and rulepack configuration is not
-part of the workbench contract; invalid configuration stops startup with an
-explicit error.
-
-## Legacy 0.30 commands
-
-The following commands remain available for the published declared-intent
-workflow. They are not used by `burr .` and are not the foundation for planned
-geometry-native checks.
-
-### `burr init`
-
-Creates a minimal `build123d` starter project:
-
-```bash
-burr init my-part
-cd my-part
-uv sync
-uv run python design.py
-burr check .
-```
-
-The generated design data explicitly selects `builtin:actuator_mount`; the
-starter does not depend on an implicit default.
-
-### `burr check`
-
-Runs the linter:
-
-```txt
-find burr-design-data.json
-  -> verify supported schema versions
-  -> verify source and artifact hashes
-  -> require and load an explicitly selected rulepack
-  -> validate rulepack compatibility and contract
-  -> check declared features
-  -> report warnings and checked/unchecked coverage
-  -> write burr-receipt.json
-```
-
-Use `--no-write-receipt` when a caller only wants terminal output. Select a
-rulepack in design data or with `--rulepack`; Burr has no implicit fallback.
-Both built-in and file selectors are supported:
-
-```bash
-burr check --rulepack builtin:actuator_mount .
-burr check --rulepack rules/printed_plate.rulepack.json .
-```
-
-The command prints receipt warnings and checked/unchecked feature coverage. Its
-exit code follows the trust outcome:
-
-| Outcome | Exit | Meaning |
-| --- | ---: | --- |
-| `pass` | `0` | The selected rulepack was compatible and evaluated checks passed with complete required mechanical coverage. |
-| `fail` | `1` | A checked claim failed or the rulepack contract is invalid. |
-| invocation/configuration error | `2` | Burr could not read or select the requested inputs. |
-| `incomplete` | `3` | Burr ran, but could not establish complete required mechanical coverage. |
-
-For multiple targets, any `fail` produces exit `1`; otherwise any `incomplete`
-produces exit `3`. Invocation and read errors remain exit `2`.
-
-### `burr explain`
-
-Expands failed checks into fix guidance:
-
-```bash
-burr explain .
-burr explain --json .
-```
-
-Human output is for review. JSON output is for agent repair loops. For an
-`incomplete` receipt, both forms retain scope warnings; the JSON repair packet
-also includes `scope`, `warnings`, and normalized `incomplete_reasons` so a
-caller does not mistake an empty failure list for a passing result. Consumers
-must require `burr.repair-packet.v2`; multi-input JSON uses
-`burr.repair-packet-list.v2`.
-
-### `burr stamp`
-
-Updates declared source and artifact hashes in `burr-design-data.json`.
+zero-configuration folder behavior. Invalid configuration stops startup with
+an explicit error.
