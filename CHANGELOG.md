@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.31.0 - 2026-08-24
+
 - Add `burr <folder>` (normally `burr .`), a Look-powered local browser for
   recursively discovered STEP, STL, and GLB files with a collapsible folder
   tree and automatic active-model refresh.
