@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+## 0.31.0 - 2026-08-24
+
+- Add `burr <folder>` (normally `burr .`), a Look-powered local browser for
+  recursively discovered STEP, STL, and GLB files with a collapsible folder
+  tree and automatic active-model refresh.
+- Keep the workbench geometry-first: `.burr/config.toml` scopes model folders
+  only.
+- Add one geometry-native STEP assembly interference check with explicit
+  pass/fail/incomplete outcomes, separated-versus-touching-versus-intersecting
+  fixtures, containment detection, file-version caching, and selectable
+  two-component highlighting in the Look viewer.
+- Add X-ray and Solid viewer modes, defaulting to X-ray so enclosed
+  or occluded assembly components remain visible.
+- Remove the retired receipt/rulepack product, including the `init`, `check`,
+  `explain`, and `stamp` commands, Python adapters, schemas, examples, repair
+  automation, and publishing lanes. Historical releases remain available from
+  Git history and version tags.
+- Make the npm manifest a private task runner; Burr's distribution surface is
+  the versioned public Git source until Look's dependency stack can support a
+  crates.io release.
+
 ## 0.30.0
 
 - Added the `burr.receipt.v2` three-state trust contract: `pass` means the selected
