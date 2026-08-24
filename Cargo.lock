@@ -217,6 +217,7 @@ checksum = "72f5acc6cb2ba439de613abc23857ec3d78374d8ed5ac84e9d11336e87da8649"
 name = "burr"
 version = "0.30.0"
 dependencies = [
+ "glam",
  "look",
  "percent-encoding",
  "serde",
@@ -225,6 +226,7 @@ dependencies = [
  "tempfile",
  "tiny_http",
  "toml",
+ "truck-meshalgo",
 ]
 
 [[package]]

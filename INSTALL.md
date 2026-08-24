@@ -37,6 +37,12 @@ The viewer is local, recursively follows folders, and refreshes changed model
 files. It uses Look's native Rust scene compiler and self-contained browser
 viewer; it does not require a separate JavaScript app or upload models.
 
+STEP assemblies with at least two component occurrences also receive Burr's
+geometry-native intersection check. The Checks tab distinguishes separated or
+face-touching components from surface crossings and containment, and a selected
+finding highlights its two components. Unsupported or inconclusive files are
+reported as `incomplete` rather than passing silently.
+
 Projects may declare model roots in `.burr/config.toml`. Burr uses the nearest
 configuration at or above the requested folder; without one, the requested
 folder remains the model root. Check and rulepack configuration is not part of

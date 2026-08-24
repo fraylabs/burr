@@ -146,6 +146,73 @@
         white-space: nowrap;
       }
 
+      .sidebar-tabs {
+        flex: 0 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+        padding: 8px 9px;
+        border-bottom: 1px solid var(--border);
+        background: var(--sidebar);
+      }
+
+      .sidebar-tab {
+        min-width: 0;
+        min-height: 31px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 10px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .sidebar-tab:hover {
+        background: var(--surface-hover);
+        color: var(--text-secondary);
+      }
+
+      .sidebar-tab[aria-selected="true"] {
+        border-color: var(--border);
+        background: var(--surface);
+        color: var(--text);
+      }
+
+      .check-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--text-muted);
+      }
+
+      .check-dot.pass {
+        background: var(--success);
+      }
+
+      .check-dot.fail {
+        background: var(--danger);
+      }
+
+      .check-dot.incomplete {
+        background: var(--accent);
+      }
+
+      .side-panel {
+        min-height: 0;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .side-panel[hidden] {
+        display: none;
+      }
+
       .tree-toolbar {
         flex: 0 0 auto;
         display: flex;
@@ -318,6 +385,125 @@
         line-height: 1.55;
       }
 
+      .checks-panel {
+        overflow: auto;
+        padding: 14px 12px 18px;
+        scrollbar-color: var(--border-strong) transparent;
+        scrollbar-width: thin;
+      }
+
+      .check-card {
+        padding: 13px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface);
+      }
+
+      .check-card + .check-card,
+      .finding-list {
+        margin-top: 10px;
+      }
+
+      .check-status-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .check-status {
+        color: var(--text);
+        font-size: 11px;
+        font-weight: 750;
+        text-transform: capitalize;
+      }
+
+      .check-summary,
+      .check-reason {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 10px;
+        line-height: 1.55;
+      }
+
+      .check-reason + .check-reason {
+        margin-top: 7px;
+      }
+
+      .finding-list {
+        display: grid;
+        gap: 7px;
+      }
+
+      .finding {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 3px minmax(0, 1fr);
+        gap: 10px;
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--surface);
+        color: var(--text-secondary);
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .finding::before {
+        content: "";
+        border-radius: var(--radius-pill);
+        background: var(--danger);
+      }
+
+      .finding:hover,
+      .finding[aria-current="true"] {
+        border-color: var(--border-strong);
+        background: var(--surface-selected);
+      }
+
+      .finding[aria-current="true"] {
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+      }
+
+      .finding strong,
+      .finding span {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .finding strong {
+        color: var(--text);
+        font-size: 10px;
+      }
+
+      .finding span {
+        margin-top: 3px;
+        color: var(--text-muted);
+        font-size: 9px;
+      }
+
+      .clear-highlight {
+        width: 100%;
+        margin-top: 10px;
+        padding: 7px 9px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 9px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .clear-highlight:hover {
+        border-color: var(--border-strong);
+        background: var(--surface-hover);
+        color: var(--text);
+      }
+
       .sidebar-footer {
         flex: 0 0 auto;
         display: flex;
@@ -479,12 +665,54 @@
           </div>
         </header>
 
-        <div class="tree-toolbar">
-          <strong>Models</strong>
-          <span id="model-count" class="model-count">0</span>
+        <div class="sidebar-tabs" role="tablist" aria-label="Burr workbench">
+          <button
+            id="models-tab"
+            class="sidebar-tab"
+            type="button"
+            role="tab"
+            aria-controls="models-panel"
+            aria-selected="true"
+          >
+            Models
+          </button>
+          <button
+            id="checks-tab"
+            class="sidebar-tab"
+            type="button"
+            role="tab"
+            aria-controls="checks-panel"
+            aria-selected="false"
+          >
+            <span id="check-dot" class="check-dot" aria-hidden="true"></span>
+            Checks
+          </button>
         </div>
 
-        <nav id="tree" class="tree" aria-label="Supported model files"></nav>
+        <section id="models-panel" class="side-panel" role="tabpanel" aria-labelledby="models-tab">
+          <div class="tree-toolbar">
+            <strong>Files</strong>
+            <span id="model-count" class="model-count">0</span>
+          </div>
+
+          <nav id="tree" class="tree" aria-label="Supported model files"></nav>
+        </section>
+
+        <section
+          id="checks-panel"
+          class="side-panel checks-panel"
+          role="tabpanel"
+          aria-labelledby="checks-tab"
+          hidden
+        >
+          <div id="checks-content" class="check-card">
+            <div class="check-status-line">
+              <span class="check-dot" aria-hidden="true"></span>
+              <span class="check-status">Select a model</span>
+            </div>
+            <p class="check-summary">Burr checks STEP assemblies for intersecting components.</p>
+          </div>
+        </section>
 
         <footer class="sidebar-footer">
           <div class="watch-status-group">
@@ -522,6 +750,12 @@
       const rootName = document.querySelector("#root-name");
       const modelCount = document.querySelector("#model-count");
       const tree = document.querySelector("#tree");
+      const modelsTab = document.querySelector("#models-tab");
+      const checksTab = document.querySelector("#checks-tab");
+      const modelsPanel = document.querySelector("#models-panel");
+      const checksPanel = document.querySelector("#checks-panel");
+      const checksContent = document.querySelector("#checks-content");
+      const checkDot = document.querySelector("#check-dot");
       const viewer = document.querySelector("#model-viewer");
       const emptyState = document.querySelector("#empty-state");
       const loadingState = document.querySelector("#loading-state");
@@ -539,6 +773,9 @@
         expanded: new Set(),
         initialized: false,
         refreshing: false,
+        checkRequest: 0,
+        checkReport: null,
+        focusedFinding: null,
         theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
       };
 
@@ -549,10 +786,20 @@
       themeToggle.addEventListener("click", () => {
         setTheme(state.theme === "dark" ? "light" : "dark", true, true);
       });
+      modelsTab.addEventListener("click", () => showPanel("models"));
+      checksTab.addEventListener("click", () => showPanel("checks"));
 
       setTheme(state.theme, false, false);
       refreshTree();
       setInterval(refreshTree, 1000);
+
+      function showPanel(panel) {
+        const showingChecks = panel === "checks";
+        modelsTab.setAttribute("aria-selected", String(!showingChecks));
+        checksTab.setAttribute("aria-selected", String(showingChecks));
+        modelsPanel.hidden = showingChecks;
+        checksPanel.hidden = !showingChecks;
+      }
 
       async function refreshTree() {
         if (state.refreshing) return;
@@ -593,9 +840,13 @@
         if (files.length === 0) {
           state.selectedPath = null;
           state.selectedVersion = null;
+          state.checkRequest += 1;
+          state.checkReport = null;
+          state.focusedFinding = null;
           viewer.removeAttribute("src");
           loadingState.hidden = true;
           emptyState.hidden = false;
+          renderChecksEmpty();
           return;
         }
 
@@ -698,8 +949,14 @@
       function selectFile(file, refreshed = false) {
         state.selectedPath = file.path;
         state.selectedVersion = file.version;
+        state.focusedFinding = null;
         updateCurrentSelection();
         emptyState.hidden = true;
+        openViewer(file, refreshed);
+        loadChecks(file);
+      }
+
+      function openViewer(file, refreshed = false, focus = null) {
         loadingState.hidden = false;
         loadingTitle.textContent = refreshed ? `Reloading ${file.name}` : `Opening ${file.name}`;
         const query = new URLSearchParams({
@@ -707,7 +964,142 @@
           v: file.version,
           theme: state.theme,
         });
+        if (focus) query.set("focus", focus.join(","));
         viewer.src = `/viewer?${query}`;
+      }
+
+      async function loadChecks(file) {
+        const request = ++state.checkRequest;
+        state.checkReport = null;
+        setCheckIndicator(null);
+        renderCheckMessage("Checking", "Inspecting component geometry locally.", null);
+        try {
+          const query = new URLSearchParams({ path: file.path, v: file.version });
+          const response = await fetch(`/api/checks?${query}`, { cache: "no-store" });
+          if (!response.ok) throw new Error(`Check request failed: ${response.status}`);
+          const report = await response.json();
+          if (
+            request !== state.checkRequest ||
+            file.path !== state.selectedPath ||
+            file.version !== state.selectedVersion
+          ) {
+            return;
+          }
+          state.checkReport = report;
+          setCheckIndicator(report.outcome);
+          renderChecks(report);
+        } catch (error) {
+          if (request !== state.checkRequest) return;
+          setCheckIndicator("incomplete");
+          renderCheckMessage(
+            "Incomplete",
+            "Burr could not inspect the selected model.",
+            "incomplete",
+          );
+          console.error(error);
+        }
+      }
+
+      function renderChecks(report) {
+        renderCheckMessage(capitalize(report.outcome), report.summary, report.outcome);
+        for (const reason of report.incomplete_reasons || []) {
+          const message = document.createElement("p");
+          message.className = "check-reason";
+          message.textContent = reason.message;
+          checksContent.append(message);
+        }
+
+        if (report.findings?.length) {
+          const list = document.createElement("div");
+          list.className = "finding-list";
+          for (const finding of report.findings) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "finding";
+            button.setAttribute(
+              "aria-current",
+              String(finding.id === state.focusedFinding),
+            );
+            button.title = finding.message;
+
+            const content = document.createElement("div");
+            const title = document.createElement("strong");
+            title.textContent = `${finding.components[0].name} × ${finding.components[1].name}`;
+            const kind = document.createElement("span");
+            kind.textContent = witnessLabel(finding.witness?.kind);
+            content.append(title, kind);
+            button.append(content);
+            button.addEventListener("click", () => focusFinding(finding));
+            list.append(button);
+          }
+          checksContent.append(list);
+        }
+
+        if (state.focusedFinding) {
+          const clear = document.createElement("button");
+          clear.type = "button";
+          clear.className = "clear-highlight";
+          clear.textContent = "Clear component highlight";
+          clear.addEventListener("click", clearFindingFocus);
+          checksContent.append(clear);
+        }
+      }
+
+      function renderChecksEmpty() {
+        setCheckIndicator(null);
+        renderCheckMessage(
+          "Select a model",
+          "Burr checks STEP assemblies for intersecting components.",
+          null,
+        );
+      }
+
+      function renderCheckMessage(status, summary, outcome) {
+        checksContent.replaceChildren();
+        const line = document.createElement("div");
+        line.className = "check-status-line";
+        const dot = document.createElement("span");
+        dot.className = `check-dot${outcome ? ` ${outcome}` : ""}`;
+        dot.setAttribute("aria-hidden", "true");
+        const label = document.createElement("span");
+        label.className = "check-status";
+        label.textContent = status;
+        line.append(dot, label);
+        const description = document.createElement("p");
+        description.className = "check-summary";
+        description.textContent = summary;
+        checksContent.append(line, description);
+      }
+
+      function setCheckIndicator(outcome) {
+        checkDot.className = `check-dot${outcome ? ` ${outcome}` : ""}`;
+      }
+
+      function focusFinding(finding) {
+        const file = state.files.find((candidate) => candidate.path === state.selectedPath);
+        if (!file) return;
+        state.focusedFinding = finding.id;
+        renderChecks(state.checkReport);
+        const focus = finding.components.map((component) => component.occurrence_index);
+        openViewer(file, false, focus);
+      }
+
+      function clearFindingFocus() {
+        const file = state.files.find((candidate) => candidate.path === state.selectedPath);
+        if (!file) return;
+        state.focusedFinding = null;
+        renderChecks(state.checkReport);
+        openViewer(file);
+      }
+
+      function capitalize(value) {
+        return value ? value[0].toUpperCase() + value.slice(1) : "Unknown";
+      }
+
+      function witnessLabel(kind) {
+        if (kind === "containment") return "Contained component";
+        if (kind === "coincident_occurrence") return "Coincident components";
+        return "Intersecting surfaces";
       }
 
       function setTheme(theme, persist, reloadViewer) {
@@ -724,7 +1116,15 @@
         if (persist) localStorage.setItem("burr-theme", state.theme);
         if (reloadViewer && state.selectedPath) {
           const selected = state.files.find((file) => file.path === state.selectedPath);
-          if (selected) selectFile(selected, true);
+          if (selected) {
+            const finding = state.checkReport?.findings?.find(
+              (candidate) => candidate.id === state.focusedFinding,
+            );
+            const focus = finding
+              ? finding.components.map((component) => component.occurrence_index)
+              : null;
+            openViewer(selected, true, focus);
+          }
         }
       }
 

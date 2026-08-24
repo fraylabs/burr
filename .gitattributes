@@ -1,0 +1,2 @@
+# Generated CAD fixtures are reproducible artifacts, not reviewable source.
+tests/fixtures/intersections/*.step binary

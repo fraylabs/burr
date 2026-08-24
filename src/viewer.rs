@@ -1,7 +1,10 @@
-use crate::project::Project;
+use crate::{
+    intersections::{self, CheckReport},
+    project::Project,
+};
 use look::{
     config::{LightingConfig, UpAxis},
-    scene::{compile_scene, prepare_source_textures},
+    scene::{compile_scene, prepare_source_textures, CompiledScene, SourceVertexAttributes},
     timing::Timings,
     ui::generate_html_viewer,
 };
@@ -39,10 +42,51 @@ struct ModelFile {
     version: String,
 }
 
-#[derive(Clone)]
-struct CachedViewer {
+struct CachedModel {
     version: String,
-    html: String,
+    scene: CompiledScene,
+    report: CheckReport,
+    viewers: HashMap<(ViewerTheme, Option<FocusPair>), String>,
+}
+
+type ModelCache = HashMap<PathBuf, CachedModel>;
+
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+struct FocusPair {
+    first: usize,
+    second: usize,
+}
+
+impl FocusPair {
+    fn from_query(value: Option<&str>) -> Result<Option<Self>, String> {
+        let Some(value) = value else {
+            return Ok(None);
+        };
+        let Some((first, second)) = value.split_once(',') else {
+            return Err("Viewer focus must contain two component indexes.".to_string());
+        };
+        let first = first
+            .parse::<usize>()
+            .map_err(|_| "Viewer focus contains an invalid component index.".to_string())?;
+        let second = second
+            .parse::<usize>()
+            .map_err(|_| "Viewer focus contains an invalid component index.".to_string())?;
+        if first == second {
+            return Err("Viewer focus must contain two different components.".to_string());
+        }
+        Ok(Some(if first < second {
+            Self { first, second }
+        } else {
+            Self {
+                first: second,
+                second: first,
+            }
+        }))
+    }
+
+    fn label(self) -> String {
+        format!("{},{}", self.first, self.second)
+    }
 }
 
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
@@ -163,7 +207,7 @@ pub fn run(start: PathBuf) -> Result<(), String> {
 fn handle_request(
     request: Request,
     project: &Project,
-    cache: &mut HashMap<(PathBuf, ViewerTheme), CachedViewer>,
+    cache: &mut ModelCache,
 ) -> Result<(), String> {
     if request.method() != &Method::Get {
         return respond(
@@ -225,12 +269,31 @@ fn handle_request(
         "/assets/burr-logo.png" | "/favicon.ico" => {
             respond_bytes(request, 200, "image/png", LOGO_PNG.to_vec())
         }
+        "/api/checks" => {
+            let Some(relative_path) = query_value(&url, "path") else {
+                return respond_json_error(request, 400, "No model path was provided.");
+            };
+            match check_model(project, &relative_path, cache) {
+                Ok(report) => respond(
+                    request,
+                    200,
+                    "application/json; charset=utf-8",
+                    serde_json::to_string(&report)
+                        .map_err(|error| format!("Failed to encode check result: {error}"))?,
+                ),
+                Err(error) => respond_json_error(request, 422, &error),
+            }
+        }
         "/viewer" => {
             let Some(relative_path) = query_value(&url, "path") else {
                 return respond_html_error(request, 400, "No model path was provided.");
             };
             let theme = ViewerTheme::from_query(query_value(&url, "theme").as_deref());
-            match render_model(project, &relative_path, theme, cache) {
+            let focus = match FocusPair::from_query(query_value(&url, "focus").as_deref()) {
+                Ok(focus) => focus,
+                Err(error) => return respond_html_error(request, 400, &error),
+            };
+            match render_model(project, &relative_path, theme, focus, cache) {
                 Ok(html) => respond(request, 200, "text/html; charset=utf-8", html),
                 Err(error) => respond_html_error(request, 422, &error),
             }
@@ -248,17 +311,60 @@ fn render_model(
     project: &Project,
     relative_path: &str,
     theme: ViewerTheme,
-    cache: &mut HashMap<(PathBuf, ViewerTheme), CachedViewer>,
+    focus: Option<FocusPair>,
+    cache: &mut ModelCache,
 ) -> Result<String, String> {
-    let path = resolve_model_path(project, relative_path)?;
-    let version = file_version(&path)?;
-    let cache_key = (path.clone(), theme);
-    if let Some(cached) = cache.get(&cache_key) {
-        if cached.version == version {
-            return Ok(cached.html.clone());
+    let cached = load_model(project, relative_path, cache)?;
+    if let Some(focus) = focus {
+        if focus.second >= cached.scene.instances.len() {
+            return Err("Viewer focus references a missing component.".to_string());
         }
     }
+    let viewer_key = (theme, focus);
+    if let Some(html) = cached.viewers.get(&viewer_key) {
+        return Ok(html.clone());
+    }
 
+    let scene = focus
+        .map(|focus| highlighted_scene(&cached.scene, focus))
+        .unwrap_or_else(|| cached.scene.clone());
+    let lighting = theme.lighting();
+    let html = generate_html_viewer(
+        &scene,
+        relative_path,
+        &scene.statistics,
+        &lighting,
+        theme.canvas_background(),
+    )
+    .map_err(|error| format!("Look could not build the viewer for {relative_path}: {error:#}"))?;
+    let html = inject_viewer_theme(html, theme, focus)?;
+    cached.viewers.insert(viewer_key, html.clone());
+    Ok(html)
+}
+
+fn check_model(
+    project: &Project,
+    relative_path: &str,
+    cache: &mut ModelCache,
+) -> Result<CheckReport, String> {
+    load_model(project, relative_path, cache).map(|cached| cached.report.clone())
+}
+
+fn load_model<'a>(
+    project: &Project,
+    relative_path: &str,
+    cache: &'a mut ModelCache,
+) -> Result<&'a mut CachedModel, String> {
+    let path = resolve_model_path(project, relative_path)?;
+    let version = file_version(&path)?;
+    let current = cache
+        .get(&path)
+        .is_some_and(|cached| cached.version == version);
+    if current {
+        return cache
+            .get_mut(&path)
+            .ok_or_else(|| "Viewer model cache became unavailable.".to_string());
+    }
     let mut timings = Timings::default();
     let up_axis = if model_format(&path) == Some("GLB") {
         UpAxis::Y
@@ -273,28 +379,73 @@ fn render_model(
     // little breathing room for the shorter iframe viewport created by Burr's
     // navigation shell and for models whose diagonal approaches that sphere.
     scene.fit_radius *= VIEWER_FRAMING_MARGIN;
-    let lighting = theme.lighting();
-    let html = generate_html_viewer(
-        &scene,
-        relative_path,
-        &scene.statistics,
-        &lighting,
-        theme.canvas_background(),
-    )
-    .map_err(|error| format!("Look could not build the viewer for {relative_path}: {error:#}"))?;
-    let html = inject_viewer_theme(html, theme)?;
-
+    let report = if model_format(&path) == Some("STEP") {
+        intersections::analyze_scene(relative_path, &version, &scene)
+    } else {
+        CheckReport::unsupported(
+            relative_path,
+            &version,
+            "Assembly intersection currently supports STEP files only.",
+        )
+    };
     cache.insert(
-        cache_key,
-        CachedViewer {
+        path.clone(),
+        CachedModel {
             version,
-            html: html.clone(),
+            scene,
+            report,
+            viewers: HashMap::new(),
         },
     );
-    Ok(html)
+    cache
+        .get_mut(&path)
+        .ok_or_else(|| "Viewer model cache became unavailable.".to_string())
 }
 
-fn inject_viewer_theme(html: String, theme: ViewerTheme) -> Result<String, String> {
+fn highlighted_scene(scene: &CompiledScene, focus: FocusPair) -> CompiledScene {
+    const MUTED: [f32; 4] = [0.28, 0.31, 0.33, 1.0];
+    const FIRST: [f32; 4] = [1.0, 0.34, 0.08, 1.0];
+    const SECOND: [f32; 4] = [0.12, 0.76, 0.94, 1.0];
+
+    let mut highlighted = scene.clone();
+    highlighted.geometries = scene
+        .instances
+        .iter()
+        .enumerate()
+        .map(|(index, instance)| {
+            let mut geometry = scene.geometries[instance.geometry].clone();
+            let color = if index == focus.first {
+                FIRST
+            } else if index == focus.second {
+                SECOND
+            } else {
+                MUTED
+            };
+            geometry.source_attributes = Some(
+                geometry
+                    .vertices
+                    .iter()
+                    .map(|_| SourceVertexAttributes {
+                        tex_coord_0: [0.0; 2],
+                        tex_coord_1: [0.0; 2],
+                        color,
+                    })
+                    .collect(),
+            );
+            geometry
+        })
+        .collect();
+    for (index, instance) in highlighted.instances.iter_mut().enumerate() {
+        instance.geometry = index;
+    }
+    highlighted
+}
+
+fn inject_viewer_theme(
+    html: String,
+    theme: ViewerTheme,
+    focus: Option<FocusPair>,
+) -> Result<String, String> {
     let marker = "</head>";
     let Some(index) = html.find(marker) else {
         return Err("Look viewer HTML did not contain a head element.".to_string());
@@ -304,9 +455,16 @@ fn inject_viewer_theme(html: String, theme: ViewerTheme) -> Result<String, Strin
         theme.name(),
         theme.viewer_css()
     );
-    let mut themed = String::with_capacity(html.len() + theme_style.len());
+    let focus_marker = focus.map_or_else(String::new, |focus| {
+        format!(
+            "<meta name=\"burr-highlighted-components\" content=\"{}\">",
+            focus.label()
+        )
+    });
+    let mut themed = String::with_capacity(html.len() + theme_style.len() + focus_marker.len());
     themed.push_str(&html[..index]);
     themed.push_str(&theme_style);
+    themed.push_str(&focus_marker);
     themed.push_str(&html[index..]);
     Ok(themed)
 }
@@ -612,9 +770,31 @@ mod tests {
     #[test]
     fn viewer_theme_is_injected_into_look_html() {
         let html = "<!doctype html><html><head></head><body></body></html>".to_string();
-        let themed = inject_viewer_theme(html, ViewerTheme::Light).unwrap();
+        let themed = inject_viewer_theme(
+            html,
+            ViewerTheme::Light,
+            Some(FocusPair {
+                first: 2,
+                second: 5,
+            }),
+        )
+        .unwrap();
         assert!(themed.contains("data-burr-theme=\"light\""));
         assert!(themed.contains("background-color: #c9ced0"));
-        assert!(themed.contains("</style></head>"));
+        assert!(themed.contains("name=\"burr-highlighted-components\" content=\"2,5\""));
+        assert!(themed.contains("</style><meta"));
+    }
+
+    #[test]
+    fn viewer_focus_is_sorted_and_rejects_invalid_pairs() {
+        assert_eq!(
+            FocusPair::from_query(Some("5,2")).unwrap(),
+            Some(FocusPair {
+                first: 2,
+                second: 5,
+            })
+        );
+        assert!(FocusPair::from_query(Some("2,2")).is_err());
+        assert!(FocusPair::from_query(Some("two,5")).is_err());
     }
 }

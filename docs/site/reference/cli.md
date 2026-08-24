@@ -34,6 +34,19 @@ the active model when its source changes. Without project configuration, no
 `models/` convention is required; passing `models` simply limits the browser to
 that subtree.
 
+For STEP assemblies with at least two component occurrences, the Checks tab
+runs Burr's geometry-native `assembly-intersection` check. A finding can
+highlight its two components in the viewer. Face-touching pairs are accepted;
+surface crossings, containment, and coincident occurrences fail. Unsupported
+or inconclusive inputs report `incomplete`, not `pass`. The current check does
+not claim exact Boolean overlap volume.
+
+The selected model's versioned result is also available locally at:
+
+```txt
+GET /api/checks?path=<project-relative-model-path>
+```
+
 When the nearest project root contains `.burr/config.toml`, Burr scans only the
 declared `project.models` directories. Missing configuration retains the
 zero-configuration folder behavior. Check and rulepack configuration is not

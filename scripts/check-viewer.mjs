@@ -17,19 +17,25 @@ const fixture = path.join(
   "enclosure",
   "counterbore.step",
 )
+const intersectionFixtures = path.join(repoRoot, "tests", "fixtures", "intersections")
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "burr-viewer-check-"))
 const modelDirectory = path.join(tempRoot, "models", "enclosure")
 const modelPath = path.join(modelDirectory, "counterbore.step")
+const assemblyDirectory = path.join(tempRoot, "models", "assemblies")
 const ignoredDirectory = path.join(tempRoot, "notes")
 const unconfiguredModelDirectory = path.join(tempRoot, "archive")
 const port = await availablePort()
 const baseUrl = `http://127.0.0.1:${port}`
 
 fs.mkdirSync(modelDirectory, { recursive: true })
+fs.mkdirSync(assemblyDirectory, { recursive: true })
 fs.mkdirSync(ignoredDirectory, { recursive: true })
 fs.mkdirSync(unconfiguredModelDirectory, { recursive: true })
 fs.mkdirSync(path.join(tempRoot, ".burr"), { recursive: true })
 fs.copyFileSync(fixture, modelPath)
+for (const name of ["contained.step", "intersecting.step", "separated.step", "touching.step"]) {
+  fs.copyFileSync(path.join(intersectionFixtures, name), path.join(assemblyDirectory, name))
+}
 fs.copyFileSync(fixture, path.join(unconfiguredModelDirectory, "not-configured.step"))
 fs.writeFileSync(path.join(ignoredDirectory, "readme.txt"), "not a model\n")
 fs.writeFileSync(
@@ -78,10 +84,56 @@ try {
   expectEqual("packs" in project, false, "project state has no premature pack contract")
 
   const initialTree = await getJson("/api/tree")
-  expectEqual(initialTree.files?.length, 1, "filtered model count")
-  expectEqual(initialTree.files?.[0]?.path, "models/enclosure/counterbore.step", "model path")
-  expectEqual(initialTree.files?.[0]?.format, "STEP", "model format")
-  const initialVersion = initialTree.files[0].version
+  expectEqual(initialTree.files?.length, 5, "filtered model count")
+  const counterbore = model(initialTree, "models/enclosure/counterbore.step")
+  expectEqual(counterbore.format, "STEP", "model format")
+  const initialVersion = counterbore.version
+
+  const shellResponse = await fetch(`${baseUrl}/`)
+  expectEqual(shellResponse.status, 200, "workbench shell status")
+  const shellHtml = await shellResponse.text()
+  expectIncludes(shellHtml, 'id="checks-tab"', "checks tab")
+  expectIncludes(shellHtml, 'id="checks-panel"', "checks panel")
+
+  const singleReport = await getJson(
+    `/api/checks?path=${encodeURIComponent(counterbore.path)}`,
+  )
+  expectEqual(singleReport.schema_version, "burr.checks.v1", "check report schema")
+  expectEqual(singleReport.check_id, "assembly-intersection", "geometry-native check id")
+  expectEqual(singleReport.outcome, "incomplete", "single-part check outcome")
+  expectEqual(singleReport.incomplete_reasons?.[0]?.code, "assembly_required", "single-part reason")
+
+  const separated = model(initialTree, "models/assemblies/separated.step")
+  const separatedReport = await getJson(
+    `/api/checks?path=${encodeURIComponent(separated.path)}`,
+  )
+  expectEqual(separatedReport.outcome, "pass", "separated assembly outcome")
+  expectEqual(separatedReport.checked_pair_count, 1, "separated pair count")
+
+  const touching = model(initialTree, "models/assemblies/touching.step")
+  const touchingReport = await getJson(`/api/checks?path=${encodeURIComponent(touching.path)}`)
+  expectEqual(touchingReport.outcome, "pass", "face-touching assembly outcome")
+
+  const intersecting = model(initialTree, "models/assemblies/intersecting.step")
+  const intersectingReport = await getJson(
+    `/api/checks?path=${encodeURIComponent(intersecting.path)}`,
+  )
+  expectEqual(intersectingReport.outcome, "fail", "intersecting assembly outcome")
+  expectEqual(intersectingReport.findings?.length, 1, "intersection finding count")
+  expectEqual(
+    intersectingReport.findings?.[0]?.witness?.kind,
+    "surface_crossing",
+    "intersection witness kind",
+  )
+
+  const contained = model(initialTree, "models/assemblies/contained.step")
+  const containedReport = await getJson(`/api/checks?path=${encodeURIComponent(contained.path)}`)
+  expectEqual(containedReport.outcome, "fail", "contained assembly outcome")
+  expectEqual(
+    containedReport.findings?.[0]?.witness?.kind,
+    "containment",
+    "containment witness kind",
+  )
 
   const logoResponse = await fetch(`${baseUrl}/assets/burr-logo.png`)
   expectEqual(logoResponse.status, 200, "logo response status")
@@ -95,7 +147,7 @@ try {
   )
 
   const viewerResponse = await fetch(
-    `${baseUrl}/viewer?path=${encodeURIComponent(initialTree.files[0].path)}&theme=dark`,
+    `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&theme=dark`,
   )
   expectEqual(viewerResponse.status, 200, "viewer response status")
   const viewerHtml = await viewerResponse.text()
@@ -106,7 +158,7 @@ try {
   expectIncludes(viewerHtml, "background-color: #0c0d10", "dark viewer surface")
 
   const lightViewerResponse = await fetch(
-    `${baseUrl}/viewer?path=${encodeURIComponent(initialTree.files[0].path)}&theme=light`,
+    `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&theme=light`,
   )
   expectEqual(lightViewerResponse.status, 200, "light viewer response status")
   const lightViewerHtml = await lightViewerResponse.text()
@@ -114,29 +166,62 @@ try {
   expectIncludes(lightViewerHtml, "background-color: #c9ced0", "light viewer surface")
   expectEqual(lightViewerHtml === viewerHtml, false, "theme-specific viewer output")
 
+  const focusedComponents = intersectingReport.findings[0].components.map(
+    (component) => component.occurrence_index,
+  )
+  const focusedViewerResponse = await fetch(
+    `${baseUrl}/viewer?path=${encodeURIComponent(intersecting.path)}&theme=dark&focus=${focusedComponents.join(",")}`,
+  )
+  expectEqual(focusedViewerResponse.status, 200, "focused viewer response status")
+  const focusedViewerHtml = await focusedViewerResponse.text()
+  expectIncludes(
+    focusedViewerHtml,
+    `name="burr-highlighted-components" content="${focusedComponents.join(",")}"`,
+    "component highlight marker",
+  )
+  expectEqual(
+    focusedViewerHtml ===
+      (await (
+        await fetch(`${baseUrl}/viewer?path=${encodeURIComponent(intersecting.path)}&theme=dark`)
+      ).text()),
+    false,
+    "focused viewer colors differ",
+  )
+
+  const invalidFocus = await fetch(
+    `${baseUrl}/viewer?path=${encodeURIComponent(intersecting.path)}&focus=0,0`,
+  )
+  expectEqual(invalidFocus.status, 400, "invalid component focus status")
+
   const traversal = await fetch(`${baseUrl}/viewer?path=..%2FCargo.toml`)
   expectEqual(traversal.status, 422, "path traversal status")
   const unsupported = await fetch(
     `${baseUrl}/viewer?path=${encodeURIComponent("notes/readme.txt")}`,
   )
   expectEqual(unsupported.status, 422, "unsupported file status")
+  const checkTraversal = await fetch(`${baseUrl}/api/checks?path=..%2FCargo.toml`)
+  expectEqual(checkTraversal.status, 422, "check path traversal status")
 
   fs.appendFileSync(modelPath, "\n")
   const updatedTree = await waitForVersionChange(initialVersion)
-  const updatedVersion = updatedTree.files[0].version
+  const updatedVersion = model(updatedTree, counterbore.path).version
   if (updatedVersion === initialVersion) {
     throw new Error("viewer watcher did not detect the changed STEP file")
   }
 
   const refreshedViewer = await fetch(
-    `${baseUrl}/viewer?path=${encodeURIComponent(updatedTree.files[0].path)}&v=${encodeURIComponent(updatedVersion)}`,
+    `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&v=${encodeURIComponent(updatedVersion)}`,
   )
   expectEqual(refreshedViewer.status, 200, "refreshed viewer status")
   expectIncludes(await refreshedViewer.text(), "STEP B-REP", "refreshed Look viewer")
+  const refreshedReport = await getJson(
+    `/api/checks?path=${encodeURIComponent(counterbore.path)}`,
+  )
+  expectEqual(refreshedReport.model_version, updatedVersion, "refreshed check version")
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
 
   console.log(
-    `viewer proof passed (simple model scope enforced, dark/light Look HTML rendered, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (model scope enforced, STEP intersection pass/fail/incomplete proven, components highlighted, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)
@@ -183,10 +268,17 @@ async function waitForServer() {
 async function waitForVersionChange(initialVersion) {
   for (let attempt = 0; attempt < 40; attempt += 1) {
     const tree = await getJson("/api/tree")
-    if (tree.files?.[0]?.version !== initialVersion) return tree
+    const current = model(tree, "models/enclosure/counterbore.step")
+    if (current.version !== initialVersion) return tree
     await delay(100)
   }
   throw new Error("viewer did not observe the changed model within 4 seconds")
+}
+
+function model(tree, wantedPath) {
+  const found = tree.files?.find((file) => file.path === wantedPath)
+  if (!found) throw new Error(`model tree did not contain ${wantedPath}`)
+  return found
 }
 
 async function getJson(route) {

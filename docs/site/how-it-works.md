@@ -8,6 +8,7 @@ burr .
   -> preserve their folder hierarchy
   -> compile the selected model with Look
   -> render it in a local browser
+  -> inspect STEP assembly component intersections
   -> refresh when the source file changes
 ```
 
@@ -30,11 +31,21 @@ models = ["models"]
 The project contract contains model scope only. It does not define rulepacks or
 declared mechanical intent.
 
-## Geometry-native direction
+## Geometry-native assembly intersection
 
-Burr's next check will inspect actual STEP assembly geometry for overlapping
-solid volume and connect each interference finding back to the viewer. Later
-checks should reuse those stable body, face, and measurement references.
+Look preserves each STEP assembly occurrence's component name, mesh, and world
+transform. Burr checks those world-space component pairs with a strict bounds
+filter followed by mesh interference and containment evidence. Face contact is
+not an intersection.
+
+The Checks tab reports `pass`, `fail`, or `incomplete`. Selecting a finding
+highlights its two component occurrences in the same Look viewport. The result
+is cached with the compiled model and is replaced when the source version
+changes.
+
+A clean result requires a STEP assembly with at least two closed component
+meshes. Burr does not currently compute exact Boolean overlap volume. It does
+not turn an unsupported or inconclusive model into a pass.
 
 See the [roadmap](/burr/roadmap) for the order and explicit non-scope.
 

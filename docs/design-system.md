@@ -12,8 +12,8 @@ palette.
 3. **Reserve orange for attention.** Burr orange marks the selected item,
    keyboard focus, or a condition that deserves inspection. It is not general
    decoration.
-4. **Use status colours only for status.** Green means healthy watching; red
-   means the watcher or model load needs attention.
+4. **Use status colours only for status.** Green means a healthy watcher or
+   passing check; red means a failed check, watcher, or model load.
 5. **Theme the whole viewer.** Switching modes changes the shell, canvas, and
    Look controls together.
 
@@ -37,7 +37,7 @@ Components consume semantic tokens rather than raw palette names.
 | `steel-surface` | `#263239` | `#dce4e7` | Steel information backgrounds |
 | `accent` | `#f08a32` | `#d86d16` | Inspection, selection, and focus |
 | `success` | `#6fbd88` | `#3d8a58` | Healthy watcher state |
-| `danger` | `#dd746d` | `#b94f48` | Failed watcher or model state |
+| `danger` | `#dd746d` | `#b94f48` | Failed check, watcher, or model state |
 
 ## Shape, spacing, and type
 
@@ -72,6 +72,11 @@ interaction all change or survive together.
   polls for file changes.
 - The selected model uses the accent only as a narrow edge, never as a large
   fill.
+- The Checks tab shows only the result for the selected model. A finding names
+  its two components; selecting it uses orange and cyan on those bodies while
+  muting unrelated geometry.
+- `pass`, `fail`, and `incomplete` retain text labels. Colour reinforces status
+  but never carries the result alone.
 - Interactive controls have visible hover and `:focus-visible` states in both
   themes.
 - Text and meaningful controls target WCAG AA contrast. Decorative logo imagery

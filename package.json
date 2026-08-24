@@ -20,6 +20,7 @@
     "rules",
     "schemas",
     "scripts",
+    "tests/fixtures/intersections",
     "tests/fixtures/viewer/models/enclosure/counterbore.step",
     "examples/build123d-actuator/bad/design.py",
     "examples/build123d-actuator/good/design.py",

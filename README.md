@@ -2,15 +2,30 @@
 
 <img src="assets/burr-logo.png" width="128" alt="Burr logo">
 
-Burr is a fast, local CAD model browser moving toward geometry-native design
-checks.
+Burr is a fast, local CAD model browser with geometry-native STEP assembly
+intersection checking.
 
 Run `burr .` to browse the STEP, STL, and GLB files in a project without
-uploading them or generating sidecar metadata. The current workbench is kept
-deliberately simple: files, folders, themes, and the model viewport.
+uploading them or generating sidecar metadata. The workbench keeps the product
+loop deliberately small: browse a model, inspect its assembly intersections,
+and select a finding to highlight the two involved components.
 
-The next product proof is direct interference detection from STEP assembly
-geometry. See [`ROADMAP.md`](ROADMAP.md) for the sequence and deferred scope.
+## Geometry-native assembly intersections
+
+For a STEP assembly with at least two component occurrences, Burr checks every
+component pair directly from Look's tessellated geometry. The Checks tab reports
+three honest outcomes:
+
+- `pass`: Burr completed the supported check and detected no intersections;
+- `fail`: Burr found at least one surface crossing, contained component, or
+  coincident occurrence;
+- `incomplete`: the file is not a supported STEP assembly or its component
+  meshes cannot support a clean result.
+
+Face contact is allowed and does not fail. Findings name both components and
+can highlight them in the viewer. This first check does not compute exact
+Boolean overlap volume or certify every possible CAD defect. See
+[`ROADMAP.md`](ROADMAP.md) for the explicit boundary and deferred checks.
 
 ## Legacy 0.30 design checks
 
@@ -98,7 +113,8 @@ The browser shows only `.step`, `.stp`, `.stl`, and `.glb` files, preserves
 nested folders, and refreshes the active model when its source changes. Without
 a project configuration, pass a narrower folder such as `burr models` when you
 want a smaller tree. Rendering is powered by
-[Look](https://github.com/stefangolas/look) and stays on your machine.
+[Look](https://github.com/stefangolas/look) and stays on your machine. Select a
+STEP assembly and open the Checks tab to inspect component intersections.
 
 To define a stable model scope, add `.burr/config.toml`:
 

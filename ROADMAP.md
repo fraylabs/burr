@@ -10,22 +10,29 @@ metadata for the basic experience.
 - The sidebar mirrors nested model folders and refreshes the active model when
   its source changes.
 - Optional `.burr/config.toml` limits the folders Burr treats as model roots.
-
-## Next: geometry-native checks
-
-The first complete vertical slice is assembly interference:
+- STEP assemblies with at least two component occurrences receive one
+  geometry-native intersection check:
 
 ```text
 open a STEP assembly
   -> identify its bodies or components
-  -> detect overlapping solid volume
-  -> report the involved geometry and measured overlap
-  -> select the finding in the viewer
+  -> detect crossing surfaces, containment, or coincident occurrences
+  -> distinguish face contact from interference
+  -> report the involved components
+  -> highlight the selected pair in the viewer
 ```
 
-Only the minimum body/component model needed for that proof should be built.
-Clearance, distance, and thin-region checks can follow once Burr has stable
-geometry references and viewer selection.
+The check returns `incomplete` instead of a clean result when the model is not a
+supported STEP assembly or component meshes are not closed. It does not claim
+exact Boolean overlap volume; surface-crossing witnesses and containment are
+the current evidence boundary.
+
+## Next
+
+Use the intersection proof on representative real assemblies and harden only
+the failure modes that evidence exposes. Clearance, distance, and thin-region
+checks can be considered after the component references and selection loop hold
+up outside the fixtures.
 
 ## Later
 
@@ -43,5 +50,5 @@ not the foundation for geometry-native checks.
 
 - ISO certification claims
 - FEA or stress simulation
-- A generic assembly framework before the interference proof needs it
-- A new pack schema before a geometry-native check is working end to end
+- Exact overlap-volume computation without a proven Boolean geometry backend
+- A generic check framework or pack schema before a second native check needs it
