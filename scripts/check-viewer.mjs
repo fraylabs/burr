@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import fs from "node:fs"
+import http from "node:http"
 import net from "node:net"
 import os from "node:os"
 import path from "node:path"
@@ -74,6 +75,12 @@ child.stderr.on("data", (chunk) => {
 
 try {
   await waitForServer()
+
+  expectEqual(
+    await requestStatusWithHost("attacker.example"),
+    403,
+    "DNS-rebinding Host rejection",
+  )
 
   const project = await getJson("/api/project")
   expectEqual(project.schema_version, "burr.project-state.v1", "project state schema")
@@ -234,7 +241,7 @@ try {
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
 
   console.log(
-    `viewer proof passed (model scope enforced, STEP interference pass/fail/incomplete proven, X-ray rendering available, components highlighted, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (loopback Host enforced, model scope enforced, STEP interference pass/fail/incomplete proven, X-ray rendering available, components highlighted, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)
@@ -259,6 +266,25 @@ async function availablePort() {
         else resolve(selected)
       })
     })
+  })
+}
+
+async function requestStatusWithHost(host) {
+  return new Promise((resolve, reject) => {
+    const request = http.request(
+      {
+        hostname: "127.0.0.1",
+        port,
+        path: "/api/project",
+        headers: { Host: host },
+      },
+      (response) => {
+        response.resume()
+        response.once("end", () => resolve(response.statusCode))
+      },
+    )
+    request.once("error", reject)
+    request.end()
   })
 }
 

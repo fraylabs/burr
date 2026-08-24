@@ -253,6 +253,16 @@ fn component_mesh(
             "Component occurrence {occurrence_index} contains no vertices."
         ));
     }
+    if let Some(index) = geometry
+        .indices
+        .iter()
+        .copied()
+        .find(|index| *index as usize >= geometry.vertices.len())
+    {
+        return Err(format!(
+            "Component occurrence {occurrence_index} references missing vertex index {index}."
+        ));
+    }
     let faces = geometry
         .indices
         .as_chunks::<3>()
@@ -442,5 +452,22 @@ mod tests {
         let report = analyze_scene("counterbore.step", "fixture", &scene);
         assert_eq!(report.outcome, CheckOutcome::Incomplete);
         assert_eq!(report.incomplete_reasons[0].code, "assembly_required");
+    }
+
+    #[test]
+    fn missing_vertex_index_is_incomplete_not_a_panic() {
+        let path = fixture("intersecting.step");
+        let mut timings = Timings::default();
+        let mut scene = compile_scene(&path, UpAxis::Z, &mut timings).unwrap();
+        let geometry_index = scene.instances[0].geometry;
+        let missing_index = scene.geometries[geometry_index].vertices.len() as u32;
+        scene.geometries[geometry_index].indices[0] = missing_index;
+
+        let report = analyze_scene("invalid.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert_eq!(report.incomplete_reasons[0].code, "invalid_component_mesh");
+        assert!(report.incomplete_reasons[0]
+            .message
+            .contains("references missing vertex index"));
     }
 }

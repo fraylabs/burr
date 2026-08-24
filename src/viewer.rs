@@ -182,7 +182,8 @@ pub fn run(start: PathBuf) -> Result<(), String> {
         .server_addr()
         .to_ip()
         .ok_or_else(|| "Burr viewer did not receive an IP address.".to_string())?;
-    let url = format!("http://127.0.0.1:{}/", address.port());
+    let port = address.port();
+    let url = format!("http://127.0.0.1:{port}/");
 
     println!("BURR PROJECT {}", project.root().display());
     println!("OPEN {url}");
@@ -197,7 +198,7 @@ pub fn run(start: PathBuf) -> Result<(), String> {
 
     let mut cache = HashMap::new();
     for request in server.incoming_requests() {
-        if let Err(error) = handle_request(request, &project, &mut cache) {
+        if let Err(error) = handle_request(request, &project, &mut cache, port) {
             eprintln!("Viewer request failed: {error}");
         }
     }
@@ -208,7 +209,16 @@ fn handle_request(
     request: Request,
     project: &Project,
     cache: &mut ModelCache,
+    expected_host_port: u16,
 ) -> Result<(), String> {
+    if !request_host_is_loopback(&request, expected_host_port) {
+        return respond(
+            request,
+            403,
+            "text/plain; charset=utf-8",
+            "Forbidden".to_string(),
+        );
+    }
     if request.method() != &Method::Get {
         return respond(
             request,
@@ -325,9 +335,10 @@ fn render_model(
         return Ok(html.clone());
     }
 
-    let scene = focus
-        .map(|focus| highlighted_scene(&cached.scene, focus))
-        .unwrap_or_else(|| cached.scene.clone());
+    let scene = match focus {
+        Some(focus) => highlighted_scene(&cached.scene, focus)?,
+        None => cached.scene.clone(),
+    };
     let lighting = theme.lighting();
     let html = generate_html_viewer(
         &scene,
@@ -403,7 +414,7 @@ fn load_model<'a>(
         .ok_or_else(|| "Viewer model cache became unavailable.".to_string())
 }
 
-fn highlighted_scene(scene: &CompiledScene, focus: FocusPair) -> CompiledScene {
+fn highlighted_scene(scene: &CompiledScene, focus: FocusPair) -> Result<CompiledScene, String> {
     const MUTED: [f32; 4] = [0.28, 0.31, 0.33, 1.0];
     const FIRST: [f32; 4] = [1.0, 0.34, 0.08, 1.0];
     const SECOND: [f32; 4] = [0.12, 0.76, 0.94, 1.0];
@@ -414,7 +425,16 @@ fn highlighted_scene(scene: &CompiledScene, focus: FocusPair) -> CompiledScene {
         .iter()
         .enumerate()
         .map(|(index, instance)| {
-            let mut geometry = scene.geometries[instance.geometry].clone();
+            let mut geometry = scene
+                .geometries
+                .get(instance.geometry)
+                .cloned()
+                .ok_or_else(|| {
+                    format!(
+                        "Component occurrence {index} references missing geometry {}.",
+                        instance.geometry
+                    )
+                })?;
             let color = if index == focus.first {
                 FIRST
             } else if index == focus.second {
@@ -433,13 +453,27 @@ fn highlighted_scene(scene: &CompiledScene, focus: FocusPair) -> CompiledScene {
                     })
                     .collect(),
             );
-            geometry
+            Ok(geometry)
         })
-        .collect();
+        .collect::<Result<Vec<_>, String>>()?;
     for (index, instance) in highlighted.instances.iter_mut().enumerate() {
         instance.geometry = index;
     }
-    highlighted
+    Ok(highlighted)
+}
+
+fn request_host_is_loopback(request: &Request, expected_port: u16) -> bool {
+    request
+        .headers()
+        .iter()
+        .find(|header| header.field.equiv("Host"))
+        .is_some_and(|header| host_is_loopback(header.value.as_str(), expected_port))
+}
+
+fn host_is_loopback(host: &str, expected_port: u16) -> bool {
+    host == format!("127.0.0.1:{expected_port}")
+        || host.eq_ignore_ascii_case(&format!("localhost:{expected_port}"))
+        || host == format!("[::1]:{expected_port}")
 }
 
 fn inject_viewer_theme(
@@ -871,5 +905,36 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
         );
         assert!(FocusPair::from_query(Some("2,2")).is_err());
         assert!(FocusPair::from_query(Some("two,5")).is_err());
+    }
+
+    #[test]
+    fn host_guard_accepts_only_loopback_names_on_the_bound_port() {
+        assert!(host_is_loopback("127.0.0.1:43120", 43120));
+        assert!(host_is_loopback("localhost:43120", 43120));
+        assert!(host_is_loopback("LOCALHOST:43120", 43120));
+        assert!(host_is_loopback("[::1]:43120", 43120));
+        assert!(!host_is_loopback("attacker.example:43120", 43120));
+        assert!(!host_is_loopback("127.0.0.1:43121", 43120));
+        assert!(!host_is_loopback("localhost", 43120));
+    }
+
+    #[test]
+    fn highlighted_scene_rejects_a_missing_geometry_index() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/viewer/models/enclosure/counterbore.step");
+        let mut timings = Timings::default();
+        let mut scene = compile_scene(&path, UpAxis::Z, &mut timings).unwrap();
+        scene.instances[0].geometry = scene.geometries.len();
+
+        let error = highlighted_scene(
+            &scene,
+            FocusPair {
+                first: 0,
+                second: 0,
+            },
+        )
+        .err()
+        .unwrap();
+        assert!(error.contains("references missing geometry"));
     }
 }
