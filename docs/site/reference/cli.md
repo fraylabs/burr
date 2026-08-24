@@ -35,7 +35,7 @@ the active model when its source changes. Without project configuration, no
 that subtree.
 
 For STEP assemblies with at least two component occurrences, the Checks tab
-runs Burr's geometry-native `assembly-intersection` check. A finding can
+runs Burr's geometry-native `assembly-interference` check. A finding can
 highlight its two components in the viewer. Face-touching pairs are accepted;
 surface crossings, containment, and coincident occurrences fail. Unsupported
 or inconclusive inputs report `incomplete`, not `pass`. The current check does

@@ -94,12 +94,14 @@ try {
   const shellHtml = await shellResponse.text()
   expectIncludes(shellHtml, 'id="checks-tab"', "checks tab")
   expectIncludes(shellHtml, 'id="checks-panel"', "checks panel")
+  expectIncludes(shellHtml, 'data-render-mode="see-through"', "see-through control")
+  expectIncludes(shellHtml, 'data-render-mode="solid"', "solid control")
 
   const singleReport = await getJson(
     `/api/checks?path=${encodeURIComponent(counterbore.path)}`,
   )
   expectEqual(singleReport.schema_version, "burr.checks.v1", "check report schema")
-  expectEqual(singleReport.check_id, "assembly-intersection", "geometry-native check id")
+  expectEqual(singleReport.check_id, "assembly-interference", "geometry-native check id")
   expectEqual(singleReport.outcome, "incomplete", "single-part check outcome")
   expectEqual(singleReport.incomplete_reasons?.[0]?.code, "assembly_required", "single-part reason")
 
@@ -156,6 +158,13 @@ try {
   expectIncludes(viewerHtml, "counterbore.step", "model label")
   expectIncludes(viewerHtml, 'data-burr-theme="dark"', "dark viewer theme marker")
   expectIncludes(viewerHtml, "background-color: #0c0d10", "dark viewer surface")
+  expectIncludes(
+    viewerHtml,
+    'name="burr-render-modes" content="see-through,solid"',
+    "viewer render modes",
+  )
+  expectIncludes(viewerHtml, 'let burrRenderMode = "see-through"', "default render mode")
+  expectIncludes(viewerHtml, "fragColor = vec4(col, uOpacity);", "transparent shader output")
 
   const lightViewerResponse = await fetch(
     `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&theme=light`,
@@ -221,7 +230,7 @@ try {
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
 
   console.log(
-    `viewer proof passed (model scope enforced, STEP intersection pass/fail/incomplete proven, components highlighted, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (model scope enforced, STEP interference pass/fail/incomplete proven, see-through rendering available, components highlighted, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)

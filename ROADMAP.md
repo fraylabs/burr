@@ -11,7 +11,7 @@ metadata for the basic experience.
   its source changes.
 - Optional `.burr/config.toml` limits the folders Burr treats as model roots.
 - STEP assemblies with at least two component occurrences receive one
-  geometry-native intersection check:
+  geometry-native interference check:
 
 ```text
 open a STEP assembly
@@ -29,7 +29,7 @@ the current evidence boundary.
 
 ## Next
 
-Use the intersection proof on representative real assemblies and harden only
+Use the interference proof on representative real assemblies and harden only
 the failure modes that evidence exposes. Clearance, distance, and thin-region
 checks can be considered after the component references and selection loop hold
 up outside the fixtures.

@@ -66,6 +66,14 @@ The switch must therefore be tested as an end-to-end contract: shell tokens,
 iframe theme marker, canvas colour, persistence after reload, and model
 interaction all change or survive together.
 
+## Model appearance
+
+The viewport offers See-through and Solid modes. See-through is the first-run
+default because assembly review must reveal enclosed and occluded component
+occurrences; Solid remains one click away for ordinary surface inspection. The
+selection persists locally under `burr-render-mode` and is sent to each Look
+iframe after a model or theme reload.
+
 ## Interaction rules
 
 - Folders are collapsed initially and preserve explicit expansion while Burr

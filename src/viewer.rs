@@ -337,6 +337,7 @@ fn render_model(
         theme.canvas_background(),
     )
     .map_err(|error| format!("Look could not build the viewer for {relative_path}: {error:#}"))?;
+    let html = inject_viewer_render_modes(html)?;
     let html = inject_viewer_theme(html, theme, focus)?;
     cached.viewers.insert(viewer_key, html.clone());
     Ok(html)
@@ -385,7 +386,7 @@ fn load_model<'a>(
         CheckReport::unsupported(
             relative_path,
             &version,
-            "Assembly intersection currently supports STEP files only.",
+            "Assembly interference currently supports STEP files only.",
         )
     };
     cache.insert(
@@ -467,6 +468,57 @@ fn inject_viewer_theme(
     themed.push_str(&focus_marker);
     themed.push_str(&html[index..]);
     Ok(themed)
+}
+
+fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
+    let replacements = [
+        (
+            "uniform vec3 uCameraPos;\n            out vec4 fragColor;",
+            "uniform vec3 uCameraPos;\n            uniform float uOpacity;\n            out vec4 fragColor;",
+            "fragment opacity uniform",
+        ),
+        (
+            "fragColor = vec4(col, 1.0);",
+            "fragColor = vec4(col, uOpacity);",
+            "fragment opacity output",
+        ),
+        (
+            "const uCamPosLoc = gl.getUniformLocation(program, 'uCameraPos');",
+            "const uCamPosLoc = gl.getUniformLocation(program, 'uCameraPos');\n        const uOpacityLoc = gl.getUniformLocation(program, 'uOpacity');",
+            "opacity uniform location",
+        ),
+        (
+            "gl.enable(gl.DEPTH_TEST);\n            gl.clearColor",
+            "gl.enable(gl.DEPTH_TEST);\n            gl.depthMask(true);\n            gl.clearColor",
+            "depth-buffer reset",
+        ),
+        (
+            "gl.uniform3fv(uCamPosLoc, camPos);\n\n            gl.bindVertexArray(vao);",
+            "gl.uniform3fv(uCamPosLoc, camPos);\n\n            const seeThrough = burrRenderMode === 'see-through';\n            gl.uniform1f(uOpacityLoc, seeThrough ? 0.28 : 1.0);\n            if (seeThrough) {\n                gl.enable(gl.BLEND);\n                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);\n                gl.depthMask(false);\n            } else {\n                gl.disable(gl.BLEND);\n                gl.depthMask(true);\n            }\n\n            gl.bindVertexArray(vao);",
+            "render-mode state",
+        ),
+        (
+            "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);",
+            "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);\n            gl.depthMask(true);",
+            "depth-buffer restore",
+        ),
+    ];
+    for (needle, replacement, label) in replacements {
+        if !html.contains(needle) {
+            return Err(format!(
+                "Look viewer HTML did not contain the expected {label} hook."
+            ));
+        }
+        html = html.replacen(needle, replacement, 1);
+    }
+
+    let marker = "</head>";
+    let Some(index) = html.find(marker) else {
+        return Err("Look viewer HTML did not contain a head element.".to_string());
+    };
+    let controls = r#"<meta name="burr-render-modes" content="see-through,solid"><script id="burr-render-mode">let burrRenderMode = "see-through";document.documentElement.dataset.burrRenderMode = burrRenderMode;window.addEventListener("message",(event)=>{if(event.origin!==window.location.origin||event.data?.type!=="burr:set-render-mode")return;const mode=event.data.mode;if(mode!=="see-through"&&mode!=="solid")return;burrRenderMode=mode;document.documentElement.dataset.burrRenderMode=mode;});</script>"#;
+    html.insert_str(index, controls);
+    Ok(html)
 }
 
 fn scan_models(project: &Project) -> Result<Vec<ModelFile>, String> {
@@ -783,6 +835,29 @@ mod tests {
         assert!(themed.contains("background-color: #c9ced0"));
         assert!(themed.contains("name=\"burr-highlighted-components\" content=\"2,5\""));
         assert!(themed.contains("</style><meta"));
+    }
+
+    #[test]
+    fn viewer_render_modes_default_to_see_through() {
+        let html = r#"<!doctype html><html><head></head><body><script>
+uniform vec3 uCameraPos;
+            out vec4 fragColor;
+fragColor = vec4(col, 1.0);
+const uCamPosLoc = gl.getUniformLocation(program, 'uCameraPos');
+gl.enable(gl.DEPTH_TEST);
+            gl.clearColor
+gl.uniform3fv(uCamPosLoc, camPos);
+
+            gl.bindVertexArray(vao);
+gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
+</script></body></html>"#
+            .to_string();
+        let rendered = inject_viewer_render_modes(html).unwrap();
+        assert!(rendered.contains("name=\"burr-render-modes\" content=\"see-through,solid\""));
+        assert!(rendered.contains("let burrRenderMode = \"see-through\""));
+        assert!(rendered.contains("fragColor = vec4(col, uOpacity);"));
+        assert!(rendered.contains("seeThrough ? 0.28 : 1.0"));
+        assert!(rendered.contains("burr:set-render-mode"));
     }
 
     #[test]

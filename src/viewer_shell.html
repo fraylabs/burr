@@ -15,7 +15,10 @@
             : matchMedia("(prefers-color-scheme: light)").matches
               ? "light"
               : "dark";
+        const savedRenderMode = localStorage.getItem("burr-render-mode");
         document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.renderMode =
+          savedRenderMode === "solid" ? "solid" : "see-through";
       })();
     </script>
     <style>
@@ -587,6 +590,47 @@
         background: var(--canvas);
       }
 
+      .render-mode-toggle {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        z-index: 3;
+        display: flex;
+        gap: 3px;
+        padding: 3px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-pill);
+        background: color-mix(in srgb, var(--surface) 90%, transparent);
+        box-shadow: 0 10px 28px var(--shadow);
+        backdrop-filter: blur(12px);
+      }
+
+      .render-mode-option {
+        padding: 6px 10px;
+        border: 0;
+        border-radius: var(--radius-pill);
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 10px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .render-mode-option:hover {
+        color: var(--text);
+      }
+
+      .render-mode-option[aria-pressed="true"] {
+        background: var(--surface-selected);
+        color: var(--text);
+        box-shadow: 0 1px 5px var(--shadow);
+      }
+
+      .render-mode-option:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
       .viewer-state {
         position: absolute;
         inset: 0;
@@ -710,7 +754,7 @@
               <span class="check-dot" aria-hidden="true"></span>
               <span class="check-status">Select a model</span>
             </div>
-            <p class="check-summary">Burr checks STEP assemblies for intersecting components.</p>
+            <p class="check-summary">Burr checks STEP assemblies for interfering solid volumes.</p>
           </div>
         </section>
 
@@ -725,6 +769,25 @@
 
       <main class="viewer" aria-label="Selected model viewer">
         <iframe id="model-viewer" title="Selected 3D model"></iframe>
+
+        <div class="render-mode-toggle" role="group" aria-label="Model appearance">
+          <button
+            class="render-mode-option"
+            type="button"
+            data-render-mode="see-through"
+            aria-pressed="true"
+          >
+            See-through
+          </button>
+          <button
+            class="render-mode-option"
+            type="button"
+            data-render-mode="solid"
+            aria-pressed="false"
+          >
+            Solid
+          </button>
+        </div>
 
         <div id="empty-state" class="viewer-state">
           <div class="state-content">
@@ -763,6 +826,7 @@
       const watchDot = document.querySelector("#watch-dot");
       const watchStatus = document.querySelector("#watch-status");
       const themeToggle = document.querySelector("#theme-toggle");
+      const renderModeButtons = [...document.querySelectorAll(".render-mode-option")];
       const themeColor = document.querySelector('meta[name="theme-color"]');
 
       const state = {
@@ -777,19 +841,26 @@
         checkReport: null,
         focusedFinding: null,
         theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
+        renderMode:
+          document.documentElement.dataset.renderMode === "solid" ? "solid" : "see-through",
       };
 
       viewer.addEventListener("load", () => {
         loadingState.hidden = true;
+        sendRenderMode();
       });
 
       themeToggle.addEventListener("click", () => {
         setTheme(state.theme === "dark" ? "light" : "dark", true, true);
       });
+      for (const button of renderModeButtons) {
+        button.addEventListener("click", () => setRenderMode(button.dataset.renderMode, true));
+      }
       modelsTab.addEventListener("click", () => showPanel("models"));
       checksTab.addEventListener("click", () => showPanel("checks"));
 
       setTheme(state.theme, false, false);
+      setRenderMode(state.renderMode, false);
       refreshTree();
       setInterval(refreshTree, 1000);
 
@@ -1049,7 +1120,7 @@
         setCheckIndicator(null);
         renderCheckMessage(
           "Select a model",
-          "Burr checks STEP assemblies for intersecting components.",
+          "Burr checks STEP assemblies for interfering solid volumes.",
           null,
         );
       }
@@ -1099,7 +1170,7 @@
       function witnessLabel(kind) {
         if (kind === "containment") return "Contained component";
         if (kind === "coincident_occurrence") return "Coincident components";
-        return "Intersecting surfaces";
+        return "Overlapping solid surfaces";
       }
 
       function setTheme(theme, persist, reloadViewer) {
@@ -1126,6 +1197,26 @@
             openViewer(selected, true, focus);
           }
         }
+      }
+
+      function setRenderMode(mode, persist) {
+        state.renderMode = mode === "solid" ? "solid" : "see-through";
+        document.documentElement.dataset.renderMode = state.renderMode;
+        for (const button of renderModeButtons) {
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.renderMode === state.renderMode),
+          );
+        }
+        if (persist) localStorage.setItem("burr-render-mode", state.renderMode);
+        sendRenderMode();
+      }
+
+      function sendRenderMode() {
+        viewer.contentWindow?.postMessage(
+          { type: "burr:set-render-mode", mode: state.renderMode },
+          window.location.origin,
+        );
       }
 
       function updateCurrentSelection() {

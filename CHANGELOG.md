@@ -8,10 +8,12 @@
 - Keep the new workbench geometry-first: `.burr/config.toml` scopes model
   folders only, and the published declared-intent checker remains isolated as a
   legacy compatibility surface.
-- Add one geometry-native STEP assembly intersection check with explicit
+- Add one geometry-native STEP assembly interference check with explicit
   pass/fail/incomplete outcomes, separated-versus-touching-versus-intersecting
   fixtures, containment detection, file-version caching, and selectable
   two-component highlighting in the Look viewer.
+- Add See-through and Solid viewer modes, defaulting to see-through so enclosed
+  or occluded assembly components remain visible.
 
 ## 0.30.0
 

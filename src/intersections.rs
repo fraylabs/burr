@@ -5,7 +5,7 @@ use truck_meshalgo::prelude::{
     ShellCondition, StandardAttributes, Topology,
 };
 
-pub const CHECK_ID: &str = "assembly-intersection";
+pub const CHECK_ID: &str = "assembly-interference";
 const REPORT_SCHEMA_VERSION: &str = "burr.checks.v1";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -90,7 +90,7 @@ impl CheckReport {
             model_version: model_version.to_string(),
             check_id: CHECK_ID,
             outcome: CheckOutcome::Incomplete,
-            summary: "Intersection check not completed".to_string(),
+            summary: "Interference check not completed".to_string(),
             component_count: 0,
             checked_pair_count: 0,
             findings: Vec::new(),
@@ -118,7 +118,7 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
                 model_version: model_version.to_string(),
                 check_id: CHECK_ID,
                 outcome: CheckOutcome::Incomplete,
-                summary: "Intersection check not completed".to_string(),
+                summary: "Interference check not completed".to_string(),
                 component_count: scene.instances.len(),
                 checked_pair_count: 0,
                 findings: Vec::new(),
@@ -137,7 +137,7 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             model_version: model_version.to_string(),
             check_id: CHECK_ID,
             outcome: CheckOutcome::Incomplete,
-            summary: "Intersection check requires a STEP assembly".to_string(),
+            summary: "Interference check requires a STEP assembly".to_string(),
             component_count: components.len(),
             checked_pair_count: 0,
             findings: Vec::new(),
@@ -169,11 +169,8 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             if let Some(witness) = intersection_witness(left, right) {
                 findings.push(IntersectionFinding {
                     id: format!("{CHECK_ID}:{left_index}:{right_index}"),
-                    code: "component_intersection",
-                    message: format!(
-                        "{} intersects {}.",
-                        left.reference.name, right.reference.name
-                    ),
+                    code: "component_interference",
+                    message: format!("{} overlaps {}.", left.reference.name, right.reference.name),
                     components: [left.reference.clone(), right.reference.clone()],
                     witness,
                 });
@@ -201,14 +198,14 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
     };
     let summary = match outcome {
         CheckOutcome::Pass => {
-            format!("No component intersections detected across {checked_pair_count} pairs")
+            format!("No assembly interference detected across {checked_pair_count} pairs")
         }
         CheckOutcome::Fail => format!(
-            "{} intersecting component pair{} detected",
+            "{} interfering component pair{} detected",
             findings.len(),
             if findings.len() == 1 { "" } else { "s" }
         ),
-        CheckOutcome::Incomplete => "Intersection check not completed".to_string(),
+        CheckOutcome::Incomplete => "Interference check not completed".to_string(),
     };
 
     CheckReport {
@@ -424,7 +421,7 @@ mod tests {
     }
 
     #[test]
-    fn contained_component_is_an_intersection() {
+    fn contained_component_is_interference() {
         let report = report("contained.step");
         assert_eq!(report.outcome, CheckOutcome::Fail);
         assert_eq!(report.findings.len(), 1);

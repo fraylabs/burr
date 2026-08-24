@@ -8,7 +8,7 @@ burr .
   -> preserve their folder hierarchy
   -> compile the selected model with Look
   -> render it in a local browser
-  -> inspect STEP assembly component intersections
+  -> inspect STEP assembly component interference
   -> refresh when the source file changes
 ```
 
@@ -31,15 +31,17 @@ models = ["models"]
 The project contract contains model scope only. It does not define rulepacks or
 declared mechanical intent.
 
-## Geometry-native assembly intersection
+## Geometry-native assembly interference
 
 Look preserves each STEP assembly occurrence's component name, mesh, and world
 transform. Burr checks those world-space component pairs with a strict bounds
 filter followed by mesh interference and containment evidence. Face contact is
-not an intersection.
+not interference.
 
 The Checks tab reports `pass`, `fail`, or `incomplete`. Selecting a finding
-highlights its two component occurrences in the same Look viewport. The result
+highlights its two component occurrences in the same Look viewport. The viewer
+defaults to See-through so enclosed or occluded components remain visible and
+offers Solid mode for ordinary inspection. The result
 is cached with the compiled model and is replaced when the source version
 changes.
 

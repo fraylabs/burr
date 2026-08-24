@@ -38,9 +38,11 @@ files. It uses Look's native Rust scene compiler and self-contained browser
 viewer; it does not require a separate JavaScript app or upload models.
 
 STEP assemblies with at least two component occurrences also receive Burr's
-geometry-native intersection check. The Checks tab distinguishes separated or
+geometry-native interference check. The Checks tab distinguishes separated or
 face-touching components from surface crossings and containment, and a selected
-finding highlights its two components. Unsupported or inconclusive files are
+finding highlights its two components. See-through rendering is the default so
+hidden components remain visible; switch to Solid for ordinary inspection.
+Unsupported or inconclusive files are
 reported as `incomplete` rather than passing silently.
 
 Projects may declare model roots in `.burr/config.toml`. Burr uses the nearest
