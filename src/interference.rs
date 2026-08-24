@@ -255,7 +255,9 @@ fn component_mesh(
     }
     let faces = geometry
         .indices
-        .chunks_exact(3)
+        .as_chunks::<3>()
+        .0
+        .iter()
         .map(|triangle| {
             [
                 triangle[0] as usize,
