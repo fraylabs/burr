@@ -125,11 +125,11 @@ try {
     `/api/checks?path=${encodeURIComponent(intersecting.path)}`,
   )
   expectEqual(intersectingReport.outcome, "fail", "intersecting assembly outcome")
-  expectEqual(intersectingReport.findings?.length, 1, "intersection finding count")
+  expectEqual(intersectingReport.findings?.length, 1, "interference finding count")
   expectEqual(
     intersectingReport.findings?.[0]?.witness?.kind,
     "surface_crossing",
-    "intersection witness kind",
+    "interference witness kind",
   )
 
   const contained = model(initialTree, "models/assemblies/contained.step")

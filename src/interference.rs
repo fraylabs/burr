@@ -26,7 +26,7 @@ pub struct CheckReport {
     pub summary: String,
     pub component_count: usize,
     pub checked_pair_count: usize,
-    pub findings: Vec<IntersectionFinding>,
+    pub findings: Vec<InterferenceFinding>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub incomplete_reasons: Vec<IncompleteReason>,
 }
@@ -38,12 +38,12 @@ pub struct IncompleteReason {
 }
 
 #[derive(Clone, Debug, Serialize)]
-pub struct IntersectionFinding {
+pub struct InterferenceFinding {
     pub id: String,
     pub code: &'static str,
     pub message: String,
     pub components: [ComponentRef; 2],
-    pub witness: IntersectionWitness,
+    pub witness: InterferenceWitness,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -55,7 +55,7 @@ pub struct ComponentRef {
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
-pub enum IntersectionWitness {
+pub enum InterferenceWitness {
     SurfaceCrossing {
         start: [f64; 3],
         end: [f64; 3],
@@ -167,7 +167,7 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             }
             checked_pair_count += 1;
             if let Some(witness) = intersection_witness(left, right) {
-                findings.push(IntersectionFinding {
+                findings.push(InterferenceFinding {
                     id: format!("{CHECK_ID}:{left_index}:{right_index}"),
                     code: "component_interference",
                     message: format!("{} overlaps {}.", left.reference.name, right.reference.name),
@@ -298,14 +298,14 @@ fn component_mesh(
 fn intersection_witness(
     left: &ComponentMesh,
     right: &ComponentMesh,
-) -> Option<IntersectionWitness> {
+) -> Option<InterferenceWitness> {
     if left.geometry_index == right.geometry_index
         && transforms_match(left.transform, right.transform)
     {
-        return Some(IntersectionWitness::CoincidentOccurrence);
+        return Some(InterferenceWitness::CoincidentOccurrence);
     }
     if let Some((start, end)) = left.mesh.collide_with(&right.mesh) {
-        return Some(IntersectionWitness::SurfaceCrossing {
+        return Some(InterferenceWitness::SurfaceCrossing {
             start: point_array(start),
             end: point_array(end),
         });
@@ -313,7 +313,7 @@ fn intersection_witness(
     if left.closed && right.closed {
         if let Some(point) = left.mesh.positions().first().copied() {
             if right.mesh.inside(point) {
-                return Some(IntersectionWitness::Containment {
+                return Some(InterferenceWitness::Containment {
                     point: point_array(point),
                     contained_component: left.reference.id.clone(),
                 });
@@ -321,7 +321,7 @@ fn intersection_witness(
         }
         if let Some(point) = right.mesh.positions().first().copied() {
             if left.mesh.inside(point) {
-                return Some(IntersectionWitness::Containment {
+                return Some(InterferenceWitness::Containment {
                     point: point_array(point),
                     contained_component: right.reference.id.clone(),
                 });
@@ -416,7 +416,7 @@ mod tests {
         assert_eq!(report.findings[0].components[1].name, "moving");
         assert!(matches!(
             report.findings[0].witness,
-            IntersectionWitness::SurfaceCrossing { .. }
+            InterferenceWitness::SurfaceCrossing { .. }
         ));
     }
 
@@ -427,7 +427,7 @@ mod tests {
         assert_eq!(report.findings.len(), 1);
         assert!(matches!(
             report.findings[0].witness,
-            IntersectionWitness::Containment { .. }
+            InterferenceWitness::Containment { .. }
         ));
     }
 
