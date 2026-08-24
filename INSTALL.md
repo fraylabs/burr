@@ -40,7 +40,7 @@ viewer; it does not require a separate JavaScript app or upload models.
 STEP assemblies with at least two component occurrences also receive Burr's
 geometry-native interference check. The Checks tab distinguishes separated or
 face-touching components from surface crossings and containment, and a selected
-finding highlights its two components. See-through rendering is the default so
+finding highlights its two components. X-ray rendering is the default so
 hidden components remain visible; switch to Solid for ordinary inspection.
 Unsupported or inconclusive files are
 reported as `incomplete` rather than passing silently.

@@ -494,7 +494,7 @@ fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
         ),
         (
             "gl.uniform3fv(uCamPosLoc, camPos);\n\n            gl.bindVertexArray(vao);",
-            "gl.uniform3fv(uCamPosLoc, camPos);\n\n            const seeThrough = burrRenderMode === 'see-through';\n            gl.uniform1f(uOpacityLoc, seeThrough ? 0.28 : 1.0);\n            if (seeThrough) {\n                gl.enable(gl.BLEND);\n                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);\n                gl.depthMask(false);\n            } else {\n                gl.disable(gl.BLEND);\n                gl.depthMask(true);\n            }\n\n            gl.bindVertexArray(vao);",
+            "gl.uniform3fv(uCamPosLoc, camPos);\n\n            const xRay = burrRenderMode === 'x-ray';\n            gl.uniform1f(uOpacityLoc, xRay ? 0.28 : 1.0);\n            if (xRay) {\n                gl.enable(gl.BLEND);\n                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);\n                gl.depthMask(false);\n            } else {\n                gl.disable(gl.BLEND);\n                gl.depthMask(true);\n            }\n\n            gl.bindVertexArray(vao);",
             "render-mode state",
         ),
         (
@@ -516,7 +516,7 @@ fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
     let Some(index) = html.find(marker) else {
         return Err("Look viewer HTML did not contain a head element.".to_string());
     };
-    let controls = r#"<meta name="burr-render-modes" content="see-through,solid"><script id="burr-render-mode">let burrRenderMode = "see-through";document.documentElement.dataset.burrRenderMode = burrRenderMode;window.addEventListener("message",(event)=>{if(event.origin!==window.location.origin||event.data?.type!=="burr:set-render-mode")return;const mode=event.data.mode;if(mode!=="see-through"&&mode!=="solid")return;burrRenderMode=mode;document.documentElement.dataset.burrRenderMode=mode;});</script>"#;
+    let controls = r#"<meta name="burr-render-modes" content="x-ray,solid"><script id="burr-render-mode">let burrRenderMode = "x-ray";document.documentElement.dataset.burrRenderMode = burrRenderMode;window.addEventListener("message",(event)=>{if(event.origin!==window.location.origin||event.data?.type!=="burr:set-render-mode")return;const mode=event.data.mode;if(mode!=="x-ray"&&mode!=="solid")return;burrRenderMode=mode;document.documentElement.dataset.burrRenderMode=mode;});</script>"#;
     html.insert_str(index, controls);
     Ok(html)
 }
@@ -838,7 +838,7 @@ mod tests {
     }
 
     #[test]
-    fn viewer_render_modes_default_to_see_through() {
+    fn viewer_render_modes_default_to_x_ray() {
         let html = r#"<!doctype html><html><head></head><body><script>
 uniform vec3 uCameraPos;
             out vec4 fragColor;
@@ -853,10 +853,10 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
 </script></body></html>"#
             .to_string();
         let rendered = inject_viewer_render_modes(html).unwrap();
-        assert!(rendered.contains("name=\"burr-render-modes\" content=\"see-through,solid\""));
-        assert!(rendered.contains("let burrRenderMode = \"see-through\""));
+        assert!(rendered.contains("name=\"burr-render-modes\" content=\"x-ray,solid\""));
+        assert!(rendered.contains("let burrRenderMode = \"x-ray\""));
         assert!(rendered.contains("fragColor = vec4(col, uOpacity);"));
-        assert!(rendered.contains("seeThrough ? 0.28 : 1.0"));
+        assert!(rendered.contains("xRay ? 0.28 : 1.0"));
         assert!(rendered.contains("burr:set-render-mode"));
     }
 

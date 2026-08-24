@@ -22,7 +22,7 @@ three honest outcomes:
 - `incomplete`: the file is not a supported STEP assembly or its component
   meshes cannot support a clean result.
 
-Face contact is allowed and does not fail. The viewer starts in see-through
+Face contact is allowed and does not fail. The viewer starts in X-ray
 mode so hidden occurrences remain visible, with a Solid option for ordinary
 inspection. Findings name both components and can highlight them in the viewer.
 This first check does not compute exact

@@ -68,7 +68,7 @@ interaction all change or survive together.
 
 ## Model appearance
 
-The viewport offers See-through and Solid modes. See-through is the first-run
+The viewport offers X-ray and Solid modes. X-ray is the first-run
 default because assembly review must reveal enclosed and occluded component
 occurrences; Solid remains one click away for ordinary surface inspection. The
 selection persists locally under `burr-render-mode` and is sent to each Look

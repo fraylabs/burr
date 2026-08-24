@@ -12,7 +12,7 @@
   pass/fail/incomplete outcomes, separated-versus-touching-versus-intersecting
   fixtures, containment detection, file-version caching, and selectable
   two-component highlighting in the Look viewer.
-- Add See-through and Solid viewer modes, defaulting to see-through so enclosed
+- Add X-ray and Solid viewer modes, defaulting to X-ray so enclosed
   or occluded assembly components remain visible.
 
 ## 0.30.0

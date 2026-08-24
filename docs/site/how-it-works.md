@@ -40,7 +40,7 @@ not interference.
 
 The Checks tab reports `pass`, `fail`, or `incomplete`. Selecting a finding
 highlights its two component occurrences in the same Look viewport. The viewer
-defaults to See-through so enclosed or occluded components remain visible and
+defaults to X-ray so enclosed or occluded components remain visible and
 offers Solid mode for ordinary inspection. The result
 is cached with the compiled model and is replaced when the source version
 changes.

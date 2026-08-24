@@ -94,7 +94,7 @@ try {
   const shellHtml = await shellResponse.text()
   expectIncludes(shellHtml, 'id="checks-tab"', "checks tab")
   expectIncludes(shellHtml, 'id="checks-panel"', "checks panel")
-  expectIncludes(shellHtml, 'data-render-mode="see-through"', "see-through control")
+  expectIncludes(shellHtml, 'data-render-mode="x-ray"', "X-ray control")
   expectIncludes(shellHtml, 'data-render-mode="solid"', "solid control")
 
   const singleReport = await getJson(
@@ -160,10 +160,10 @@ try {
   expectIncludes(viewerHtml, "background-color: #0c0d10", "dark viewer surface")
   expectIncludes(
     viewerHtml,
-    'name="burr-render-modes" content="see-through,solid"',
+    'name="burr-render-modes" content="x-ray,solid"',
     "viewer render modes",
   )
-  expectIncludes(viewerHtml, 'let burrRenderMode = "see-through"', "default render mode")
+  expectIncludes(viewerHtml, 'let burrRenderMode = "x-ray"', "default render mode")
   expectIncludes(viewerHtml, "fragColor = vec4(col, uOpacity);", "transparent shader output")
 
   const lightViewerResponse = await fetch(
@@ -230,7 +230,7 @@ try {
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
 
   console.log(
-    `viewer proof passed (model scope enforced, STEP interference pass/fail/incomplete proven, see-through rendering available, components highlighted, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (model scope enforced, STEP interference pass/fail/incomplete proven, X-ray rendering available, components highlighted, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)
