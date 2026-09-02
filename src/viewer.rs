@@ -22,10 +22,11 @@ use tiny_http::{Header, Method, Request, Response, Server, StatusCode};
 const SHELL_HTML: &str = include_str!("viewer_shell.html");
 const LOGO_PNG: &[u8] = include_bytes!("../assets/burr-logo.png");
 const VIEWER_FRAMING_MARGIN: f32 = 1.3;
-const SKIP_DIRECTORIES: [&str; 9] = [
+const SKIP_DIRECTORIES: [&str; 10] = [
     ".git",
     ".jj",
     ".next",
+    "__cadgen__",
     "__pycache__",
     "build",
     "dist",
@@ -843,10 +844,16 @@ mod tests {
     fn scan_models_filters_and_sorts_supported_files() {
         let temp = tempdir().unwrap();
         fs::create_dir_all(temp.path().join("models/enclosure")).unwrap();
+        fs::create_dir_all(temp.path().join("models/__cadgen__/components")).unwrap();
         fs::create_dir_all(temp.path().join("node_modules/ignored")).unwrap();
         fs::write(temp.path().join("models/zeta.stl"), "solid empty\nendsolid").unwrap();
         fs::write(temp.path().join("models/enclosure/alpha.STEP"), "STEP").unwrap();
         fs::write(temp.path().join("models/readme.txt"), "ignore me").unwrap();
+        fs::write(
+            temp.path().join("models/__cadgen__/components/render.glb"),
+            "generated render cache",
+        )
+        .unwrap();
         fs::write(
             temp.path().join("node_modules/ignored/hidden.glb"),
             "ignore me",
