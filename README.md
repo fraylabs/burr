@@ -21,6 +21,7 @@ machine. Parsing, tessellation, and camera interaction are powered by
 - Switch the complete interface between light and dark themes.
 - Use **X-ray** mode by default to reveal enclosed or occluded occurrences.
 - Switch to **Solid** mode for ordinary surface inspection.
+- Export the current camera, theme, and render mode as a local PNG snapshot.
 
 Long file names stay on one line and truncate with an ellipsis. The complete
 path remains available on hover.

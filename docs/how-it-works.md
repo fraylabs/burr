@@ -31,6 +31,13 @@ The project contract contains model scope only. See
 [project configuration](project-configuration.md) for its validation and
 path-safety rules.
 
+## Snapshots
+
+**Snapshot** exports the current model canvas as a PNG through the browser's
+download flow. The image preserves the active camera, light or dark theme, and
+X-ray or Solid mode. Burr does not write the image into the model workspace or
+send model geometry to a remote renderer.
+
 ## Geometry-native assembly interference
 
 Look preserves each STEP assembly occurrence's component name, mesh, and world

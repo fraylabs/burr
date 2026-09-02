@@ -107,6 +107,10 @@ try {
   expectIncludes(shellHtml, 'id="checks-panel"', "checks panel")
   expectIncludes(shellHtml, 'data-render-mode="x-ray"', "X-ray control")
   expectIncludes(shellHtml, 'data-render-mode="solid"', "solid control")
+  expectIncludes(shellHtml, 'id="snapshot-button"', "snapshot control")
+  expectIncludes(shellHtml, "snapshotFilename(state.selectedPath)", "snapshot filename generation")
+  expectIncludes(shellHtml, 'type: "burr:export-snapshot"', "snapshot request dispatch")
+  expectIncludes(shellHtml, "burr:snapshot-exported", "snapshot completion feedback")
 
   const singleReport = await getJson(
     `/api/checks?path=${encodeURIComponent(counterbore.path)}`,
@@ -176,6 +180,9 @@ try {
   )
   expectIncludes(viewerHtml, 'let burrRenderMode = "x-ray"', "default render mode")
   expectIncludes(viewerHtml, "fragColor = vec4(col, uOpacity);", "transparent shader output")
+  expectIncludes(viewerHtml, 'name="burr-snapshot-export" content="png"', "PNG export marker")
+  expectIncludes(viewerHtml, "burr:export-snapshot", "snapshot request listener")
+  expectIncludes(viewerHtml, "canvas.toBlob", "canvas PNG export")
 
   const lightViewerResponse = await fetch(
     `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&theme=light`,
@@ -241,7 +248,7 @@ try {
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
 
   console.log(
-    `viewer proof passed (loopback Host enforced, model scope enforced, STEP interference pass/fail/incomplete proven, X-ray rendering available, components highlighted, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (loopback Host enforced, model scope enforced, STEP interference pass/fail/incomplete proven, X-ray rendering and PNG export available, components highlighted, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)

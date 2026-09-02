@@ -590,19 +590,54 @@
         background: var(--canvas);
       }
 
-      .render-mode-toggle {
+      .viewer-controls {
         position: absolute;
         top: 16px;
         right: 16px;
         z-index: 3;
         display: flex;
-        gap: 3px;
-        padding: 3px;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .snapshot-button,
+      .render-mode-toggle {
         border: 1px solid var(--border);
-        border-radius: var(--radius-pill);
         background: color-mix(in srgb, var(--surface) 90%, transparent);
         box-shadow: 0 10px 28px var(--shadow);
         backdrop-filter: blur(12px);
+      }
+
+      .snapshot-button {
+        min-width: 76px;
+        padding: 9px 12px;
+        border-radius: var(--radius-pill);
+        color: var(--text-secondary);
+        font-size: 10px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .snapshot-button:hover:not(:disabled) {
+        border-color: var(--border-strong);
+        color: var(--text);
+      }
+
+      .snapshot-button:disabled {
+        cursor: default;
+        opacity: 0.5;
+      }
+
+      .snapshot-button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .render-mode-toggle {
+        display: flex;
+        gap: 3px;
+        padding: 3px;
+        border-radius: var(--radius-pill);
       }
 
       .render-mode-option {
@@ -770,23 +805,34 @@
       <main class="viewer" aria-label="Selected model viewer">
         <iframe id="model-viewer" title="Selected 3D model"></iframe>
 
-        <div class="render-mode-toggle" role="group" aria-label="Model appearance">
+        <div class="viewer-controls">
           <button
-            class="render-mode-option"
+            id="snapshot-button"
+            class="snapshot-button"
             type="button"
-            data-render-mode="x-ray"
-            aria-pressed="true"
+            aria-label="Export current model view as PNG"
+            disabled
           >
-            X-ray
+            Snapshot
           </button>
-          <button
-            class="render-mode-option"
-            type="button"
-            data-render-mode="solid"
-            aria-pressed="false"
-          >
-            Solid
-          </button>
+          <div class="render-mode-toggle" role="group" aria-label="Model appearance">
+            <button
+              class="render-mode-option"
+              type="button"
+              data-render-mode="x-ray"
+              aria-pressed="true"
+            >
+              X-ray
+            </button>
+            <button
+              class="render-mode-option"
+              type="button"
+              data-render-mode="solid"
+              aria-pressed="false"
+            >
+              Solid
+            </button>
+          </div>
         </div>
 
         <div id="empty-state" class="viewer-state">
@@ -826,6 +872,7 @@
       const watchDot = document.querySelector("#watch-dot");
       const watchStatus = document.querySelector("#watch-status");
       const themeToggle = document.querySelector("#theme-toggle");
+      const snapshotButton = document.querySelector("#snapshot-button");
       const renderModeButtons = [...document.querySelectorAll(".render-mode-option")];
       const themeColor = document.querySelector('meta[name="theme-color"]');
 
@@ -840,6 +887,7 @@
         checkRequest: 0,
         checkReport: null,
         focusedFinding: null,
+        snapshotReset: null,
         theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
         renderMode:
           document.documentElement.dataset.renderMode === "solid" ? "solid" : "x-ray",
@@ -847,6 +895,12 @@
 
       viewer.addEventListener("load", () => {
         loadingState.hidden = true;
+        const snapshotReady = Boolean(
+          state.selectedPath &&
+            viewer.contentDocument?.querySelector('meta[name="burr-snapshot-export"]'),
+        );
+        snapshotButton.disabled = !snapshotReady;
+        snapshotButton.textContent = snapshotReady ? "Snapshot" : "Unavailable";
         sendRenderMode();
       });
 
@@ -856,6 +910,8 @@
       for (const button of renderModeButtons) {
         button.addEventListener("click", () => setRenderMode(button.dataset.renderMode, true));
       }
+      snapshotButton.addEventListener("click", exportSnapshot);
+      window.addEventListener("message", receiveViewerMessage);
       modelsTab.addEventListener("click", () => showPanel("models"));
       checksTab.addEventListener("click", () => showPanel("checks"));
 
@@ -915,6 +971,7 @@
           state.checkReport = null;
           state.focusedFinding = null;
           viewer.removeAttribute("src");
+          snapshotButton.disabled = true;
           loadingState.hidden = true;
           emptyState.hidden = false;
           renderChecksEmpty();
@@ -1029,6 +1086,8 @@
 
       function openViewer(file, refreshed = false, focus = null) {
         loadingState.hidden = false;
+        snapshotButton.disabled = true;
+        snapshotButton.textContent = "Snapshot";
         loadingTitle.textContent = refreshed ? `Reloading ${file.name}` : `Opening ${file.name}`;
         const query = new URLSearchParams({
           path: file.path,
@@ -1217,6 +1276,53 @@
           { type: "burr:set-render-mode", mode: state.renderMode },
           window.location.origin,
         );
+      }
+
+      function exportSnapshot() {
+        if (!state.selectedPath || snapshotButton.disabled) return;
+        snapshotButton.disabled = true;
+        snapshotButton.textContent = "Exporting…";
+        clearTimeout(state.snapshotReset);
+        state.snapshotReset = setTimeout(() => {
+          snapshotButton.disabled = false;
+          snapshotButton.textContent = "Try again";
+        }, 5000);
+        viewer.contentWindow?.postMessage(
+          {
+            type: "burr:export-snapshot",
+            filename: snapshotFilename(state.selectedPath),
+          },
+          window.location.origin,
+        );
+      }
+
+      function receiveViewerMessage(event) {
+        if (event.origin !== window.location.origin || event.source !== viewer.contentWindow) return;
+        const type = event.data?.type;
+        if (type !== "burr:snapshot-exported" && type !== "burr:snapshot-error") return;
+        clearTimeout(state.snapshotReset);
+        snapshotButton.disabled = false;
+        if (type === "burr:snapshot-exported") {
+          snapshotButton.textContent = "Saved";
+          snapshotButton.title = `Saved ${event.data.filename}`;
+          state.snapshotReset = setTimeout(() => {
+            snapshotButton.textContent = "Snapshot";
+          }, 1600);
+        } else {
+          snapshotButton.textContent = "Try again";
+          snapshotButton.title = event.data.message || "Snapshot export failed";
+        }
+      }
+
+      function snapshotFilename(modelPath) {
+        const leaf = modelPath.split("/").pop() || "burr-model";
+        const stem = leaf.replace(/\.(step|stp|stl|glb)$/i, "");
+        const safe =
+          stem
+            .normalize("NFKD")
+            .replace(/[^a-zA-Z0-9._-]+/g, "-")
+            .replace(/^-+|-+$/g, "") || "burr-model";
+        return `${safe}-${state.renderMode}-${state.theme}.png`;
       }
 
       function updateCurrentSelection() {

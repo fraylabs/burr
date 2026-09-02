@@ -533,7 +533,7 @@ fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
         ),
         (
             "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);",
-            "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);\n            gl.depthMask(true);",
+            "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);\n            gl.depthMask(true);\n            burrCaptureSnapshot(canvas);",
             "depth-buffer restore",
         ),
     ];
@@ -550,7 +550,59 @@ fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
     let Some(index) = html.find(marker) else {
         return Err("Look viewer HTML did not contain a head element.".to_string());
     };
-    let controls = r#"<meta name="burr-render-modes" content="x-ray,solid"><script id="burr-render-mode">let burrRenderMode = "x-ray";document.documentElement.dataset.burrRenderMode = burrRenderMode;window.addEventListener("message",(event)=>{if(event.origin!==window.location.origin||event.data?.type!=="burr:set-render-mode")return;const mode=event.data.mode;if(mode!=="x-ray"&&mode!=="solid")return;burrRenderMode=mode;document.documentElement.dataset.burrRenderMode=mode;});</script>"#;
+    let controls = r#"<meta name="burr-render-modes" content="x-ray,solid"><meta name="burr-snapshot-export" content="png"><script id="burr-viewer-controls">
+let burrRenderMode = "x-ray";
+let burrSnapshotRequest = null;
+document.documentElement.dataset.burrRenderMode = burrRenderMode;
+
+window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin) return;
+    if (event.data?.type === "burr:set-render-mode") {
+        const mode = event.data.mode;
+        if (mode !== "x-ray" && mode !== "solid") return;
+        burrRenderMode = mode;
+        document.documentElement.dataset.burrRenderMode = mode;
+        return;
+    }
+    if (event.data?.type !== "burr:export-snapshot") return;
+    const filename = event.data.filename;
+    if (typeof filename !== "string" || !/^[a-zA-Z0-9._-]+\.png$/.test(filename)) {
+        window.parent.postMessage(
+            { type: "burr:snapshot-error", message: "Snapshot filename was invalid." },
+            window.location.origin,
+        );
+        return;
+    }
+    burrSnapshotRequest = filename;
+});
+
+function burrCaptureSnapshot(canvas) {
+    if (!burrSnapshotRequest) return;
+    const filename = burrSnapshotRequest;
+    burrSnapshotRequest = null;
+    canvas.toBlob((blob) => {
+        if (!blob) {
+            window.parent.postMessage(
+                { type: "burr:snapshot-error", message: "The model canvas could not be captured." },
+                window.location.origin,
+            );
+            return;
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        window.parent.postMessage(
+            { type: "burr:snapshot-exported", filename },
+            window.location.origin,
+        );
+    }, "image/png");
+}
+</script>"#;
     html.insert_str(index, controls);
     Ok(html)
 }
@@ -892,6 +944,10 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
         assert!(rendered.contains("fragColor = vec4(col, uOpacity);"));
         assert!(rendered.contains("xRay ? 0.28 : 1.0"));
         assert!(rendered.contains("burr:set-render-mode"));
+        assert!(rendered.contains("name=\"burr-snapshot-export\" content=\"png\""));
+        assert!(rendered.contains("burr:export-snapshot"));
+        assert!(rendered.contains("canvas.toBlob"));
+        assert!(rendered.contains("burrCaptureSnapshot(canvas);"));
     }
 
     #[test]
