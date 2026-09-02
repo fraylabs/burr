@@ -14,6 +14,11 @@ and refreshes the active model when a file changes. Models stay on your
 machine. Parsing, tessellation, and camera interaction are powered by
 [Look](https://github.com/stefangolas/look).
 
+The optional `$burr` agent skill makes Burr the front door for a design task.
+It can route source creation to an independently maintained provider and then
+return to Burr to view and check the result. Existing files never require a
+design provider: `burr .` continues to work on its own.
+
 ## Viewer
 
 - Browse supported model files from the collapsible sidebar.
@@ -59,6 +64,19 @@ Then open any model folder:
 cd your-project
 burr .
 ```
+
+To use Burr as an agent skill:
+
+```bash
+npx skills add fraylabs/burr
+```
+
+The skill does not bundle design systems. It uses an installed mechanical CAD
+or electronics provider only when a request needs one; for example,
+[text-to-cad](https://github.com/earthtojake/text-to-cad) can produce mechanical
+models and [KiStack](https://github.com/American-Embedded/kistack) can own KiCad
+electronics work. Burr remains responsible for the resulting local model
+workspace, viewer, and supported checks.
 
 The first installation compiles Burr and its CAD dependencies. Starting an
 already-built Burr process is normally near-instant.
