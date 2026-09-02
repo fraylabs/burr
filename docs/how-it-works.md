@@ -8,6 +8,7 @@ burr .
   -> preserve their folder hierarchy
   -> compile the selected model with Look
   -> render it in a local browser
+  -> animate configured rigid assembly poses
   -> inspect STEP assembly component interference
   -> refresh when the source file changes
 ```
@@ -27,9 +28,23 @@ schema_version = "burr.project.v1"
 models = ["models"]
 ```
 
-The project contract contains model scope only. See
+The project contract can also name rigid motions between two STEP assembly
+poses. See
 [project configuration](project-configuration.md) for its validation and
 path-safety rules.
+
+## Named assembly motion
+
+A project may connect two STEP files as the endpoints of a named motion. Burr
+matches uniquely named components, verifies that their geometry is unchanged,
+and interpolates their transforms locally. The viewer then provides one
+play/pause button and a scrubber between the endpoint labels. This is intended
+for mechanisms such as a deployed and folded hanger, not mesh morphing or
+physics simulation.
+
+The browser receives precomputed rigid-transform frames; model vertices are not
+duplicated for every frame. **Snapshot** captures whichever frame is currently
+visible.
 
 ## Snapshots
 

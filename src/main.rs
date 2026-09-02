@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 mod interference;
+mod motion;
 mod project;
 mod viewer;
 

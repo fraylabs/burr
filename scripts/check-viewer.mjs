@@ -37,6 +37,10 @@ fs.copyFileSync(fixture, modelPath)
 for (const name of ["contained.step", "intersecting.step", "separated.step", "touching.step"]) {
   fs.copyFileSync(path.join(interferenceFixtures, name), path.join(assemblyDirectory, name))
 }
+fs.copyFileSync(
+  path.join(interferenceFixtures, "separated.step"),
+  path.join(assemblyDirectory, "separated-folded.step"),
+)
 fs.copyFileSync(fixture, path.join(unconfiguredModelDirectory, "not-configured.step"))
 fs.writeFileSync(path.join(ignoredDirectory, "readme.txt"), "not a model\n")
 fs.writeFileSync(
@@ -46,6 +50,15 @@ fs.writeFileSync(
     "",
     "[project]",
     'models = ["models"]',
+    "",
+    "[[motions]]",
+    'id = "fold"',
+    'label = "Fold assembly"',
+    'from = "models/assemblies/separated.step"',
+    'from_label = "Deployed"',
+    'to = "models/assemblies/separated-folded.step"',
+    'to_label = "Folded"',
+    "duration_ms = 800",
     "",
   ].join("\n"),
 )
@@ -88,14 +101,18 @@ try {
   expectEqual(project.config_path, ".burr/config.toml", "portable config path")
   expectEqual(project.model_paths?.length, 1, "configured model root count")
   expectEqual(project.model_paths?.[0], "models", "configured model root")
+  expectEqual(project.motions?.length, 1, "configured motion count")
+  expectEqual(project.motions?.[0]?.id, "fold", "configured motion id")
   expectEqual(
     Object.keys(project).sort().join(","),
-    "config_path,configured,model_paths,root,schema_version",
+    "config_path,configured,model_paths,motions,root,schema_version",
     "closed project state",
   )
 
   const initialTree = await getJson("/api/tree")
-  expectEqual(initialTree.files?.length, 5, "filtered model count")
+  expectEqual(initialTree.files?.length, 6, "filtered model count")
+  expectEqual(initialTree.motions?.[0]?.from_label, "Deployed", "tree motion start label")
+  expectEqual(initialTree.motions?.[0]?.to_label, "Folded", "tree motion end label")
   const counterbore = model(initialTree, "models/enclosure/counterbore.step")
   expectEqual(counterbore.format, "STEP", "model format")
   const initialVersion = counterbore.version
@@ -108,6 +125,9 @@ try {
   expectIncludes(shellHtml, 'data-render-mode="x-ray"', "X-ray control")
   expectIncludes(shellHtml, 'data-render-mode="solid"', "solid control")
   expectIncludes(shellHtml, 'id="snapshot-button"', "snapshot control")
+  expectIncludes(shellHtml, 'id="motion-controls"', "motion controls")
+  expectIncludes(shellHtml, 'id="motion-progress"', "motion scrubber")
+  expectIncludes(shellHtml, 'type: "burr:toggle-motion"', "motion playback dispatch")
   expectIncludes(shellHtml, "snapshotFilename(state.selectedPath)", "snapshot filename generation")
   expectIncludes(shellHtml, 'type: "burr:export-snapshot"', "snapshot request dispatch")
   expectIncludes(shellHtml, "burr:snapshot-exported", "snapshot completion feedback")
@@ -184,6 +204,25 @@ try {
   expectIncludes(viewerHtml, "burr:export-snapshot", "snapshot request listener")
   expectIncludes(viewerHtml, "canvas.toBlob", "canvas PNG export")
 
+  const motionViewerResponse = await fetch(
+    `${baseUrl}/viewer?path=${encodeURIComponent("models/assemblies/separated.step")}&motion=fold`,
+  )
+  expectEqual(motionViewerResponse.status, 200, "motion viewer response status")
+  const motionViewerHtml = await motionViewerResponse.text()
+  expectIncludes(
+    motionViewerHtml,
+    'name="burr-motion" content="rigid-poses"',
+    "rigid motion marker",
+  )
+  expectIncludes(motionViewerHtml, "uBurrInstanceTransforms[32]", "motion transform shader")
+  expectIncludes(motionViewerHtml, "burr:set-motion-progress", "motion scrub listener")
+  expectIncludes(motionViewerHtml, "burr:motion-state", "motion playback state")
+
+  const unknownMotion = await fetch(
+    `${baseUrl}/viewer?path=${encodeURIComponent("models/assemblies/separated.step")}&motion=unknown`,
+  )
+  expectEqual(unknownMotion.status, 422, "unknown motion status")
+
   const lightViewerResponse = await fetch(
     `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&theme=light`,
   )
@@ -248,7 +287,7 @@ try {
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
 
   console.log(
-    `viewer proof passed (loopback Host enforced, model scope enforced, STEP interference pass/fail/incomplete proven, X-ray rendering and PNG export available, components highlighted, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (loopback Host enforced, model scope enforced, named STEP motion rendered, STEP interference pass/fail/incomplete proven, X-ray rendering and PNG export available, components highlighted, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)

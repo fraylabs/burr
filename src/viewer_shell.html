@@ -666,6 +666,68 @@
         outline-offset: 2px;
       }
 
+      .motion-controls {
+        position: absolute;
+        left: 50%;
+        bottom: 72px;
+        z-index: 3;
+        width: min(560px, calc(100% - 36px));
+        display: grid;
+        grid-template-columns: auto auto minmax(120px, 1fr) auto;
+        align-items: center;
+        gap: 11px;
+        padding: 8px 11px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-pill);
+        background: color-mix(in srgb, var(--surface) 92%, transparent);
+        box-shadow: 0 12px 32px var(--shadow);
+        backdrop-filter: blur(12px);
+        transform: translateX(-50%);
+      }
+
+      .motion-controls[hidden] {
+        display: none;
+      }
+
+      .motion-play {
+        min-width: 58px;
+        padding: 7px 11px;
+        border: 0;
+        border-radius: var(--radius-pill);
+        background: var(--surface-selected);
+        color: var(--text);
+        font-size: 10px;
+        font-weight: 750;
+        cursor: pointer;
+      }
+
+      .motion-play:hover {
+        background: var(--surface-hover);
+      }
+
+      .motion-play:focus-visible,
+      .motion-progress:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .motion-label {
+        min-width: 0;
+        overflow: hidden;
+        color: var(--text-muted);
+        font-size: 9px;
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .motion-progress {
+        width: 100%;
+        min-width: 0;
+        accent-color: var(--accent);
+        cursor: ew-resize;
+      }
+
       .viewer-state {
         position: absolute;
         inset: 0;
@@ -729,6 +791,14 @@
       @media (max-width: 720px) {
         #app {
           grid-template-columns: 220px minmax(0, 1fr);
+        }
+
+        .motion-controls {
+          grid-template-columns: auto minmax(90px, 1fr);
+        }
+
+        .motion-label {
+          display: none;
         }
       }
     </style>
@@ -835,6 +905,21 @@
           </div>
         </div>
 
+        <div id="motion-controls" class="motion-controls" aria-label="Model motion" hidden>
+          <button id="motion-play" class="motion-play" type="button">Play</button>
+          <span id="motion-from" class="motion-label">Start</span>
+          <input
+            id="motion-progress"
+            class="motion-progress"
+            type="range"
+            min="0"
+            max="1000"
+            value="0"
+            aria-label="Motion progress"
+          />
+          <span id="motion-to" class="motion-label">End</span>
+        </div>
+
         <div id="empty-state" class="viewer-state">
           <div class="state-content">
             <div class="state-mark" aria-hidden="true">⌁</div>
@@ -874,10 +959,16 @@
       const themeToggle = document.querySelector("#theme-toggle");
       const snapshotButton = document.querySelector("#snapshot-button");
       const renderModeButtons = [...document.querySelectorAll(".render-mode-option")];
+      const motionControls = document.querySelector("#motion-controls");
+      const motionPlay = document.querySelector("#motion-play");
+      const motionProgress = document.querySelector("#motion-progress");
+      const motionFrom = document.querySelector("#motion-from");
+      const motionTo = document.querySelector("#motion-to");
       const themeColor = document.querySelector('meta[name="theme-color"]');
 
       const state = {
         files: [],
+        motions: [],
         selectedPath: null,
         selectedVersion: null,
         signature: "",
@@ -888,6 +979,12 @@
         checkReport: null,
         focusedFinding: null,
         snapshotReset: null,
+        activeMotion: null,
+        motionProgress: 0,
+        motionPlaying: false,
+        motionReady: false,
+        motionSuspended: false,
+        motionSignature: "",
         theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
         renderMode:
           document.documentElement.dataset.renderMode === "solid" ? "solid" : "x-ray",
@@ -901,7 +998,14 @@
         );
         snapshotButton.disabled = !snapshotReady;
         snapshotButton.textContent = snapshotReady ? "Snapshot" : "Unavailable";
+        state.motionReady = Boolean(
+          state.activeMotion &&
+            !state.motionSuspended &&
+            viewer.contentDocument?.querySelector('meta[name="burr-motion"]'),
+        );
+        renderMotionControls();
         sendRenderMode();
+        sendMotionProgress();
       });
 
       themeToggle.addEventListener("click", () => {
@@ -911,6 +1015,8 @@
         button.addEventListener("click", () => setRenderMode(button.dataset.renderMode, true));
       }
       snapshotButton.addEventListener("click", exportSnapshot);
+      motionPlay.addEventListener("click", toggleMotion);
+      motionProgress.addEventListener("input", setMotionProgress);
       window.addEventListener("message", receiveViewerMessage);
       modelsTab.addEventListener("click", () => showPanel("models"));
       checksTab.addEventListener("click", () => showPanel("checks"));
@@ -949,6 +1055,7 @@
 
       function applyTree(payload) {
         const files = Array.isArray(payload.files) ? payload.files : [];
+        const motions = Array.isArray(payload.motions) ? payload.motions : [];
         rootName.textContent = payload.root || "Model browser";
         rootName.title = payload.root || "Model browser";
         modelCount.textContent = String(files.length);
@@ -957,8 +1064,12 @@
         const selected = files.find((file) => file.path === state.selectedPath);
         const selectedChanged = selected && selected.version !== state.selectedVersion;
         const selectionRemoved = state.selectedPath && !selected;
+        const motionSignature = JSON.stringify(motions);
+        const motionsChanged = state.motionSignature && motionSignature !== state.motionSignature;
 
         state.files = files;
+        state.motions = motions;
+        state.motionSignature = motionSignature;
         if (signature !== state.signature) {
           state.signature = signature;
           renderTree(files);
@@ -970,18 +1081,21 @@
           state.checkRequest += 1;
           state.checkReport = null;
           state.focusedFinding = null;
+          state.activeMotion = null;
+          state.motionReady = false;
           viewer.removeAttribute("src");
           snapshotButton.disabled = true;
           loadingState.hidden = true;
           emptyState.hidden = false;
           renderChecksEmpty();
+          renderMotionControls();
           return;
         }
 
         emptyState.hidden = true;
         if (!state.selectedPath || selectionRemoved) {
           selectFile(files[0]);
-        } else if (selectedChanged) {
+        } else if (selectedChanged || motionsChanged) {
           selectFile(selected, true);
         }
       }
@@ -1078,6 +1192,7 @@
         state.selectedPath = file.path;
         state.selectedVersion = file.version;
         state.focusedFinding = null;
+        selectMotion(file.path);
         updateCurrentSelection();
         emptyState.hidden = true;
         openViewer(file, refreshed);
@@ -1085,6 +1200,9 @@
       }
 
       function openViewer(file, refreshed = false, focus = null) {
+        state.motionSuspended = Boolean(focus);
+        state.motionReady = false;
+        renderMotionControls();
         loadingState.hidden = false;
         snapshotButton.disabled = true;
         snapshotButton.textContent = "Snapshot";
@@ -1095,7 +1213,62 @@
           theme: state.theme,
         });
         if (focus) query.set("focus", focus.join(","));
+        else if (state.activeMotion) query.set("motion", state.activeMotion.id);
         viewer.src = `/viewer?${query}`;
+      }
+
+      function selectMotion(path) {
+        const motion = state.motions.find(
+          (candidate) => candidate.from === path || candidate.to === path,
+        );
+        state.activeMotion = motion || null;
+        state.motionProgress = motion?.to === path ? 1 : 0;
+        state.motionPlaying = false;
+        state.motionReady = false;
+        state.motionSuspended = false;
+        renderMotionControls();
+      }
+
+      function renderMotionControls() {
+        const motion = state.activeMotion;
+        motionControls.hidden = !motion || !state.motionReady || state.motionSuspended;
+        if (!motion) return;
+        motionControls.setAttribute("aria-label", motion.label || "Model motion");
+        motionFrom.textContent = motion.from_label || "Start";
+        motionFrom.title = motion.from_label || "Start";
+        motionTo.textContent = motion.to_label || "End";
+        motionTo.title = motion.to_label || "End";
+        motionProgress.value = String(Math.round(state.motionProgress * 1000));
+        motionPlay.textContent = state.motionPlaying
+          ? "Pause"
+          : state.motionProgress >= 0.999
+            ? "Replay"
+            : "Play";
+        motionPlay.setAttribute("aria-pressed", String(state.motionPlaying));
+      }
+
+      function setMotionProgress() {
+        if (!state.activeMotion || !state.motionReady) return;
+        state.motionProgress = Number(motionProgress.value) / 1000;
+        state.motionPlaying = false;
+        renderMotionControls();
+        sendMotionProgress();
+      }
+
+      function sendMotionProgress() {
+        if (!state.activeMotion || !state.motionReady || state.motionSuspended) return;
+        viewer.contentWindow?.postMessage(
+          { type: "burr:set-motion-progress", progress: state.motionProgress },
+          window.location.origin,
+        );
+      }
+
+      function toggleMotion() {
+        if (!state.activeMotion || !state.motionReady) return;
+        viewer.contentWindow?.postMessage(
+          { type: "burr:toggle-motion" },
+          window.location.origin,
+        );
       }
 
       async function loadChecks(file) {
@@ -1299,6 +1472,14 @@
       function receiveViewerMessage(event) {
         if (event.origin !== window.location.origin || event.source !== viewer.contentWindow) return;
         const type = event.data?.type;
+        if (type === "burr:motion-state") {
+          const progress = Number(event.data.progress);
+          if (!Number.isFinite(progress)) return;
+          state.motionProgress = Math.max(0, Math.min(1, progress));
+          state.motionPlaying = Boolean(event.data.playing);
+          renderMotionControls();
+          return;
+        }
         if (type !== "burr:snapshot-exported" && type !== "burr:snapshot-error") return;
         clearTimeout(state.snapshotReset);
         snapshotButton.disabled = false;
