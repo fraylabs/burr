@@ -23,29 +23,30 @@ can use `.burr/config.toml` to name one or more model folders while retaining a
 stable project root:
 
 ```toml
-schema_version = "burr.project.v1"
+schema_version = "burr.project.v2"
 
 [project]
 models = ["models"]
 ```
 
-The project contract can also name rigid motions between two STEP assembly
-poses. See
+The project contract can also name rigid joint motions within one STEP
+assembly. See
 [project configuration](project-configuration.md) for its validation and
 path-safety rules.
 
 ## Named assembly motion
 
-A project may connect two STEP files as the endpoints of a named motion. Burr
-matches uniquely named components, verifies that their geometry is unchanged,
-and interpolates their transforms locally. The viewer then provides one
-play/pause button and a scrubber between the endpoint labels. This is intended
-for mechanisms such as a deployed and folded hanger, not mesh morphing or
-physics simulation.
+A project may attach revolute or prismatic joints to uniquely named components
+in one STEP assembly. Burr tessellates that model once, then calculates each
+component transform from the configured axis, pivot and angle or travel. The
+viewer provides one play/pause button and a scrubber between the endpoint
+labels. This is intended for mechanisms such as a deployed and folded hanger,
+not mesh morphing or physics simulation.
 
 The browser receives precomputed rigid-transform frames; model vertices are not
-duplicated for every frame. **Snapshot** captures whichever frame is currently
-visible.
+duplicated for every frame and no second pose is tessellated. Revolute motion
+follows the declared hinge arc rather than blending between two world-space
+snapshots. **Snapshot** captures whichever frame is currently visible.
 
 ## Snapshots
 
@@ -62,9 +63,9 @@ materials or rigid motion, and encoding the browser viewer. The local server
 uses separate workers so those updates remain available during tessellation.
 
 Burr stores the final self-contained viewer HTML rather than serializing Look's
-internal CAD scene. A BLAKE3 fingerprint of every source pose, the canonical
-source path, Burr version, theme, focus, and motion configuration determine
-reuse. Editing a source or upgrading Burr therefore generates a new entry.
+internal CAD scene. A BLAKE3 fingerprint of the source model, its canonical
+path, Burr version, theme, focus, and motion configuration determine reuse.
+Editing a source or upgrading Burr therefore generates a new entry.
 The process keeps up to 32 viewers and 256 MiB in memory. The platform cache
 retains up to 128 entries and 512 MiB, and ignores viewer HTML larger than
 64 MiB.

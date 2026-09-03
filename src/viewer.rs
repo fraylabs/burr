@@ -63,6 +63,8 @@ struct ModelCache {
     viewers: HashMap<String, String>,
     viewer_order: VecDeque<String>,
     viewer_bytes: usize,
+    #[cfg(test)]
+    compile_count: usize,
 }
 
 struct RenderedViewer {
@@ -562,33 +564,25 @@ fn render_motion_model(
     viewer_cache: &ViewerCache,
     reporter: &LoadReporter<'_>,
 ) -> Result<RenderedViewer, String> {
-    let initial_progress = if relative_path == motion.from {
-        0.0
-    } else if relative_path == motion.to {
-        1.0
-    } else {
+    if relative_path != motion.model {
         return Err(format!(
             "Motion '{}' does not include model {relative_path}.",
             motion.id
         ));
-    };
+    }
+    let initial_progress = 0.0;
 
     reporter.stage(
         "Reading source",
-        "Checking both motion poses against the reusable viewer cache.",
+        "Checking the motion model against the reusable viewer cache.",
     );
-    let from_path = resolve_model_path(project, &motion.from)?;
-    let to_path = resolve_model_path(project, &motion.to)?;
-    let from_fingerprint = source_fingerprint(&from_path)?;
-    let to_fingerprint = source_fingerprint(&to_path)?;
-    let motion_signature = format!(
-        "{}|{}|{}|{}|{}",
-        motion.id, motion.from, motion.to, motion.duration_ms, to_fingerprint
-    );
+    let model_path = resolve_model_path(project, &motion.model)?;
+    let model_fingerprint = source_fingerprint(&model_path)?;
+    let motion_signature = motion.cache_signature();
     let viewer_key = viewer_cache_key(
         relative_path,
-        &from_path,
-        &from_fingerprint,
+        &model_path,
+        &model_fingerprint,
         theme,
         None,
         Some(&motion_signature),
@@ -611,17 +605,20 @@ fn render_motion_model(
         Err(error) => eprintln!("burr: {error}; rebuilding the viewer"),
     }
 
-    let from_scene = load_model(project, &motion.from, cache, Some(reporter))?
-        .scene
-        .clone();
-    let to_scene = load_model(project, &motion.to, cache, Some(reporter))?
+    let source_scene = load_model(project, &motion.model, cache, Some(reporter))?
         .scene
         .clone();
     reporter.stage(
         "Preparing motion",
-        "Matching rigid components and generating the playback frames.",
+        "Applying the configured joints and generating the playback frames.",
     );
-    let prepared = prepare_motion(&from_scene, &to_scene, motion.duration_ms, initial_progress)?;
+    let prepared = prepare_motion(
+        &source_scene,
+        &motion.joints,
+        UpAxis::Z,
+        motion.duration_ms,
+        initial_progress,
+    )?;
     reporter.stage(
         "Building viewer",
         "Encoding the compiled motion for the local browser.",
@@ -716,6 +713,10 @@ fn load_model<'a>(
             "Tessellating geometry",
             &format!("Look is compiling {relative_path} locally."),
         );
+    }
+    #[cfg(test)]
+    {
+        cache.compile_count += 1;
     }
     let mut scene = compile_scene(&path, up_axis, &mut timings)
         .map_err(|error| format!("Look could not render {relative_path}: {error:#}"))?;
@@ -1538,9 +1539,13 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
             .join("tests/fixtures/interference/separated.step");
         let mut timings = Timings::default();
         let from = compile_scene(&path, UpAxis::Z, &mut timings).unwrap();
-        let mut to = from.clone();
-        to.instances[1].transform *= glam::Mat4::from_rotation_z(std::f32::consts::FRAC_PI_2);
-        let motion = prepare_motion(&from, &to, 800, 0.0).unwrap();
+        let joints = [crate::project::MotionJoint::Revolute {
+            components: vec!["moving".to_string()],
+            origin_mm: [0.0, 0.0, 0.0],
+            axis: [0.0, 0.0, 1.0],
+            angle_degrees: 90.0,
+        }];
+        let motion = prepare_motion(&from, &joints, UpAxis::Z, 800, 0.0).unwrap();
         let html = generate_html_viewer(
             &motion.scene,
             "motion.step",
@@ -1559,6 +1564,73 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
         assert!(html.contains("burr:set-motion-progress"));
         assert!(html.contains("burr:toggle-motion"));
         assert!(html.contains("burrApplyMotionFrame(gl);"));
+    }
+
+    #[test]
+    fn motion_compiles_only_its_single_source_model() {
+        let temp = tempdir().unwrap();
+        fs::create_dir_all(temp.path().join("models")).unwrap();
+        fs::create_dir_all(temp.path().join(".burr")).unwrap();
+        fs::copy(
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("tests/fixtures/interference/separated.step"),
+            temp.path().join("models/assembly.step"),
+        )
+        .unwrap();
+        fs::write(
+            temp.path().join(".burr/config.toml"),
+            r#"schema_version = "burr.project.v2"
+[project]
+models = ["models"]
+[[motions]]
+id = "fold"
+label = "Fold"
+model = "models/assembly.step"
+from_label = "Open"
+to_label = "Closed"
+duration_ms = 800
+[[motions.joints]]
+type = "revolute"
+components = ["moving"]
+origin_mm = [0.0, 0.0, 0.0]
+axis = [0.0, 0.0, 1.0]
+angle_degrees = 90.0
+"#,
+        )
+        .unwrap();
+
+        let project = Project::discover(temp.path()).unwrap();
+        let motion = project.motion("fold").unwrap();
+        let mut model_cache = ModelCache::default();
+        let viewer_cache = ViewerCache::at(temp.path().join("cache"));
+        let tracker = LoadTracker::default();
+        let reporter = tracker.reporter(None);
+
+        let first = render_motion_model(
+            &project,
+            "models/assembly.step",
+            ViewerTheme::Dark,
+            motion,
+            &mut model_cache,
+            &viewer_cache,
+            &reporter,
+        )
+        .unwrap();
+        let second = render_motion_model(
+            &project,
+            "models/assembly.step",
+            ViewerTheme::Dark,
+            motion,
+            &mut model_cache,
+            &viewer_cache,
+            &reporter,
+        )
+        .unwrap();
+
+        assert_eq!(first.cache, "generated");
+        assert_eq!(second.cache, "memory");
+        assert_eq!(model_cache.compile_count, 1);
+        assert_eq!(model_cache.models.len(), 1);
     }
 
     #[test]

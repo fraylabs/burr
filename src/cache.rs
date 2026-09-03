@@ -26,7 +26,7 @@ impl ViewerCache {
     }
 
     #[cfg(test)]
-    fn at(root: PathBuf) -> Self {
+    pub(crate) fn at(root: PathBuf) -> Self {
         Self { root: Some(root) }
     }
 

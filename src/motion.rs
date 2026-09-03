@@ -1,5 +1,9 @@
+use crate::project::MotionJoint;
 use glam::{Mat3, Mat4, Vec3};
-use look::scene::{Bounds, CompiledScene, Geometry};
+use look::{
+    config::UpAxis,
+    scene::{Bounds, CompiledScene, Geometry},
+};
 use std::collections::HashMap;
 
 pub const MAX_MOTION_COMPONENTS: usize = 32;
@@ -17,108 +21,179 @@ pub struct PreparedMotion {
 }
 
 pub fn prepare_motion(
-    from: &CompiledScene,
-    to: &CompiledScene,
+    source: &CompiledScene,
+    joints: &[MotionJoint],
+    source_up_axis: UpAxis,
     duration_ms: u32,
     initial_progress: f32,
 ) -> Result<PreparedMotion, String> {
-    if from.instances.is_empty() || from.instances.len() > MAX_MOTION_COMPONENTS {
+    if source.instances.is_empty() || source.instances.len() > MAX_MOTION_COMPONENTS {
         return Err(format!(
-            "Motion requires from 1 to {MAX_MOTION_COMPONENTS} named components."
+            "Motion requires 1 to {MAX_MOTION_COMPONENTS} named components."
         ));
     }
-    if from.instances.len() != to.instances.len() {
-        return Err("Motion poses must contain the same number of components.".to_string());
+    if joints.is_empty() {
+        return Err("Motion requires at least one rigid joint.".to_string());
     }
 
-    let target_by_name = named_instances(to)?;
-    let mut targets = Vec::with_capacity(from.instances.len());
-    let mut geometries = Vec::with_capacity(from.instances.len());
+    let source_by_name = named_instances(source)?;
+    let instance_motions = instance_motions(
+        source.instances.len(),
+        &source_by_name,
+        joints,
+        source_up_axis,
+    )?;
+    let mut geometries = Vec::with_capacity(source.instances.len());
     let mut instance_ids = Vec::new();
 
-    let source_names = named_instances(from)?;
-    if source_names.len() != target_by_name.len() {
-        return Err("Motion poses must contain the same named components.".to_string());
-    }
-
-    for (instance_index, from_instance) in from.instances.iter().enumerate() {
-        let name = from_instance
+    for (instance_index, source_instance) in source.instances.iter().enumerate() {
+        let name = source_instance
             .node_name
             .as_deref()
             .ok_or_else(|| "Motion components must have non-empty names.".to_string())?;
-        let to_index = target_by_name
-            .get(name)
-            .copied()
-            .ok_or_else(|| format!("Motion target pose is missing component '{name}'."))?;
-        let to_instance = &to.instances[to_index];
-        let from_geometry = from
+        let geometry = source
             .geometries
-            .get(from_instance.geometry)
+            .get(source_instance.geometry)
             .ok_or_else(|| format!("Motion source component '{name}' has no geometry."))?;
-        let to_geometry = to
-            .geometries
-            .get(to_instance.geometry)
-            .ok_or_else(|| format!("Motion target component '{name}' has no geometry."))?;
-        if !same_geometry(from_geometry, to_geometry) {
-            return Err(format!(
-                "Motion component '{name}' changes geometry between poses; only rigid transforms are supported."
-            ));
-        }
-        let (from_scale, _, _) = from_instance.transform.to_scale_rotation_translation();
-        let (to_scale, _, _) = to_instance.transform.to_scale_rotation_translation();
-        if (from_scale - to_scale).abs().max_element() > 1.0e-5 {
-            return Err(format!(
-                "Motion component '{name}' changes scale between poses; only rigid transforms are supported."
-            ));
-        }
-
         instance_ids.extend(std::iter::repeat_n(
             instance_index as f32,
-            from_geometry.vertices.len(),
+            geometry.vertices.len(),
         ));
-        geometries.push(from_geometry.clone());
-        targets.push(to_instance.transform);
+        geometries.push(geometry.clone());
     }
 
-    let mut scene = from.clone();
+    let mut scene = source.clone();
     scene.geometries = geometries;
     for (index, instance) in scene.instances.iter_mut().enumerate() {
         instance.geometry = index;
         instance.transform = Mat4::IDENTITY;
         instance.normal_transform = Mat3::IDENTITY;
     }
-    scene.bounds = union_bounds(from.bounds, to.bounds);
-    scene.fit_radius = bounds_radius(scene.bounds) * 1.3;
 
     let frame_count = (duration_ms as usize * MOTION_FRAMES_PER_SECOND).div_ceil(1_000) + 1;
     let mut frames = Vec::with_capacity(
         frame_count * scene.instances.len() * Mat4::IDENTITY.to_cols_array().len(),
     );
+    let mut animated_bounds = EmptyBounds::new();
     for frame in 0..frame_count {
         let progress = frame as f32 / (frame_count - 1) as f32;
         let eased = progress * progress * (3.0 - 2.0 * progress);
-        for (from_instance, target) in from.instances.iter().zip(&targets) {
-            let (from_scale, from_rotation, from_translation) =
-                from_instance.transform.to_scale_rotation_translation();
-            let (to_scale, to_rotation, to_translation) = target.to_scale_rotation_translation();
-            let transform = Mat4::from_scale_rotation_translation(
-                from_scale.lerp(to_scale, eased),
-                from_rotation.slerp(to_rotation, eased),
-                from_translation.lerp(to_translation, eased),
-            );
+        for (index, source_instance) in source.instances.iter().enumerate() {
+            let transform =
+                motion_transform(source_instance.transform, &instance_motions[index], eased);
+            if !transform.is_finite() {
+                return Err("Motion generated a non-finite component transform.".to_string());
+            }
             frames.extend(transform.to_cols_array());
+            animated_bounds.include_geometry_bounds(&scene.geometries[index], transform);
         }
     }
+    scene.bounds = animated_bounds.finish()?;
+    scene.fit_radius = bounds_radius(scene.bounds) * 1.3;
 
     Ok(PreparedMotion {
         scene,
         instance_ids_base64: base64_f32(&instance_ids),
         frames_base64: base64_f32(&frames),
         frame_count,
-        instance_count: from.instances.len(),
+        instance_count: source.instances.len(),
         duration_ms,
         initial_progress: initial_progress.clamp(0.0, 1.0),
     })
+}
+
+#[derive(Clone, Debug)]
+enum InstanceMotion {
+    Fixed,
+    Revolute {
+        origin: Vec3,
+        axis: Vec3,
+        angle_radians: f32,
+    },
+    Prismatic {
+        axis: Vec3,
+        distance_mm: f32,
+    },
+}
+
+fn instance_motions(
+    instance_count: usize,
+    source_by_name: &HashMap<&str, usize>,
+    joints: &[MotionJoint],
+    source_up_axis: UpAxis,
+) -> Result<Vec<InstanceMotion>, String> {
+    let mut motions = vec![InstanceMotion::Fixed; instance_count];
+    let normalization = normalization_transform(source_up_axis);
+    for joint in joints {
+        let (components, operation) = match joint {
+            MotionJoint::Revolute {
+                components,
+                origin_mm,
+                axis,
+                angle_degrees,
+            } => (
+                components,
+                InstanceMotion::Revolute {
+                    origin: normalization.transform_point3(Vec3::from_array(*origin_mm)),
+                    axis: normalization.transform_vector3(Vec3::from_array(*axis)),
+                    angle_radians: angle_degrees.to_radians(),
+                },
+            ),
+            MotionJoint::Prismatic {
+                components,
+                axis,
+                distance_mm,
+            } => (
+                components,
+                InstanceMotion::Prismatic {
+                    axis: normalization.transform_vector3(Vec3::from_array(*axis)),
+                    distance_mm: *distance_mm,
+                },
+            ),
+        };
+        for component in components {
+            let index = source_by_name
+                .get(component.as_str())
+                .copied()
+                .ok_or_else(|| {
+                    format!("Motion component '{component}' is missing from the source model.")
+                })?;
+            if !matches!(motions[index], InstanceMotion::Fixed) {
+                return Err(format!(
+                    "Motion component may be assigned to only one joint: '{component}'."
+                ));
+            }
+            motions[index] = operation.clone();
+        }
+    }
+    Ok(motions)
+}
+
+fn normalization_transform(up_axis: UpAxis) -> Mat4 {
+    match up_axis {
+        UpAxis::Y => Mat4::IDENTITY,
+        UpAxis::Z => Mat4::from_rotation_x(-std::f32::consts::FRAC_PI_2),
+        UpAxis::X => Mat4::from_rotation_z(std::f32::consts::FRAC_PI_2),
+    }
+}
+
+fn motion_transform(source: Mat4, motion: &InstanceMotion, progress: f32) -> Mat4 {
+    match motion {
+        InstanceMotion::Fixed => source,
+        InstanceMotion::Revolute {
+            origin,
+            axis,
+            angle_radians,
+        } => {
+            Mat4::from_translation(*origin)
+                * Mat4::from_axis_angle(*axis, angle_radians * progress)
+                * Mat4::from_translation(-*origin)
+                * source
+        }
+        InstanceMotion::Prismatic { axis, distance_mm } => {
+            Mat4::from_translation(*axis * *distance_mm * progress) * source
+        }
+    }
 }
 
 fn named_instances(scene: &CompiledScene) -> Result<HashMap<&str, usize>, String> {
@@ -136,38 +211,47 @@ fn named_instances(scene: &CompiledScene) -> Result<HashMap<&str, usize>, String
     Ok(names)
 }
 
-fn same_geometry(left: &Geometry, right: &Geometry) -> bool {
-    left.indices == right.indices
-        && left.vertices.len() == right.vertices.len()
-        && left
-            .vertices
-            .iter()
-            .zip(&right.vertices)
-            .all(|(left, right)| {
-                left.position
-                    .iter()
-                    .zip(right.position)
-                    .all(|(left, right)| (left - right).abs() <= 1.0e-5)
-                    && left
-                        .normal
-                        .iter()
-                        .zip(right.normal)
-                        .all(|(left, right)| (left - right).abs() <= 1.0e-5)
-            })
+struct EmptyBounds {
+    min: Vec3,
+    max: Vec3,
+    has_vertex: bool,
 }
 
-fn union_bounds(left: Bounds, right: Bounds) -> Bounds {
-    Bounds {
-        min: [
-            left.min[0].min(right.min[0]),
-            left.min[1].min(right.min[1]),
-            left.min[2].min(right.min[2]),
-        ],
-        max: [
-            left.max[0].max(right.max[0]),
-            left.max[1].max(right.max[1]),
-            left.max[2].max(right.max[2]),
-        ],
+impl EmptyBounds {
+    fn new() -> Self {
+        Self {
+            min: Vec3::splat(f32::INFINITY),
+            max: Vec3::splat(f32::NEG_INFINITY),
+            has_vertex: false,
+        }
+    }
+
+    fn include_geometry_bounds(&mut self, geometry: &Geometry, transform: Mat4) {
+        if geometry.vertices.is_empty() {
+            return;
+        }
+        let min = Vec3::from_array(geometry.bounds.min);
+        let max = Vec3::from_array(geometry.bounds.max);
+        for x in [min.x, max.x] {
+            for y in [min.y, max.y] {
+                for z in [min.z, max.z] {
+                    let position = transform.transform_point3(Vec3::new(x, y, z));
+                    self.min = self.min.min(position);
+                    self.max = self.max.max(position);
+                    self.has_vertex = true;
+                }
+            }
+        }
+    }
+
+    fn finish(self) -> Result<Bounds, String> {
+        if !self.has_vertex || !self.min.is_finite() || !self.max.is_finite() {
+            return Err("Motion source model contains no finite geometry.".to_string());
+        }
+        Ok(Bounds {
+            min: self.min.to_array(),
+            max: self.max.to_array(),
+        })
     }
 }
 
@@ -211,7 +295,6 @@ fn base64_encode(data: &[u8]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use glam::Quat;
     use look::{config::UpAxis, scene::compile_scene, timing::Timings};
     use std::path::Path;
 
@@ -221,14 +304,22 @@ mod tests {
         compile_scene(&path, UpAxis::Z, &mut Timings::default()).unwrap()
     }
 
-    #[test]
-    fn builds_rigid_frames_for_matching_named_components() {
-        let from = fixture_scene();
-        let mut to = from.clone();
-        to.instances[1].transform *= Mat4::from_rotation_z(std::f32::consts::FRAC_PI_2);
+    fn revolute_joint(component: &str) -> MotionJoint {
+        MotionJoint::Revolute {
+            components: vec![component.to_string()],
+            origin_mm: [0.0, 0.0, 0.0],
+            axis: [0.0, 0.0, 1.0],
+            angle_degrees: 90.0,
+        }
+    }
 
-        let prepared = prepare_motion(&from, &to, 900, 0.25).unwrap();
-        assert_eq!(prepared.instance_count, from.instances.len());
+    #[test]
+    fn builds_rigid_frames_from_one_source_scene() {
+        let source = fixture_scene();
+
+        let prepared =
+            prepare_motion(&source, &[revolute_joint("moving")], UpAxis::Z, 900, 0.25).unwrap();
+        assert_eq!(prepared.instance_count, source.instances.len());
         assert_eq!(prepared.frame_count, 55);
         assert_eq!(prepared.initial_progress, 0.25);
         assert!(prepared.instance_ids_base64.len() > 16);
@@ -241,41 +332,72 @@ mod tests {
     }
 
     #[test]
-    fn rejects_geometry_changes_between_poses() {
-        let from = fixture_scene();
-        let mut to = from.clone();
-        to.geometries[to.instances[0].geometry].vertices[0].position[0] += 1.0;
+    fn revolute_motion_keeps_the_declared_world_pivot_fixed() {
+        let source = fixture_scene();
+        let moving_index = named_instances(&source).unwrap()["moving"];
+        let source_transform = source.instances[moving_index].transform;
+        let pivot = Vec3::new(10.0, 2.0, -3.0);
+        let pivot_in_component = source_transform.inverse().transform_point3(pivot);
+        let operation = InstanceMotion::Revolute {
+            origin: pivot,
+            axis: Vec3::Z,
+            angle_radians: std::f32::consts::FRAC_PI_2,
+        };
 
-        assert!(prepare_motion(&from, &to, 900, 0.0)
-            .unwrap_err()
-            .contains("changes geometry"));
+        let target = motion_transform(source_transform, &operation, 1.0)
+            .transform_point3(pivot_in_component);
+        assert!((target - pivot).length() < 1.0e-5);
     }
 
     #[test]
-    fn generated_quaternion_path_stays_finite() {
-        let from = fixture_scene();
-        let mut to = from.clone();
-        to.instances[0].transform *= Mat4::from_quat(Quat::from_rotation_z(2.5));
-        let prepared = prepare_motion(&from, &to, 900, 0.0).unwrap();
-        assert!(!prepared.frames_base64.is_empty());
+    fn prismatic_motion_reaches_the_declared_distance() {
+        let operation = InstanceMotion::Prismatic {
+            axis: Vec3::Y,
+            distance_mm: 7.5,
+        };
+        let target = motion_transform(Mat4::IDENTITY, &operation, 1.0).transform_point3(Vec3::ZERO);
+
+        assert!((target - Vec3::new(0.0, 7.5, 0.0)).length() < 1.0e-6);
+    }
+
+    #[test]
+    fn z_up_joint_coordinates_follow_the_step_scene_normalization() {
+        let source = fixture_scene();
+        let source_by_name = named_instances(&source).unwrap();
+        let joints = [MotionJoint::Revolute {
+            components: vec!["moving".to_string()],
+            origin_mm: [1.0, 2.0, 3.0],
+            axis: [0.0, 0.0, 1.0],
+            angle_degrees: 90.0,
+        }];
+        let motions =
+            instance_motions(source.instances.len(), &source_by_name, &joints, UpAxis::Z).unwrap();
+        let moving_index = source_by_name["moving"];
+
+        let InstanceMotion::Revolute { origin, axis, .. } = &motions[moving_index] else {
+            panic!("moving component did not receive the revolute joint");
+        };
+        assert!((*origin - Vec3::new(1.0, 3.0, -2.0)).length() < 1.0e-6);
+        assert!((*axis - Vec3::Y).length() < 1.0e-6);
     }
 
     #[test]
     fn long_motions_keep_sixty_frame_per_second_resolution() {
-        let from = fixture_scene();
-        let prepared = prepare_motion(&from, &from, 10_000, 0.0).unwrap();
+        let source = fixture_scene();
+        let prepared =
+            prepare_motion(&source, &[revolute_joint("moving")], UpAxis::Z, 10_000, 0.0).unwrap();
 
         assert_eq!(prepared.frame_count, 601);
     }
 
     #[test]
-    fn rejects_scale_changes_between_poses() {
-        let from = fixture_scene();
-        let mut to = from.clone();
-        to.instances[0].transform *= Mat4::from_scale(Vec3::splat(1.1));
+    fn rejects_a_joint_component_missing_from_the_source() {
+        let source = fixture_scene();
 
-        assert!(prepare_motion(&from, &to, 900, 0.0)
-            .unwrap_err()
-            .contains("changes scale"));
+        assert!(
+            prepare_motion(&source, &[revolute_joint("missing")], UpAxis::Z, 900, 0.0,)
+                .unwrap_err()
+                .contains("missing from the source model")
+        );
     }
 }

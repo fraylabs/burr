@@ -47,16 +47,12 @@ fs.copyFileSync(fixture, modelPath)
 for (const name of ["contained.step", "intersecting.step", "separated.step", "touching.step"]) {
   fs.copyFileSync(path.join(interferenceFixtures, name), path.join(assemblyDirectory, name))
 }
-fs.copyFileSync(
-  path.join(interferenceFixtures, "separated.step"),
-  path.join(assemblyDirectory, "separated-folded.step"),
-)
 fs.copyFileSync(fixture, path.join(unconfiguredModelDirectory, "not-configured.step"))
 fs.writeFileSync(path.join(ignoredDirectory, "readme.txt"), "not a model\n")
 fs.writeFileSync(
   path.join(tempRoot, ".burr", "config.toml"),
   [
-    'schema_version = "burr.project.v1"',
+    'schema_version = "burr.project.v2"',
     "",
     "[project]",
     'models = ["models"]',
@@ -64,11 +60,17 @@ fs.writeFileSync(
     "[[motions]]",
     'id = "fold"',
     'label = "Fold assembly"',
-    'from = "models/assemblies/separated.step"',
+    'model = "models/assemblies/separated.step"',
     'from_label = "Deployed"',
-    'to = "models/assemblies/separated-folded.step"',
     'to_label = "Folded"',
     "duration_ms = 800",
+    "",
+    "[[motions.joints]]",
+    'type = "revolute"',
+    'components = ["moving"]',
+    "origin_mm = [0.0, 0.0, 0.0]",
+    "axis = [0.0, 0.0, 1.0]",
+    "angle_degrees = 90.0",
     "",
   ].join("\n"),
 )
@@ -107,7 +109,7 @@ try {
   )
 
   const project = await getJson("/api/project")
-  expectEqual(project.schema_version, "burr.project-state.v1", "project state schema")
+  expectEqual(project.schema_version, "burr.project-state.v2", "project state schema")
   expectEqual(project.configured, true, "configured project state")
   expectEqual(project.config_path, ".burr/config.toml", "portable config path")
   expectEqual(project.model_paths?.length, 1, "configured model root count")
@@ -115,13 +117,18 @@ try {
   expectEqual(project.motions?.length, 1, "configured motion count")
   expectEqual(project.motions?.[0]?.id, "fold", "configured motion id")
   expectEqual(
+    project.motions?.[0]?.model,
+    "models/assemblies/separated.step",
+    "single motion model",
+  )
+  expectEqual(
     Object.keys(project).sort().join(","),
     "config_path,configured,model_paths,motions,root,schema_version",
     "closed project state",
   )
 
   const initialTree = await getJson("/api/tree")
-  expectEqual(initialTree.files?.length, 6, "filtered model count")
+  expectEqual(initialTree.files?.length, 5, "filtered model count")
   expectEqual(initialTree.motions?.[0]?.from_label, "Deployed", "tree motion start label")
   expectEqual(initialTree.motions?.[0]?.to_label, "Folded", "tree motion end label")
   const counterbore = model(initialTree, "models/enclosure/counterbore.step")
@@ -149,6 +156,8 @@ try {
     "model-first check scheduling",
   )
   expectIncludes(shellHtml, "Open the Checks tab", "on-demand check guidance")
+  expectIncludes(shellHtml, "Source pose only", "animated-pose check boundary")
+  expectIncludes(shellHtml, "Animated poses have not been checked", "honest motion check status")
   expectIncludes(shellHtml, 'type: "burr:toggle-motion"', "motion playback dispatch")
   expectIncludes(shellHtml, "snapshotFilename(state.selectedPath)", "snapshot filename generation")
   expectIncludes(shellHtml, 'type: "burr:export-snapshot"', "snapshot request dispatch")
@@ -359,7 +368,7 @@ try {
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
 
   console.log(
-    `viewer proof passed (loopback Host enforced, model scope enforced, progressive load status exposed, cross-process viewer cache reused and invalidated, named STEP motion rendered, STEP interference pass/fail/incomplete proven, X-ray rendering and PNG export available, components highlighted, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (loopback Host enforced, model scope enforced, progressive load status exposed, cross-process viewer cache reused and invalidated, single-source STEP motion rendered, STEP interference pass/fail/incomplete proven, X-ray rendering and PNG export available, components highlighted, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)

@@ -1324,11 +1324,9 @@
       }
 
       function selectMotion(path) {
-        const motion = state.motions.find(
-          (candidate) => candidate.from === path || candidate.to === path,
-        );
+        const motion = state.motions.find((candidate) => candidate.model === path);
         state.activeMotion = motion || null;
-        state.motionProgress = motion?.to === path ? 1 : 0;
+        state.motionProgress = 0;
         state.motionPlaying = false;
         state.motionReady = false;
         state.motionSuspended = false;
@@ -1355,9 +1353,11 @@
 
       function setMotionProgress() {
         if (!state.activeMotion || !state.motionReady) return;
+        const checksWereAvailable = checksMatchVisiblePose();
         state.motionProgress = Number(motionProgress.value) / 1000;
         state.motionPlaying = false;
         renderMotionControls();
+        syncChecksWithVisiblePose(checksWereAvailable);
         sendMotionProgress();
       }
 
@@ -1378,6 +1378,10 @@
       }
 
       async function loadChecks(file) {
+        if (!checksMatchVisiblePose()) {
+          renderMotionCheckBoundary();
+          return;
+        }
         const request = ++state.checkRequest;
         state.checkReport = null;
         setCheckIndicator(null);
@@ -1411,8 +1415,55 @@
 
       function ensureChecks() {
         if (!state.viewerReady || state.checkReport) return;
+        if (!checksMatchVisiblePose()) {
+          renderMotionCheckBoundary();
+          return;
+        }
         const selected = state.files.find((file) => file.path === state.selectedPath);
         if (selected) loadChecks(selected);
+      }
+
+      function checksMatchVisiblePose() {
+        return (
+          !state.activeMotion ||
+          (!state.motionPlaying && state.motionProgress <= 0.0005)
+        );
+      }
+
+      function syncChecksWithVisiblePose(previouslyAvailable) {
+        const available = checksMatchVisiblePose();
+        if (available === previouslyAvailable) return;
+        state.checkRequest += 1;
+        state.checkReport = null;
+        state.focusedFinding = null;
+        setCheckIndicator(null);
+        if (!available) {
+          renderMotionCheckBoundary();
+          return;
+        }
+        const selected = state.files.find((file) => file.path === state.selectedPath);
+        if (
+          state.viewerReady &&
+          selected &&
+          checksTab.getAttribute("aria-selected") === "true"
+        ) {
+          loadChecks(selected);
+        } else {
+          renderCheckMessage(
+            "Ready",
+            "Open the Checks tab to inspect this model's source pose.",
+            null,
+          );
+        }
+      }
+
+      function renderMotionCheckBoundary() {
+        const sourceLabel = state.activeMotion?.from_label || "the source pose";
+        renderCheckMessage(
+          "Source pose only",
+          `Move the motion back to ${sourceLabel} before running checks. Animated poses have not been checked.`,
+          null,
+        );
       }
 
       function renderChecks(report) {
@@ -1591,9 +1642,11 @@
         if (type === "burr:motion-state") {
           const progress = Number(event.data.progress);
           if (!Number.isFinite(progress)) return;
+          const checksWereAvailable = checksMatchVisiblePose();
           state.motionProgress = Math.max(0, Math.min(1, progress));
           state.motionPlaying = Boolean(event.data.playing);
           renderMotionControls();
+          syncChecksWithVisiblePose(checksWereAvailable);
           return;
         }
         if (type !== "burr:snapshot-exported" && type !== "burr:snapshot-error") return;
