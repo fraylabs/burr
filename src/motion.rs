@@ -3,7 +3,7 @@ use look::scene::{Bounds, CompiledScene, Geometry};
 use std::collections::HashMap;
 
 pub const MAX_MOTION_COMPONENTS: usize = 32;
-const MOTION_FRAME_COUNT: usize = 61;
+const MOTION_FRAMES_PER_SECOND: usize = 60;
 
 #[derive(Debug)]
 pub struct PreparedMotion {
@@ -90,11 +90,12 @@ pub fn prepare_motion(
     scene.bounds = union_bounds(from.bounds, to.bounds);
     scene.fit_radius = bounds_radius(scene.bounds) * 1.3;
 
+    let frame_count = (duration_ms as usize * MOTION_FRAMES_PER_SECOND).div_ceil(1_000) + 1;
     let mut frames = Vec::with_capacity(
-        MOTION_FRAME_COUNT * scene.instances.len() * Mat4::IDENTITY.to_cols_array().len(),
+        frame_count * scene.instances.len() * Mat4::IDENTITY.to_cols_array().len(),
     );
-    for frame in 0..MOTION_FRAME_COUNT {
-        let progress = frame as f32 / (MOTION_FRAME_COUNT - 1) as f32;
+    for frame in 0..frame_count {
+        let progress = frame as f32 / (frame_count - 1) as f32;
         let eased = progress * progress * (3.0 - 2.0 * progress);
         for (from_instance, target) in from.instances.iter().zip(&targets) {
             let (from_scale, from_rotation, from_translation) =
@@ -113,7 +114,7 @@ pub fn prepare_motion(
         scene,
         instance_ids_base64: base64_f32(&instance_ids),
         frames_base64: base64_f32(&frames),
-        frame_count: MOTION_FRAME_COUNT,
+        frame_count,
         instance_count: from.instances.len(),
         duration_ms,
         initial_progress: initial_progress.clamp(0.0, 1.0),
@@ -228,7 +229,7 @@ mod tests {
 
         let prepared = prepare_motion(&from, &to, 900, 0.25).unwrap();
         assert_eq!(prepared.instance_count, from.instances.len());
-        assert_eq!(prepared.frame_count, MOTION_FRAME_COUNT);
+        assert_eq!(prepared.frame_count, 55);
         assert_eq!(prepared.initial_progress, 0.25);
         assert!(prepared.instance_ids_base64.len() > 16);
         assert!(prepared.frames_base64.len() > 16);
@@ -257,6 +258,14 @@ mod tests {
         to.instances[0].transform *= Mat4::from_quat(Quat::from_rotation_z(2.5));
         let prepared = prepare_motion(&from, &to, 900, 0.0).unwrap();
         assert!(!prepared.frames_base64.is_empty());
+    }
+
+    #[test]
+    fn long_motions_keep_sixty_frame_per_second_resolution() {
+        let from = fixture_scene();
+        let prepared = prepare_motion(&from, &from, 10_000, 0.0).unwrap();
+
+        assert_eq!(prepared.frame_count, 601);
     }
 
     #[test]
