@@ -49,10 +49,10 @@ correctness. Those boundaries are tracked in
 
 ## Install
 
-Until the next crates.io release, install the current repository version:
+Install the current GitHub release:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.32.0 --locked
 ```
 
 Then open any model folder:

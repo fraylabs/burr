@@ -8,7 +8,7 @@ geometry-native STEP assembly interference check.
 Install Burr from its public Git repository:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.32.0 --locked
 ```
 
 Open a folder containing CAD models:
