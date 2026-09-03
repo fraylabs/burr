@@ -1,5 +1,7 @@
 use crate::{
+    cache::{source_fingerprint, ViewerCache},
     interference::{self, CheckReport},
+    load_status::{valid_load_id, LoadReporter, LoadTracker},
     motion::{prepare_motion, PreparedMotion, MAX_MOTION_COMPONENTS},
     project::{Motion, Project},
 };
@@ -16,6 +18,8 @@ use std::{
     fs,
     path::{Component, Path, PathBuf},
     process::Command,
+    sync::{mpsc, Arc, Mutex, MutexGuard},
+    thread,
     time::{SystemTime, UNIX_EPOCH},
 };
 use tiny_http::{Header, Method, Request, Response, Server, StatusCode};
@@ -23,6 +27,8 @@ use tiny_http::{Header, Method, Request, Response, Server, StatusCode};
 const SHELL_HTML: &str = include_str!("viewer_shell.html");
 const LOGO_PNG: &[u8] = include_bytes!("../assets/burr-logo.png");
 const VIEWER_FRAMING_MARGIN: f32 = 1.3;
+const SERVER_WORKERS: usize = 4;
+const MAX_MEMORY_VIEWERS: usize = 32;
 const SKIP_DIRECTORIES: [&str; 10] = [
     ".git",
     ".jj",
@@ -47,11 +53,26 @@ struct ModelFile {
 struct CachedModel {
     version: String,
     scene: CompiledScene,
-    report: CheckReport,
-    viewers: HashMap<(ViewerTheme, Option<FocusPair>), String>,
+    report: Option<CheckReport>,
 }
 
-type ModelCache = HashMap<PathBuf, CachedModel>;
+#[derive(Default)]
+struct ModelCache {
+    models: HashMap<PathBuf, CachedModel>,
+    viewers: HashMap<String, String>,
+}
+
+struct RenderedViewer {
+    html: String,
+    cache: &'static str,
+}
+
+struct RenderSelection<'a> {
+    relative_path: &'a str,
+    theme: ViewerTheme,
+    focus: Option<FocusPair>,
+    motion_id: Option<&'a str>,
+}
 
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
 struct FocusPair {
@@ -167,7 +188,7 @@ body { background-color: #c9ced0; color: #1b1d1f; }
 "#;
 
 pub fn run(start: PathBuf) -> Result<(), String> {
-    let project = Project::discover(&start)?;
+    let project = Arc::new(Project::discover(&start)?);
 
     let requested_port = std::env::var("BURR_VIEWER_PORT")
         .ok()
@@ -198,11 +219,43 @@ pub fn run(start: PathBuf) -> Result<(), String> {
         }
     }
 
-    let mut cache = HashMap::new();
+    let cache = Arc::new(Mutex::new(ModelCache::default()));
+    let load_tracker = Arc::new(LoadTracker::default());
+    let viewer_cache = Arc::new(ViewerCache::from_environment());
+    let (sender, receiver) = mpsc::channel::<Request>();
+    let receiver = Arc::new(Mutex::new(receiver));
+    for _ in 0..SERVER_WORKERS {
+        let receiver = Arc::clone(&receiver);
+        let project = Arc::clone(&project);
+        let cache = Arc::clone(&cache);
+        let load_tracker = Arc::clone(&load_tracker);
+        let viewer_cache = Arc::clone(&viewer_cache);
+        thread::spawn(move || loop {
+            let request = {
+                let Ok(receiver) = receiver.lock() else {
+                    break;
+                };
+                match receiver.recv() {
+                    Ok(request) => request,
+                    Err(_) => break,
+                }
+            };
+            if let Err(error) = handle_request(
+                request,
+                &project,
+                &cache,
+                &load_tracker,
+                &viewer_cache,
+                port,
+            ) {
+                eprintln!("Viewer request failed: {error}");
+            }
+        });
+    }
     for request in server.incoming_requests() {
-        if let Err(error) = handle_request(request, &project, &mut cache, port) {
-            eprintln!("Viewer request failed: {error}");
-        }
+        sender
+            .send(request)
+            .map_err(|_| "Burr viewer workers stopped unexpectedly.".to_string())?;
     }
     Ok(())
 }
@@ -210,7 +263,9 @@ pub fn run(start: PathBuf) -> Result<(), String> {
 fn handle_request(
     request: Request,
     project: &Project,
-    cache: &mut ModelCache,
+    cache: &Mutex<ModelCache>,
+    load_tracker: &LoadTracker,
+    viewer_cache: &ViewerCache,
     expected_host_port: u16,
 ) -> Result<(), String> {
     if !request_host_is_loopback(&request, expected_host_port) {
@@ -279,6 +334,21 @@ fn handle_request(
             }
             Err(error) => respond_json_error(request, 500, &error),
         },
+        "/api/load-status" => {
+            let Some(load_id) = query_value(&url, "id") else {
+                return respond_json_error(request, 400, "No load id was provided.");
+            };
+            if !valid_load_id(&load_id) {
+                return respond_json_error(request, 400, "The load id was invalid.");
+            }
+            respond(
+                request,
+                200,
+                "application/json; charset=utf-8",
+                serde_json::to_string(&load_tracker.status(&load_id))
+                    .map_err(|error| format!("Failed to encode load status: {error}"))?,
+            )
+        }
         "/assets/burr-logo.png" | "/favicon.ico" => {
             respond_bytes(request, 200, "image/png", LOGO_PNG.to_vec())
         }
@@ -307,16 +377,36 @@ fn handle_request(
                 Err(error) => return respond_html_error(request, 400, &error),
             };
             let motion_id = query_value(&url, "motion");
-            match render_model(
-                project,
-                &relative_path,
-                theme,
-                focus,
-                motion_id.as_deref(),
-                cache,
-            ) {
-                Ok(html) => respond(request, 200, "text/html; charset=utf-8", html),
-                Err(error) => respond_html_error(request, 422, &error),
+            let load_id = query_value(&url, "load");
+            if load_id.as_deref().is_some_and(|id| !valid_load_id(id)) {
+                return respond_html_error(request, 400, "The load id was invalid.");
+            }
+            let reporter = load_tracker.reporter(load_id.as_deref());
+            reporter.start(&relative_path);
+            let rendered = {
+                let mut cache = lock_model_cache(cache)?;
+                render_model(
+                    project,
+                    RenderSelection {
+                        relative_path: &relative_path,
+                        theme,
+                        focus,
+                        motion_id: motion_id.as_deref(),
+                    },
+                    &mut cache,
+                    viewer_cache,
+                    &reporter,
+                )
+            };
+            match rendered {
+                Ok(rendered) => {
+                    reporter.ready(rendered.cache);
+                    respond(request, 200, "text/html; charset=utf-8", rendered.html)
+                }
+                Err(error) => {
+                    reporter.failed(&error);
+                    respond_html_error(request, 422, &error)
+                }
             }
         }
         _ => respond(
@@ -330,14 +420,13 @@ fn handle_request(
 
 fn render_model(
     project: &Project,
-    relative_path: &str,
-    theme: ViewerTheme,
-    focus: Option<FocusPair>,
-    motion_id: Option<&str>,
+    selection: RenderSelection<'_>,
     cache: &mut ModelCache,
-) -> Result<String, String> {
-    if let Some(motion_id) = motion_id {
-        if focus.is_some() {
+    viewer_cache: &ViewerCache,
+    reporter: &LoadReporter<'_>,
+) -> Result<RenderedViewer, String> {
+    if let Some(motion_id) = selection.motion_id {
+        if selection.focus.is_some() {
             return Err(
                 "Motion playback is unavailable while components are highlighted.".to_string(),
             );
@@ -346,37 +435,91 @@ fn render_model(
             .motion(motion_id)
             .cloned()
             .ok_or_else(|| format!("Unknown Burr motion: {motion_id}"))?;
-        return render_motion_model(project, relative_path, theme, &motion, cache);
+        return render_motion_model(
+            project,
+            selection.relative_path,
+            selection.theme,
+            &motion,
+            cache,
+            viewer_cache,
+            reporter,
+        );
     }
 
-    let cached = load_model(project, relative_path, cache)?;
-    if let Some(focus) = focus {
-        if focus.second >= cached.scene.instances.len() {
-            return Err("Viewer focus references a missing component.".to_string());
+    reporter.stage(
+        "Reading source",
+        &format!(
+            "Checking {} against the reusable viewer cache.",
+            selection.relative_path
+        ),
+    );
+    let path = resolve_model_path(project, selection.relative_path)?;
+    let fingerprint = source_fingerprint(&path)?;
+    let viewer_key = viewer_cache_key(
+        selection.relative_path,
+        &path,
+        &fingerprint,
+        selection.theme,
+        selection.focus,
+        None,
+    );
+    if let Some(html) = cache.viewers.get(&viewer_key) {
+        return Ok(RenderedViewer {
+            html: html.clone(),
+            cache: "memory",
+        });
+    }
+    match viewer_cache.load(&viewer_key) {
+        Ok(Some(html)) => {
+            remember_viewer(cache, viewer_key, html.clone());
+            return Ok(RenderedViewer {
+                html,
+                cache: "disk",
+            });
         }
-    }
-    let viewer_key = (theme, focus);
-    if let Some(html) = cached.viewers.get(&viewer_key) {
-        return Ok(html.clone());
+        Ok(None) => {}
+        Err(error) => eprintln!("burr: {error}; rebuilding the viewer"),
     }
 
-    let scene = match focus {
-        Some(focus) => highlighted_scene(&cached.scene, focus)?,
-        None => cached.scene.clone(),
+    let html = {
+        let cached = load_model(project, selection.relative_path, cache, Some(reporter))?;
+        if let Some(focus) = selection.focus {
+            if focus.second >= cached.scene.instances.len() {
+                return Err("Viewer focus references a missing component.".to_string());
+            }
+        }
+
+        let scene = match selection.focus {
+            Some(focus) => highlighted_scene(&cached.scene, focus)?,
+            None => cached.scene.clone(),
+        };
+        reporter.stage(
+            "Building viewer",
+            "Encoding the compiled geometry for the local browser.",
+        );
+        let lighting = selection.theme.lighting();
+        let html = generate_html_viewer(
+            &scene,
+            selection.relative_path,
+            &scene.statistics,
+            &lighting,
+            selection.theme.canvas_background(),
+        )
+        .map_err(|error| {
+            format!(
+                "Look could not build the viewer for {}: {error:#}",
+                selection.relative_path
+            )
+        })?;
+        let html = inject_viewer_render_modes(html)?;
+        inject_viewer_theme(html, selection.theme, selection.focus)?
     };
-    let lighting = theme.lighting();
-    let html = generate_html_viewer(
-        &scene,
-        relative_path,
-        &scene.statistics,
-        &lighting,
-        theme.canvas_background(),
-    )
-    .map_err(|error| format!("Look could not build the viewer for {relative_path}: {error:#}"))?;
-    let html = inject_viewer_render_modes(html)?;
-    let html = inject_viewer_theme(html, theme, focus)?;
-    cached.viewers.insert(viewer_key, html.clone());
-    Ok(html)
+    persist_viewer(viewer_cache, &viewer_key, &html);
+    remember_viewer(cache, viewer_key, html.clone());
+    Ok(RenderedViewer {
+        html,
+        cache: "generated",
+    })
 }
 
 fn render_motion_model(
@@ -385,7 +528,9 @@ fn render_motion_model(
     theme: ViewerTheme,
     motion: &Motion,
     cache: &mut ModelCache,
-) -> Result<String, String> {
+    viewer_cache: &ViewerCache,
+    reporter: &LoadReporter<'_>,
+) -> Result<RenderedViewer, String> {
     let initial_progress = if relative_path == motion.from {
         0.0
     } else if relative_path == motion.to {
@@ -397,9 +542,59 @@ fn render_motion_model(
         ));
     };
 
-    let from_scene = load_model(project, &motion.from, cache)?.scene.clone();
-    let to_scene = load_model(project, &motion.to, cache)?.scene.clone();
+    reporter.stage(
+        "Reading source",
+        "Checking both motion poses against the reusable viewer cache.",
+    );
+    let from_path = resolve_model_path(project, &motion.from)?;
+    let to_path = resolve_model_path(project, &motion.to)?;
+    let from_fingerprint = source_fingerprint(&from_path)?;
+    let to_fingerprint = source_fingerprint(&to_path)?;
+    let motion_signature = format!(
+        "{}|{}|{}|{}|{}",
+        motion.id, motion.from, motion.to, motion.duration_ms, to_fingerprint
+    );
+    let viewer_key = viewer_cache_key(
+        relative_path,
+        &from_path,
+        &from_fingerprint,
+        theme,
+        None,
+        Some(&motion_signature),
+    );
+    if let Some(html) = cache.viewers.get(&viewer_key) {
+        return Ok(RenderedViewer {
+            html: html.clone(),
+            cache: "memory",
+        });
+    }
+    match viewer_cache.load(&viewer_key) {
+        Ok(Some(html)) => {
+            remember_viewer(cache, viewer_key, html.clone());
+            return Ok(RenderedViewer {
+                html,
+                cache: "disk",
+            });
+        }
+        Ok(None) => {}
+        Err(error) => eprintln!("burr: {error}; rebuilding the viewer"),
+    }
+
+    let from_scene = load_model(project, &motion.from, cache, Some(reporter))?
+        .scene
+        .clone();
+    let to_scene = load_model(project, &motion.to, cache, Some(reporter))?
+        .scene
+        .clone();
+    reporter.stage(
+        "Preparing motion",
+        "Matching rigid components and generating the playback frames.",
+    );
     let prepared = prepare_motion(&from_scene, &to_scene, motion.duration_ms, initial_progress)?;
+    reporter.stage(
+        "Building viewer",
+        "Encoding the compiled motion for the local browser.",
+    );
     let lighting = theme.lighting();
     let html = generate_html_viewer(
         &prepared.scene,
@@ -411,29 +606,71 @@ fn render_motion_model(
     .map_err(|error| format!("Look could not build motion '{}': {error:#}", motion.id))?;
     let html = inject_viewer_render_modes(html)?;
     let html = inject_viewer_motion(html, &prepared)?;
-    inject_viewer_theme(html, theme, None)
+    let html = inject_viewer_theme(html, theme, None)?;
+    persist_viewer(viewer_cache, &viewer_key, &html);
+    remember_viewer(cache, viewer_key, html.clone());
+    Ok(RenderedViewer {
+        html,
+        cache: "generated",
+    })
 }
 
 fn check_model(
     project: &Project,
     relative_path: &str,
-    cache: &mut ModelCache,
+    cache: &Mutex<ModelCache>,
 ) -> Result<CheckReport, String> {
-    load_model(project, relative_path, cache).map(|cached| cached.report.clone())
+    let path = resolve_model_path(project, relative_path)?;
+    let format = model_format(&path);
+    let (version, scene) = {
+        let mut cache = lock_model_cache(cache)?;
+        let cached = load_model(project, relative_path, &mut cache, None)?;
+        if let Some(report) = cached.report.as_ref() {
+            return Ok(report.clone());
+        }
+        (cached.version.clone(), cached.scene.clone())
+    };
+
+    let report = if format == Some("STEP") {
+        interference::analyze_scene(relative_path, &version, &scene)
+    } else {
+        CheckReport::unsupported(
+            relative_path,
+            &version,
+            "Assembly interference currently supports STEP files only.",
+        )
+    };
+
+    let mut cache = lock_model_cache(cache)?;
+    if let Some(cached) = cache.models.get_mut(&path) {
+        if cached.version == version {
+            cached.report = Some(report.clone());
+        }
+    }
+    Ok(report)
 }
 
 fn load_model<'a>(
     project: &Project,
     relative_path: &str,
     cache: &'a mut ModelCache,
+    reporter: Option<&LoadReporter<'_>>,
 ) -> Result<&'a mut CachedModel, String> {
     let path = resolve_model_path(project, relative_path)?;
     let version = file_version(&path)?;
     let current = cache
+        .models
         .get(&path)
         .is_some_and(|cached| cached.version == version);
     if current {
+        if let Some(reporter) = reporter {
+            reporter.stage(
+                "Preparing viewer",
+                &format!("Reusing compiled geometry for {relative_path}."),
+            );
+        }
         return cache
+            .models
             .get_mut(&path)
             .ok_or_else(|| "Viewer model cache became unavailable.".to_string());
     }
@@ -443,35 +680,78 @@ fn load_model<'a>(
     } else {
         UpAxis::Z
     };
+    if let Some(reporter) = reporter {
+        reporter.stage(
+            "Tessellating geometry",
+            &format!("Look is compiling {relative_path} locally."),
+        );
+    }
     let mut scene = compile_scene(&path, up_axis, &mut timings)
         .map_err(|error| format!("Look could not render {relative_path}: {error:#}"))?;
+    if let Some(reporter) = reporter {
+        reporter.stage(
+            "Preparing materials",
+            &format!("Decoding the textures and materials for {relative_path}."),
+        );
+    }
     prepare_source_textures(&mut scene, &mut timings)
         .map_err(|error| format!("Look could not prepare {relative_path}: {error:#}"))?;
     // Look's self-contained viewer fits directly to the scene sphere. Leave a
     // little breathing room for the shorter iframe viewport created by Burr's
     // navigation shell and for models whose diagonal approaches that sphere.
     scene.fit_radius *= VIEWER_FRAMING_MARGIN;
-    let report = if model_format(&path) == Some("STEP") {
-        interference::analyze_scene(relative_path, &version, &scene)
-    } else {
-        CheckReport::unsupported(
-            relative_path,
-            &version,
-            "Assembly interference currently supports STEP files only.",
-        )
-    };
-    cache.insert(
+    cache.models.insert(
         path.clone(),
         CachedModel {
             version,
             scene,
-            report,
-            viewers: HashMap::new(),
+            report: None,
         },
     );
     cache
+        .models
         .get_mut(&path)
         .ok_or_else(|| "Viewer model cache became unavailable.".to_string())
+}
+
+fn viewer_cache_key(
+    relative_path: &str,
+    source_path: &Path,
+    source_fingerprint: &str,
+    theme: ViewerTheme,
+    focus: Option<FocusPair>,
+    motion: Option<&str>,
+) -> String {
+    format!(
+        "burr-viewer-v1\nburr={}\nsource={}\nfingerprint={}\nrelative={}\ntheme={}\nfocus={}\nmotion={}",
+        env!("CARGO_PKG_VERSION"),
+        source_path.display(),
+        source_fingerprint,
+        relative_path,
+        theme.name(),
+        focus.map_or_else(|| "none".to_string(), FocusPair::label),
+        motion.unwrap_or("none"),
+    )
+}
+
+fn persist_viewer(cache: &ViewerCache, key: &str, html: &str) {
+    match cache.store(key, html) {
+        Ok(_) => {}
+        Err(error) => eprintln!("burr: {error}; continuing without a reusable viewer"),
+    }
+}
+
+fn remember_viewer(cache: &mut ModelCache, key: String, html: String) {
+    if cache.viewers.len() >= MAX_MEMORY_VIEWERS && !cache.viewers.contains_key(&key) {
+        cache.viewers.clear();
+    }
+    cache.viewers.insert(key, html);
+}
+
+fn lock_model_cache(cache: &Mutex<ModelCache>) -> Result<MutexGuard<'_, ModelCache>, String> {
+    cache
+        .lock()
+        .map_err(|_| "Burr model cache became unavailable.".to_string())
 }
 
 fn highlighted_scene(scene: &CompiledScene, focus: FocusPair) -> Result<CompiledScene, String> {

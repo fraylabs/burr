@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 0.33.0 - 2026-09-03
+
+- Report real model-loading stages in the workbench while Look reads,
+  tessellates, prepares materials, and builds the browser viewer.
+- Reuse content-addressed viewer HTML across Burr processes, with bounded
+  platform cache storage and owner-only permissions on Unix systems.
+- Prioritize making the model visible before running assembly interference;
+  checks now begin when the Checks tab is opened.
+- Add automated memory/disk-cache and source-invalidation proofs plus a release
+  measurement harness for the published hanger and digital-photo-frame outcome
+  packs.
+
 ## 0.32.0 - 2026-09-03
 
 - Exclude generated `__cadgen__` render caches from model discovery so Burr's

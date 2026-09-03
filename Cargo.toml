@@ -1,6 +1,6 @@
 [package]
 name = "burr"
-version = "0.32.0"
+version = "0.33.0"
 edition = "2021"
 description = "Fast local browser and assembly interference checker for CAD models."
 license = "MIT"
@@ -8,6 +8,7 @@ repository = "https://github.com/fraylabs/burr"
 publish = false
 
 [dependencies]
+blake3 = "1.8"
 glam = "0.30"
 look = { git = "https://github.com/stefangolas/look.git", rev = "f0ed52edc1f0648cdece331002b38ed33e7c541a" }
 percent-encoding = "2.3.2"
