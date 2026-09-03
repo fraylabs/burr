@@ -83,6 +83,10 @@ iframe after a model or theme reload.
 - The Checks tab shows only the result for the selected model. A finding names
   its two components; selecting it uses orange and cyan on those bodies while
   muting unrelated geometry.
+- Loading is an accessible polite status and names the real local stage. Keep
+  the model path secondary, and never substitute a fake percentage.
+- Model rendering has priority. Begin geometry checks when the user opens the
+  Checks tab so background analysis cannot hide the selected model.
 - `pass`, `fail`, and `incomplete` retain text labels. Colour reinforces status
   but never carries the result alone.
 - Interactive controls have visible hover and `:focus-visible` states in both

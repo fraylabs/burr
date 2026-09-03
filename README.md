@@ -27,11 +27,25 @@ machine. Parsing, tessellation, and camera interaction are powered by
 Long file names stay on one line and truncate with an ellipsis. The complete
 path remains available on hover.
 
+## Loading and reuse
+
+On a cold model, Burr reports the actual local stage: reading source,
+tessellating geometry, preparing materials or motion, and building the viewer.
+After generation, Burr reuses the self-contained viewer from a bounded local
+cache, including after the process restarts. Source content, Burr version,
+theme, component focus, and motion configuration are part of the cache key.
+Memory reuse is capped at 256 MiB and persistent reuse at 512 MiB.
+
+The cache contains browser-ready model geometry but never leaves the machine.
+On Unix systems its directory and files are owner-only. See
+[docs/how-it-works.md](docs/how-it-works.md) for platform locations and
+[docs/performance.md](docs/performance.md) for the cleanroom outcome evidence.
+
 ## Assembly interference
 
-For STEP assemblies with at least two component occurrences, Burr checks every
-component pair directly from the tessellated world-space geometry. The Checks
-tab reports one of three outcomes:
+For STEP assemblies with at least two component occurrences, opening the Checks
+tab runs Burr against every component pair in the tessellated world-space
+geometry. It reports one of three outcomes:
 
 - `pass`: no solid-volume interference was detected;
 - `fail`: Burr found crossing surfaces, containment, or coincident occurrences;
@@ -52,7 +66,7 @@ correctness. Those boundaries are tracked in
 Install the current GitHub release:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.32.0 --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.33.0 --locked
 ```
 
 Then open any model folder:
@@ -104,6 +118,7 @@ The browser shell uses small loopback-only endpoints:
 GET /api/health
 GET /api/project
 GET /api/tree
+GET /api/load-status?id=<viewer-load-id>
 GET /api/checks?path=<project-relative-model-path>
 GET /viewer?path=<project-relative-model-path>&motion=<motion-id>
 ```
@@ -118,6 +133,13 @@ scope.
 cargo test --locked
 npm run check:viewer
 npm run check
+```
+
+Measure extracted real-world outcome packs with the optimized binary:
+
+```bash
+cargo build --release --locked
+npm run measure:outcomes -- /path/to/hanger /path/to/photo-frame
 ```
 
 `npm run check` is the complete repository gate: formatting, strict production

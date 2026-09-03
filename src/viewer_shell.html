@@ -928,13 +928,20 @@
           </div>
         </div>
 
-        <div id="loading-state" class="viewer-state" hidden>
+        <div
+          id="loading-state"
+          class="viewer-state"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          hidden
+        >
           <div class="state-content">
             <div class="state-mark" aria-hidden="true">
               <span class="loading-ring"></span>
             </div>
             <strong id="loading-title">Preparing model</strong>
-            <p>Look is tessellating the source file locally.</p>
+            <p id="loading-stage">Reading the source file locally.</p>
           </div>
         </div>
       </main>
@@ -954,6 +961,7 @@
       const emptyState = document.querySelector("#empty-state");
       const loadingState = document.querySelector("#loading-state");
       const loadingTitle = document.querySelector("#loading-title");
+      const loadingStage = document.querySelector("#loading-stage");
       const watchDot = document.querySelector("#watch-dot");
       const watchStatus = document.querySelector("#watch-status");
       const themeToggle = document.querySelector("#theme-toggle");
@@ -965,6 +973,8 @@
       const motionFrom = document.querySelector("#motion-from");
       const motionTo = document.querySelector("#motion-to");
       const themeColor = document.querySelector('meta[name="theme-color"]');
+      const loadSession = globalThis.crypto?.randomUUID?.() ||
+        `tab-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
 
       const state = {
         files: [],
@@ -985,12 +995,17 @@
         motionReady: false,
         motionSuspended: false,
         motionSignature: "",
+        loadSequence: 0,
+        activeLoadId: null,
+        activeLoadController: null,
+        viewerReady: false,
         theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
         renderMode:
           document.documentElement.dataset.renderMode === "solid" ? "solid" : "x-ray",
       };
 
-      viewer.addEventListener("load", () => {
+      function acceptViewerReady(loadId) {
+        if (!clearActiveLoad(loadId)) return;
         loadingState.hidden = true;
         const snapshotReady = Boolean(
           state.selectedPath &&
@@ -1006,7 +1021,54 @@
         renderMotionControls();
         sendRenderMode();
         sendMotionProgress();
-      });
+        state.viewerReady = snapshotReady;
+        const selected = state.files.find((file) => file.path === state.selectedPath);
+        if (
+          snapshotReady &&
+          selected &&
+          !state.checkReport &&
+          checksTab.getAttribute("aria-selected") === "true"
+        ) {
+          loadChecks(selected);
+        } else if (snapshotReady && selected && !state.checkReport) {
+          renderCheckMessage(
+            "Ready",
+            "Open the Checks tab to inspect this model's component geometry.",
+            null,
+          );
+        } else if (!snapshotReady && selected && !state.checkReport) {
+          setCheckIndicator("incomplete");
+          renderCheckMessage(
+            "Incomplete",
+            "Burr could not prepare the selected model for inspection.",
+            "incomplete",
+          );
+        }
+      }
+
+      function failViewerLoad(loadId) {
+        if (!clearActiveLoad(loadId)) return;
+        loadingState.hidden = true;
+        snapshotButton.disabled = true;
+        snapshotButton.textContent = "Unavailable";
+        state.motionReady = false;
+        state.viewerReady = false;
+        renderMotionControls();
+        setCheckIndicator("incomplete");
+        renderCheckMessage(
+          "Incomplete",
+          "Burr could not inspect the selected model.",
+          "incomplete",
+        );
+      }
+
+      function clearActiveLoad(loadId = null) {
+        if (loadId && state.activeLoadId !== loadId) return false;
+        state.activeLoadController?.abort();
+        state.activeLoadController = null;
+        state.activeLoadId = null;
+        return true;
+      }
 
       themeToggle.addEventListener("click", () => {
         setTheme(state.theme === "dark" ? "light" : "dark", true, true);
@@ -1019,7 +1081,10 @@
       motionProgress.addEventListener("input", setMotionProgress);
       window.addEventListener("message", receiveViewerMessage);
       modelsTab.addEventListener("click", () => showPanel("models"));
-      checksTab.addEventListener("click", () => showPanel("checks"));
+      checksTab.addEventListener("click", () => {
+        showPanel("checks");
+        ensureChecks();
+      });
 
       setTheme(state.theme, false, false);
       setRenderMode(state.renderMode, false);
@@ -1083,6 +1148,8 @@
           state.focusedFinding = null;
           state.activeMotion = null;
           state.motionReady = false;
+          clearActiveLoad();
+          state.viewerReady = false;
           viewer.removeAttribute("src");
           snapshotButton.disabled = true;
           loadingState.hidden = true;
@@ -1191,15 +1258,24 @@
       function selectFile(file, refreshed = false) {
         state.selectedPath = file.path;
         state.selectedVersion = file.version;
+        state.checkRequest += 1;
+        state.checkReport = null;
         state.focusedFinding = null;
+        setCheckIndicator(null);
+        renderCheckMessage("Waiting", "Checks begin after the model is visible.", null);
         selectMotion(file.path);
         updateCurrentSelection();
         emptyState.hidden = true;
         openViewer(file, refreshed);
-        loadChecks(file);
       }
 
       function openViewer(file, refreshed = false, focus = null) {
+        clearActiveLoad();
+        const loadId = `${loadSession}-${++state.loadSequence}`;
+        const loadController = new AbortController();
+        state.activeLoadId = loadId;
+        state.activeLoadController = loadController;
+        state.viewerReady = false;
         state.motionSuspended = Boolean(focus);
         state.motionReady = false;
         renderMotionControls();
@@ -1207,14 +1283,44 @@
         snapshotButton.disabled = true;
         snapshotButton.textContent = "Snapshot";
         loadingTitle.textContent = refreshed ? `Reloading ${file.name}` : `Opening ${file.name}`;
+        loadingStage.textContent = "Reading the source file locally.";
         const query = new URLSearchParams({
           path: file.path,
           v: file.version,
           theme: state.theme,
+          load: loadId,
         });
         if (focus) query.set("focus", focus.join(","));
         else if (state.activeMotion) query.set("motion", state.activeMotion.id);
         viewer.src = `/viewer?${query}`;
+        pollLoadStatus(loadId, loadController);
+      }
+
+      async function pollLoadStatus(loadId, controller) {
+        while (state.activeLoadId === loadId) {
+          try {
+            const query = new URLSearchParams({ id: loadId });
+            const response = await fetch(`/api/load-status?${query}`, {
+              cache: "no-store",
+              signal: controller.signal,
+            });
+            if (response.ok) {
+              const status = await response.json();
+              if (state.activeLoadId !== loadId) return;
+              loadingStage.textContent = status.detail
+                ? `${status.stage} — ${status.detail}`
+                : status.stage;
+              if (status.state === "error") {
+                failViewerLoad(loadId);
+                return;
+              }
+            }
+          } catch (error) {
+            if (error.name === "AbortError") return;
+            console.debug("Burr load status is temporarily unavailable", error);
+          }
+          await new Promise((resolve) => setTimeout(resolve, 150));
+        }
       }
 
       function selectMotion(path) {
@@ -1301,6 +1407,12 @@
           );
           console.error(error);
         }
+      }
+
+      function ensureChecks() {
+        if (!state.viewerReady || state.checkReport) return;
+        const selected = state.files.find((file) => file.path === state.selectedPath);
+        if (selected) loadChecks(selected);
       }
 
       function renderChecks(report) {
@@ -1472,6 +1584,10 @@
       function receiveViewerMessage(event) {
         if (event.origin !== window.location.origin || event.source !== viewer.contentWindow) return;
         const type = event.data?.type;
+        if (type === "burr:viewer-ready") {
+          acceptViewerReady(event.data.loadId);
+          return;
+        }
         if (type === "burr:motion-state") {
           const progress = Number(event.data.progress);
           if (!Number.isFinite(progress)) return;

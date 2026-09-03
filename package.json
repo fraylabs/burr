@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.32.0",
+  "version": "0.33.0",
   "private": true,
   "description": "Fast local browser and assembly interference checker for CAD models.",
   "type": "module",
@@ -8,6 +8,7 @@
     "test": "cargo test --locked",
     "check:static": "cargo fmt --check && cargo clippy --locked --bin burr --all-features -- -D warnings -D clippy::dbg_macro -D clippy::todo -D clippy::unimplemented -D clippy::unwrap_used -D clippy::expect_used -D clippy::undocumented_unsafe_blocks -D clippy::missing_safety_doc && cargo clippy --locked --tests --all-features -- -D warnings -D clippy::dbg_macro -D clippy::todo -D clippy::unimplemented",
     "check:viewer": "node scripts/check-viewer.mjs",
+    "measure:outcomes": "node scripts/measure-outcomes.mjs",
     "check:core": "cargo test --locked && cargo run --locked --quiet -- --version && node --check scripts/check-viewer.mjs && npm run check:viewer",
     "check": "npm run check:static && npm run check:core"
   },

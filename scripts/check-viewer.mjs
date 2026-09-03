@@ -5,10 +5,17 @@ import http from "node:http"
 import net from "node:net"
 import os from "node:os"
 import path from "node:path"
-import { spawn } from "node:child_process"
+import { execFileSync, spawn } from "node:child_process"
 import { fileURLToPath } from "node:url"
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
+const cargoTargetDirectory = JSON.parse(
+  execFileSync("cargo", ["metadata", "--no-deps", "--format-version", "1"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  }),
+).target_directory
+const burrExecutable = process.platform === "win32" ? "burr.exe" : "burr"
 const fixture = path.join(
   repoRoot,
   "tests",
@@ -20,6 +27,7 @@ const fixture = path.join(
 )
 const interferenceFixtures = path.join(repoRoot, "tests", "fixtures", "interference")
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "burr-viewer-check-"))
+const cacheDirectory = path.join(tempRoot, "cache")
 const modelDirectory = path.join(tempRoot, "models", "enclosure")
 const modelPath = path.join(modelDirectory, "counterbore.step")
 const assemblyDirectory = path.join(tempRoot, "models", "assemblies")
@@ -27,6 +35,8 @@ const ignoredDirectory = path.join(tempRoot, "notes")
 const unconfiguredModelDirectory = path.join(tempRoot, "archive")
 const port = await availablePort()
 const baseUrl = `http://127.0.0.1:${port}`
+let replayChild = null
+let replayClosed = null
 
 fs.mkdirSync(modelDirectory, { recursive: true })
 fs.mkdirSync(assemblyDirectory, { recursive: true })
@@ -72,6 +82,7 @@ const child = spawn(
     cwd: tempRoot,
     env: {
       ...process.env,
+      BURR_CACHE_DIR: cacheDirectory,
       BURR_VIEWER_NO_OPEN: "1",
       BURR_VIEWER_PORT: String(port),
     },
@@ -127,6 +138,17 @@ try {
   expectIncludes(shellHtml, 'id="snapshot-button"', "snapshot control")
   expectIncludes(shellHtml, 'id="motion-controls"', "motion controls")
   expectIncludes(shellHtml, 'id="motion-progress"', "motion scrubber")
+  expectIncludes(shellHtml, 'id="loading-stage"', "progressive loading stage")
+  expectIncludes(shellHtml, 'aria-live="polite"', "accessible loading announcements")
+  expectIncludes(shellHtml, "/api/load-status?", "load-status polling")
+  expectIncludes(shellHtml, "new AbortController()", "superseded load cancellation")
+  expectIncludes(shellHtml, 'type === "burr:viewer-ready"', "event-specific viewer readiness")
+  expectIncludes(
+    shellHtml,
+    "Checks begin after the model is visible.",
+    "model-first check scheduling",
+  )
+  expectIncludes(shellHtml, "Open the Checks tab", "on-demand check guidance")
   expectIncludes(shellHtml, 'type: "burr:toggle-motion"', "motion playback dispatch")
   expectIncludes(shellHtml, "snapshotFilename(state.selectedPath)", "snapshot filename generation")
   expectIncludes(shellHtml, 'type: "burr:export-snapshot"', "snapshot request dispatch")
@@ -184,7 +206,7 @@ try {
   )
 
   const viewerResponse = await fetch(
-    `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&theme=dark`,
+    `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&theme=dark&load=proof-generated`,
   )
   expectEqual(viewerResponse.status, 200, "viewer response status")
   const viewerHtml = await viewerResponse.text()
@@ -203,6 +225,54 @@ try {
   expectIncludes(viewerHtml, 'name="burr-snapshot-export" content="png"', "PNG export marker")
   expectIncludes(viewerHtml, "burr:export-snapshot", "snapshot request listener")
   expectIncludes(viewerHtml, "canvas.toBlob", "canvas PNG export")
+  expectIncludes(viewerHtml, 'type: "burr:viewer-ready"', "specific load completion message")
+  const generatedStatus = await getJson("/api/load-status?id=proof-generated")
+  expectEqual(generatedStatus.schema_version, "burr.load-status.v1", "load status schema")
+  expectEqual(generatedStatus.state, "ready", "generated viewer ready state")
+  expectEqual(generatedStatus.cache, "generated", "generated viewer cache outcome")
+
+  const memoryViewerResponse = await fetch(
+    `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&theme=dark&load=proof-memory`,
+  )
+  expectEqual(memoryViewerResponse.status, 200, "memory-cached viewer response status")
+  const memoryViewerHtml = await memoryViewerResponse.text()
+  expectEqual(
+    viewerWithoutLoadIdentity(memoryViewerHtml),
+    viewerWithoutLoadIdentity(viewerHtml),
+    "memory-cached viewer output",
+  )
+  const memoryStatus = await getJson("/api/load-status?id=proof-memory")
+  expectEqual(memoryStatus.cache, "memory", "same-process viewer cache outcome")
+
+  const replayPort = await availablePort()
+  const replayBaseUrl = `http://127.0.0.1:${replayPort}`
+  replayChild = spawn(path.join(cargoTargetDirectory, "debug", burrExecutable), ["."], {
+    cwd: tempRoot,
+    env: {
+      ...process.env,
+      BURR_CACHE_DIR: cacheDirectory,
+      BURR_VIEWER_NO_OPEN: "1",
+      BURR_VIEWER_PORT: String(replayPort),
+    },
+    stdio: "ignore",
+  })
+  replayClosed = new Promise((resolve) => replayChild.once("close", resolve))
+  await waitForServerAt(replayChild, replayBaseUrl)
+  const diskViewerResponse = await fetch(
+    `${replayBaseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&theme=dark&load=proof-disk`,
+  )
+  expectEqual(diskViewerResponse.status, 200, "disk-cached viewer response status")
+  expectEqual(
+    viewerWithoutLoadIdentity(await diskViewerResponse.text()),
+    viewerWithoutLoadIdentity(viewerHtml),
+    "disk-cached viewer output",
+  )
+  const diskStatus = await getJsonAt(replayBaseUrl, "/api/load-status?id=proof-disk")
+  expectEqual(diskStatus.cache, "disk", "cross-process viewer cache outcome")
+  replayChild.kill("SIGTERM")
+  await Promise.race([replayClosed, delay(2_000)])
+  replayChild = null
+  replayClosed = null
 
   const motionViewerResponse = await fetch(
     `${baseUrl}/viewer?path=${encodeURIComponent("models/assemblies/separated.step")}&motion=fold`,
@@ -276,10 +346,12 @@ try {
   }
 
   const refreshedViewer = await fetch(
-    `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&v=${encodeURIComponent(updatedVersion)}`,
+    `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&v=${encodeURIComponent(updatedVersion)}&load=proof-invalidated`,
   )
   expectEqual(refreshedViewer.status, 200, "refreshed viewer status")
   expectIncludes(await refreshedViewer.text(), "STEP B-REP", "refreshed Look viewer")
+  const invalidatedStatus = await getJson("/api/load-status?id=proof-invalidated")
+  expectEqual(invalidatedStatus.cache, "generated", "changed source invalidates viewer cache")
   const refreshedReport = await getJson(
     `/api/checks?path=${encodeURIComponent(counterbore.path)}`,
   )
@@ -287,13 +359,17 @@ try {
   expectIncludes(stdout, `OPEN ${baseUrl}/`, "printed viewer URL")
 
   console.log(
-    `viewer proof passed (loopback Host enforced, model scope enforced, named STEP motion rendered, STEP interference pass/fail/incomplete proven, X-ray rendering and PNG export available, components highlighted, watcher refreshed, traversal rejected)`,
+    `viewer proof passed (loopback Host enforced, model scope enforced, progressive load status exposed, cross-process viewer cache reused and invalidated, named STEP motion rendered, STEP interference pass/fail/incomplete proven, X-ray rendering and PNG export available, components highlighted, watcher refreshed, traversal rejected)`,
   )
 } catch (error) {
   if (stdout) process.stderr.write(`viewer stdout:\n${stdout}`)
   if (stderr) process.stderr.write(`viewer stderr:\n${stderr}`)
   throw error
 } finally {
+  if (replayChild) {
+    replayChild.kill("SIGTERM")
+    await Promise.race([replayClosed, delay(2_000)])
+  }
   child.kill("SIGTERM")
   await Promise.race([childClosed, delay(2_000)])
   fs.rmSync(tempRoot, { recursive: true, force: true })
@@ -335,12 +411,16 @@ async function requestStatusWithHost(host) {
 }
 
 async function waitForServer() {
+  return waitForServerAt(child, baseUrl)
+}
+
+async function waitForServerAt(process, url) {
   for (let attempt = 0; attempt < 240; attempt += 1) {
-    if (child.exitCode !== null) {
-      throw new Error(`viewer exited before becoming ready with code ${child.exitCode}`)
+    if (process.exitCode !== null) {
+      throw new Error(`viewer exited before becoming ready with code ${process.exitCode}`)
     }
     try {
-      const response = await fetch(`${baseUrl}/api/health`)
+      const response = await fetch(`${url}/api/health`)
       if (response.ok) return
     } catch {
       // The initial Rust build may still be running.
@@ -367,9 +447,21 @@ function model(tree, wantedPath) {
 }
 
 async function getJson(route) {
-  const response = await fetch(`${baseUrl}${route}`, { cache: "no-store" })
+  return getJsonAt(baseUrl, route)
+}
+
+async function getJsonAt(url, route) {
+  const response = await fetch(`${url}${route}`, { cache: "no-store" })
   if (!response.ok) throw new Error(`${route} returned ${response.status}`)
   return response.json()
+}
+
+function viewerWithoutLoadIdentity(html) {
+  const start = html.indexOf("<!--burr-load-id-start-->")
+  const endMarker = "<!--burr-load-id-end-->"
+  const end = html.indexOf(endMarker, start)
+  if (start < 0 || end < 0) throw new Error("viewer did not contain its load identity")
+  return `${html.slice(0, start)}${html.slice(end + endMarker.length)}`
 }
 
 function expectEqual(actual, expected, label) {
