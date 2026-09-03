@@ -4,12 +4,22 @@ import fs from "node:fs"
 import net from "node:net"
 import os from "node:os"
 import path from "node:path"
-import { spawn } from "node:child_process"
+import { execFileSync, spawn } from "node:child_process"
 import { performance } from "node:perf_hooks"
 import { fileURLToPath } from "node:url"
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
-const burr = path.join(repoRoot, "target", "release", process.platform === "win32" ? "burr.exe" : "burr")
+const cargoTargetDirectory = JSON.parse(
+  execFileSync("cargo", ["metadata", "--no-deps", "--format-version", "1"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  }),
+).target_directory
+const burr = path.join(
+  cargoTargetDirectory,
+  "release",
+  process.platform === "win32" ? "burr.exe" : "burr",
+)
 const projects = process.argv.slice(2).map((project) => path.resolve(project))
 
 if (projects.length === 0) {

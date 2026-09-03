@@ -15,8 +15,8 @@ Apple M1 Pro running macOS 26.5.1:
 
 | Outcome motion | Cold generation | Same process | After restart | Viewer response |
 | --- | ---: | ---: | ---: | ---: |
-| Fold-flat hanger | 4,336.76 ms | 5.71 ms | 6.59 ms | 2,945,235 bytes |
-| Digital photo frame | 9,006.08 ms | 6.39 ms | 8.09 ms | 4,078,500 bytes |
+| Fold-flat hanger | 3,672.72 ms | 6.09 ms | 8.29 ms | 2,945,540 bytes |
+| Digital photo frame | 8,414.08 ms | 6.47 ms | 6.93 ms | 4,078,805 bytes |
 
 The cache provenance reported by Burr was `generated`, `memory`, and `disk`
 for the three columns respectively. The automated viewer proof separately

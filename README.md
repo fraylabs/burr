@@ -34,6 +34,7 @@ tessellating geometry, preparing materials or motion, and building the viewer.
 After generation, Burr reuses the self-contained viewer from a bounded local
 cache, including after the process restarts. Source content, Burr version,
 theme, component focus, and motion configuration are part of the cache key.
+Memory reuse is capped at 256 MiB and persistent reuse at 512 MiB.
 
 The cache contains browser-ready model geometry but never leaves the machine.
 On Unix systems its directory and files are owner-only. See

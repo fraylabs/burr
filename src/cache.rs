@@ -9,7 +9,9 @@ const CACHE_MAGIC: &[u8] = b"BURR_VIEWER_CACHE_V1\n";
 const CACHE_DIRECTORY_VERSION: &str = "viewer-v1";
 const CACHE_FILE_SUFFIX: &str = ".burr-viewer";
 const MAX_CACHE_ENTRIES: usize = 128;
-const MAX_CACHE_FILE_BYTES: usize = 64 * 1024 * 1024;
+const MAX_CACHE_TOTAL_BYTES: u64 = 512 * 1024 * 1024;
+pub const MAX_VIEWER_HTML_BYTES: usize = 64 * 1024 * 1024;
+const MAX_CACHE_ENTRY_BYTES: usize = MAX_VIEWER_HTML_BYTES + 64 * 1024;
 
 #[derive(Clone, Debug)]
 pub struct ViewerCache {
@@ -42,7 +44,7 @@ impl ViewerCache {
                 ));
             }
         };
-        if bytes.len() > MAX_CACHE_FILE_BYTES || !bytes.starts_with(CACHE_MAGIC) {
+        if bytes.len() > MAX_CACHE_ENTRY_BYTES || !bytes.starts_with(CACHE_MAGIC) {
             return Ok(None);
         }
         let length_start = CACHE_MAGIC.len();
@@ -74,8 +76,11 @@ impl ViewerCache {
         let Some(path) = self.entry_path(key) else {
             return Ok(false);
         };
+        if html.len() > MAX_VIEWER_HTML_BYTES {
+            return Ok(false);
+        }
         let total_bytes = CACHE_MAGIC.len() + 8 + key.len() + html.len();
-        if total_bytes > MAX_CACHE_FILE_BYTES {
+        if total_bytes > MAX_CACHE_ENTRY_BYTES {
             return Ok(false);
         }
         let Some(root) = path.parent() else {
@@ -186,6 +191,10 @@ fn cache_root_from_environment() -> Option<PathBuf> {
 }
 
 fn prune_cache(root: &Path) {
+    prune_cache_to_limits(root, MAX_CACHE_ENTRIES, MAX_CACHE_TOTAL_BYTES);
+}
+
+fn prune_cache_to_limits(root: &Path, max_entries: usize, max_bytes: u64) {
     let Ok(entries) = fs::read_dir(root) else {
         return;
     };
@@ -198,17 +207,28 @@ fn prune_cache(root: &Path) {
                 .is_some_and(|name| name.ends_with(CACHE_FILE_SUFFIX))
         })
         .filter_map(|entry| {
-            let modified = entry.metadata().ok()?.modified().ok()?;
-            Some((modified, entry.path()))
+            let metadata = entry.metadata().ok()?;
+            let modified = metadata.modified().ok()?;
+            Some((modified, entry.path(), metadata.len()))
         })
         .collect::<Vec<_>>();
-    if entries.len() <= MAX_CACHE_ENTRIES {
+    let mut entry_count = entries.len();
+    let mut total_bytes = entries
+        .iter()
+        .map(|(_, _, bytes)| *bytes)
+        .fold(0_u64, u64::saturating_add);
+    if entry_count <= max_entries && total_bytes <= max_bytes {
         return;
     }
-    entries.sort_by_key(|(modified, _)| *modified);
-    let remove_count = entries.len() - MAX_CACHE_ENTRIES;
-    for (_, path) in entries.into_iter().take(remove_count) {
-        let _ = fs::remove_file(path);
+    entries.sort_by_key(|(modified, _, _)| *modified);
+    for (_, path, bytes) in entries {
+        if entry_count <= max_entries && total_bytes <= max_bytes {
+            break;
+        }
+        if fs::remove_file(path).is_ok() {
+            entry_count = entry_count.saturating_sub(1);
+            total_bytes = total_bytes.saturating_sub(bytes);
+        }
     }
 }
 
@@ -299,5 +319,29 @@ mod tests {
         fs::write(path, "not a Burr viewer").unwrap();
 
         assert_eq!(cache.load("model-a").unwrap(), None);
+    }
+
+    #[test]
+    fn pruning_enforces_entry_and_byte_limits() {
+        let temp = tempdir().unwrap();
+        for (name, contents) in [("a", "1234"), ("b", "5678"), ("c", "9012")] {
+            fs::write(
+                temp.path().join(format!("{name}{CACHE_FILE_SUFFIX}")),
+                contents,
+            )
+            .unwrap();
+        }
+
+        prune_cache_to_limits(temp.path(), 2, 8);
+
+        let remaining = fs::read_dir(temp.path()).unwrap().count();
+        let bytes = fs::read_dir(temp.path())
+            .unwrap()
+            .filter_map(Result::ok)
+            .filter_map(|entry| entry.metadata().ok())
+            .map(|metadata| metadata.len())
+            .sum::<u64>();
+        assert!(remaining <= 2);
+        assert!(bytes <= 8);
     }
 }

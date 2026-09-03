@@ -1,5 +1,5 @@
 use crate::{
-    cache::{source_fingerprint, ViewerCache},
+    cache::{source_fingerprint, ViewerCache, MAX_VIEWER_HTML_BYTES},
     interference::{self, CheckReport},
     load_status::{valid_load_id, LoadReporter, LoadTracker},
     motion::{prepare_motion, PreparedMotion, MAX_MOTION_COMPONENTS},
@@ -14,7 +14,7 @@ use look::{
 use percent_encoding::percent_decode_str;
 use serde_json::json;
 use std::{
-    collections::HashMap,
+    collections::{HashMap, VecDeque},
     fs,
     path::{Component, Path, PathBuf},
     process::Command,
@@ -29,6 +29,7 @@ const LOGO_PNG: &[u8] = include_bytes!("../assets/burr-logo.png");
 const VIEWER_FRAMING_MARGIN: f32 = 1.3;
 const SERVER_WORKERS: usize = 4;
 const MAX_MEMORY_VIEWERS: usize = 32;
+const MAX_MEMORY_VIEWER_BYTES: usize = 256 * 1024 * 1024;
 const SKIP_DIRECTORIES: [&str; 10] = [
     ".git",
     ".jj",
@@ -60,6 +61,8 @@ struct CachedModel {
 struct ModelCache {
     models: HashMap<PathBuf, CachedModel>,
     viewers: HashMap<String, String>,
+    viewer_order: VecDeque<String>,
+    viewer_bytes: usize,
 }
 
 struct RenderedViewer {
@@ -253,11 +256,31 @@ pub fn run(start: PathBuf) -> Result<(), String> {
         });
     }
     for request in server.incoming_requests() {
+        if request_is_priority(&request) {
+            if let Err(error) = handle_request(
+                request,
+                &project,
+                &cache,
+                &load_tracker,
+                &viewer_cache,
+                port,
+            ) {
+                eprintln!("Viewer request failed: {error}");
+            }
+            continue;
+        }
         sender
             .send(request)
             .map_err(|_| "Burr viewer workers stopped unexpectedly.".to_string())?;
     }
     Ok(())
+}
+
+fn request_is_priority(request: &Request) -> bool {
+    matches!(
+        request.url().split('?').next(),
+        Some("/api/health" | "/api/load-status")
+    )
 }
 
 fn handle_request(
@@ -400,8 +423,16 @@ fn handle_request(
             };
             match rendered {
                 Ok(rendered) => {
-                    reporter.ready(rendered.cache);
-                    respond(request, 200, "text/html; charset=utf-8", rendered.html)
+                    match inject_viewer_ready_notification(rendered.html, load_id.as_deref()) {
+                        Ok(html) => {
+                            reporter.ready(rendered.cache);
+                            respond(request, 200, "text/html; charset=utf-8", html)
+                        }
+                        Err(error) => {
+                            reporter.failed(&error);
+                            respond_html_error(request, 422, &error)
+                        }
+                    }
                 }
                 Err(error) => {
                     reporter.failed(&error);
@@ -463,9 +494,9 @@ fn render_model(
         selection.focus,
         None,
     );
-    if let Some(html) = cache.viewers.get(&viewer_key) {
+    if let Some(html) = memory_viewer(cache, &viewer_key) {
         return Ok(RenderedViewer {
-            html: html.clone(),
+            html,
             cache: "memory",
         });
     }
@@ -562,9 +593,9 @@ fn render_motion_model(
         None,
         Some(&motion_signature),
     );
-    if let Some(html) = cache.viewers.get(&viewer_key) {
+    if let Some(html) = memory_viewer(cache, &viewer_key) {
         return Ok(RenderedViewer {
-            html: html.clone(),
+            html,
             cache: "memory",
         });
     }
@@ -742,9 +773,54 @@ fn persist_viewer(cache: &ViewerCache, key: &str, html: &str) {
 }
 
 fn remember_viewer(cache: &mut ModelCache, key: String, html: String) {
-    if cache.viewers.len() >= MAX_MEMORY_VIEWERS && !cache.viewers.contains_key(&key) {
-        cache.viewers.clear();
+    remember_viewer_with_limits(
+        cache,
+        key,
+        html,
+        MAX_MEMORY_VIEWERS,
+        MAX_MEMORY_VIEWER_BYTES,
+        MAX_VIEWER_HTML_BYTES,
+    );
+}
+
+fn memory_viewer(cache: &mut ModelCache, key: &str) -> Option<String> {
+    let html = cache.viewers.get(key)?.clone();
+    cache.viewer_order.retain(|candidate| candidate != key);
+    cache.viewer_order.push_back(key.to_string());
+    Some(html)
+}
+
+fn remember_viewer_with_limits(
+    cache: &mut ModelCache,
+    key: String,
+    html: String,
+    max_entries: usize,
+    max_total_bytes: usize,
+    max_entry_bytes: usize,
+) {
+    let html_bytes = html.len();
+    if max_entries == 0 || html_bytes > max_entry_bytes || html_bytes > max_total_bytes {
+        return;
     }
+    if let Some(previous) = cache.viewers.remove(&key) {
+        cache.viewer_bytes = cache.viewer_bytes.saturating_sub(previous.len());
+        cache.viewer_order.retain(|candidate| candidate != &key);
+    }
+    while !cache.viewers.is_empty()
+        && (cache.viewers.len() >= max_entries
+            || cache.viewer_bytes.saturating_add(html_bytes) > max_total_bytes)
+    {
+        let Some(oldest) = cache.viewer_order.pop_front() else {
+            cache.viewers.clear();
+            cache.viewer_bytes = 0;
+            break;
+        };
+        if let Some(evicted) = cache.viewers.remove(&oldest) {
+            cache.viewer_bytes = cache.viewer_bytes.saturating_sub(evicted.len());
+        }
+    }
+    cache.viewer_bytes = cache.viewer_bytes.saturating_add(html_bytes);
+    cache.viewer_order.push_back(key.clone());
     cache.viewers.insert(key, html);
 }
 
@@ -842,6 +918,24 @@ fn inject_viewer_theme(
     themed.push_str(&focus_marker);
     themed.push_str(&html[index..]);
     Ok(themed)
+}
+
+fn inject_viewer_ready_notification(
+    mut html: String,
+    load_id: Option<&str>,
+) -> Result<String, String> {
+    let Some(load_id) = load_id else {
+        return Ok(html);
+    };
+    let marker = "</head>";
+    let Some(index) = html.find(marker) else {
+        return Err("Look viewer HTML did not contain a head element.".to_string());
+    };
+    let notification = format!(
+        r#"<!--burr-load-id-start--><meta name="burr-load-id" content="{load_id}"><script>window.addEventListener("load", () => {{ window.parent.postMessage({{ type: "burr:viewer-ready", loadId: "{load_id}" }}, window.location.origin); }}, {{ once: true }});</script><!--burr-load-id-end-->"#
+    );
+    html.insert_str(index, &notification);
+    Ok(html)
 }
 
 fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
@@ -1430,6 +1524,15 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
     }
 
     #[test]
+    fn viewer_ready_notification_carries_the_specific_load_id() {
+        let html = "<!doctype html><html><head></head><body></body></html>".to_string();
+        let rendered = inject_viewer_ready_notification(html, Some("window-3")).unwrap();
+
+        assert!(rendered.contains("name=\"burr-load-id\" content=\"window-3\""));
+        assert!(rendered.contains("type: \"burr:viewer-ready\", loadId: \"window-3\""));
+    }
+
+    #[test]
     fn viewer_motion_injects_rigid_component_playback() {
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("tests/fixtures/interference/separated.step");
@@ -1469,6 +1572,25 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
         );
         assert!(FocusPair::from_query(Some("2,2")).is_err());
         assert!(FocusPair::from_query(Some("two,5")).is_err());
+    }
+
+    #[test]
+    fn memory_viewer_cache_enforces_entry_and_total_byte_limits() {
+        let mut cache = ModelCache::default();
+        remember_viewer_with_limits(&mut cache, "a".into(), "1234".into(), 2, 8, 6);
+        remember_viewer_with_limits(&mut cache, "b".into(), "5678".into(), 2, 8, 6);
+        assert_eq!(cache.viewer_bytes, 8);
+
+        assert_eq!(memory_viewer(&mut cache, "a").as_deref(), Some("1234"));
+        remember_viewer_with_limits(&mut cache, "c".into(), "9012".into(), 2, 8, 6);
+        assert!(cache.viewers.contains_key("a"));
+        assert!(cache.viewers.contains_key("c"));
+        assert!(!cache.viewers.contains_key("b"));
+        assert_eq!(cache.viewer_bytes, 8);
+
+        remember_viewer_with_limits(&mut cache, "large".into(), "1234567".into(), 2, 8, 6);
+        assert!(!cache.viewers.contains_key("large"));
+        assert_eq!(cache.viewer_bytes, 8);
     }
 
     #[test]

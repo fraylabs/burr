@@ -65,8 +65,9 @@ Burr stores the final self-contained viewer HTML rather than serializing Look's
 internal CAD scene. A BLAKE3 fingerprint of every source pose, the canonical
 source path, Burr version, theme, focus, and motion configuration determine
 reuse. Editing a source or upgrading Burr therefore generates a new entry.
-The process keeps up to 32 viewers in memory; the platform cache retains up to
-128 entries and ignores entries larger than 64 MiB.
+The process keeps up to 32 viewers and 256 MiB in memory. The platform cache
+retains up to 128 entries and 512 MiB, and ignores viewer HTML larger than
+64 MiB.
 
 Default cache locations are:
 

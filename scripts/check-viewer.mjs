@@ -5,10 +5,17 @@ import http from "node:http"
 import net from "node:net"
 import os from "node:os"
 import path from "node:path"
-import { spawn } from "node:child_process"
+import { execFileSync, spawn } from "node:child_process"
 import { fileURLToPath } from "node:url"
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
+const cargoTargetDirectory = JSON.parse(
+  execFileSync("cargo", ["metadata", "--no-deps", "--format-version", "1"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  }),
+).target_directory
+const burrExecutable = process.platform === "win32" ? "burr.exe" : "burr"
 const fixture = path.join(
   repoRoot,
   "tests",
@@ -134,6 +141,8 @@ try {
   expectIncludes(shellHtml, 'id="loading-stage"', "progressive loading stage")
   expectIncludes(shellHtml, 'aria-live="polite"', "accessible loading announcements")
   expectIncludes(shellHtml, "/api/load-status?", "load-status polling")
+  expectIncludes(shellHtml, "new AbortController()", "superseded load cancellation")
+  expectIncludes(shellHtml, 'type === "burr:viewer-ready"', "event-specific viewer readiness")
   expectIncludes(
     shellHtml,
     "Checks begin after the model is visible.",
@@ -216,6 +225,7 @@ try {
   expectIncludes(viewerHtml, 'name="burr-snapshot-export" content="png"', "PNG export marker")
   expectIncludes(viewerHtml, "burr:export-snapshot", "snapshot request listener")
   expectIncludes(viewerHtml, "canvas.toBlob", "canvas PNG export")
+  expectIncludes(viewerHtml, 'type: "burr:viewer-ready"', "specific load completion message")
   const generatedStatus = await getJson("/api/load-status?id=proof-generated")
   expectEqual(generatedStatus.schema_version, "burr.load-status.v1", "load status schema")
   expectEqual(generatedStatus.state, "ready", "generated viewer ready state")
@@ -225,13 +235,18 @@ try {
     `${baseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&theme=dark&load=proof-memory`,
   )
   expectEqual(memoryViewerResponse.status, 200, "memory-cached viewer response status")
-  expectEqual(await memoryViewerResponse.text(), viewerHtml, "memory-cached viewer output")
+  const memoryViewerHtml = await memoryViewerResponse.text()
+  expectEqual(
+    viewerWithoutLoadIdentity(memoryViewerHtml),
+    viewerWithoutLoadIdentity(viewerHtml),
+    "memory-cached viewer output",
+  )
   const memoryStatus = await getJson("/api/load-status?id=proof-memory")
   expectEqual(memoryStatus.cache, "memory", "same-process viewer cache outcome")
 
   const replayPort = await availablePort()
   const replayBaseUrl = `http://127.0.0.1:${replayPort}`
-  replayChild = spawn(path.join(repoRoot, "target", "debug", "burr"), ["."], {
+  replayChild = spawn(path.join(cargoTargetDirectory, "debug", burrExecutable), ["."], {
     cwd: tempRoot,
     env: {
       ...process.env,
@@ -247,7 +262,11 @@ try {
     `${replayBaseUrl}/viewer?path=${encodeURIComponent(counterbore.path)}&theme=dark&load=proof-disk`,
   )
   expectEqual(diskViewerResponse.status, 200, "disk-cached viewer response status")
-  expectEqual(await diskViewerResponse.text(), viewerHtml, "disk-cached viewer output")
+  expectEqual(
+    viewerWithoutLoadIdentity(await diskViewerResponse.text()),
+    viewerWithoutLoadIdentity(viewerHtml),
+    "disk-cached viewer output",
+  )
   const diskStatus = await getJsonAt(replayBaseUrl, "/api/load-status?id=proof-disk")
   expectEqual(diskStatus.cache, "disk", "cross-process viewer cache outcome")
   replayChild.kill("SIGTERM")
@@ -435,6 +454,14 @@ async function getJsonAt(url, route) {
   const response = await fetch(`${url}${route}`, { cache: "no-store" })
   if (!response.ok) throw new Error(`${route} returned ${response.status}`)
   return response.json()
+}
+
+function viewerWithoutLoadIdentity(html) {
+  const start = html.indexOf("<!--burr-load-id-start-->")
+  const endMarker = "<!--burr-load-id-end-->"
+  const end = html.indexOf(endMarker, start)
+  if (start < 0 || end < 0) throw new Error("viewer did not contain its load identity")
+  return `${html.slice(0, start)}${html.slice(end + endMarker.length)}`
 }
 
 function expectEqual(actual, expected, label) {

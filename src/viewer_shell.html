@@ -997,16 +997,15 @@
         motionSignature: "",
         loadSequence: 0,
         activeLoadId: null,
+        activeLoadController: null,
         viewerReady: false,
         theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
         renderMode:
           document.documentElement.dataset.renderMode === "solid" ? "solid" : "x-ray",
       };
 
-      viewer.addEventListener("load", () => {
-        const loadedId = viewer.src ? new URL(viewer.src).searchParams.get("load") : null;
-        if (loadedId && loadedId !== state.activeLoadId) return;
-        state.activeLoadId = null;
+      function acceptViewerReady(loadId) {
+        if (!clearActiveLoad(loadId)) return;
         loadingState.hidden = true;
         const snapshotReady = Boolean(
           state.selectedPath &&
@@ -1045,7 +1044,31 @@
             "incomplete",
           );
         }
-      });
+      }
+
+      function failViewerLoad(loadId) {
+        if (!clearActiveLoad(loadId)) return;
+        loadingState.hidden = true;
+        snapshotButton.disabled = true;
+        snapshotButton.textContent = "Unavailable";
+        state.motionReady = false;
+        state.viewerReady = false;
+        renderMotionControls();
+        setCheckIndicator("incomplete");
+        renderCheckMessage(
+          "Incomplete",
+          "Burr could not inspect the selected model.",
+          "incomplete",
+        );
+      }
+
+      function clearActiveLoad(loadId = null) {
+        if (loadId && state.activeLoadId !== loadId) return false;
+        state.activeLoadController?.abort();
+        state.activeLoadController = null;
+        state.activeLoadId = null;
+        return true;
+      }
 
       themeToggle.addEventListener("click", () => {
         setTheme(state.theme === "dark" ? "light" : "dark", true, true);
@@ -1125,7 +1148,7 @@
           state.focusedFinding = null;
           state.activeMotion = null;
           state.motionReady = false;
-          state.activeLoadId = null;
+          clearActiveLoad();
           state.viewerReady = false;
           viewer.removeAttribute("src");
           snapshotButton.disabled = true;
@@ -1247,8 +1270,11 @@
       }
 
       function openViewer(file, refreshed = false, focus = null) {
+        clearActiveLoad();
         const loadId = `${loadSession}-${++state.loadSequence}`;
+        const loadController = new AbortController();
         state.activeLoadId = loadId;
+        state.activeLoadController = loadController;
         state.viewerReady = false;
         state.motionSuspended = Boolean(focus);
         state.motionReady = false;
@@ -1267,22 +1293,30 @@
         if (focus) query.set("focus", focus.join(","));
         else if (state.activeMotion) query.set("motion", state.activeMotion.id);
         viewer.src = `/viewer?${query}`;
-        pollLoadStatus(loadId);
+        pollLoadStatus(loadId, loadController);
       }
 
-      async function pollLoadStatus(loadId) {
+      async function pollLoadStatus(loadId, controller) {
         while (state.activeLoadId === loadId) {
           try {
             const query = new URLSearchParams({ id: loadId });
-            const response = await fetch(`/api/load-status?${query}`, { cache: "no-store" });
+            const response = await fetch(`/api/load-status?${query}`, {
+              cache: "no-store",
+              signal: controller.signal,
+            });
             if (response.ok) {
               const status = await response.json();
               if (state.activeLoadId !== loadId) return;
               loadingStage.textContent = status.detail
                 ? `${status.stage} — ${status.detail}`
                 : status.stage;
+              if (status.state === "error") {
+                failViewerLoad(loadId);
+                return;
+              }
             }
           } catch (error) {
+            if (error.name === "AbortError") return;
             console.debug("Burr load status is temporarily unavailable", error);
           }
           await new Promise((resolve) => setTimeout(resolve, 150));
@@ -1550,6 +1584,10 @@
       function receiveViewerMessage(event) {
         if (event.origin !== window.location.origin || event.source !== viewer.contentWindow) return;
         const type = event.data?.type;
+        if (type === "burr:viewer-ready") {
+          acceptViewerReady(event.data.loadId);
+          return;
+        }
         if (type === "burr:motion-state") {
           const progress = Number(event.data.progress);
           if (!Number.isFinite(progress)) return;
