@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 0.34.0 - 2026-09-03
+
+- Replace two-STEP motion endpoints with one STEP assembly plus explicit
+  revolute and prismatic joints, so Burr tessellates each motion model once and
+  follows its declared hinge arcs and linear travel in the browser.
+- Introduce `burr.project.v2` for the single-source motion contract, with
+  fail-closed validation for model scope, component assignments, axes, pivots,
+  angles, and travel.
+- Keep source-pose interference results hidden while motion is playing or
+  paused elsewhere, so an unchecked animated pose is never presented as clean.
+
 ## 0.33.0 - 2026-09-03
 
 - Report real model-loading stages in the workbench while Look reads,

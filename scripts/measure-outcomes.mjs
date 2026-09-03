@@ -94,7 +94,7 @@ async function measureProject(project) {
 async function selectRepresentativeModel(baseUrl) {
   const project = await getJson(baseUrl, "/api/project")
   const motion = project.motions?.[0]
-  if (motion) return { path: motion.from, motion: motion.id }
+  if (motion) return { path: motion.model, motion: motion.id }
   const tree = await getJson(baseUrl, "/api/tree")
   const model = tree.files?.[0]
   if (!model) throw new Error("outcome project contains no supported models")

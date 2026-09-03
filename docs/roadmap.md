@@ -10,6 +10,8 @@ metadata for the basic experience.
 - The sidebar mirrors nested model folders and refreshes the active model when
   its source changes.
 - Optional `.burr/config.toml` limits the folders Burr treats as model roots.
+- Optional named motion tessellates one STEP assembly and applies declared
+  revolute or prismatic joints in the browser.
 - STEP assemblies with at least two component occurrences receive one
   geometry-native interference check:
 
@@ -33,6 +35,10 @@ Use the interference proof on representative real assemblies and harden only
 the failure modes that evidence exposes. Clearance, distance, and thin-region
 checks can be considered after the component references and selection loop hold
 up outside the fixtures.
+
+Evaluate interference at configured motion frames. The current check is
+available only at the source pose so Burr never presents a static source result
+as evidence for an animated pose.
 
 ## Later
 

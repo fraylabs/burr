@@ -21,7 +21,7 @@ machine. Parsing, tessellation, and camera interaction are powered by
 - Switch the complete interface between light and dark themes.
 - Use **X-ray** mode by default to reveal enclosed or occluded occurrences.
 - Switch to **Solid** mode for ordinary surface inspection.
-- Play or scrub configured motion between matching STEP assembly poses.
+- Play or scrub configured revolute and prismatic motion on one STEP assembly.
 - Export the current camera, theme, and render mode as a local PNG snapshot.
 
 Long file names stay on one line and truncate with an ellipsis. The complete
@@ -66,7 +66,7 @@ correctness. Those boundaries are tracked in
 Install the current GitHub release:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.33.0 --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.34.0 --locked
 ```
 
 Then open any model folder:
@@ -86,7 +86,7 @@ command line. To limit a project to stable model roots, add
 `.burr/config.toml`:
 
 ```toml
-schema_version = "burr.project.v1"
+schema_version = "burr.project.v2"
 
 [project]
 models = ["models"]
@@ -94,11 +94,17 @@ models = ["models"]
 [[motions]]
 id = "fold"
 label = "Fold hanger"
-from = "models/hanger-deployed.step"
+model = "models/hanger-deployed.step"
 from_label = "Deployed"
-to = "models/hanger-folded.step"
 to_label = "Folded"
 duration_ms = 1200
+
+[[motions.joints]]
+type = "revolute"
+components = ["left_arm"]
+origin_mm = [-26.0, 0.0, 2.6]
+axis = [0.0, 0.0, 1.0]
+angle_degrees = 70.0
 ```
 
 Burr uses the nearest configuration at or above the requested folder. See
