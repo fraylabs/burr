@@ -21,6 +21,8 @@ machine. Parsing, tessellation, and camera interaction are powered by
 - Switch the complete interface between light and dark themes.
 - Use **X-ray** mode by default to reveal enclosed or occluded occurrences.
 - Switch to **Solid** mode for ordinary surface inspection.
+- Play or scrub configured motion between matching STEP assembly poses.
+- Export the current camera, theme, and render mode as a local PNG snapshot.
 
 Long file names stay on one line and truncate with an ellipsis. The complete
 path remains available on hover.
@@ -47,10 +49,10 @@ correctness. Those boundaries are tracked in
 
 ## Install
 
-Until the next crates.io release, install the current repository version:
+Install the current GitHub release:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.32.0 --locked
 ```
 
 Then open any model folder:
@@ -74,6 +76,15 @@ schema_version = "burr.project.v1"
 
 [project]
 models = ["models"]
+
+[[motions]]
+id = "fold"
+label = "Fold hanger"
+from = "models/hanger-deployed.step"
+from_label = "Deployed"
+to = "models/hanger-folded.step"
+to_label = "Folded"
+duration_ms = 1200
 ```
 
 Burr uses the nearest configuration at or above the requested folder. See
@@ -94,7 +105,7 @@ GET /api/health
 GET /api/project
 GET /api/tree
 GET /api/checks?path=<project-relative-model-path>
-GET /viewer?path=<project-relative-model-path>
+GET /viewer?path=<project-relative-model-path>&motion=<motion-id>
 ```
 
 Check reports use schema `burr.checks.v1` and check id

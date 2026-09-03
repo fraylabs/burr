@@ -1,6 +1,7 @@
 use crate::{
     interference::{self, CheckReport},
-    project::Project,
+    motion::{prepare_motion, PreparedMotion, MAX_MOTION_COMPONENTS},
+    project::{Motion, Project},
 };
 use look::{
     config::{LightingConfig, UpAxis},
@@ -22,10 +23,11 @@ use tiny_http::{Header, Method, Request, Response, Server, StatusCode};
 const SHELL_HTML: &str = include_str!("viewer_shell.html");
 const LOGO_PNG: &[u8] = include_bytes!("../assets/burr-logo.png");
 const VIEWER_FRAMING_MARGIN: f32 = 1.3;
-const SKIP_DIRECTORIES: [&str; 9] = [
+const SKIP_DIRECTORIES: [&str; 10] = [
     ".git",
     ".jj",
     ".next",
+    "__cadgen__",
     "__pycache__",
     "build",
     "dist",
@@ -267,11 +269,12 @@ fn handle_request(
                         })
                     })
                     .collect::<Vec<_>>();
+                let motions = project.public_state()["motions"].clone();
                 respond(
                     request,
                     200,
                     "application/json; charset=utf-8",
-                    json!({ "root": root_name, "files": files }).to_string(),
+                    json!({ "root": root_name, "files": files, "motions": motions }).to_string(),
                 )
             }
             Err(error) => respond_json_error(request, 500, &error),
@@ -303,7 +306,15 @@ fn handle_request(
                 Ok(focus) => focus,
                 Err(error) => return respond_html_error(request, 400, &error),
             };
-            match render_model(project, &relative_path, theme, focus, cache) {
+            let motion_id = query_value(&url, "motion");
+            match render_model(
+                project,
+                &relative_path,
+                theme,
+                focus,
+                motion_id.as_deref(),
+                cache,
+            ) {
                 Ok(html) => respond(request, 200, "text/html; charset=utf-8", html),
                 Err(error) => respond_html_error(request, 422, &error),
             }
@@ -322,8 +333,22 @@ fn render_model(
     relative_path: &str,
     theme: ViewerTheme,
     focus: Option<FocusPair>,
+    motion_id: Option<&str>,
     cache: &mut ModelCache,
 ) -> Result<String, String> {
+    if let Some(motion_id) = motion_id {
+        if focus.is_some() {
+            return Err(
+                "Motion playback is unavailable while components are highlighted.".to_string(),
+            );
+        }
+        let motion = project
+            .motion(motion_id)
+            .cloned()
+            .ok_or_else(|| format!("Unknown Burr motion: {motion_id}"))?;
+        return render_motion_model(project, relative_path, theme, &motion, cache);
+    }
+
     let cached = load_model(project, relative_path, cache)?;
     if let Some(focus) = focus {
         if focus.second >= cached.scene.instances.len() {
@@ -352,6 +377,41 @@ fn render_model(
     let html = inject_viewer_theme(html, theme, focus)?;
     cached.viewers.insert(viewer_key, html.clone());
     Ok(html)
+}
+
+fn render_motion_model(
+    project: &Project,
+    relative_path: &str,
+    theme: ViewerTheme,
+    motion: &Motion,
+    cache: &mut ModelCache,
+) -> Result<String, String> {
+    let initial_progress = if relative_path == motion.from {
+        0.0
+    } else if relative_path == motion.to {
+        1.0
+    } else {
+        return Err(format!(
+            "Motion '{}' does not include model {relative_path}.",
+            motion.id
+        ));
+    };
+
+    let from_scene = load_model(project, &motion.from, cache)?.scene.clone();
+    let to_scene = load_model(project, &motion.to, cache)?.scene.clone();
+    let prepared = prepare_motion(&from_scene, &to_scene, motion.duration_ms, initial_progress)?;
+    let lighting = theme.lighting();
+    let html = generate_html_viewer(
+        &prepared.scene,
+        relative_path,
+        &prepared.scene.statistics,
+        &lighting,
+        theme.canvas_background(),
+    )
+    .map_err(|error| format!("Look could not build motion '{}': {error:#}", motion.id))?;
+    let html = inject_viewer_render_modes(html)?;
+    let html = inject_viewer_motion(html, &prepared)?;
+    inject_viewer_theme(html, theme, None)
 }
 
 fn check_model(
@@ -528,12 +588,12 @@ fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
         ),
         (
             "gl.uniform3fv(uCamPosLoc, camPos);\n\n            gl.bindVertexArray(vao);",
-            "gl.uniform3fv(uCamPosLoc, camPos);\n\n            const xRay = burrRenderMode === 'x-ray';\n            gl.uniform1f(uOpacityLoc, xRay ? 0.28 : 1.0);\n            if (xRay) {\n                gl.enable(gl.BLEND);\n                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);\n                gl.depthMask(false);\n            } else {\n                gl.disable(gl.BLEND);\n                gl.depthMask(true);\n            }\n\n            gl.bindVertexArray(vao);",
+            "gl.uniform3fv(uCamPosLoc, camPos);\n            burrApplyMotionFrame(gl);\n\n            const xRay = burrRenderMode === 'x-ray';\n            gl.uniform1f(uOpacityLoc, xRay ? 0.28 : 1.0);\n            if (xRay) {\n                gl.enable(gl.BLEND);\n                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);\n                gl.depthMask(false);\n            } else {\n                gl.disable(gl.BLEND);\n                gl.depthMask(true);\n            }\n\n            gl.bindVertexArray(vao);",
             "render-mode state",
         ),
         (
             "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);",
-            "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);\n            gl.depthMask(true);",
+            "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);\n            gl.depthMask(true);\n            burrCaptureSnapshot(canvas);",
             "depth-buffer restore",
         ),
     ];
@@ -550,8 +610,193 @@ fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
     let Some(index) = html.find(marker) else {
         return Err("Look viewer HTML did not contain a head element.".to_string());
     };
-    let controls = r#"<meta name="burr-render-modes" content="x-ray,solid"><script id="burr-render-mode">let burrRenderMode = "x-ray";document.documentElement.dataset.burrRenderMode = burrRenderMode;window.addEventListener("message",(event)=>{if(event.origin!==window.location.origin||event.data?.type!=="burr:set-render-mode")return;const mode=event.data.mode;if(mode!=="x-ray"&&mode!=="solid")return;burrRenderMode=mode;document.documentElement.dataset.burrRenderMode=mode;});</script>"#;
+    let controls = r#"<meta name="burr-render-modes" content="x-ray,solid"><meta name="burr-snapshot-export" content="png"><script id="burr-viewer-controls">
+let burrRenderMode = "x-ray";
+let burrSnapshotRequest = null;
+document.documentElement.dataset.burrRenderMode = burrRenderMode;
+
+function burrApplyMotionFrame() {}
+
+window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin) return;
+    if (event.data?.type === "burr:set-render-mode") {
+        const mode = event.data.mode;
+        if (mode !== "x-ray" && mode !== "solid") return;
+        burrRenderMode = mode;
+        document.documentElement.dataset.burrRenderMode = mode;
+        return;
+    }
+    if (event.data?.type !== "burr:export-snapshot") return;
+    const filename = event.data.filename;
+    if (typeof filename !== "string" || !/^[a-zA-Z0-9._-]+\.png$/.test(filename)) {
+        window.parent.postMessage(
+            { type: "burr:snapshot-error", message: "Snapshot filename was invalid." },
+            window.location.origin,
+        );
+        return;
+    }
+    burrSnapshotRequest = filename;
+});
+
+function burrCaptureSnapshot(canvas) {
+    if (!burrSnapshotRequest) return;
+    const filename = burrSnapshotRequest;
+    burrSnapshotRequest = null;
+    canvas.toBlob((blob) => {
+        if (!blob) {
+            window.parent.postMessage(
+                { type: "burr:snapshot-error", message: "The model canvas could not be captured." },
+                window.location.origin,
+            );
+            return;
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        window.parent.postMessage(
+            { type: "burr:snapshot-exported", filename },
+            window.location.origin,
+        );
+    }, "image/png");
+}
+</script>"#;
     html.insert_str(index, controls);
+    Ok(html)
+}
+
+fn inject_viewer_motion(mut html: String, motion: &PreparedMotion) -> Result<String, String> {
+    let shader_header = format!(
+        "in vec4 aColor;\n            in float aBurrInstance;\n            uniform mat4 uMVP;\n            uniform mat4 uBurrInstanceTransforms[{MAX_MOTION_COMPONENTS}];"
+    );
+    let motion_arrays = format!(
+        "const colors = b64ToFloat32Array(colorB64);\n        const burrInstanceIds = b64ToFloat32Array(\"{}\");\n        const burrMotionFrames = b64ToFloat32Array(\"{}\");",
+        motion.instance_ids_base64, motion.frames_base64
+    );
+    let replacements = [
+        (
+            "in vec4 aColor;\n            uniform mat4 uMVP;".to_string(),
+            shader_header,
+            "motion vertex attributes",
+        ),
+        (
+            "vNormal = mat3(uModel) * aNormal;\n                vFragPos = vec3(uModel * vec4(aPosition, 1.0));\n                vColor = aColor;\n                gl_Position = uMVP * vec4(aPosition, 1.0);".to_string(),
+            "mat4 burrTransform = uBurrInstanceTransforms[int(aBurrInstance)];\n                vec4 burrPosition = burrTransform * vec4(aPosition, 1.0);\n                vNormal = mat3(burrTransform) * aNormal;\n                vFragPos = vec3(burrPosition);\n                vColor = aColor;\n                gl_Position = uMVP * burrPosition;".to_string(),
+            "motion vertex transform",
+        ),
+        (
+            "const colors = b64ToFloat32Array(colorB64);".to_string(),
+            motion_arrays,
+            "motion data arrays",
+        ),
+        (
+            "const idxBuffer = gl.createBuffer();".to_string(),
+            "const burrInstanceBuffer = gl.createBuffer();\n        gl.bindBuffer(gl.ARRAY_BUFFER, burrInstanceBuffer);\n        gl.bufferData(gl.ARRAY_BUFFER, burrInstanceIds, gl.STATIC_DRAW);\n        const aBurrInstanceLoc = gl.getAttribLocation(program, 'aBurrInstance');\n        gl.enableVertexAttribArray(aBurrInstanceLoc);\n        gl.vertexAttribPointer(aBurrInstanceLoc, 1, gl.FLOAT, false, 0, 0);\n\n        const idxBuffer = gl.createBuffer();".to_string(),
+            "motion instance buffer",
+        ),
+        (
+            "const uModelLoc = gl.getUniformLocation(program, 'uModel');".to_string(),
+            "const uModelLoc = gl.getUniformLocation(program, 'uModel');\n        const uBurrInstanceTransformsLoc = gl.getUniformLocation(program, 'uBurrInstanceTransforms[0]');".to_string(),
+            "motion transform uniform",
+        ),
+    ];
+    for (needle, replacement, label) in replacements {
+        if !html.contains(&needle) {
+            return Err(format!(
+                "Look viewer HTML did not contain the expected {label} hook."
+            ));
+        }
+        html = html.replacen(&needle, &replacement, 1);
+    }
+
+    let marker = "</head>";
+    let Some(index) = html.find(marker) else {
+        return Err("Look viewer HTML did not contain a head element.".to_string());
+    };
+    let motion_script = format!(
+        r#"<meta name="burr-motion" content="rigid-poses"><script id="burr-motion-player">
+const burrMotionFrameCount = {frame_count};
+const burrMotionInstanceCount = {instance_count};
+const burrMotionDuration = {duration_ms};
+let burrMotionProgress = {initial_progress};
+let burrMotionPlaying = false;
+let burrMotionStartedAt = null;
+let burrMotionLastReportedFrame = -1;
+
+function burrEmitMotionState() {{
+    window.parent.postMessage(
+        {{
+            type: "burr:motion-state",
+            progress: burrMotionProgress,
+            playing: burrMotionPlaying,
+        }},
+        window.location.origin,
+    );
+}}
+
+function burrApplyMotionFrame(gl) {{
+    const wasPlaying = burrMotionPlaying;
+    if (burrMotionPlaying) {{
+        const now = performance.now();
+        if (burrMotionStartedAt === null) {{
+            burrMotionStartedAt = now - burrMotionProgress * burrMotionDuration;
+        }}
+        burrMotionProgress = Math.min(1, (now - burrMotionStartedAt) / burrMotionDuration);
+        if (burrMotionProgress >= 1) {{
+            burrMotionProgress = 1;
+            burrMotionPlaying = false;
+            burrMotionStartedAt = null;
+        }}
+    }}
+
+    const frame = Math.round(burrMotionProgress * (burrMotionFrameCount - 1));
+    const start = frame * burrMotionInstanceCount * 16;
+    const end = start + burrMotionInstanceCount * 16;
+    gl.uniformMatrix4fv(
+        uBurrInstanceTransformsLoc,
+        false,
+        burrMotionFrames.subarray(start, end),
+    );
+    if (frame !== burrMotionLastReportedFrame || (wasPlaying && !burrMotionPlaying)) {{
+        burrMotionLastReportedFrame = frame;
+        burrEmitMotionState();
+    }}
+}}
+
+window.addEventListener("message", (event) => {{
+    if (event.origin !== window.location.origin) return;
+    if (event.data?.type === "burr:set-motion-progress") {{
+        const progress = Number(event.data.progress);
+        if (!Number.isFinite(progress)) return;
+        burrMotionProgress = Math.max(0, Math.min(1, progress));
+        burrMotionPlaying = false;
+        burrMotionStartedAt = null;
+        burrMotionLastReportedFrame = -1;
+        burrEmitMotionState();
+        return;
+    }}
+    if (event.data?.type !== "burr:toggle-motion") return;
+    if (burrMotionPlaying) {{
+        burrMotionPlaying = false;
+        burrMotionStartedAt = null;
+    }} else {{
+        if (burrMotionProgress >= 1) burrMotionProgress = 0;
+        burrMotionPlaying = true;
+        burrMotionStartedAt = performance.now() - burrMotionProgress * burrMotionDuration;
+    }}
+    burrEmitMotionState();
+}});
+</script>"#,
+        frame_count = motion.frame_count,
+        instance_count = motion.instance_count,
+        duration_ms = motion.duration_ms,
+        initial_progress = motion.initial_progress,
+    );
+    html.insert_str(index, &motion_script);
     Ok(html)
 }
 
@@ -791,10 +1036,16 @@ mod tests {
     fn scan_models_filters_and_sorts_supported_files() {
         let temp = tempdir().unwrap();
         fs::create_dir_all(temp.path().join("models/enclosure")).unwrap();
+        fs::create_dir_all(temp.path().join("models/__cadgen__/components")).unwrap();
         fs::create_dir_all(temp.path().join("node_modules/ignored")).unwrap();
         fs::write(temp.path().join("models/zeta.stl"), "solid empty\nendsolid").unwrap();
         fs::write(temp.path().join("models/enclosure/alpha.STEP"), "STEP").unwrap();
         fs::write(temp.path().join("models/readme.txt"), "ignore me").unwrap();
+        fs::write(
+            temp.path().join("models/__cadgen__/components/render.glb"),
+            "generated render cache",
+        )
+        .unwrap();
         fs::write(
             temp.path().join("node_modules/ignored/hidden.glb"),
             "ignore me",
@@ -892,6 +1143,39 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
         assert!(rendered.contains("fragColor = vec4(col, uOpacity);"));
         assert!(rendered.contains("xRay ? 0.28 : 1.0"));
         assert!(rendered.contains("burr:set-render-mode"));
+        assert!(rendered.contains("name=\"burr-snapshot-export\" content=\"png\""));
+        assert!(rendered.contains("burr:export-snapshot"));
+        assert!(rendered.contains("canvas.toBlob"));
+        assert!(rendered.contains("burrCaptureSnapshot(canvas);"));
+    }
+
+    #[test]
+    fn viewer_motion_injects_rigid_component_playback() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/interference/separated.step");
+        let mut timings = Timings::default();
+        let from = compile_scene(&path, UpAxis::Z, &mut timings).unwrap();
+        let mut to = from.clone();
+        to.instances[1].transform *= glam::Mat4::from_rotation_z(std::f32::consts::FRAC_PI_2);
+        let motion = prepare_motion(&from, &to, 800, 0.0).unwrap();
+        let html = generate_html_viewer(
+            &motion.scene,
+            "motion.step",
+            &motion.scene.statistics,
+            &LightingConfig::default(),
+            "#0c0d10",
+        )
+        .unwrap();
+        let html = inject_viewer_render_modes(html).unwrap();
+        let html = inject_viewer_motion(html, &motion).unwrap();
+
+        assert!(html.contains("name=\"burr-motion\" content=\"rigid-poses\""));
+        assert!(html.contains("in float aBurrInstance;"));
+        assert!(html.contains("uniform mat4 uBurrInstanceTransforms[32];"));
+        assert!(html.contains("burrMotionFrames.subarray(start, end)"));
+        assert!(html.contains("burr:set-motion-progress"));
+        assert!(html.contains("burr:toggle-motion"));
+        assert!(html.contains("burrApplyMotionFrame(gl);"));
     }
 
     #[test]

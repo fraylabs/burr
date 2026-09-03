@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.32.0 - 2026-09-03
+
+- Exclude generated `__cadgen__` render caches from model discovery so Burr's
+  sidebar does not expose temporary or incompatible GLB artifacts.
+- Add one-click PNG snapshots of the current Look viewport, preserving the
+  selected model, camera, theme, and X-ray or Solid presentation.
+- Add named STEP assembly motions in `.burr/config.toml`, with play/pause and
+  timeline controls for rigid components whose geometry is unchanged between
+  the configured poses.
+
 ## 0.31.0 - 2026-08-24
 
 - Add `burr <folder>` (normally `burr .`), a Look-powered local browser for
