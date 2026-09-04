@@ -3,6 +3,11 @@
 Burr is a fast, local browser for STEP, STL, and GLB files with a
 geometry-native STEP assembly interference check.
 
+The optional `$burr` agent skill can coordinate source creation through an
+independently installed design provider before returning to Burr for local
+review. Providers are optional; ordinary `burr .` usage has no CAD or KiCad
+skill dependency.
+
 ## Quick start
 
 Install Burr from its public Git repository:
