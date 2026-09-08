@@ -1,7 +1,8 @@
 # Optional design providers
 
-Load this reference only when a Burr task needs to create or modify source
-geometry. Existing-file browsing and checks do not need a provider.
+Load this reference when a Burr task needs to create or modify authoritative
+design source, including CAD, PCB layout, or schematics. Existing-file browsing
+and checks do not need a provider.
 
 ## Provider contract
 
@@ -13,11 +14,13 @@ For each provider task:
 1. Identify the authoritative source and requested output.
 2. Use an already available provider that matches that source domain.
 3. Let the provider perform its own domain validation.
-4. Export STEP when assembly structure or mechanical review matters; use STL or
-   GLB when visual inspection alone is sufficient.
+4. When 3D review is needed, export STEP for assembly structure or mechanical
+   checks; use STL or GLB when visual inspection alone is sufficient. Do not
+   require a 3D export for a schematic-only task.
 5. Keep outputs inside the user's project and record which source produced
    them.
-6. Return to Burr to browse, refresh, and run supported checks.
+6. Return to Burr to browse, refresh, and run supported checks when the task
+   calls for mechanical review.
 
 If the needed provider is unavailable, report the missing capability and ask
 before installing anything. Do not silently substitute a different source

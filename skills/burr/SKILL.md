@@ -1,6 +1,6 @@
 ---
 name: burr
-description: Create, open, inspect, and check physical designs through Burr. Use when working in Burr, running burr on a model folder, generating or modifying CAD for Burr, browsing STEP/STL/GLB files, or inspecting STEP assembly interference. Existing-file workflows require no external design provider.
+description: Create, open, inspect, and check physical designs through Burr. Use for Burr workflows involving CAD, KiCad PCB or schematic work, browsing STEP/STL/GLB files, or inspecting STEP assembly interference. Existing-file workflows require no external design provider.
 ---
 
 # Burr design environment
@@ -29,10 +29,11 @@ From inside a project, the usual command is `burr .`.
 
 ### Create or modify a design
 
-When source geometry must change, read
+When authoritative design source must change, including a schematic or PCB, read
 [`references/providers.md`](references/providers.md). Select only the provider
 that owns the requested source domain, let it create and validate that source,
-then return to Burr with its exported model.
+then return to Burr with its exported model when mechanical review is needed.
+An electronics-only source edit need not produce a new 3D export.
 
 Examples:
 
@@ -58,8 +59,10 @@ Start Burr at the narrowest useful project folder after a viewable artifact
 exists. Burr discovers STEP/STP, STL, and GLB recursively, preserves folder
 hierarchy in the sidebar, and watches the selected model for changes.
 
-Use `.burr/config.toml` only to limit model roots when unconfigured discovery
-is noisy. Provider selection is not currently a Burr project-config feature;
+Use `.burr/config.toml` to limit model roots when unconfigured discovery
+is noisy or to declare supported joint motion when requested. Consult the installed
+version's project-configuration documentation; do not invent joint parameters.
+Provider selection is not currently a Burr project-config feature;
 do not invent provider keys or rulepacks.
 
 ## Inspect or repair an assembly
@@ -78,6 +81,9 @@ The Checks outcomes mean:
 A clean-looking image never overrides `fail` or `incomplete`. A `pass` does not
 prove production fit, clearance, tolerances, motion, strength, or
 manufacturability.
+
+Checks apply to the source pose, not a played or scrubbed motion pose. Do not
+present the source-pose result as a collision check of an animated pose or path.
 
 ## Ownership boundaries
 
