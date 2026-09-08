@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+## 0.34.0 - 2026-09-03
+
+- Replace two-STEP motion endpoints with one STEP assembly plus explicit
+  revolute and prismatic joints, so Burr tessellates each motion model once and
+  follows its declared hinge arcs and linear travel in the browser.
+- Introduce `burr.project.v2` for the single-source motion contract, with
+  fail-closed validation for model scope, component assignments, axes, pivots,
+  angles, and travel.
+- Keep source-pose interference results hidden while motion is playing or
+  paused elsewhere, so an unchecked animated pose is never presented as clean.
+
+## 0.33.0 - 2026-09-03
+
+- Report real model-loading stages in the workbench while Look reads,
+  tessellates, prepares materials, and builds the browser viewer.
+- Reuse content-addressed viewer HTML across Burr processes, with bounded
+  platform cache storage and owner-only permissions on Unix systems.
+- Prioritize making the model visible before running assembly interference;
+  checks now begin when the Checks tab is opened.
+- Add automated memory/disk-cache and source-invalidation proofs plus a release
+  measurement harness for the published hanger and digital-photo-frame outcome
+  packs.
+
+## 0.32.0 - 2026-09-03
+
+- Exclude generated `__cadgen__` render caches from model discovery so Burr's
+  sidebar does not expose temporary or incompatible GLB artifacts.
+- Add one-click PNG snapshots of the current Look viewport, preserving the
+  selected model, camera, theme, and X-ray or Solid presentation.
+- Add named STEP assembly motions in `.burr/config.toml`, with play/pause and
+  timeline controls for rigid components whose geometry is unchanged between
+  the configured poses.
+
 ## 0.31.0 - 2026-08-24
 
 - Add `burr <folder>` (normally `burr .`), a Look-powered local browser for

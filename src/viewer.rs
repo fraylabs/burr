@@ -1,6 +1,9 @@
 use crate::{
+    cache::{source_fingerprint, ViewerCache, MAX_VIEWER_HTML_BYTES},
     interference::{self, CheckReport},
-    project::Project,
+    load_status::{valid_load_id, LoadReporter, LoadTracker},
+    motion::{prepare_motion, PreparedMotion, MAX_MOTION_COMPONENTS},
+    project::{Motion, Project},
 };
 use look::{
     config::{LightingConfig, UpAxis},
@@ -11,10 +14,12 @@ use look::{
 use percent_encoding::percent_decode_str;
 use serde_json::json;
 use std::{
-    collections::HashMap,
+    collections::{HashMap, VecDeque},
     fs,
     path::{Component, Path, PathBuf},
     process::Command,
+    sync::{mpsc, Arc, Mutex, MutexGuard},
+    thread,
     time::{SystemTime, UNIX_EPOCH},
 };
 use tiny_http::{Header, Method, Request, Response, Server, StatusCode};
@@ -22,10 +27,14 @@ use tiny_http::{Header, Method, Request, Response, Server, StatusCode};
 const SHELL_HTML: &str = include_str!("viewer_shell.html");
 const LOGO_PNG: &[u8] = include_bytes!("../assets/burr-logo.png");
 const VIEWER_FRAMING_MARGIN: f32 = 1.3;
-const SKIP_DIRECTORIES: [&str; 9] = [
+const SERVER_WORKERS: usize = 4;
+const MAX_MEMORY_VIEWERS: usize = 32;
+const MAX_MEMORY_VIEWER_BYTES: usize = 256 * 1024 * 1024;
+const SKIP_DIRECTORIES: [&str; 10] = [
     ".git",
     ".jj",
     ".next",
+    "__cadgen__",
     "__pycache__",
     "build",
     "dist",
@@ -45,11 +54,30 @@ struct ModelFile {
 struct CachedModel {
     version: String,
     scene: CompiledScene,
-    report: CheckReport,
-    viewers: HashMap<(ViewerTheme, Option<FocusPair>), String>,
+    report: Option<CheckReport>,
 }
 
-type ModelCache = HashMap<PathBuf, CachedModel>;
+#[derive(Default)]
+struct ModelCache {
+    models: HashMap<PathBuf, CachedModel>,
+    viewers: HashMap<String, String>,
+    viewer_order: VecDeque<String>,
+    viewer_bytes: usize,
+    #[cfg(test)]
+    compile_count: usize,
+}
+
+struct RenderedViewer {
+    html: String,
+    cache: &'static str,
+}
+
+struct RenderSelection<'a> {
+    relative_path: &'a str,
+    theme: ViewerTheme,
+    focus: Option<FocusPair>,
+    motion_id: Option<&'a str>,
+}
 
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
 struct FocusPair {
@@ -165,7 +193,7 @@ body { background-color: #c9ced0; color: #1b1d1f; }
 "#;
 
 pub fn run(start: PathBuf) -> Result<(), String> {
-    let project = Project::discover(&start)?;
+    let project = Arc::new(Project::discover(&start)?);
 
     let requested_port = std::env::var("BURR_VIEWER_PORT")
         .ok()
@@ -196,19 +224,73 @@ pub fn run(start: PathBuf) -> Result<(), String> {
         }
     }
 
-    let mut cache = HashMap::new();
+    let cache = Arc::new(Mutex::new(ModelCache::default()));
+    let load_tracker = Arc::new(LoadTracker::default());
+    let viewer_cache = Arc::new(ViewerCache::from_environment());
+    let (sender, receiver) = mpsc::channel::<Request>();
+    let receiver = Arc::new(Mutex::new(receiver));
+    for _ in 0..SERVER_WORKERS {
+        let receiver = Arc::clone(&receiver);
+        let project = Arc::clone(&project);
+        let cache = Arc::clone(&cache);
+        let load_tracker = Arc::clone(&load_tracker);
+        let viewer_cache = Arc::clone(&viewer_cache);
+        thread::spawn(move || loop {
+            let request = {
+                let Ok(receiver) = receiver.lock() else {
+                    break;
+                };
+                match receiver.recv() {
+                    Ok(request) => request,
+                    Err(_) => break,
+                }
+            };
+            if let Err(error) = handle_request(
+                request,
+                &project,
+                &cache,
+                &load_tracker,
+                &viewer_cache,
+                port,
+            ) {
+                eprintln!("Viewer request failed: {error}");
+            }
+        });
+    }
     for request in server.incoming_requests() {
-        if let Err(error) = handle_request(request, &project, &mut cache, port) {
-            eprintln!("Viewer request failed: {error}");
+        if request_is_priority(&request) {
+            if let Err(error) = handle_request(
+                request,
+                &project,
+                &cache,
+                &load_tracker,
+                &viewer_cache,
+                port,
+            ) {
+                eprintln!("Viewer request failed: {error}");
+            }
+            continue;
         }
+        sender
+            .send(request)
+            .map_err(|_| "Burr viewer workers stopped unexpectedly.".to_string())?;
     }
     Ok(())
+}
+
+fn request_is_priority(request: &Request) -> bool {
+    matches!(
+        request.url().split('?').next(),
+        Some("/api/health" | "/api/load-status")
+    )
 }
 
 fn handle_request(
     request: Request,
     project: &Project,
-    cache: &mut ModelCache,
+    cache: &Mutex<ModelCache>,
+    load_tracker: &LoadTracker,
+    viewer_cache: &ViewerCache,
     expected_host_port: u16,
 ) -> Result<(), String> {
     if !request_host_is_loopback(&request, expected_host_port) {
@@ -267,15 +349,31 @@ fn handle_request(
                         })
                     })
                     .collect::<Vec<_>>();
+                let motions = project.public_state()["motions"].clone();
                 respond(
                     request,
                     200,
                     "application/json; charset=utf-8",
-                    json!({ "root": root_name, "files": files }).to_string(),
+                    json!({ "root": root_name, "files": files, "motions": motions }).to_string(),
                 )
             }
             Err(error) => respond_json_error(request, 500, &error),
         },
+        "/api/load-status" => {
+            let Some(load_id) = query_value(&url, "id") else {
+                return respond_json_error(request, 400, "No load id was provided.");
+            };
+            if !valid_load_id(&load_id) {
+                return respond_json_error(request, 400, "The load id was invalid.");
+            }
+            respond(
+                request,
+                200,
+                "application/json; charset=utf-8",
+                serde_json::to_string(&load_tracker.status(&load_id))
+                    .map_err(|error| format!("Failed to encode load status: {error}"))?,
+            )
+        }
         "/assets/burr-logo.png" | "/favicon.ico" => {
             respond_bytes(request, 200, "image/png", LOGO_PNG.to_vec())
         }
@@ -303,9 +401,45 @@ fn handle_request(
                 Ok(focus) => focus,
                 Err(error) => return respond_html_error(request, 400, &error),
             };
-            match render_model(project, &relative_path, theme, focus, cache) {
-                Ok(html) => respond(request, 200, "text/html; charset=utf-8", html),
-                Err(error) => respond_html_error(request, 422, &error),
+            let motion_id = query_value(&url, "motion");
+            let load_id = query_value(&url, "load");
+            if load_id.as_deref().is_some_and(|id| !valid_load_id(id)) {
+                return respond_html_error(request, 400, "The load id was invalid.");
+            }
+            let reporter = load_tracker.reporter(load_id.as_deref());
+            reporter.start(&relative_path);
+            let rendered = {
+                let mut cache = lock_model_cache(cache)?;
+                render_model(
+                    project,
+                    RenderSelection {
+                        relative_path: &relative_path,
+                        theme,
+                        focus,
+                        motion_id: motion_id.as_deref(),
+                    },
+                    &mut cache,
+                    viewer_cache,
+                    &reporter,
+                )
+            };
+            match rendered {
+                Ok(rendered) => {
+                    match inject_viewer_ready_notification(rendered.html, load_id.as_deref()) {
+                        Ok(html) => {
+                            reporter.ready(rendered.cache);
+                            respond(request, 200, "text/html; charset=utf-8", html)
+                        }
+                        Err(error) => {
+                            reporter.failed(&error);
+                            respond_html_error(request, 422, &error)
+                        }
+                    }
+                }
+                Err(error) => {
+                    reporter.failed(&error);
+                    respond_html_error(request, 422, &error)
+                }
             }
         }
         _ => respond(
@@ -319,61 +453,252 @@ fn handle_request(
 
 fn render_model(
     project: &Project,
-    relative_path: &str,
-    theme: ViewerTheme,
-    focus: Option<FocusPair>,
+    selection: RenderSelection<'_>,
     cache: &mut ModelCache,
-) -> Result<String, String> {
-    let cached = load_model(project, relative_path, cache)?;
-    if let Some(focus) = focus {
-        if focus.second >= cached.scene.instances.len() {
-            return Err("Viewer focus references a missing component.".to_string());
+    viewer_cache: &ViewerCache,
+    reporter: &LoadReporter<'_>,
+) -> Result<RenderedViewer, String> {
+    if let Some(motion_id) = selection.motion_id {
+        if selection.focus.is_some() {
+            return Err(
+                "Motion playback is unavailable while components are highlighted.".to_string(),
+            );
         }
-    }
-    let viewer_key = (theme, focus);
-    if let Some(html) = cached.viewers.get(&viewer_key) {
-        return Ok(html.clone());
+        let motion = project
+            .motion(motion_id)
+            .cloned()
+            .ok_or_else(|| format!("Unknown Burr motion: {motion_id}"))?;
+        return render_motion_model(
+            project,
+            selection.relative_path,
+            selection.theme,
+            &motion,
+            cache,
+            viewer_cache,
+            reporter,
+        );
     }
 
-    let scene = match focus {
-        Some(focus) => highlighted_scene(&cached.scene, focus)?,
-        None => cached.scene.clone(),
+    reporter.stage(
+        "Reading source",
+        &format!(
+            "Checking {} against the reusable viewer cache.",
+            selection.relative_path
+        ),
+    );
+    let path = resolve_model_path(project, selection.relative_path)?;
+    let fingerprint = source_fingerprint(&path)?;
+    let viewer_key = viewer_cache_key(
+        selection.relative_path,
+        &path,
+        &fingerprint,
+        selection.theme,
+        selection.focus,
+        None,
+    );
+    if let Some(html) = memory_viewer(cache, &viewer_key) {
+        return Ok(RenderedViewer {
+            html,
+            cache: "memory",
+        });
+    }
+    match viewer_cache.load(&viewer_key) {
+        Ok(Some(html)) => {
+            remember_viewer(cache, viewer_key, html.clone());
+            return Ok(RenderedViewer {
+                html,
+                cache: "disk",
+            });
+        }
+        Ok(None) => {}
+        Err(error) => eprintln!("burr: {error}; rebuilding the viewer"),
+    }
+
+    let html = {
+        let cached = load_model(project, selection.relative_path, cache, Some(reporter))?;
+        if let Some(focus) = selection.focus {
+            if focus.second >= cached.scene.instances.len() {
+                return Err("Viewer focus references a missing component.".to_string());
+            }
+        }
+
+        let scene = match selection.focus {
+            Some(focus) => highlighted_scene(&cached.scene, focus)?,
+            None => cached.scene.clone(),
+        };
+        reporter.stage(
+            "Building viewer",
+            "Encoding the compiled geometry for the local browser.",
+        );
+        let lighting = selection.theme.lighting();
+        let html = generate_html_viewer(
+            &scene,
+            selection.relative_path,
+            &scene.statistics,
+            &lighting,
+            selection.theme.canvas_background(),
+        )
+        .map_err(|error| {
+            format!(
+                "Look could not build the viewer for {}: {error:#}",
+                selection.relative_path
+            )
+        })?;
+        let html = inject_viewer_render_modes(html)?;
+        inject_viewer_theme(html, selection.theme, selection.focus)?
     };
+    persist_viewer(viewer_cache, &viewer_key, &html);
+    remember_viewer(cache, viewer_key, html.clone());
+    Ok(RenderedViewer {
+        html,
+        cache: "generated",
+    })
+}
+
+fn render_motion_model(
+    project: &Project,
+    relative_path: &str,
+    theme: ViewerTheme,
+    motion: &Motion,
+    cache: &mut ModelCache,
+    viewer_cache: &ViewerCache,
+    reporter: &LoadReporter<'_>,
+) -> Result<RenderedViewer, String> {
+    if relative_path != motion.model {
+        return Err(format!(
+            "Motion '{}' does not include model {relative_path}.",
+            motion.id
+        ));
+    }
+    let initial_progress = 0.0;
+
+    reporter.stage(
+        "Reading source",
+        "Checking the motion model against the reusable viewer cache.",
+    );
+    let model_path = resolve_model_path(project, &motion.model)?;
+    let model_fingerprint = source_fingerprint(&model_path)?;
+    let motion_signature = motion.cache_signature();
+    let viewer_key = viewer_cache_key(
+        relative_path,
+        &model_path,
+        &model_fingerprint,
+        theme,
+        None,
+        Some(&motion_signature),
+    );
+    if let Some(html) = memory_viewer(cache, &viewer_key) {
+        return Ok(RenderedViewer {
+            html,
+            cache: "memory",
+        });
+    }
+    match viewer_cache.load(&viewer_key) {
+        Ok(Some(html)) => {
+            remember_viewer(cache, viewer_key, html.clone());
+            return Ok(RenderedViewer {
+                html,
+                cache: "disk",
+            });
+        }
+        Ok(None) => {}
+        Err(error) => eprintln!("burr: {error}; rebuilding the viewer"),
+    }
+
+    let source_scene = load_model(project, &motion.model, cache, Some(reporter))?
+        .scene
+        .clone();
+    reporter.stage(
+        "Preparing motion",
+        "Applying the configured joints and generating the playback frames.",
+    );
+    let prepared = prepare_motion(
+        &source_scene,
+        &motion.joints,
+        UpAxis::Z,
+        motion.duration_ms,
+        initial_progress,
+    )?;
+    reporter.stage(
+        "Building viewer",
+        "Encoding the compiled motion for the local browser.",
+    );
     let lighting = theme.lighting();
     let html = generate_html_viewer(
-        &scene,
+        &prepared.scene,
         relative_path,
-        &scene.statistics,
+        &prepared.scene.statistics,
         &lighting,
         theme.canvas_background(),
     )
-    .map_err(|error| format!("Look could not build the viewer for {relative_path}: {error:#}"))?;
+    .map_err(|error| format!("Look could not build motion '{}': {error:#}", motion.id))?;
     let html = inject_viewer_render_modes(html)?;
-    let html = inject_viewer_theme(html, theme, focus)?;
-    cached.viewers.insert(viewer_key, html.clone());
-    Ok(html)
+    let html = inject_viewer_motion(html, &prepared)?;
+    let html = inject_viewer_theme(html, theme, None)?;
+    persist_viewer(viewer_cache, &viewer_key, &html);
+    remember_viewer(cache, viewer_key, html.clone());
+    Ok(RenderedViewer {
+        html,
+        cache: "generated",
+    })
 }
 
 fn check_model(
     project: &Project,
     relative_path: &str,
-    cache: &mut ModelCache,
+    cache: &Mutex<ModelCache>,
 ) -> Result<CheckReport, String> {
-    load_model(project, relative_path, cache).map(|cached| cached.report.clone())
+    let path = resolve_model_path(project, relative_path)?;
+    let format = model_format(&path);
+    let (version, scene) = {
+        let mut cache = lock_model_cache(cache)?;
+        let cached = load_model(project, relative_path, &mut cache, None)?;
+        if let Some(report) = cached.report.as_ref() {
+            return Ok(report.clone());
+        }
+        (cached.version.clone(), cached.scene.clone())
+    };
+
+    let report = if format == Some("STEP") {
+        interference::analyze_scene(relative_path, &version, &scene)
+    } else {
+        CheckReport::unsupported(
+            relative_path,
+            &version,
+            "Assembly interference currently supports STEP files only.",
+        )
+    };
+
+    let mut cache = lock_model_cache(cache)?;
+    if let Some(cached) = cache.models.get_mut(&path) {
+        if cached.version == version {
+            cached.report = Some(report.clone());
+        }
+    }
+    Ok(report)
 }
 
 fn load_model<'a>(
     project: &Project,
     relative_path: &str,
     cache: &'a mut ModelCache,
+    reporter: Option<&LoadReporter<'_>>,
 ) -> Result<&'a mut CachedModel, String> {
     let path = resolve_model_path(project, relative_path)?;
     let version = file_version(&path)?;
     let current = cache
+        .models
         .get(&path)
         .is_some_and(|cached| cached.version == version);
     if current {
+        if let Some(reporter) = reporter {
+            reporter.stage(
+                "Preparing viewer",
+                &format!("Reusing compiled geometry for {relative_path}."),
+            );
+        }
         return cache
+            .models
             .get_mut(&path)
             .ok_or_else(|| "Viewer model cache became unavailable.".to_string());
     }
@@ -383,35 +708,127 @@ fn load_model<'a>(
     } else {
         UpAxis::Z
     };
+    if let Some(reporter) = reporter {
+        reporter.stage(
+            "Tessellating geometry",
+            &format!("Look is compiling {relative_path} locally."),
+        );
+    }
+    #[cfg(test)]
+    {
+        cache.compile_count += 1;
+    }
     let mut scene = compile_scene(&path, up_axis, &mut timings)
         .map_err(|error| format!("Look could not render {relative_path}: {error:#}"))?;
+    if let Some(reporter) = reporter {
+        reporter.stage(
+            "Preparing materials",
+            &format!("Decoding the textures and materials for {relative_path}."),
+        );
+    }
     prepare_source_textures(&mut scene, &mut timings)
         .map_err(|error| format!("Look could not prepare {relative_path}: {error:#}"))?;
     // Look's self-contained viewer fits directly to the scene sphere. Leave a
     // little breathing room for the shorter iframe viewport created by Burr's
     // navigation shell and for models whose diagonal approaches that sphere.
     scene.fit_radius *= VIEWER_FRAMING_MARGIN;
-    let report = if model_format(&path) == Some("STEP") {
-        interference::analyze_scene(relative_path, &version, &scene)
-    } else {
-        CheckReport::unsupported(
-            relative_path,
-            &version,
-            "Assembly interference currently supports STEP files only.",
-        )
-    };
-    cache.insert(
+    cache.models.insert(
         path.clone(),
         CachedModel {
             version,
             scene,
-            report,
-            viewers: HashMap::new(),
+            report: None,
         },
     );
     cache
+        .models
         .get_mut(&path)
         .ok_or_else(|| "Viewer model cache became unavailable.".to_string())
+}
+
+fn viewer_cache_key(
+    relative_path: &str,
+    source_path: &Path,
+    source_fingerprint: &str,
+    theme: ViewerTheme,
+    focus: Option<FocusPair>,
+    motion: Option<&str>,
+) -> String {
+    format!(
+        "burr-viewer-v1\nburr={}\nsource={}\nfingerprint={}\nrelative={}\ntheme={}\nfocus={}\nmotion={}",
+        env!("CARGO_PKG_VERSION"),
+        source_path.display(),
+        source_fingerprint,
+        relative_path,
+        theme.name(),
+        focus.map_or_else(|| "none".to_string(), FocusPair::label),
+        motion.unwrap_or("none"),
+    )
+}
+
+fn persist_viewer(cache: &ViewerCache, key: &str, html: &str) {
+    match cache.store(key, html) {
+        Ok(_) => {}
+        Err(error) => eprintln!("burr: {error}; continuing without a reusable viewer"),
+    }
+}
+
+fn remember_viewer(cache: &mut ModelCache, key: String, html: String) {
+    remember_viewer_with_limits(
+        cache,
+        key,
+        html,
+        MAX_MEMORY_VIEWERS,
+        MAX_MEMORY_VIEWER_BYTES,
+        MAX_VIEWER_HTML_BYTES,
+    );
+}
+
+fn memory_viewer(cache: &mut ModelCache, key: &str) -> Option<String> {
+    let html = cache.viewers.get(key)?.clone();
+    cache.viewer_order.retain(|candidate| candidate != key);
+    cache.viewer_order.push_back(key.to_string());
+    Some(html)
+}
+
+fn remember_viewer_with_limits(
+    cache: &mut ModelCache,
+    key: String,
+    html: String,
+    max_entries: usize,
+    max_total_bytes: usize,
+    max_entry_bytes: usize,
+) {
+    let html_bytes = html.len();
+    if max_entries == 0 || html_bytes > max_entry_bytes || html_bytes > max_total_bytes {
+        return;
+    }
+    if let Some(previous) = cache.viewers.remove(&key) {
+        cache.viewer_bytes = cache.viewer_bytes.saturating_sub(previous.len());
+        cache.viewer_order.retain(|candidate| candidate != &key);
+    }
+    while !cache.viewers.is_empty()
+        && (cache.viewers.len() >= max_entries
+            || cache.viewer_bytes.saturating_add(html_bytes) > max_total_bytes)
+    {
+        let Some(oldest) = cache.viewer_order.pop_front() else {
+            cache.viewers.clear();
+            cache.viewer_bytes = 0;
+            break;
+        };
+        if let Some(evicted) = cache.viewers.remove(&oldest) {
+            cache.viewer_bytes = cache.viewer_bytes.saturating_sub(evicted.len());
+        }
+    }
+    cache.viewer_bytes = cache.viewer_bytes.saturating_add(html_bytes);
+    cache.viewer_order.push_back(key.clone());
+    cache.viewers.insert(key, html);
+}
+
+fn lock_model_cache(cache: &Mutex<ModelCache>) -> Result<MutexGuard<'_, ModelCache>, String> {
+    cache
+        .lock()
+        .map_err(|_| "Burr model cache became unavailable.".to_string())
 }
 
 fn highlighted_scene(scene: &CompiledScene, focus: FocusPair) -> Result<CompiledScene, String> {
@@ -504,6 +921,24 @@ fn inject_viewer_theme(
     Ok(themed)
 }
 
+fn inject_viewer_ready_notification(
+    mut html: String,
+    load_id: Option<&str>,
+) -> Result<String, String> {
+    let Some(load_id) = load_id else {
+        return Ok(html);
+    };
+    let marker = "</head>";
+    let Some(index) = html.find(marker) else {
+        return Err("Look viewer HTML did not contain a head element.".to_string());
+    };
+    let notification = format!(
+        r#"<!--burr-load-id-start--><meta name="burr-load-id" content="{load_id}"><script>window.addEventListener("load", () => {{ window.parent.postMessage({{ type: "burr:viewer-ready", loadId: "{load_id}" }}, window.location.origin); }}, {{ once: true }});</script><!--burr-load-id-end-->"#
+    );
+    html.insert_str(index, &notification);
+    Ok(html)
+}
+
 fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
     let replacements = [
         (
@@ -528,12 +963,12 @@ fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
         ),
         (
             "gl.uniform3fv(uCamPosLoc, camPos);\n\n            gl.bindVertexArray(vao);",
-            "gl.uniform3fv(uCamPosLoc, camPos);\n\n            const xRay = burrRenderMode === 'x-ray';\n            gl.uniform1f(uOpacityLoc, xRay ? 0.28 : 1.0);\n            if (xRay) {\n                gl.enable(gl.BLEND);\n                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);\n                gl.depthMask(false);\n            } else {\n                gl.disable(gl.BLEND);\n                gl.depthMask(true);\n            }\n\n            gl.bindVertexArray(vao);",
+            "gl.uniform3fv(uCamPosLoc, camPos);\n            burrApplyMotionFrame(gl);\n\n            const xRay = burrRenderMode === 'x-ray';\n            gl.uniform1f(uOpacityLoc, xRay ? 0.28 : 1.0);\n            if (xRay) {\n                gl.enable(gl.BLEND);\n                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);\n                gl.depthMask(false);\n            } else {\n                gl.disable(gl.BLEND);\n                gl.depthMask(true);\n            }\n\n            gl.bindVertexArray(vao);",
             "render-mode state",
         ),
         (
             "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);",
-            "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);\n            gl.depthMask(true);",
+            "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);\n            gl.depthMask(true);\n            burrCaptureSnapshot(canvas);",
             "depth-buffer restore",
         ),
     ];
@@ -550,8 +985,193 @@ fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
     let Some(index) = html.find(marker) else {
         return Err("Look viewer HTML did not contain a head element.".to_string());
     };
-    let controls = r#"<meta name="burr-render-modes" content="x-ray,solid"><script id="burr-render-mode">let burrRenderMode = "x-ray";document.documentElement.dataset.burrRenderMode = burrRenderMode;window.addEventListener("message",(event)=>{if(event.origin!==window.location.origin||event.data?.type!=="burr:set-render-mode")return;const mode=event.data.mode;if(mode!=="x-ray"&&mode!=="solid")return;burrRenderMode=mode;document.documentElement.dataset.burrRenderMode=mode;});</script>"#;
+    let controls = r#"<meta name="burr-render-modes" content="x-ray,solid"><meta name="burr-snapshot-export" content="png"><script id="burr-viewer-controls">
+let burrRenderMode = "x-ray";
+let burrSnapshotRequest = null;
+document.documentElement.dataset.burrRenderMode = burrRenderMode;
+
+function burrApplyMotionFrame() {}
+
+window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin) return;
+    if (event.data?.type === "burr:set-render-mode") {
+        const mode = event.data.mode;
+        if (mode !== "x-ray" && mode !== "solid") return;
+        burrRenderMode = mode;
+        document.documentElement.dataset.burrRenderMode = mode;
+        return;
+    }
+    if (event.data?.type !== "burr:export-snapshot") return;
+    const filename = event.data.filename;
+    if (typeof filename !== "string" || !/^[a-zA-Z0-9._-]+\.png$/.test(filename)) {
+        window.parent.postMessage(
+            { type: "burr:snapshot-error", message: "Snapshot filename was invalid." },
+            window.location.origin,
+        );
+        return;
+    }
+    burrSnapshotRequest = filename;
+});
+
+function burrCaptureSnapshot(canvas) {
+    if (!burrSnapshotRequest) return;
+    const filename = burrSnapshotRequest;
+    burrSnapshotRequest = null;
+    canvas.toBlob((blob) => {
+        if (!blob) {
+            window.parent.postMessage(
+                { type: "burr:snapshot-error", message: "The model canvas could not be captured." },
+                window.location.origin,
+            );
+            return;
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        window.parent.postMessage(
+            { type: "burr:snapshot-exported", filename },
+            window.location.origin,
+        );
+    }, "image/png");
+}
+</script>"#;
     html.insert_str(index, controls);
+    Ok(html)
+}
+
+fn inject_viewer_motion(mut html: String, motion: &PreparedMotion) -> Result<String, String> {
+    let shader_header = format!(
+        "in vec4 aColor;\n            in float aBurrInstance;\n            uniform mat4 uMVP;\n            uniform mat4 uBurrInstanceTransforms[{MAX_MOTION_COMPONENTS}];"
+    );
+    let motion_arrays = format!(
+        "const colors = b64ToFloat32Array(colorB64);\n        const burrInstanceIds = b64ToFloat32Array(\"{}\");\n        const burrMotionFrames = b64ToFloat32Array(\"{}\");",
+        motion.instance_ids_base64, motion.frames_base64
+    );
+    let replacements = [
+        (
+            "in vec4 aColor;\n            uniform mat4 uMVP;".to_string(),
+            shader_header,
+            "motion vertex attributes",
+        ),
+        (
+            "vNormal = mat3(uModel) * aNormal;\n                vFragPos = vec3(uModel * vec4(aPosition, 1.0));\n                vColor = aColor;\n                gl_Position = uMVP * vec4(aPosition, 1.0);".to_string(),
+            "mat4 burrTransform = uBurrInstanceTransforms[int(aBurrInstance)];\n                vec4 burrPosition = burrTransform * vec4(aPosition, 1.0);\n                vNormal = mat3(burrTransform) * aNormal;\n                vFragPos = vec3(burrPosition);\n                vColor = aColor;\n                gl_Position = uMVP * burrPosition;".to_string(),
+            "motion vertex transform",
+        ),
+        (
+            "const colors = b64ToFloat32Array(colorB64);".to_string(),
+            motion_arrays,
+            "motion data arrays",
+        ),
+        (
+            "const idxBuffer = gl.createBuffer();".to_string(),
+            "const burrInstanceBuffer = gl.createBuffer();\n        gl.bindBuffer(gl.ARRAY_BUFFER, burrInstanceBuffer);\n        gl.bufferData(gl.ARRAY_BUFFER, burrInstanceIds, gl.STATIC_DRAW);\n        const aBurrInstanceLoc = gl.getAttribLocation(program, 'aBurrInstance');\n        gl.enableVertexAttribArray(aBurrInstanceLoc);\n        gl.vertexAttribPointer(aBurrInstanceLoc, 1, gl.FLOAT, false, 0, 0);\n\n        const idxBuffer = gl.createBuffer();".to_string(),
+            "motion instance buffer",
+        ),
+        (
+            "const uModelLoc = gl.getUniformLocation(program, 'uModel');".to_string(),
+            "const uModelLoc = gl.getUniformLocation(program, 'uModel');\n        const uBurrInstanceTransformsLoc = gl.getUniformLocation(program, 'uBurrInstanceTransforms[0]');".to_string(),
+            "motion transform uniform",
+        ),
+    ];
+    for (needle, replacement, label) in replacements {
+        if !html.contains(&needle) {
+            return Err(format!(
+                "Look viewer HTML did not contain the expected {label} hook."
+            ));
+        }
+        html = html.replacen(&needle, &replacement, 1);
+    }
+
+    let marker = "</head>";
+    let Some(index) = html.find(marker) else {
+        return Err("Look viewer HTML did not contain a head element.".to_string());
+    };
+    let motion_script = format!(
+        r#"<meta name="burr-motion" content="rigid-poses"><script id="burr-motion-player">
+const burrMotionFrameCount = {frame_count};
+const burrMotionInstanceCount = {instance_count};
+const burrMotionDuration = {duration_ms};
+let burrMotionProgress = {initial_progress};
+let burrMotionPlaying = false;
+let burrMotionStartedAt = null;
+let burrMotionLastReportedFrame = -1;
+
+function burrEmitMotionState() {{
+    window.parent.postMessage(
+        {{
+            type: "burr:motion-state",
+            progress: burrMotionProgress,
+            playing: burrMotionPlaying,
+        }},
+        window.location.origin,
+    );
+}}
+
+function burrApplyMotionFrame(gl) {{
+    const wasPlaying = burrMotionPlaying;
+    if (burrMotionPlaying) {{
+        const now = performance.now();
+        if (burrMotionStartedAt === null) {{
+            burrMotionStartedAt = now - burrMotionProgress * burrMotionDuration;
+        }}
+        burrMotionProgress = Math.min(1, (now - burrMotionStartedAt) / burrMotionDuration);
+        if (burrMotionProgress >= 1) {{
+            burrMotionProgress = 1;
+            burrMotionPlaying = false;
+            burrMotionStartedAt = null;
+        }}
+    }}
+
+    const frame = Math.round(burrMotionProgress * (burrMotionFrameCount - 1));
+    const start = frame * burrMotionInstanceCount * 16;
+    const end = start + burrMotionInstanceCount * 16;
+    gl.uniformMatrix4fv(
+        uBurrInstanceTransformsLoc,
+        false,
+        burrMotionFrames.subarray(start, end),
+    );
+    if (frame !== burrMotionLastReportedFrame || (wasPlaying && !burrMotionPlaying)) {{
+        burrMotionLastReportedFrame = frame;
+        burrEmitMotionState();
+    }}
+}}
+
+window.addEventListener("message", (event) => {{
+    if (event.origin !== window.location.origin) return;
+    if (event.data?.type === "burr:set-motion-progress") {{
+        const progress = Number(event.data.progress);
+        if (!Number.isFinite(progress)) return;
+        burrMotionProgress = Math.max(0, Math.min(1, progress));
+        burrMotionPlaying = false;
+        burrMotionStartedAt = null;
+        burrMotionLastReportedFrame = -1;
+        burrEmitMotionState();
+        return;
+    }}
+    if (event.data?.type !== "burr:toggle-motion") return;
+    if (burrMotionPlaying) {{
+        burrMotionPlaying = false;
+        burrMotionStartedAt = null;
+    }} else {{
+        if (burrMotionProgress >= 1) burrMotionProgress = 0;
+        burrMotionPlaying = true;
+        burrMotionStartedAt = performance.now() - burrMotionProgress * burrMotionDuration;
+    }}
+    burrEmitMotionState();
+}});
+</script>"#,
+        frame_count = motion.frame_count,
+        instance_count = motion.instance_count,
+        duration_ms = motion.duration_ms,
+        initial_progress = motion.initial_progress,
+    );
+    html.insert_str(index, &motion_script);
     Ok(html)
 }
 
@@ -791,10 +1411,16 @@ mod tests {
     fn scan_models_filters_and_sorts_supported_files() {
         let temp = tempdir().unwrap();
         fs::create_dir_all(temp.path().join("models/enclosure")).unwrap();
+        fs::create_dir_all(temp.path().join("models/__cadgen__/components")).unwrap();
         fs::create_dir_all(temp.path().join("node_modules/ignored")).unwrap();
         fs::write(temp.path().join("models/zeta.stl"), "solid empty\nendsolid").unwrap();
         fs::write(temp.path().join("models/enclosure/alpha.STEP"), "STEP").unwrap();
         fs::write(temp.path().join("models/readme.txt"), "ignore me").unwrap();
+        fs::write(
+            temp.path().join("models/__cadgen__/components/render.glb"),
+            "generated render cache",
+        )
+        .unwrap();
         fs::write(
             temp.path().join("node_modules/ignored/hidden.glb"),
             "ignore me",
@@ -892,6 +1518,119 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
         assert!(rendered.contains("fragColor = vec4(col, uOpacity);"));
         assert!(rendered.contains("xRay ? 0.28 : 1.0"));
         assert!(rendered.contains("burr:set-render-mode"));
+        assert!(rendered.contains("name=\"burr-snapshot-export\" content=\"png\""));
+        assert!(rendered.contains("burr:export-snapshot"));
+        assert!(rendered.contains("canvas.toBlob"));
+        assert!(rendered.contains("burrCaptureSnapshot(canvas);"));
+    }
+
+    #[test]
+    fn viewer_ready_notification_carries_the_specific_load_id() {
+        let html = "<!doctype html><html><head></head><body></body></html>".to_string();
+        let rendered = inject_viewer_ready_notification(html, Some("window-3")).unwrap();
+
+        assert!(rendered.contains("name=\"burr-load-id\" content=\"window-3\""));
+        assert!(rendered.contains("type: \"burr:viewer-ready\", loadId: \"window-3\""));
+    }
+
+    #[test]
+    fn viewer_motion_injects_rigid_component_playback() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/interference/separated.step");
+        let mut timings = Timings::default();
+        let from = compile_scene(&path, UpAxis::Z, &mut timings).unwrap();
+        let joints = [crate::project::MotionJoint::Revolute {
+            components: vec!["moving".to_string()],
+            origin_mm: [0.0, 0.0, 0.0],
+            axis: [0.0, 0.0, 1.0],
+            angle_degrees: 90.0,
+        }];
+        let motion = prepare_motion(&from, &joints, UpAxis::Z, 800, 0.0).unwrap();
+        let html = generate_html_viewer(
+            &motion.scene,
+            "motion.step",
+            &motion.scene.statistics,
+            &LightingConfig::default(),
+            "#0c0d10",
+        )
+        .unwrap();
+        let html = inject_viewer_render_modes(html).unwrap();
+        let html = inject_viewer_motion(html, &motion).unwrap();
+
+        assert!(html.contains("name=\"burr-motion\" content=\"rigid-poses\""));
+        assert!(html.contains("in float aBurrInstance;"));
+        assert!(html.contains("uniform mat4 uBurrInstanceTransforms[32];"));
+        assert!(html.contains("burrMotionFrames.subarray(start, end)"));
+        assert!(html.contains("burr:set-motion-progress"));
+        assert!(html.contains("burr:toggle-motion"));
+        assert!(html.contains("burrApplyMotionFrame(gl);"));
+    }
+
+    #[test]
+    fn motion_compiles_only_its_single_source_model() {
+        let temp = tempdir().unwrap();
+        fs::create_dir_all(temp.path().join("models")).unwrap();
+        fs::create_dir_all(temp.path().join(".burr")).unwrap();
+        fs::copy(
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("tests/fixtures/interference/separated.step"),
+            temp.path().join("models/assembly.step"),
+        )
+        .unwrap();
+        fs::write(
+            temp.path().join(".burr/config.toml"),
+            r#"schema_version = "burr.project.v2"
+[project]
+models = ["models"]
+[[motions]]
+id = "fold"
+label = "Fold"
+model = "models/assembly.step"
+from_label = "Open"
+to_label = "Closed"
+duration_ms = 800
+[[motions.joints]]
+type = "revolute"
+components = ["moving"]
+origin_mm = [0.0, 0.0, 0.0]
+axis = [0.0, 0.0, 1.0]
+angle_degrees = 90.0
+"#,
+        )
+        .unwrap();
+
+        let project = Project::discover(temp.path()).unwrap();
+        let motion = project.motion("fold").unwrap();
+        let mut model_cache = ModelCache::default();
+        let viewer_cache = ViewerCache::at(temp.path().join("cache"));
+        let tracker = LoadTracker::default();
+        let reporter = tracker.reporter(None);
+
+        let first = render_motion_model(
+            &project,
+            "models/assembly.step",
+            ViewerTheme::Dark,
+            motion,
+            &mut model_cache,
+            &viewer_cache,
+            &reporter,
+        )
+        .unwrap();
+        let second = render_motion_model(
+            &project,
+            "models/assembly.step",
+            ViewerTheme::Dark,
+            motion,
+            &mut model_cache,
+            &viewer_cache,
+            &reporter,
+        )
+        .unwrap();
+
+        assert_eq!(first.cache, "generated");
+        assert_eq!(second.cache, "memory");
+        assert_eq!(model_cache.compile_count, 1);
+        assert_eq!(model_cache.models.len(), 1);
     }
 
     #[test]
@@ -905,6 +1644,25 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
         );
         assert!(FocusPair::from_query(Some("2,2")).is_err());
         assert!(FocusPair::from_query(Some("two,5")).is_err());
+    }
+
+    #[test]
+    fn memory_viewer_cache_enforces_entry_and_total_byte_limits() {
+        let mut cache = ModelCache::default();
+        remember_viewer_with_limits(&mut cache, "a".into(), "1234".into(), 2, 8, 6);
+        remember_viewer_with_limits(&mut cache, "b".into(), "5678".into(), 2, 8, 6);
+        assert_eq!(cache.viewer_bytes, 8);
+
+        assert_eq!(memory_viewer(&mut cache, "a").as_deref(), Some("1234"));
+        remember_viewer_with_limits(&mut cache, "c".into(), "9012".into(), 2, 8, 6);
+        assert!(cache.viewers.contains_key("a"));
+        assert!(cache.viewers.contains_key("c"));
+        assert!(!cache.viewers.contains_key("b"));
+        assert_eq!(cache.viewer_bytes, 8);
+
+        remember_viewer_with_limits(&mut cache, "large".into(), "1234567".into(), 2, 8, 6);
+        assert!(!cache.viewers.contains_key("large"));
+        assert_eq!(cache.viewer_bytes, 8);
     }
 
     #[test]

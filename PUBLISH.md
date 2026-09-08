@@ -18,7 +18,7 @@ version. Tag the clean checked commit using the existing
 Users can install a tagged release directly from Git:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.31.0 --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.34.0 --locked
 ```
 
 Do not enable crates.io publishing until Look and its required Truck forks have
