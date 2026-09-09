@@ -98,3 +98,6 @@ present the source-pose result as a collision check of an animated pose or path.
 Final responses should name the authoritative source, produced model path,
 Burr version, checks outcome when used, provider validation when relevant, and
 any unsupported or inconclusive scope.
+For source-only work with no 3D export, state "model not produced" and
+"Burr Checks not run"; report the provider's validation separately. Do not
+imply Burr was run or require its version when it was not used.
