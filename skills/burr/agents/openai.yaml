@@ -1,0 +1,4 @@
+interface:
+  display_name: "Burr"
+  short_description: "Create, browse, and check physical designs"
+  default_prompt: "Use $burr as the design environment for this project, selecting only the source providers the task actually needs."
