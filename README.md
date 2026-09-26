@@ -71,7 +71,7 @@ correctness. Those boundaries are tracked in
 Install the current GitHub release:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.34.0 --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.35.0 --locked
 ```
 
 Then open any model folder:

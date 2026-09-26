@@ -78,7 +78,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -89,7 +89,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -206,7 +206,7 @@ checksum = "72f5acc6cb2ba439de613abc23857ec3d78374d8ed5ac84e9d11336e87da8649"
 
 [[package]]
 name = "burr"
-version = "0.34.0"
+version = "0.35.0"
 dependencies = [
  "blake3",
  "glam",
@@ -542,7 +542,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -581,6 +581,12 @@ name = "foldhash"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
+
+[[package]]
+name = "forward_ref"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c8cbd1169bd7b4a0a20d92b9af7a7e0422888bd38a6f5ec29c1fd8c1558a272e"
 
 [[package]]
 name = "futures-core"
@@ -796,6 +802,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "inari"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f4048200fd855870ab456160b71ebeefdf0d4c70e24e5242513a232cc4beb9f7"
+dependencies = [
+ "cfg-if",
+ "forward_ref",
+]
+
+[[package]]
 name = "indexmap"
 version = "2.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -966,7 +982,7 @@ checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
 [[package]]
 name = "look"
 version = "0.1.0"
-source = "git+https://github.com/stefangolas/look.git?rev=f0ed52edc1f0648cdece331002b38ed33e7c541a#f0ed52edc1f0648cdece331002b38ed33e7c541a"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
 dependencies = [
  "anyhow",
  "blake3",
@@ -989,6 +1005,7 @@ dependencies = [
  "truck-stepio",
  "truck-topology",
  "wgpu",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1575,7 +1592,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -1804,7 +1821,7 @@ dependencies = [
  "getrandom",
  "once_cell",
  "rustix",
- "windows-sys",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -1927,7 +1944,7 @@ checksum = "7d56353a2a665ad0f41a421187180aab746c8c325620617ad883a99a1cbe66d2"
 [[package]]
 name = "truck-assembly"
 version = "0.1.0"
-source = "git+https://github.com/stefangolas/truck?rev=09726a9e#09726a9e20c3ddb6cb09ec82bd2fbd24d3ab7cfc"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
 dependencies = [
  "rayon",
  "truck-base",
@@ -1936,7 +1953,7 @@ dependencies = [
 [[package]]
 name = "truck-base"
 version = "0.5.0"
-source = "git+https://github.com/stefangolas/truck?rev=09726a9e#09726a9e20c3ddb6cb09ec82bd2fbd24d3ab7cfc"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
 dependencies = [
  "cgmath",
  "matext4cgmath",
@@ -1945,9 +1962,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "truck-certified"
+version = "0.1.0"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
+dependencies = [
+ "cgmath",
+ "robust",
+ "spade",
+ "truck-base",
+ "truck-evidence",
+ "truck-geometry",
+ "truck-geotrait",
+ "truck-polymesh",
+ "truck-topology",
+]
+
+[[package]]
 name = "truck-derivers"
 version = "0.1.0"
-source = "git+https://github.com/stefangolas/truck?rev=09726a9e#09726a9e20c3ddb6cb09ec82bd2fbd24d3ab7cfc"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",
@@ -1956,9 +1989,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "truck-evidence"
+version = "0.1.0"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
+dependencies = [
+ "inari",
+ "truck-base",
+ "truck-geometry",
+ "truck-geotrait",
+]
+
+[[package]]
 name = "truck-geometry"
 version = "0.5.0"
-source = "git+https://github.com/stefangolas/truck?rev=09726a9e#09726a9e20c3ddb6cb09ec82bd2fbd24d3ab7cfc"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
 dependencies = [
  "serde",
  "thiserror 2.0.20",
@@ -1969,7 +2013,7 @@ dependencies = [
 [[package]]
 name = "truck-geotrait"
 version = "0.4.0"
-source = "git+https://github.com/stefangolas/truck?rev=09726a9e#09726a9e20c3ddb6cb09ec82bd2fbd24d3ab7cfc"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
 dependencies = [
  "getrandom",
  "rand",
@@ -1981,7 +2025,7 @@ dependencies = [
 [[package]]
 name = "truck-meshalgo"
 version = "0.4.0"
-source = "git+https://github.com/stefangolas/truck?rev=09726a9e#09726a9e20c3ddb6cb09ec82bd2fbd24d3ab7cfc"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
 dependencies = [
  "array-macro",
  "derive_more 2.1.1",
@@ -1993,6 +2037,7 @@ dependencies = [
  "serde_json",
  "spade",
  "truck-base",
+ "truck-certified",
  "truck-geometry",
  "truck-geotrait",
  "truck-polymesh",
@@ -2003,7 +2048,7 @@ dependencies = [
 [[package]]
 name = "truck-modeling"
 version = "0.6.0"
-source = "git+https://github.com/stefangolas/truck?rev=09726a9e#09726a9e20c3ddb6cb09ec82bd2fbd24d3ab7cfc"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
 dependencies = [
  "derive_more 2.1.1",
  "itertools 0.15.0",
@@ -2011,15 +2056,17 @@ dependencies = [
  "serde",
  "thiserror 2.0.20",
  "truck-base",
+ "truck-evidence",
  "truck-geometry",
  "truck-geotrait",
+ "truck-polymesh",
  "truck-topology",
 ]
 
 [[package]]
 name = "truck-polymesh"
 version = "0.6.0"
-source = "git+https://github.com/stefangolas/truck?rev=09726a9e#09726a9e20c3ddb6cb09ec82bd2fbd24d3ab7cfc"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
 dependencies = [
  "array-macro",
  "bytemuck",
@@ -2034,13 +2081,14 @@ dependencies = [
 [[package]]
 name = "truck-stepio"
 version = "0.3.0"
-source = "git+https://github.com/stefangolas/truck?rev=09726a9e#09726a9e20c3ddb6cb09ec82bd2fbd24d3ab7cfc"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
 dependencies = [
  "chrono",
  "derive_more 2.1.1",
  "ruststep",
  "serde",
  "truck-assembly",
+ "truck-base",
  "truck-derivers",
  "truck-geometry",
  "truck-geotrait",
@@ -2052,8 +2100,9 @@ dependencies = [
 [[package]]
 name = "truck-topology"
 version = "0.6.0"
-source = "git+https://github.com/stefangolas/truck?rev=09726a9e#09726a9e20c3ddb6cb09ec82bd2fbd24d3ab7cfc"
+source = "git+https://github.com/stefangolas/look.git?rev=dc6687c5a579cee5cdfe91411d30bb71d19a5ac6#dc6687c5a579cee5cdfe91411d30bb71d19a5ac6"
 dependencies = [
+ "inari",
  "parking_lot",
  "rayon",
  "rclite",
@@ -2061,6 +2110,8 @@ dependencies = [
  "serde",
  "thiserror 2.0.20",
  "truck-base",
+ "truck-evidence",
+ "truck-geometry",
  "truck-geotrait",
 ]
 
@@ -2381,7 +2432,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2487,11 +2538,36 @@ dependencies = [
 
 [[package]]
 name = "windows-sys"
+version = "0.59.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e38bc4d79ed67fd075bcc251a1c39b32a1776bbe92e5bef1f0bf1f8c531853b"
+dependencies = [
+ "windows-targets",
+]
+
+[[package]]
+name = "windows-sys"
 version = "0.61.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc"
 dependencies = [
  "windows-link",
+]
+
+[[package]]
+name = "windows-targets"
+version = "0.52.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b724f72796e036ab90c1021d4780d4d3d648aca59e491e6b98e725b84e99973"
+dependencies = [
+ "windows_aarch64_gnullvm",
+ "windows_aarch64_msvc",
+ "windows_i686_gnu",
+ "windows_i686_gnullvm",
+ "windows_i686_msvc",
+ "windows_x86_64_gnu",
+ "windows_x86_64_gnullvm",
+ "windows_x86_64_msvc",
 ]
 
 [[package]]
@@ -2502,6 +2578,54 @@ checksum = "3949bd5b99cafdf1c7ca86b43ca564028dfe27d66958f2470940f73d86d75b37"
 dependencies = [
  "windows-link",
 ]
+
+[[package]]
+name = "windows_aarch64_gnullvm"
+version = "0.52.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "32a4622180e7a0ec044bb555404c800bc9fd9ec262ec147edd5989ccd0c02cd3"
+
+[[package]]
+name = "windows_aarch64_msvc"
+version = "0.52.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09ec2a7bb152e2252b53fa7803150007879548bc709c039df7627cabbd05d469"
+
+[[package]]
+name = "windows_i686_gnu"
+version = "0.52.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e9b5ad5ab802e97eb8e295ac6720e509ee4c243f69d781394014ebfe8bbfa0b"
+
+[[package]]
+name = "windows_i686_gnullvm"
+version = "0.52.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0eee52d38c090b3caa76c563b86c3a4bd71ef1a819287c19d586d7334ae8ed66"
+
+[[package]]
+name = "windows_i686_msvc"
+version = "0.52.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66"
+
+[[package]]
+name = "windows_x86_64_gnu"
+version = "0.52.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "147a5c80aabfbf0c7d901cb5895d1de30ef2907eb21fbbab29ca94c5b08b1a78"
+
+[[package]]
+name = "windows_x86_64_gnullvm"
+version = "0.52.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "24d5b23dc417412679681396f2b49f3de8c1473deb516bd34410872eff51ed0d"
+
+[[package]]
+name = "windows_x86_64_msvc"
+version = "0.52.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 
 [[package]]
 name = "winnow"

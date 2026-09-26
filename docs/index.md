@@ -13,7 +13,7 @@ skill dependency.
 Install Burr from its public Git repository:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.34.0 --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.35.0 --locked
 ```
 
 Open a folder containing CAD models:
