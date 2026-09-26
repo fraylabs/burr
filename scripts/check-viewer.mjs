@@ -79,7 +79,10 @@ let stdout = ""
 let stderr = ""
 const child = spawn(
   "cargo",
-  ["run", "--locked", "--quiet", "--manifest-path", path.join(repoRoot, "Cargo.toml"), "--", "."],
+  [
+    "--config", path.join(repoRoot, ".cargo", "config.toml"),
+    "run", "--locked", "--quiet", "--manifest-path", path.join(repoRoot, "Cargo.toml"), "--", ".",
+  ],
   {
     cwd: tempRoot,
     env: {
