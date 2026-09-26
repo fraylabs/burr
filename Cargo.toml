@@ -1,6 +1,6 @@
 [package]
 name = "burr"
-version = "0.34.0"
+version = "0.35.0"
 edition = "2021"
 description = "Fast local browser and assembly interference checker for CAD models."
 license = "MIT"
@@ -10,26 +10,27 @@ publish = false
 [dependencies]
 blake3 = "1.8"
 glam = "0.30"
-look = { git = "https://github.com/stefangolas/look.git", rev = "f0ed52edc1f0648cdece331002b38ed33e7c541a" }
+look = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6" }
 percent-encoding = "2.3.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tiny_http = "0.12.0"
 toml = "0.9"
-truck-meshalgo = { git = "https://github.com/stefangolas/truck", rev = "09726a9e", default-features = false, features = ["analyzers", "filters"] }
+truck-meshalgo = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6", default-features = false, features = ["analyzers", "filters"] }
 
 [dev-dependencies]
 tempfile = "3.12"
 
 [patch.crates-io]
+# Keep all geometry types on the same vendored kernel revision as Look.
 ruststep = { git = "https://github.com/stefangolas/ruststep", rev = "67f1f7c" }
-truck-assembly = { git = "https://github.com/stefangolas/truck", rev = "09726a9e" }
-truck-base = { git = "https://github.com/stefangolas/truck", rev = "09726a9e" }
-truck-derivers = { git = "https://github.com/stefangolas/truck", rev = "09726a9e" }
-truck-geometry = { git = "https://github.com/stefangolas/truck", rev = "09726a9e" }
-truck-geotrait = { git = "https://github.com/stefangolas/truck", rev = "09726a9e" }
-truck-meshalgo = { git = "https://github.com/stefangolas/truck", rev = "09726a9e" }
-truck-modeling = { git = "https://github.com/stefangolas/truck", rev = "09726a9e" }
-truck-polymesh = { git = "https://github.com/stefangolas/truck", rev = "09726a9e" }
-truck-stepio = { git = "https://github.com/stefangolas/truck", rev = "09726a9e" }
-truck-topology = { git = "https://github.com/stefangolas/truck", rev = "09726a9e" }
+truck-assembly = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6" }
+truck-base = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6" }
+truck-derivers = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6" }
+truck-geometry = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6" }
+truck-geotrait = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6" }
+truck-meshalgo = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6" }
+truck-modeling = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6" }
+truck-polymesh = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6" }
+truck-stepio = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6" }
+truck-topology = { git = "https://github.com/stefangolas/look.git", rev = "dc6687c5a579cee5cdfe91411d30bb71d19a5ac6" }
