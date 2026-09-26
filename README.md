@@ -70,9 +70,22 @@ correctness. Those boundaries are tracked in
 
 Install the current GitHub release:
 
+On Apple Silicon:
+
 ```bash
 cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.35.0 --locked
 ```
+
+On x86-64, the current Look geometry kernel requires a CPU with **AVX and
+FMA**. Cargo's Git installer does not inherit repository build configuration,
+so pass the required features explicitly:
+
+```bash
+RUSTFLAGS="-Ctarget-feature=+avx,+fma" cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.35.0 --locked
+```
+
+Older x86-64 CPUs without these features are not supported by this release.
+Local repository builds apply the same flags through `.cargo/config.toml`.
 
 Then open any model folder:
 

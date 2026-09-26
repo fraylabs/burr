@@ -1,0 +1,4 @@
+# Look's inari interval backend requires these features on x86-64.
+# Keep architecture-specific: Apple Silicon needs no extra target features.
+[target.'cfg(target_arch = "x86_64")']
+rustflags = ["-Ctarget-feature=+avx,+fma"]
