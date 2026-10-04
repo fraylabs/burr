@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 0.38.2 - 2026-10-05
+
+- Large assemblies now open in the browser. The viewer no longer embeds every
+  part's geometry in one huge HTML page: each part definition's mesh is stored
+  once as a compact binary file, fetched by the page and drawn as instances for
+  every occurrence, and selection highlights change instance colours instead of
+  copying geometry.
+- On the Voron V0 (1,691 parts) and Voron 2.4 (1,428 parts) assemblies, 0.38.1
+  showed no frame within two minutes in Chrome. 0.38.2 shows the first complete
+  frame after 20 s and 52 s including import, with the page down from about
+  2 GB to under 1 MB and peak memory down from 7.8 GB to 4.1 GB and from 12.3 GB
+  to 6.3 GB. The viewer now adds almost nothing on top of loading the model.
+- Interference results are unchanged.
+
 ## 0.38.1 - 2026-10-05
 
 - Unresolved pairs now carry the right reason: a planar overlap that is only
