@@ -26,7 +26,7 @@ def smoke(version):
         commands.mkdir()
         # Hosted runners have Rust preinstalled. Expose only installer tools to
         # both children, and omit the runner's credentials and language homes.
-        for name in ("sh", "curl", "tar", "uname", "mktemp", "mkdir", "install",
+        for name in ("sh", "curl", "tar", "gzip", "uname", "mktemp", "mkdir", "install",
                      "mv", "rm", "shasum", "sha256sum"):
             executable = shutil.which(name)
             if executable:
