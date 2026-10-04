@@ -1,5 +1,5 @@
 """Sequential release corpus runs; adapted from the baseline run_corpus.py."""
-import argparse, hashlib, json, os, pathlib, re, subprocess, sys, time
+import argparse, hashlib, json, os, pathlib, re, signal, subprocess, sys, time
 import psutil
 
 parser = argparse.ArgumentParser()
@@ -13,7 +13,9 @@ args.output.mkdir(parents=True, exist_ok=True)
 binary_sha = hashlib.sha256(args.binary.read_bytes()).hexdigest()
 rows = json.loads((args.manifest or args.corpus / "results.json").read_text())
 files = [(args.corpus / row["file"], row["sha256"]) for row in rows]
-files += [(p, None) for p in sorted((args.corpus / "repros").glob("*.step"))]
+repro_manifest = (args.manifest.parent / "repros-manifest.json") if args.manifest else args.corpus / "repros" / "manifest.json"
+repro_hashes = {row["file"]: row["sha256"] for row in json.loads(repro_manifest.read_text())} if repro_manifest.exists() else {}
+files += [(p, repro_hashes.get(p.name)) for p in sorted((args.corpus / "repros").glob("*.step"))]
 for file, expected_sha in files:
     sha = hashlib.sha256(file.read_bytes()).hexdigest()
     if expected_sha and sha != expected_sha:
@@ -50,7 +52,10 @@ for file, expected_sha in files:
             elif peak > 9 * 1024 ** 3:
                 cap = "memory"
             if cap:
-                process.kill()
+                try:
+                    os.kill(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
                 done, status, usage = os.wait4(process.pid, 0)
                 process.returncode = os.waitstatus_to_exitcode(status)
                 break

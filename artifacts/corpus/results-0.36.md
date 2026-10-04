@@ -1,6 +1,6 @@
 # Burr 0.36 real-assembly integration
 
-Measured all 21 original multipart STEP models and the six original repros on 2026-10-04T13:21:34+00:00.
+Measured all 21 original multipart STEP models and the six original repros; report updated 2026-10-04T13:27:52+00:00.
 
 7 of 21 models now agree with the conclusive OCCT assembly verdict, compared with 4 before. Classifications: {'incomplete': 14, 'correct': 7}. Burr verdicts: {'incomplete': 14, 'fail': 6, 'pass': 1}.
 
@@ -44,7 +44,7 @@ The remaining import diagnoses are concrete: all 26 surface-conversion refusals 
 
 The full robot graph fails while following two source SHAPE_REPRESENTATION_RELATIONSHIP records to MANIFOLD_SURFACE_SHAPE_REPRESENTATION (#55392 and #288197). Those entity variants are absent from Truck’s shape-representation holder table; a read-only probe confirms 197 decoded shape representations (107 basic + 90 advanced BREP), omitting the two manifold-surface representations. Supporting that representation variant is the next structure fix; this integration reports the loss explicitly instead of declaring a single flattened body safe.
 
-Several meshes remain open even though every declared face contributes triangles: Bowden, Fly, both Apollo enclosures, and the arcade button. The best working guess is that face-boundary sampling, degenerate triangles or welding leave unmatched/nonmanifold edges; zero lost faces does not prove a closed mesh. Apollo and Fly need boundary-edge diagnostics next. The arcade spring is also invalid in the OCCT reference. Bowden has no conclusive exact verdict because its recorded OCCT run timed out.
+Several meshes remain open even though every declared face contributes triangles: Bowden, Fly, both Apollo enclosures, and the arcade button. A read-only probe of production mesh preparation finds 120 boundary edges and 100 nonmanifold edges in Apollo flat Solid #15; corner Solid #15 has 128 boundary edges and 100 nonmanifold edges. Their other solids are closed. Fly has nonmanifold edges in five of its six definitions, including a bracket with zero boundary edges but two nonmanifold edges. The best working guess is nonconforming boundary sampling or overlapping triangulation; simple near-vertex welding is not an adequate explanation for Apollo, whose nearest distinct boundary vertices are over 0.04 mm apart. See topology-0.36.json and the reproducible corpus-topology.rs probe. Zero lost faces does not prove a closed mesh. The arcade spring is also invalid in the OCCT reference. Bowden has no conclusive exact verdict because its recorded OCCT run timed out.
 
 A correct overall fail still does not certify its pair list. The cover reports 17 pairs versus OCCT 22, and the Adafruit switch reports 4 versus 11; those lists need a placement-matched exact comparison. Faze4 and the two build123d examples retain the reference pair counts (9, 3, 12). No assembly-level false positive or false negative is observed among the seven conclusive results.
 
