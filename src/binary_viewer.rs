@@ -26,7 +26,10 @@ use look::{
     config::{parse_hex_color, LightingConfig},
     scene::CompiledScene,
 };
-use std::result::Result;
+use std::{
+    collections::{BTreeSet, HashMap},
+    result::Result,
+};
 /// Generates the local viewer page; definition buffers travel separately.
 ///
 /// Lighting follows the CLI `LightingConfig` (ambient, direction, intensity,
@@ -48,10 +51,18 @@ pub fn generate_html_viewer(
             ));
         }
     }
-    let mut definitions = Vec::with_capacity(scene.geometries.len());
-    for geometry in &scene.geometries {
-        definitions.push(assets.store_mesh(geometry)?);
+    let used = scene
+        .instances
+        .iter()
+        .map(|instance| instance.geometry)
+        .collect::<BTreeSet<_>>();
+    let mut definitions = Vec::with_capacity(used.len());
+    let mut definition_index = HashMap::with_capacity(used.len());
+    for geometry in used {
+        definition_index.insert(geometry, definitions.len());
+        definitions.push(assets.store_mesh(&scene.geometries[geometry])?);
     }
+    assets.maintain_mesh_cache();
     let occurrences = scene.instances.iter().enumerate().map(|(index, instance)| {
         let color = match focus {
             Some((first, _)) if index == first => [1.0, 0.34, 0.08, 1.0],
@@ -60,7 +71,7 @@ pub fn generate_html_viewer(
             None => scene.materials.get(instance.material)
                 .map(|m| m.base_color_factor).unwrap_or([1.0; 4]),
         };
-        serde_json::json!({ "geometry": instance.geometry, "transform": instance.transform.to_cols_array(),
+        serde_json::json!({ "geometry": definition_index[&instance.geometry], "transform": instance.transform.to_cols_array(),
             "normal": instance.normal_transform.to_cols_array(), "color": color, "id": index })
     }).collect::<Vec<_>>();
     let manifest = serde_json::json!({ "definitions": definitions, "occurrences": occurrences, "highlight": focus.is_some() });
@@ -689,7 +700,24 @@ mod tests {
             highlighted_manifest["occurrences"][1]["color"]
         );
         assert!(html.len() < 100_000);
+        let id = manifest["definitions"][0]["id"].as_str().unwrap();
+        let mesh = std::fs::OpenOptions::new()
+            .write(true)
+            .open(cache.mesh_path(id).unwrap())
+            .unwrap();
+        mesh.set_times(std::fs::FileTimes::new().set_modified(std::time::UNIX_EPOCH))
+            .unwrap();
         assert!(cache.meshes_available(&html));
+        assert!(
+            mesh.metadata()
+                .unwrap()
+                .modified()
+                .unwrap()
+                .elapsed()
+                .unwrap()
+                .as_secs()
+                < 30
+        );
         let id = manifest["definitions"][0]["id"].as_str().unwrap();
         std::fs::remove_file(cache.mesh_path(id).unwrap()).unwrap();
         assert!(!cache.meshes_available(&html));
@@ -705,6 +733,22 @@ mod tests {
         .unwrap();
         assert_eq!(html, rebuilt);
         assert!(cache.meshes_available(&rebuilt));
+    }
+
+    #[test]
+    fn unavailable_persistent_cache_still_serves_local_meshes() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/viewer/models/enclosure/counterbore.step");
+        let scene = compile_scene(&path, UpAxis::Z, &mut Timings::default()).unwrap();
+        let temp = tempdir().unwrap();
+        let blocked = temp.path().join("not-a-directory");
+        std::fs::write(&blocked, "cache unavailable").unwrap();
+        let cache = crate::cache::ViewerCache::at(blocked);
+        let definition = cache.store_mesh(&scene.geometries[0]).unwrap();
+        let file = cache.mesh_path(definition["id"].as_str().unwrap()).unwrap();
+        assert!(file.is_file());
+        assert!(!file.starts_with(temp.path()));
+        std::fs::remove_file(file).unwrap();
     }
 
     #[test]

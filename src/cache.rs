@@ -36,18 +36,68 @@ impl ViewerCache {
     fn mesh_root(&self) -> PathBuf {
         self.root
             .clone()
-            .unwrap_or_else(|| {
-                std::env::temp_dir().join(format!("burr-session-{}", std::process::id()))
-            })
+            .map(|root| root.join("meshes-v2"))
+            .unwrap_or_else(Self::session_mesh_root)
+    }
+
+    fn session_mesh_root() -> PathBuf {
+        std::env::temp_dir()
+            .join(format!("burr-session-{}", std::process::id()))
             .join("meshes-v2")
     }
 
     pub fn mesh_path(&self, id: &str) -> Option<PathBuf> {
-        (id.len() == 64
-            && id
+        if id.len() != 64
+            || !id
                 .bytes()
-                .all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase()))
-        .then(|| self.mesh_root().join(id))
+                .all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase())
+        {
+            return None;
+        }
+        let temporary = Self::session_mesh_root().join(id);
+        Some(if temporary.is_file() {
+            temporary
+        } else {
+            self.mesh_root().join(id)
+        })
+    }
+
+    fn create_mesh_file(&self) -> Result<(PathBuf, PathBuf, fs::File), String> {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let mut last_error = String::new();
+        for root in [self.mesh_root(), Self::session_mesh_root()] {
+            let temporary = root.join(format!(".{}.{}.tmp", std::process::id(), nonce));
+            let opened = (|| {
+                fs::create_dir_all(&root).map_err(|e| e.to_string())?;
+                secure_directory(&root)?;
+                let file = fs::OpenOptions::new()
+                    .write(true)
+                    .create_new(true)
+                    .open(&temporary)
+                    .map_err(|e| e.to_string())?;
+                if let Err(error) = secure_file(&temporary) {
+                    let _ = fs::remove_file(&temporary);
+                    return Err(error);
+                }
+                Ok(file)
+            })();
+            match opened {
+                Ok(file) => return Ok((root, temporary, file)),
+                Err(error) => last_error = error,
+            }
+        }
+        Err(format!(
+            "Could not prepare local mesh storage: {last_error}"
+        ))
+    }
+
+    pub fn maintain_mesh_cache(&self) {
+        for root in [self.mesh_root(), Self::session_mesh_root()] {
+            prune_meshes(&root, MAX_MESH_CACHE_TOTAL_BYTES, MESH_DOWNLOAD_GRACE);
+        }
     }
 
     /// Write one definition with bounded working memory; never expand occurrences.
@@ -55,24 +105,12 @@ impl ViewerCache {
         &self,
         geometry: &look::scene::Geometry,
     ) -> Result<serde_json::Value, String> {
-        let root = self.mesh_root();
-        fs::create_dir_all(&root).map_err(|e| e.to_string())?;
-        secure_directory(&root)?;
-        let nonce = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_nanos();
-        let temporary = root.join(format!(".{}.{}.tmp", std::process::id(), nonce));
+        // A disabled or unwritable persistent cache must not prevent viewing.
+        let (root, temporary, file) = self.create_mesh_file()?;
         let result = (|| {
-            let file = fs::OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(&temporary)
-                .map_err(|e| e.to_string())?;
-            secure_file(&temporary)?;
             let mut writer = BufWriter::new(file);
             let mut hash = blake3::Hasher::new();
-            let source_color = |index| {
+            let source_color = |index: usize| {
                 geometry
                     .source_attributes
                     .as_ref()
@@ -154,9 +192,18 @@ impl ViewerCache {
             let expected = vertices
                 .checked_mul(stride)
                 .and_then(|v| indices.checked_mul(4).and_then(|i| v.checked_add(i)));
-            fs::metadata(path)
+            let Ok(file) = fs::OpenOptions::new().write(true).open(path) else {
+                return false;
+            };
+            let valid = file
+                .metadata()
                 .ok()
-                .is_some_and(|m| m.is_file() && Some(m.len()) == expected)
+                .is_some_and(|m| m.is_file() && Some(m.len()) == expected);
+            if valid {
+                // Cache hits renew the grace period too, before the browser fetches.
+                let _ = file.set_times(fs::FileTimes::new().set_modified(SystemTime::now()));
+            }
+            valid
         })
     }
 
@@ -266,11 +313,7 @@ impl ViewerCache {
             ));
         }
         prune_cache(root);
-        prune_meshes(
-            &self.mesh_root(),
-            MAX_MESH_CACHE_TOTAL_BYTES,
-            MESH_DOWNLOAD_GRACE,
-        );
+
         Ok(true)
     }
 
