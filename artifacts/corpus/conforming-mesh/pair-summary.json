@@ -5,8 +5,8 @@
     "after_verdict": "fail",
     "occt_verdict": "fail",
     "before_topology": {
-      "boundary_edges": 0,
-      "nonmanifold_edges": 0
+      "boundary_edges": 27,
+      "nonmanifold_edges": 4595
     },
     "after_topology": {
       "boundary_edges": 0,
@@ -32,8 +32,8 @@
     "after_verdict": "fail",
     "occt_verdict": "fail",
     "before_topology": {
-      "boundary_edges": 0,
-      "nonmanifold_edges": 0
+      "boundary_edges": 10,
+      "nonmanifold_edges": 235
     },
     "after_topology": {
       "boundary_edges": 0,
@@ -170,8 +170,8 @@
     "after_verdict": "fail",
     "occt_verdict": "fail",
     "before_topology": {
-      "boundary_edges": 0,
-      "nonmanifold_edges": 0
+      "boundary_edges": 26,
+      "nonmanifold_edges": 11
     },
     "after_topology": {
       "boundary_edges": 0,
