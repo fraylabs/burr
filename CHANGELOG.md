@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 0.35.1 - 2026-10-04
+
+- Publish prebuilt binaries for macOS (Apple Silicon and Intel) and Linux
+  x86-64 with every release, plus a checksum-verifying `install.sh`, so Burr
+  installs in seconds without a Rust toolchain.
+
+## 0.35.0 - 2026-09-26
+
+- Update Look and its vendored geometry kernel; x86-64 builds now require AVX
+  and FMA.
+
 ## 0.34.0 - 2026-09-03
 
 - Replace two-STEP motion endpoints with one STEP assembly plus explicit

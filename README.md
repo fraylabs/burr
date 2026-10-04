@@ -81,7 +81,7 @@ version or choose another directory:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/fraylabs/burr/main/install.sh | \
-  BURR_VERSION=0.35.0 BURR_INSTALL_DIR="$HOME/.local/bin" sh
+  BURR_VERSION=0.35.1 BURR_INSTALL_DIR="$HOME/.local/bin" sh
 ```
 
 macOS binaries support macOS 11 or newer. Linux binaries require glibc 2.35 or
@@ -91,7 +91,7 @@ FMA**; older CPUs are unsupported. Apple Silicon needs no extra CPU features.
 To build from source instead:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.35.0 --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.35.1 --locked
 ```
 
 On x86-64, prefix that Cargo command with `RUSTFLAGS="-Ctarget-feature=+avx,+fma"`.
