@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 0.37.0 - 2026-10-04
+
+- Interference pairs are now checked pair by pair against an exact OpenCascade
+  reference on every corpus model whose check completes: 52 real pairs found,
+  0 false pairs (0.36.0 listed 9 false pairs on two models).
+- Pairs Burr cannot prove from the tessellation, because a part's mesh is open,
+  are listed as unresolved with the reason, instead of being dropped or shown
+  as interference. On the corpus these are 10 nut/screw pairs on the openAMR
+  cover and 1 capacitor pair on an Adafruit switch; tessellation fixes for
+  both are in progress.
+- Placement rounding is bounded before a contact counts as overlap, which
+  removes sub-tolerance witnesses on touching parts.
+
 ## 0.36.0 - 2026-10-04
 
 Tested against 21 real public STEP assemblies (Voron printers, an open-source

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install a prebuilt Burr. Optional: BURR_VERSION=0.36.0, BURR_INSTALL_DIR=/path.
+# Install a prebuilt Burr. Optional: BURR_VERSION=0.37.0, BURR_INSTALL_DIR=/path.
 set -eu
 
 # Everything runs from main at the end, so a truncated download does nothing.
