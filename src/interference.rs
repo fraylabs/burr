@@ -272,7 +272,7 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
                     scene.instances.len(),
                     "invalid_component_mesh",
                     format!("Component occurrence {index} {message}."),
-                )
+                );
             }
         }
     }
@@ -309,6 +309,14 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
     let checked_pair_count = components.len() * (components.len() - 1) / 2;
     let candidates = candidate_pairs(&components);
     let candidate_pair_count = candidates.len();
+    let mut source_bounds = Bounds::empty();
+    for mesh in meshes.iter().flatten() {
+        source_bounds.add(mesh.bounds.min);
+        source_bounds.add(mesh.bounds.max);
+    }
+    let source_resolution = 2.0
+        * source_bounds.diagonal()
+        * look::step::meshing_policy::MeshingPolicy::DEFAULT.relative_linear_deflection;
     for (left_index, right_index) in candidates {
         let left = &components[left_index];
         let right = &components[right_index];
@@ -317,11 +325,14 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
         let tolerance = left.coordinate_error + right.coordinate_error;
         // Edge intervals narrower than the mesher's nominal sampling scale
         // cannot establish reliable surface crossing near curved boundaries.
-        // Vertex/interior witnesses keep the coordinate-accuracy path, and the
-        // search continues past short intervals to find a stronger witness.
-        let probe_resolution = (left_mesh.bounds.diagonal() * left.scale
+        // Near nonplanar mesh patches, interior samples also need separation
+        // beyond this scale. Planar shallow overlaps retain coordinate accuracy.
+        let mut probe_resolution = (left_mesh.bounds.diagonal() * left.scale
             + right_mesh.bounds.diagonal() * right.scale)
             * look::step::meshing_policy::MeshingPolicy::DEFAULT.relative_linear_deflection;
+        if !left_mesh.oriented && !right_mesh.oriented {
+            probe_resolution = probe_resolution.max(source_resolution);
+        }
         if !left_mesh.closed || !right_mesh.closed {
             unresolved_pairs.push(UnresolvedPair {
                 id: format!("{CHECK_ID}:unresolved:{left_index}:{right_index}"),
@@ -356,15 +367,32 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             let overlap =
                 left.bounds.max.min(right.bounds.max) - left.bounds.min.max(right.bounds.min);
             if mesh_witness.is_some() || overlap.min_element() <= tolerance {
-                let below_sampling = mesh_witness.as_ref().is_some_and(|witness| {
-                    matches!(witness, InterferenceWitness::SurfaceCrossing { start, end }
-                        if DVec3::from_array(*start).distance(DVec3::from_array(*end)) <= probe_resolution)
-                });
+                let below_sampling =
+                    (!left_mesh.oriented && !right_mesh.oriented && mesh_witness.is_some())
+                        || mesh_witness.as_ref().is_some_and(|witness| match witness {
+                            InterferenceWitness::SurfaceCrossing { start, end } => {
+                                DVec3::from_array(*start).distance(DVec3::from_array(*end))
+                                    <= probe_resolution
+                            }
+                            InterferenceWitness::InteriorOverlap { point }
+                            | InterferenceWitness::Containment { point, .. } => {
+                                let world = DVec3::from_array(*point);
+                                let a = left.inverse.transform_point3(world);
+                                let b = right.inverse.transform_point3(world);
+                                let ta = probe_resolution / left.scale;
+                                let tb = probe_resolution / right.scale;
+                                left_mesh.near_surface(a, ta)
+                                    && right_mesh.near_surface(b, tb)
+                                    && (left_mesh.nonplanar_near_surface(a, ta)
+                                        || right_mesh.nonplanar_near_surface(b, tb))
+                            }
+                            InterferenceWitness::CoincidentOccurrence => false,
+                        });
                 unresolved_pairs.push(UnresolvedPair {
                 id: format!("{CHECK_ID}:unresolved:{left_index}:{right_index}"),
                     code: if below_sampling { "below_tessellation_resolution" } else { "below_coordinate_resolution" },
                     message: if below_sampling {
-                        format!("{} and {} have only a crossing interval below the mesh sampling resolution; no reliable positive volume was proven.",left.reference.name,right.reference.name)
+                        format!("{} and {} have only overlap evidence below the mesh sampling resolution near nonplanar boundaries; no reliable positive volume was proven.",left.reference.name,right.reference.name)
                     } else { format!("{} and {} have a possible overlap below the coordinate and placement resolution; no positive volume was proven.",left.reference.name,right.reference.name) },
                     components: [left.reference.clone(),right.reference.clone()],
                     coordinate_error_bound: tolerance,
@@ -413,7 +441,7 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
     {
         incomplete_reasons.push(IncompleteReason {
             code: "below_tessellation_resolution",
-            message: "Some crossing intervals are below the nominal mesh sampling scale. See the unresolved component pairs.".into(),
+            message: "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs.".into(),
         });
     }
     let pair_set_complete = incomplete_reasons.is_empty() && unresolved_pairs.is_empty();
@@ -534,7 +562,7 @@ fn intersection_witness(
     right: &Component,
     right_mesh: &Mesh,
     tolerance: f64,
-    minimum_crossing_length: f64,
+    tessellation_resolution: f64,
 ) -> Option<InterferenceWitness> {
     if left.geometry_index == right.geometry_index
         && left_mesh.closed
@@ -560,7 +588,7 @@ fn intersection_witness(
         right,
         right_mesh,
         tolerance,
-        minimum_crossing_length,
+        tessellation_resolution,
     )
     .or_else(|| {
         penetrating_surface(
@@ -569,7 +597,7 @@ fn intersection_witness(
             left,
             left_mesh,
             tolerance,
-            minimum_crossing_length,
+            tessellation_resolution,
         )
     })
 }
@@ -580,21 +608,68 @@ fn penetrating_surface(
     target: &Component,
     target_mesh: &Mesh,
     tolerance: f64,
-    minimum_crossing_length: f64,
+    tessellation_resolution: f64,
 ) -> Option<InterferenceWitness> {
     if !source_mesh.closed || !target_mesh.closed {
         return None;
     }
     let to_target = target.inverse * source.transform;
+    let unoriented_pair =
+        !source_mesh.oriented && !target_mesh.oriented && tessellation_resolution > 0.0;
+    let uncertain_margin = if unoriented_pair {
+        tessellation_resolution * 0.5
+    } else {
+        0.0
+    };
     let local_tolerance = (tolerance / target.scale).max(target_mesh.epsilon);
     let source_tolerance = (tolerance / source.scale).max(source_mesh.epsilon);
+    let to_source = source.inverse * target.transform;
+    let nominal_resolution = (source_mesh.bounds.diagonal() * source.scale
+        + target_mesh.bounds.diagonal() * target.scale)
+        * look::step::meshing_policy::MeshingPolicy::DEFAULT.relative_linear_deflection;
+    let reliable_inside = |point: DVec3, triangle: Option<usize>| {
+        if !target_mesh.inside(point, local_tolerance) {
+            return false;
+        }
+        let source_point = to_source.transform_point3(point);
+        let source_sample = triangle
+            .map(|t| source_mesh.triangle_surface_sample(t))
+            .unwrap_or_else(|| source_mesh.nearest_surface_sample(source_point));
+        let target_sample = target_mesh.nearest_surface_sample(point);
+        let curved = source_sample.0 || target_sample.0;
+        let local_resolution =
+            nominal_resolution.max(source_sample.1 * source.scale + target_sample.1 * target.scale);
+        let uncertain = unoriented_pair && curved;
+        let target_margin = if uncertain {
+            local_tolerance.max(uncertain_margin / target.scale)
+        } else {
+            local_tolerance
+        };
+        target_mesh.inside(point, target_margin)
+            && (!uncertain
+                || source_mesh.inside(
+                    source_point,
+                    source_tolerance.max(uncertain_margin / source.scale),
+                ))
+            && !(tessellation_resolution > 0.0
+                && curved
+                && target_mesh.near_surface(point, local_resolution / target.scale))
+            && !(tessellation_resolution > 0.0
+                && target_mesh.near_surface(point, nominal_resolution / target.scale)
+                && (target_mesh
+                    .legacy_nonplanar_near_surface(point, nominal_resolution / target.scale)
+                    || source_mesh.legacy_nonplanar_near_surface(
+                        source_point,
+                        nominal_resolution / source.scale,
+                    )))
+    };
     let candidates = source_mesh.candidate_triangles(transformed_bounds(
         target_mesh.bounds,
         source.inverse * target.transform,
     ));
     // A source vertex inside the target is a cheap positive-volume witness.
     if let Some(&point) = source_mesh.points.first() {
-        if target_mesh.inside(to_target.transform_point3(point), local_tolerance) {
+        if reliable_inside(to_target.transform_point3(point), None) {
             return Some(InterferenceWitness::Containment {
                 point: source.transform.transform_point3(point).to_array(),
                 contained_component: source.reference.id.clone(),
@@ -608,7 +683,7 @@ fn penetrating_surface(
             .into_iter()
             .chain([vertices.iter().sum::<DVec3>() / 3.0])
         {
-            if target_mesh.inside(point, local_tolerance) {
+            if reliable_inside(point, Some(triangle)) {
                 let world = target.transform.transform_point3(point).to_array();
                 return Some(InterferenceWitness::InteriorOverlap { point: world });
             }
@@ -629,12 +704,12 @@ fn penetrating_surface(
             cuts.push(1.0);
             for interval in cuts.windows(2) {
                 if (interval[1] - interval[0]) * direction.length()
-                    <= (2.0 * local_tolerance).max(minimum_crossing_length / target.scale)
+                    <= (2.0 * local_tolerance).max(tessellation_resolution / target.scale)
                 {
                     continue;
                 }
                 let point = a + direction * ((interval[0] + interval[1]) * 0.5);
-                if target_mesh.inside(point, local_tolerance) {
+                if reliable_inside(point, Some(triangle)) {
                     return Some(InterferenceWitness::SurfaceCrossing {
                         start: target
                             .transform
@@ -660,9 +735,18 @@ fn penetrating_surface(
         let normal = (b - a).cross(c - a).normalize_or_zero();
         let centroid = (a + b + c) / 3.0;
         for sign in [-1.0, 1.0] {
-            let probe = centroid + normal * (sign * 4.0 * source_tolerance);
+            let source_sample = source_mesh.triangle_surface_sample(triangle);
+            let target_sample =
+                target_mesh.nearest_surface_sample(to_target.transform_point3(centroid));
+            let margin = if unoriented_pair && (source_sample.0 || target_sample.0) {
+                let uncertainty = uncertain_margin;
+                source_tolerance.max(uncertainty / source.scale)
+            } else {
+                source_tolerance
+            };
+            let probe = centroid + normal * (sign * 4.0 * margin);
             if source_mesh.inside(probe, source_tolerance)
-                && target_mesh.inside(to_target.transform_point3(probe), local_tolerance)
+                && reliable_inside(to_target.transform_point3(probe), Some(triangle))
             {
                 return Some(InterferenceWitness::InteriorOverlap {
                     point: source.transform.transform_point3(probe).to_array(),
@@ -989,6 +1073,73 @@ mod tests {
         scene.instances[1].transform =
             glam::Mat4::from_translation(glam::Vec3::new(9.999, 0.0, 0.0));
         let report = analyze_scene("shallow-overlap.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Fail);
+        assert_eq!(report.findings.len(), 1);
+    }
+
+    #[test]
+    fn unoriented_planar_overlap_keeps_coordinate_accuracy() {
+        let mut scene = compile_scene(
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        scene.instances[1].geometry = scene.instances[0].geometry;
+        scene.instances[0].transform = glam::Mat4::IDENTITY;
+        scene.instances[1].transform = glam::Mat4::from_translation(glam::Vec3::new(0.1, 0.0, 0.0));
+        let geometry = scene.instances[0].geometry;
+        assert_eq!(
+            scene.geometries[geometry]
+                .surface_normals
+                .as_ref()
+                .unwrap()
+                .len(),
+            scene.geometries[geometry].vertices.len()
+        );
+        scene.geometries[geometry].surface_normals = None;
+        scene.geometries[geometry].indices.swap(0, 1);
+        assert!(!Mesh::prepare(&scene.geometries[geometry]).unwrap().oriented);
+        let thick = analyze_scene("unoriented-thick.step", "fixture", &scene);
+        assert_eq!(
+            thick.findings.len(),
+            1,
+            "a resolved interior still proves overlap"
+        );
+        for vertex in &mut scene.geometries[geometry].vertices {
+            vertex.position[2] *= 0.0001;
+        }
+        let thin = analyze_scene("unoriented-thin.step", "fixture", &scene);
+        assert_eq!(
+            thin.findings.len(),
+            1,
+            "planar overlap retains coordinate accuracy"
+        );
+    }
+
+    #[test]
+    fn phase_offset_cylindrical_contact_is_unresolved_not_interference() {
+        let report = report("curved-contact.step");
+        assert_eq!(report.component_count, 2);
+        assert!(report.findings.is_empty());
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert_eq!(report.unresolved_pairs.len(), 1);
+        assert_eq!(
+            report.unresolved_pairs[0].code,
+            "below_tessellation_resolution"
+        );
+    }
+
+    #[test]
+    fn curved_overlap_beyond_sampling_resolution_is_still_confirmed() {
+        let mut scene = compile_scene(
+            &fixture("curved-contact.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        scene.instances[1].transform *= glam::Mat4::from_scale(glam::Vec3::splat(1.05));
+        let report = analyze_scene("curved-overlap.step", "fixture", &scene);
         assert_eq!(report.outcome, CheckOutcome::Fail);
         assert_eq!(report.findings.len(), 1);
     }

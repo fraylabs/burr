@@ -69,8 +69,12 @@ pub(super) struct Mesh {
     pub triangles: Vec<[u32; 3]>,
     pub bounds: Bounds,
     pub closed: bool,
-    oriented: bool,
+    pub oriented: bool,
     pub epsilon: f64,
+    sampled_curve: Vec<bool>,
+    legacy_curve: Vec<bool>,
+    surface_curvature: Vec<Option<bool>>,
+    sampled_deviation: Vec<f64>,
     order: Vec<usize>,
     nodes: Vec<Node>,
 }
@@ -144,9 +148,11 @@ impl Mesh {
             remap.push(id);
         }
         let mut triangles = Vec::with_capacity(geometry.indices.len() / 3);
+        let mut source_samples = Vec::new();
         let mut edges: HashMap<[u32; 2], usize> = HashMap::new();
         for t in geometry.indices.as_chunks::<3>().0 {
-            let t = [
+            let original = *t;
+            let mut t = [
                 remap[t[0] as usize],
                 remap[t[1] as usize],
                 remap[t[2] as usize],
@@ -161,6 +167,37 @@ impl Mesh {
             {
                 continue;
             }
+            let mut normals = geometry
+                .surface_normals
+                .as_ref()
+                .filter(|normals| normals.len() == geometry.vertices.len())
+                .and_then(|normals| {
+                    let a = DVec3::from_array(normals.get(original[0] as usize)?.map(f64::from));
+                    let b = DVec3::from_array(normals.get(original[1] as usize)?.map(f64::from));
+                    let c = DVec3::from_array(normals.get(original[2] as usize)?.map(f64::from));
+                    [a, b, c]
+                        .iter()
+                        .all(|n| n.is_finite() && n.length_squared() > 1e-12)
+                        .then(|| [a.normalize(), b.normalize(), c.normalize()])
+                });
+            if let Some(ref mut normals) = normals {
+                let [a, b, c] = t.map(|i| points[i as usize]);
+                if (b - a).cross(c - a).dot(normals.iter().sum::<DVec3>()) < 0.0 {
+                    t.swap(1, 2);
+                    normals.swap(1, 2);
+                }
+            }
+            let mut curved = false;
+            let mut deviation = 0.0_f64;
+            if let Some(normals) = normals {
+                for (a, b) in [(0, 1), (1, 2), (2, 0)] {
+                    let angle = normals[a].dot(normals[b]).clamp(-1.0, 1.0).acos();
+                    curved |= angle > 64.0 * f64::from(f32::EPSILON);
+                    let chord = (points[t[b] as usize] - points[t[a] as usize]).length();
+                    deviation = deviation.max(chord * 0.5 * (angle * 0.25).tan());
+                }
+            }
+            source_samples.push((normals.is_some(), curved, deviation));
             triangles.push(t);
             for [a, b] in [[t[0], t[1]], [t[1], t[2]], [t[2], t[0]]] {
                 *edges.entry([a.min(b), a.max(b)]).or_default() += 1;
@@ -185,6 +222,50 @@ impl Mesh {
         if triangles.is_empty() {
             return Err("contains no non-degenerate triangles".into());
         }
+        // A gentle nonplanar transition can be a sampled curved boundary.
+        // Distinct planar faces meeting at a sharp corner retain the ordinary
+        // coordinate-accuracy path. This is a conservative ambiguity marker,
+        // not a reconstruction or certification of the source surface.
+        let normals = triangles
+            .iter()
+            .map(|&[a, b, c]| {
+                (points[b as usize] - points[a as usize])
+                    .cross(points[c as usize] - points[a as usize])
+                    .normalize_or_zero()
+            })
+            .collect::<Vec<_>>();
+        let roundoff = 64.0 * f64::from(f32::EPSILON);
+        let angular_cosine = look::step::meshing_policy::MeshingPolicy::DEFAULT
+            .maximum_angular_deflection
+            .cos();
+        let surface_curvature: Vec<Option<bool>> = source_samples
+            .iter()
+            .map(|sample| sample.0.then_some(sample.1))
+            .collect();
+        let mut legacy_curve = vec![false; triangles.len()];
+        let sampled_deviation = source_samples.iter().map(|sample| sample.2).collect();
+        let mut neighbor: HashMap<[u32; 2], usize> = HashMap::new();
+        for (i, &[a, b, c]) in triangles.iter().enumerate() {
+            for [a, b] in [[a, b], [b, c], [c, a]] {
+                let edge = [a.min(b), a.max(b)];
+                if let Some(&j) = neighbor.get(&edge) {
+                    if normals[i].cross(normals[j]).length_squared() > roundoff.powi(2)
+                        && normals[i].dot(normals[j]).abs() + roundoff >= angular_cosine
+                    {
+                        legacy_curve[i] = true;
+                        legacy_curve[j] = true;
+                    }
+                } else {
+                    neighbor.insert(edge, i);
+                }
+            }
+        }
+        drop(neighbor);
+        let sampled_curve = surface_curvature
+            .iter()
+            .zip(&legacy_curve)
+            .map(|(source, legacy)| source.unwrap_or(false) || *legacy)
+            .collect();
         let order = (0..triangles.len()).collect();
         let mut mesh = Self {
             points,
@@ -193,6 +274,10 @@ impl Mesh {
             closed,
             oriented: false,
             epsilon,
+            sampled_curve,
+            legacy_curve,
+            surface_curvature,
+            sampled_deviation,
             order,
             nodes: Vec::new(),
         };
@@ -367,6 +452,76 @@ impl Mesh {
         }
         false
     }
+    /// Whether the query is near a facet with a gentle nonplanar neighbor.
+    /// Such a patch may approximate a curved surface or a shallow crease.
+    pub fn nonplanar_near_surface(&self, p: DVec3, tolerance: f64) -> bool {
+        self.curve_near_surface(p, tolerance, &self.sampled_curve)
+    }
+    pub fn legacy_nonplanar_near_surface(&self, p: DVec3, tolerance: f64) -> bool {
+        self.curve_near_surface(p, tolerance, &self.legacy_curve)
+    }
+    fn curve_near_surface(&self, p: DVec3, tolerance: f64, flags: &[bool]) -> bool {
+        let squared = tolerance * tolerance;
+        let mut stack = vec![0];
+        while let Some(i) = stack.pop() {
+            let node = &self.nodes[i];
+            if node.bounds.distance_squared(p) > squared {
+                continue;
+            }
+            if let Some(children) = node.children {
+                stack.extend(children);
+            } else {
+                for &t in &self.order[node.start..node.end] {
+                    if flags[t] && point_triangle_distance_squared(p, self.triangle(t)) <= squared {
+                        return true;
+                    }
+                }
+            }
+        }
+        false
+    }
+
+    pub fn triangle_surface_sample(&self, triangle: usize) -> (bool, f64) {
+        (
+            self.surface_curvature[triangle].unwrap_or(self.legacy_curve[triangle]),
+            self.sampled_deviation[triangle],
+        )
+    }
+
+    pub fn nearest_surface_sample(&self, point: DVec3) -> (bool, f64) {
+        let mut nearest = f64::INFINITY;
+        let mut sample = (false, 0.0_f64);
+        let mut stack = vec![0];
+        while let Some(index) = stack.pop() {
+            let node = &self.nodes[index];
+            if node.bounds.distance_squared(point) > nearest {
+                continue;
+            }
+            if let Some([a, b]) = node.children {
+                let da = self.nodes[a].bounds.distance_squared(point);
+                let db = self.nodes[b].bounds.distance_squared(point);
+                if da < db {
+                    stack.extend([b, a]);
+                } else {
+                    stack.extend([a, b]);
+                }
+            } else {
+                for &triangle in &self.order[node.start..node.end] {
+                    let distance = point_triangle_distance_squared(point, self.triangle(triangle));
+                    if distance < nearest {
+                        nearest = distance;
+                        sample = self.triangle_surface_sample(triangle);
+                    } else if (distance - nearest).abs() <= self.epsilon.powi(2) {
+                        let other = self.triangle_surface_sample(triangle);
+                        sample.0 &= other.0;
+                        sample.1 = sample.1.max(other.1);
+                    }
+                }
+            }
+        }
+        sample
+    }
+
     pub fn inside(&self, p: DVec3, tolerance: f64) -> bool {
         if !self.bounds.contains(p) || self.near_surface(p, tolerance) {
             return false;
@@ -378,6 +533,7 @@ impl Mesh {
         // An edge/vertex hit can be a tangency rather than a crossing. Never
         // turn deduplicating such a hit into odd parity: recast in a different
         // direction and use only a ray whose crossings are face-interior hits.
+        let mut agreed_inside = false;
         for direction in [
             DVec3::new(1.0, 0.3713906763541037, 0.6947465906068658),
             DVec3::new(0.219513694312, 1.0, 0.51789347219),
@@ -386,14 +542,16 @@ impl Mesh {
             let (_, ambiguous, winding, crossing_count) =
                 self.cast_ray(p, direction, f64::INFINITY);
             if !ambiguous {
-                return if self.oriented {
-                    winding != 0
-                } else {
-                    crossing_count % 2 == 1
-                };
+                if self.oriented {
+                    return winding != 0;
+                }
+                if crossing_count % 2 == 0 {
+                    return false;
+                }
+                agreed_inside = true;
             }
         }
-        false
+        agreed_inside
     }
 
     pub fn candidate_triangles(&self, bounds: Bounds) -> Vec<usize> {
@@ -482,6 +640,76 @@ mod tests {
     use super::*;
 
     #[test]
+    fn evaluator_normals_repair_a_reversed_triangle() {
+        let positions = [DVec3::ZERO, DVec3::X, DVec3::Y, DVec3::Z];
+        let triangles = [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]];
+        let mut vertices = Vec::new();
+        let mut normals = Vec::new();
+        let mut indices = Vec::new();
+        for triangle in triangles {
+            let [a, b, c] = triangle.map(|i| positions[i]);
+            let normal = (b - a).cross(c - a).normalize().as_vec3().to_array();
+            for point in [a, b, c] {
+                indices.push(vertices.len() as u32);
+                vertices.push(look::scene::Vertex {
+                    position: point.as_vec3().to_array(),
+                    normal: [0.; 3],
+                });
+                normals.push(normal);
+            }
+        }
+        indices.swap(0, 1);
+        let geometry = look::scene::Geometry {
+            surface_normals: Some(normals),
+            bounds: look::scene::Bounds::from_positions(
+                &vertices.iter().map(|v| v.position).collect::<Vec<_>>(),
+            ),
+            vertices,
+            indices,
+            source_attributes: None,
+            bounding_center: [0.; 3],
+            bounding_radius: 0.,
+        };
+        let mesh = Mesh::prepare(&geometry).unwrap();
+        assert!(mesh.oriented);
+        assert!(mesh.inside(DVec3::splat(0.1), mesh.epsilon));
+    }
+
+    #[test]
+    fn source_surface_normals_mark_a_single_cylindrical_triangle() {
+        let angle = 0.5_f32;
+        let normals = vec![
+            [1.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [angle.cos(), angle.sin(), 0.0],
+        ];
+        let positions = [
+            [1.0, 0.0, 0.0],
+            [1.0, 0.0, 1.0],
+            [angle.cos(), angle.sin(), 0.0],
+        ];
+        let vertices = positions
+            .map(|position| look::scene::Vertex {
+                position,
+                normal: [0.; 3],
+            })
+            .to_vec();
+        let geometry = look::scene::Geometry {
+            surface_normals: Some(normals),
+            bounds: look::scene::Bounds::from_positions(&positions),
+            vertices,
+            indices: vec![0, 1, 2],
+            source_attributes: None,
+            bounding_center: [0.; 3],
+            bounding_radius: 0.,
+        };
+        let mesh = Mesh::prepare(&geometry).unwrap();
+        let point = mesh.triangle(0).iter().sum::<DVec3>() / 3.0;
+        assert!(mesh.nonplanar_near_surface(point, 0.01));
+        assert!(mesh.triangle_surface_sample(0).1 > 0.02);
+    }
+
+    #[test]
     fn touching_solids_do_not_turn_an_exterior_point_into_interior() {
         let rotation = glam::DMat4::from_rotation_z(std::f64::consts::FRAC_PI_4);
         let cube = [
@@ -529,6 +757,10 @@ mod tests {
             oriented: true,
             epsilon: 1e-7,
             order: (0..24).collect(),
+            sampled_curve: vec![false; 24],
+            legacy_curve: vec![false; 24],
+            surface_curvature: vec![None; 24],
+            sampled_deviation: vec![0.0; 24],
             nodes: Vec::new(),
         };
         mesh.build(0, 24);
@@ -582,6 +814,10 @@ mod tests {
             oriented: true,
             epsilon: 1e-7,
             order: (0..12).collect(),
+            sampled_curve: vec![false; 12],
+            legacy_curve: vec![false; 12],
+            surface_curvature: vec![None; 12],
+            sampled_deviation: vec![0.0; 12],
             nodes: Vec::new(),
         };
         mesh.build(0, 12);
