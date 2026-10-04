@@ -1,6 +1,7 @@
 """Ensure a completed subset scan cannot certify an unchecked Burr pair."""
 import unittest
-from compare_pairs import validate_reference_scope
+import cadquery as cq
+from compare_pairs import source_bounds, validate_reference_scope
 
 
 class ReferenceScope(unittest.TestCase):
@@ -30,6 +31,16 @@ class ReferenceScope(unittest.TestCase):
     def test_unknown_scope_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'Unknown'):
             validate_reference_scope(dict(pair_check_scope='unknown'), set(), True)
+
+
+class SourceBounds(unittest.TestCase):
+    def test_empty_occt_occurrence_is_an_explicit_refusal(self):
+        with self.assertRaisesRegex(ValueError, "OCCT source occurrence 17.*empty.*no usable bounding box"):
+            source_bounds(cq.Compound.makeCompound([]), 17, 'empty')
+
+    def test_finite_bounds_keep_the_step_to_scene_axis_conversion(self):
+        self.assertEqual(source_bounds(cq.Solid.makeBox(1, 2, 3), 0, 'box'),
+                         [0, 0, -2, 1, 3, 0])
 
 
 if __name__ == '__main__':

@@ -12,6 +12,7 @@ import re
 import cadquery as cq
 import numpy as np
 from scipy.optimize import linear_sum_assignment
+from OCP.Standard import Standard_Failure
 
 from occt_components import components
 
@@ -39,6 +40,14 @@ def validate_reference_scope(reference, found, reported_pairs_only):
     return scope
 
 
+def source_bounds(shape, index, name):
+    try:
+        b = shape.BoundingBox()
+    except Standard_Failure as error:
+        raise ValueError(f'OCCT source occurrence {index} ({name!r}) has no usable bounding box: {error}') from error
+    return [b.xmin, b.zmin, -b.ymax, b.xmax, b.zmax, -b.ymin]
+
+
 def compare(model, scene_path, burr_path, occt_path, reference_complete=False, reported_pairs_only=False):
     scene = json.loads(scene_path.read_text(encoding="utf-8"))['parts']
     report = json.loads(burr_path.read_text(encoding="utf-8"))['report']
@@ -51,10 +60,7 @@ def compare(model, scene_path, burr_path, occt_path, reference_complete=False, r
     if len(scene) != len(exact):
         raise ValueError('Occurrence count differs; cannot compare pair identities')
     shapes = [cq.Shape.cast(s) for _, s in exact]
-    boxes = []
-    for shape in shapes:
-        b = shape.BoundingBox()
-        boxes.append([b.xmin, b.zmin, -b.ymax, b.xmax, b.zmax, -b.ymin])
+    boxes = [source_bounds(shape, i, exact[i][0]) for i, shape in enumerate(shapes)]
     x = np.array([p['min'] + p['max'] for p in scene])
     y = np.array(boxes)
     cost = np.linalg.norm(x[:, None] - y[None, :], axis=2)
