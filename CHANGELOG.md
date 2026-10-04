@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 0.36.0 - 2026-10-04
+
+Tested against 21 real public STEP assemblies (Voron printers, an open-source
+robot, a robot arm, Adafruit parts and others) and an exact OCCT reference.
+Burr now agrees with OCCT on 7 of them (up from 4) and says "incomplete" with a
+reason on the rest, instead of crashing, timing out or guessing. No conclusive
+result disagreed with OCCT.
+
+- Load assemblies as assemblies: nullable STEP metadata (`$`) no longer drops
+  product and placement records, occurrence placements are composed correctly,
+  and flat multi-solid exports are split into parts.
+- Recover faces that used to disappear (16,251 lost faces down to 134 across
+  the corpus): fixed hyperbola parameter selection, reversed surface curves and
+  collapsed line edges; a bad face is refused on its own instead of crashing
+  the whole load.
+- Report interference only for real shared interior volume. Touching parts,
+  coincident sheets and zero-volume meshes no longer count; identical parts at
+  the same placement still do.
+- Check large assemblies in milliseconds: per-part BVHs, a broad-phase sweep
+  and early structural checks replace whole-scene vertex welding.
+- Say why a check is incomplete: lost assembly structure or lost faces are
+  reported, with counts, before any pair is checked.
+- Burr now builds against the `burr` branch of
+  [fraylabs/look](https://github.com/fraylabs/look), which carries these
+  geometry-kernel fixes.
+
 ## 0.35.1 - 2026-10-04
 
 - Publish prebuilt binaries for macOS (Apple Silicon and Intel) and Linux
