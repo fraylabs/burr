@@ -1,0 +1,84 @@
+{
+  "look_head": "d1583a7cb4325ee311dd8cea93dbbce97548e577",
+  "scope": "Review fixes only; positions, triangles and placements unchanged. Ten models compared against complete OCCT pair references using compare_pairs.py. Bowden is limited to the 18 previously reported pairs, not a complete candidate-pair scan.",
+  "protected_true": 64,
+  "protected_false": 0,
+  "models": [
+    {
+      "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+      "true_pairs": 11,
+      "false_pairs": 0,
+      "known_positive_pairs_unresolved": 0,
+      "total_unresolved_pairs": 13
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "true_pairs": 9,
+      "false_pairs": 0,
+      "known_positive_pairs_unresolved": 0,
+      "total_unresolved_pairs": 126
+    },
+    {
+      "model": "TradRack__tr-toolhead-board.STEP",
+      "true_pairs": 6,
+      "false_pairs": 0,
+      "known_positive_pairs_unresolved": 0,
+      "total_unresolved_pairs": 0
+    },
+    {
+      "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+      "true_pairs": 7,
+      "false_pairs": 0,
+      "known_positive_pairs_unresolved": 1,
+      "total_unresolved_pairs": 7
+    },
+    {
+      "model": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+      "true_pairs": 0,
+      "false_pairs": 0,
+      "known_positive_pairs_unresolved": 0,
+      "total_unresolved_pairs": 0
+    },
+    {
+      "model": "apollo-3d-enclosure__corner__assembly.step",
+      "true_pairs": 0,
+      "false_pairs": 0,
+      "known_positive_pairs_unresolved": 0,
+      "total_unresolved_pairs": 0
+    },
+    {
+      "model": "apollo-3d-enclosure__flat__assembly.step",
+      "true_pairs": 0,
+      "false_pairs": 0,
+      "known_positive_pairs_unresolved": 0,
+      "total_unresolved_pairs": 0
+    },
+    {
+      "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+      "true_pairs": 16,
+      "false_pairs": 0,
+      "known_positive_pairs_unresolved": 6,
+      "total_unresolved_pairs": 25
+    },
+    {
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "true_pairs": 12,
+      "false_pairs": 0,
+      "known_positive_pairs_unresolved": 0,
+      "total_unresolved_pairs": 2
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "true_pairs": 3,
+      "false_pairs": 0,
+      "known_positive_pairs_unresolved": 0,
+      "total_unresolved_pairs": 5
+    }
+  ],
+  "bowden": {
+    "true_pairs": 9,
+    "false_pairs": 0,
+    "formerly_false_pairs_unresolved": 9,
+    "full_pair_completeness": "unknown"
+  }
+}

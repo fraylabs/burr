@@ -367,27 +367,25 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             let overlap =
                 left.bounds.max.min(right.bounds.max) - left.bounds.min.max(right.bounds.min);
             if mesh_witness.is_some() || overlap.min_element() <= tolerance {
-                let below_sampling =
-                    (!left_mesh.oriented && !right_mesh.oriented && mesh_witness.is_some())
-                        || mesh_witness.as_ref().is_some_and(|witness| match witness {
-                            InterferenceWitness::SurfaceCrossing { start, end } => {
-                                DVec3::from_array(*start).distance(DVec3::from_array(*end))
-                                    <= probe_resolution
-                            }
-                            InterferenceWitness::InteriorOverlap { point }
-                            | InterferenceWitness::Containment { point, .. } => {
-                                let world = DVec3::from_array(*point);
-                                let a = left.inverse.transform_point3(world);
-                                let b = right.inverse.transform_point3(world);
-                                let ta = probe_resolution / left.scale;
-                                let tb = probe_resolution / right.scale;
-                                left_mesh.near_surface(a, ta)
-                                    && right_mesh.near_surface(b, tb)
-                                    && (left_mesh.nonplanar_near_surface(a, ta)
-                                        || right_mesh.nonplanar_near_surface(b, tb))
-                            }
-                            InterferenceWitness::CoincidentOccurrence => false,
-                        });
+                let below_sampling = mesh_witness.as_ref().is_some_and(|witness| match witness {
+                    InterferenceWitness::SurfaceCrossing { start, end } => {
+                        DVec3::from_array(*start).distance(DVec3::from_array(*end))
+                            <= probe_resolution
+                    }
+                    InterferenceWitness::InteriorOverlap { point }
+                    | InterferenceWitness::Containment { point, .. } => {
+                        let world = DVec3::from_array(*point);
+                        let a = left.inverse.transform_point3(world);
+                        let b = right.inverse.transform_point3(world);
+                        let ta = probe_resolution / left.scale;
+                        let tb = probe_resolution / right.scale;
+                        left_mesh.near_surface(a, ta)
+                            && right_mesh.near_surface(b, tb)
+                            && (left_mesh.nonplanar_near_surface(a, ta)
+                                || right_mesh.nonplanar_near_surface(b, tb))
+                    }
+                    InterferenceWitness::CoincidentOccurrence => false,
+                });
                 unresolved_pairs.push(UnresolvedPair {
                 id: format!("{CHECK_ID}:unresolved:{left_index}:{right_index}"),
                     code: if below_sampling { "below_tessellation_resolution" } else { "below_coordinate_resolution" },
@@ -1058,6 +1056,40 @@ mod tests {
         let report = analyze_scene("rotated-contact.step", "fixture", &scene);
         assert_eq!(report.candidate_pair_count, 1);
         assert_eq!(report.outcome, CheckOutcome::Pass);
+    }
+
+    #[test]
+    fn relaxed_planar_overlap_reports_coordinate_uncertainty() {
+        let mut scene = compile_scene(
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        let geometry = scene.instances[0].geometry;
+        scene.instances[1].geometry = geometry;
+        scene.geometries[geometry].surface_normals = None;
+        scene.geometries[geometry].indices.swap(0, 1);
+        assert!(!Mesh::prepare(&scene.geometries[geometry]).unwrap().oriented);
+        scene.instances[0].transform =
+            glam::Mat4::from_translation(glam::Vec3::new(1_000_000.0, 0.0, 0.0));
+        scene.instances[1].transform =
+            glam::Mat4::from_translation(glam::Vec3::new(1_000_000.0 + 9.875, 0.0, 0.0));
+        let report = analyze_scene("planar-placement-uncertainty.step", "fixture", &scene);
+        assert!(report.findings.is_empty());
+        assert_eq!(report.unresolved_pairs.len(), 1);
+        assert!(matches!(
+            report.unresolved_pairs[0].mesh_witness,
+            Some(InterferenceWitness::InteriorOverlap { .. })
+                | Some(InterferenceWitness::Containment { .. })
+        ));
+        assert_eq!(
+            report.unresolved_pairs[0].code,
+            "below_coordinate_resolution"
+        );
+        assert!(report.unresolved_pairs[0]
+            .tessellation_probe_resolution
+            .is_none());
     }
 
     #[test]

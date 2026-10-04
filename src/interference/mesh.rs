@@ -490,7 +490,6 @@ impl Mesh {
 
     pub fn nearest_surface_sample(&self, point: DVec3) -> (bool, f64) {
         let mut nearest = f64::INFINITY;
-        let mut sample = (false, 0.0_f64);
         let mut stack = vec![0];
         while let Some(index) = stack.pop() {
             let node = &self.nodes[index];
@@ -508,18 +507,39 @@ impl Mesh {
             } else {
                 for &triangle in &self.order[node.start..node.end] {
                     let distance = point_triangle_distance_squared(point, self.triangle(triangle));
-                    if distance < nearest {
-                        nearest = distance;
-                        sample = self.triangle_surface_sample(triangle);
-                    } else if (distance - nearest).abs() <= self.epsilon.powi(2) {
+                    nearest = nearest.min(distance);
+                }
+            }
+        }
+        // Collect the complete linear epsilon shell after finding its center.
+        // Updating the sample during the search would discard earlier ties or
+        // prune a tied facet merely because another node was visited first.
+        let tie_limit = (nearest.sqrt() + self.epsilon).powi(2);
+        let mut sample: Option<(bool, f64)> = None;
+        let mut stack = vec![0];
+        while let Some(index) = stack.pop() {
+            let node = &self.nodes[index];
+            if node.bounds.distance_squared(point) > tie_limit {
+                continue;
+            }
+            if let Some(children) = node.children {
+                stack.extend(children);
+            } else {
+                for &triangle in &self.order[node.start..node.end] {
+                    if point_triangle_distance_squared(point, self.triangle(triangle)) <= tie_limit
+                    {
                         let other = self.triangle_surface_sample(triangle);
-                        sample.0 &= other.0;
-                        sample.1 = sample.1.max(other.1);
+                        if let Some(sample) = &mut sample {
+                            sample.0 &= other.0;
+                            sample.1 = sample.1.max(other.1);
+                        } else {
+                            sample = Some(other);
+                        }
                     }
                 }
             }
         }
-        sample
+        sample.unwrap_or((false, 0.0))
     }
 
     pub fn inside(&self, p: DVec3, tolerance: f64) -> bool {
@@ -638,6 +658,66 @@ fn point_triangle_distance_squared(p: DVec3, [a, b, c]: [DVec3; 3]) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn near_surface_ties_use_linear_distance_and_ignore_traversal_order() {
+        let positions = [
+            [0., 0., 0.],
+            [1., 0., 0.],
+            [0., 1., 0.],
+            [0., 0., 0.00005],
+            [1., 0., 0.00005],
+            [0., 1., 0.00005],
+        ];
+        let geometry = look::scene::Geometry {
+            vertices: positions
+                .iter()
+                .map(|&position| look::scene::Vertex {
+                    position,
+                    normal: [0.; 3],
+                })
+                .collect(),
+            surface_normals: None,
+            source_attributes: None,
+            indices: vec![0, 1, 2, 3, 4, 5],
+            bounds: look::scene::Bounds::from_positions(&positions),
+            bounding_center: [0.; 3],
+            bounding_radius: 0.,
+        };
+        let mut mesh = Mesh::prepare(&geometry).unwrap();
+        mesh.epsilon = 0.0001;
+        mesh.surface_curvature = vec![Some(true), Some(false)];
+        mesh.sampled_deviation = vec![0.2, 0.1];
+        let point = DVec3::new(0.1, 0.1, 1.0);
+        assert_eq!(mesh.nearest_surface_sample(point), (false, 0.2));
+        mesh.order.reverse();
+        assert_eq!(mesh.nearest_surface_sample(point), (false, 0.2));
+        // Put the tied facets in separate BVH leaves so nearest-only pruning
+        // cannot quietly discard the farther member of the epsilon shell.
+        let mut leaves = Vec::new();
+        for (start, &triangle) in mesh.order.iter().enumerate() {
+            let mut bounds = Bounds::empty();
+            for point in mesh.triangle(triangle) {
+                bounds.add(point);
+            }
+            leaves.push(Node {
+                bounds,
+                start,
+                end: start + 1,
+                children: None,
+            });
+        }
+        mesh.nodes = vec![Node {
+            bounds: mesh.bounds,
+            start: 0,
+            end: 2,
+            children: Some([1, 2]),
+        }];
+        mesh.nodes.extend(leaves);
+        assert_eq!(mesh.nearest_surface_sample(point), (false, 0.2));
+        mesh.epsilon *= 0.25;
+        assert_eq!(mesh.nearest_surface_sample(point), (false, 0.1));
+    }
 
     #[test]
     fn evaluator_normals_repair_a_reversed_triangle() {
