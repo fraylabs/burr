@@ -564,6 +564,48 @@ mod tests {
     }
 
     #[test]
+    fn duplicate_solid_definitions_at_same_placement_fail() -> Result<(), Box<dyn std::error::Error>> {
+        let mut scene = compile_scene(
+            &fixture("separated.step"), UpAxis::Z, &mut Timings::default(),
+        )?;
+        let original = scene.instances[0].geometry;
+        let duplicate = scene.geometries.len();
+        scene.geometries.push(scene.geometries[original].clone());
+        scene.instances[1].geometry = duplicate;
+        for instance in &mut scene.instances {
+            instance.transform = glam::Mat4::IDENTITY;
+        }
+        let report = analyze_scene("duplicate-definitions.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Fail);
+        assert_eq!(report.findings.len(), 1);
+        assert!(matches!(report.findings[0].witness, InterferenceWitness::InteriorOverlap { .. }));
+        Ok(())
+    }
+
+    #[test]
+    fn self_mapping_cube_rotation_fails() -> Result<(), Box<dyn std::error::Error>> {
+        let mut scene = compile_scene(
+            &fixture("separated.step"), UpAxis::Z, &mut Timings::default(),
+        )?;
+        let definition = scene.instances[0].geometry;
+        scene.instances[1].geometry = definition;
+        let mut bounds = Bounds::empty();
+        for vertex in &scene.geometries[definition].vertices {
+            bounds.add(DVec3::from_array(vertex.position.map(f64::from)));
+        }
+        let center = ((bounds.min + bounds.max) * 0.5).as_vec3();
+        scene.instances[0].transform = glam::Mat4::IDENTITY;
+        scene.instances[1].transform = glam::Mat4::from_translation(center)
+            * glam::Mat4::from_rotation_z(std::f32::consts::FRAC_PI_2)
+            * glam::Mat4::from_translation(-center);
+        let report = analyze_scene("self-mapping-cube.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Fail);
+        assert_eq!(report.findings.len(), 1);
+        assert!(matches!(report.findings[0].witness, InterferenceWitness::InteriorOverlap { .. }));
+        Ok(())
+    }
+
+    #[test]
     fn rotated_crossing_without_contained_vertices_is_detected() {
         let mut scene = compile_scene(
             &fixture("separated.step"),
