@@ -7,15 +7,15 @@ use crate::{
 };
 use look::{
     config::{LightingConfig, UpAxis},
-    scene::{compile_scene, prepare_source_textures, CompiledScene, SourceVertexAttributes},
+    scene::{compile_scene, prepare_source_textures, CompiledScene},
     timing::Timings,
-    ui::generate_html_viewer,
 };
 use percent_encoding::percent_decode_str;
 use serde_json::json;
 use std::{
     collections::{HashMap, VecDeque},
     fs,
+    io::Read,
     path::{Component, Path, PathBuf},
     process::Command,
     sync::{mpsc, Arc, Mutex, MutexGuard},
@@ -60,7 +60,7 @@ struct CachedModel {
 #[derive(Default)]
 struct ModelCache {
     models: HashMap<PathBuf, CachedModel>,
-    viewers: HashMap<String, String>,
+    viewers: HashMap<String, Arc<String>>,
     viewer_order: VecDeque<String>,
     viewer_bytes: usize,
     #[cfg(test)]
@@ -68,7 +68,7 @@ struct ModelCache {
 }
 
 struct RenderedViewer {
-    html: String,
+    html: Arc<String>,
     cache: &'static str,
 }
 
@@ -312,6 +312,29 @@ fn handle_request(
 
     let url = request.url().to_string();
     let route = url.split('?').next().unwrap_or("/");
+    if let Some(id) = route.strip_prefix("/mesh/") {
+        let Some(path) = viewer_cache.mesh_path(id) else {
+            return respond_json_error(request, 400, "Invalid mesh id.");
+        };
+        let Ok(file) = fs::File::open(path) else {
+            return respond_json_error(request, 404, "Mesh is unavailable. Reopen the model.");
+        };
+        let length = file.metadata().map_err(|e| e.to_string())?.len() as usize;
+        let content_type = Header::from_bytes("Content-Type", "application/octet-stream")
+            .map_err(|_| "Invalid mesh content type.".to_string())?;
+        let cache_control =
+            Header::from_bytes("Cache-Control", "private, max-age=31536000, immutable")
+                .map_err(|_| "Invalid mesh cache header.".to_string())?;
+        return request
+            .respond(Response::new(
+                StatusCode(200),
+                vec![content_type, cache_control],
+                file,
+                Some(length),
+                None,
+            ))
+            .map_err(|e| format!("Failed to send mesh: {e}"));
+    }
     match route {
         "/" => respond(
             request,
@@ -424,18 +447,16 @@ fn handle_request(
                 )
             };
             match rendered {
-                Ok(rendered) => {
-                    match inject_viewer_ready_notification(rendered.html, load_id.as_deref()) {
-                        Ok(html) => {
-                            reporter.ready(rendered.cache);
-                            respond(request, 200, "text/html; charset=utf-8", html)
-                        }
-                        Err(error) => {
-                            reporter.failed(&error);
-                            respond_html_error(request, 422, &error)
-                        }
+                Ok(rendered) => match ViewerBody::new(rendered.html, load_id.as_deref()) {
+                    Ok(html) => {
+                        reporter.ready(rendered.cache);
+                        respond_viewer(request, html)
                     }
-                }
+                    Err(error) => {
+                        reporter.failed(&error);
+                        respond_html_error(request, 422, &error)
+                    }
+                },
                 Err(error) => {
                     reporter.failed(&error);
                     respond_html_error(request, 422, &error)
@@ -496,21 +517,24 @@ fn render_model(
         selection.focus,
         None,
     );
-    if let Some(html) = memory_viewer(cache, &viewer_key) {
+    if let Some(html) =
+        memory_viewer(cache, &viewer_key).filter(|html| viewer_cache.meshes_available(html))
+    {
         return Ok(RenderedViewer {
             html,
             cache: "memory",
         });
     }
     match viewer_cache.load(&viewer_key) {
-        Ok(Some(html)) => {
+        Ok(Some(html)) if viewer_cache.meshes_available(&html) => {
+            let html = Arc::new(html);
             remember_viewer(cache, viewer_key, html.clone());
             return Ok(RenderedViewer {
                 html,
                 cache: "disk",
             });
         }
-        Ok(None) => {}
+        Ok(_) => {}
         Err(error) => eprintln!("burr: {error}; rebuilding the viewer"),
     }
 
@@ -522,21 +546,20 @@ fn render_model(
             }
         }
 
-        let scene = match selection.focus {
-            Some(focus) => Arc::new(highlighted_scene(&cached.scene, focus)?),
-            None => cached.scene.clone(),
-        };
+        let scene = &cached.scene;
         reporter.stage(
             "Building viewer",
             "Encoding the compiled geometry for the local browser.",
         );
         let lighting = selection.theme.lighting();
-        let html = generate_html_viewer(
-            &scene,
+        let html = crate::binary_viewer::generate_html_viewer(
+            scene,
             selection.relative_path,
-            &scene.statistics,
             &lighting,
             selection.theme.canvas_background(),
+            viewer_cache,
+            selection.focus.map(|f| (f.first, f.second)),
+            None,
         )
         .map_err(|error| {
             format!(
@@ -544,9 +567,10 @@ fn render_model(
                 selection.relative_path
             )
         })?;
-        let html = inject_viewer_render_modes(html)?;
+        let html = inject_binary_draw(inject_viewer_render_modes(html)?);
         inject_viewer_theme(html, selection.theme, selection.focus)?
     };
+    let html = Arc::new(html);
     persist_viewer(viewer_cache, &viewer_key, &html);
     remember_viewer(cache, viewer_key, html.clone());
     Ok(RenderedViewer {
@@ -587,21 +611,24 @@ fn render_motion_model(
         None,
         Some(&motion_signature),
     );
-    if let Some(html) = memory_viewer(cache, &viewer_key) {
+    if let Some(html) =
+        memory_viewer(cache, &viewer_key).filter(|html| viewer_cache.meshes_available(html))
+    {
         return Ok(RenderedViewer {
             html,
             cache: "memory",
         });
     }
     match viewer_cache.load(&viewer_key) {
-        Ok(Some(html)) => {
+        Ok(Some(html)) if viewer_cache.meshes_available(&html) => {
+            let html = Arc::new(html);
             remember_viewer(cache, viewer_key, html.clone());
             return Ok(RenderedViewer {
                 html,
                 cache: "disk",
             });
         }
-        Ok(None) => {}
+        Ok(_) => {}
         Err(error) => eprintln!("burr: {error}; rebuilding the viewer"),
     }
 
@@ -624,17 +651,20 @@ fn render_motion_model(
         "Encoding the compiled motion for the local browser.",
     );
     let lighting = theme.lighting();
-    let html = generate_html_viewer(
-        &prepared.scene,
+    let html = crate::binary_viewer::generate_html_viewer(
+        &source_scene,
         relative_path,
-        &prepared.scene.statistics,
         &lighting,
         theme.canvas_background(),
+        viewer_cache,
+        None,
+        Some(&prepared),
     )
     .map_err(|error| format!("Look could not build motion '{}': {error:#}", motion.id))?;
-    let html = inject_viewer_render_modes(html)?;
+    let html = inject_binary_draw(inject_viewer_render_modes(html)?);
     let html = inject_viewer_motion(html, &prepared)?;
     let html = inject_viewer_theme(html, theme, None)?;
+    let html = Arc::new(html);
     persist_viewer(viewer_cache, &viewer_key, &html);
     remember_viewer(cache, viewer_key, html.clone());
     Ok(RenderedViewer {
@@ -718,6 +748,9 @@ fn load_model<'a>(
     {
         cache.compile_count += 1;
     }
+    // Keep only the active compiled model: browsing several assemblies must not
+    // retain all their CPU meshes. In-flight checks retain their own Arc.
+    cache.models.clear();
     let mut scene = compile_scene(&path, up_axis, &mut timings)
         .map_err(|error| format!("Look could not render {relative_path}: {error:#}"))?;
     if let Some(reporter) = reporter {
@@ -754,9 +787,23 @@ fn viewer_cache_key(
     focus: Option<FocusPair>,
     motion: Option<&str>,
 ) -> String {
+    // Dependency pins and viewer code are part of the content identity even
+    // when a development build keeps the same Burr version number.
+    let mut implementation = blake3::Hasher::new();
+    for bytes in [
+        include_bytes!("../Cargo.lock").as_slice(),
+        include_bytes!("binary_viewer.rs").as_slice(),
+        include_bytes!("cache.rs").as_slice(),
+        include_bytes!("motion.rs").as_slice(),
+        include_bytes!("viewer.rs").as_slice(),
+    ] {
+        implementation.update(bytes);
+    }
+    let implementation = implementation.finalize().to_hex();
     format!(
-        "burr-viewer-v4\nburr={}\nsource={}\nfingerprint={}\nrelative={}\ntheme={}\nfocus={}\nmotion={}",
+        "burr-viewer-v6-binary\nburr={}\nimplementation={}\nsource={}\nfingerprint={}\nrelative={}\ntheme={}\nfocus={}\nmotion={}",
         env!("CARGO_PKG_VERSION"),
+        implementation,
         source_path.display(),
         source_fingerprint,
         relative_path,
@@ -773,7 +820,7 @@ fn persist_viewer(cache: &ViewerCache, key: &str, html: &str) {
     }
 }
 
-fn remember_viewer(cache: &mut ModelCache, key: String, html: String) {
+fn remember_viewer(cache: &mut ModelCache, key: String, html: Arc<String>) {
     remember_viewer_with_limits(
         cache,
         key,
@@ -784,7 +831,7 @@ fn remember_viewer(cache: &mut ModelCache, key: String, html: String) {
     );
 }
 
-fn memory_viewer(cache: &mut ModelCache, key: &str) -> Option<String> {
+fn memory_viewer(cache: &mut ModelCache, key: &str) -> Option<Arc<String>> {
     let html = cache.viewers.get(key)?.clone();
     cache.viewer_order.retain(|candidate| candidate != key);
     cache.viewer_order.push_back(key.to_string());
@@ -794,7 +841,7 @@ fn memory_viewer(cache: &mut ModelCache, key: &str) -> Option<String> {
 fn remember_viewer_with_limits(
     cache: &mut ModelCache,
     key: String,
-    html: String,
+    html: Arc<String>,
     max_entries: usize,
     max_total_bytes: usize,
     max_entry_bytes: usize,
@@ -829,54 +876,6 @@ fn lock_model_cache(cache: &Mutex<ModelCache>) -> Result<MutexGuard<'_, ModelCac
     cache
         .lock()
         .map_err(|_| "Burr model cache became unavailable.".to_string())
-}
-
-fn highlighted_scene(scene: &CompiledScene, focus: FocusPair) -> Result<CompiledScene, String> {
-    const MUTED: [f32; 4] = [0.28, 0.31, 0.33, 1.0];
-    const FIRST: [f32; 4] = [1.0, 0.34, 0.08, 1.0];
-    const SECOND: [f32; 4] = [0.12, 0.76, 0.94, 1.0];
-
-    let mut highlighted = scene.clone();
-    highlighted.geometries = scene
-        .instances
-        .iter()
-        .enumerate()
-        .map(|(index, instance)| {
-            let mut geometry = scene
-                .geometries
-                .get(instance.geometry)
-                .cloned()
-                .ok_or_else(|| {
-                    format!(
-                        "Component occurrence {index} references missing geometry {}.",
-                        instance.geometry
-                    )
-                })?;
-            let color = if index == focus.first {
-                FIRST
-            } else if index == focus.second {
-                SECOND
-            } else {
-                MUTED
-            };
-            geometry.source_attributes = Some(
-                geometry
-                    .vertices
-                    .iter()
-                    .map(|_| SourceVertexAttributes {
-                        tex_coord_0: [0.0; 2],
-                        tex_coord_1: [0.0; 2],
-                        color,
-                    })
-                    .collect(),
-            );
-            Ok(geometry)
-        })
-        .collect::<Result<Vec<_>, String>>()?;
-    for (index, instance) in highlighted.instances.iter_mut().enumerate() {
-        instance.geometry = index;
-    }
-    Ok(highlighted)
 }
 
 fn request_host_is_loopback(request: &Request, expected_port: u16) -> bool {
@@ -921,22 +920,76 @@ fn inject_viewer_theme(
     Ok(themed)
 }
 
-fn inject_viewer_ready_notification(
-    mut html: String,
-    load_id: Option<&str>,
-) -> Result<String, String> {
-    let Some(load_id) = load_id else {
-        return Ok(html);
-    };
-    let marker = "</head>";
-    let Some(index) = html.find(marker) else {
-        return Err("Look viewer HTML did not contain a head element.".to_string());
-    };
-    let notification = format!(
-        r#"<!--burr-load-id-start--><meta name="burr-load-id" content="{load_id}"><script>window.addEventListener("load", () => {{ window.parent.postMessage({{ type: "burr:viewer-ready", loadId: "{load_id}" }}, window.location.origin); }}, {{ once: true }});</script><!--burr-load-id-end-->"#
-    );
-    html.insert_str(index, &notification);
-    Ok(html)
+/// Stream the cached page around a small request-specific load notification.
+struct ViewerBody {
+    html: Arc<String>,
+    notification: Vec<u8>,
+    split: usize,
+    offset: usize,
+}
+
+impl ViewerBody {
+    fn new(html: Arc<String>, load_id: Option<&str>) -> Result<Self, String> {
+        let (split, notification) = if let Some(load_id) = load_id {
+            let index = html
+                .find("</head>")
+                .ok_or("Viewer HTML did not contain a head element.")?;
+            let script = format!(
+                r#"<!--burr-load-id-start--><meta name="burr-load-id" content="{load_id}"><script>window.addEventListener("burr:first-frame", () => {{ window.parent.postMessage({{ type: "burr:viewer-ready", loadId: "{load_id}" }}, window.location.origin); }}, {{ once: true }});</script><!--burr-load-id-end-->"#
+            );
+            (index, script.into_bytes())
+        } else {
+            (0, Vec::new())
+        };
+        Ok(Self {
+            html,
+            notification,
+            split,
+            offset: 0,
+        })
+    }
+
+    fn len(&self) -> usize {
+        self.html.len() + self.notification.len()
+    }
+}
+
+impl Read for ViewerBody {
+    fn read(&mut self, output: &mut [u8]) -> std::io::Result<usize> {
+        let bytes = if self.offset < self.split {
+            &self.html.as_bytes()[self.offset..self.split]
+        } else if self.offset < self.split + self.notification.len() {
+            &self.notification[self.offset - self.split..]
+        } else {
+            &self.html.as_bytes()[self.offset - self.notification.len()..]
+        };
+        let count = output.len().min(bytes.len());
+        output[..count].copy_from_slice(&bytes[..count]);
+        self.offset += count;
+        Ok(count)
+    }
+}
+
+fn respond_viewer(request: Request, body: ViewerBody) -> Result<(), String> {
+    let content_type = Header::from_bytes("Content-Type", "text/html; charset=utf-8")
+        .map_err(|_| "Failed to create viewer content type.".to_string())?;
+    let cache_control = Header::from_bytes("Cache-Control", "no-store")
+        .map_err(|_| "Failed to create viewer cache header.".to_string())?;
+    let length = body.len();
+    request
+        .respond(Response::new(
+            StatusCode(200),
+            vec![content_type, cache_control],
+            body,
+            Some(length),
+            None,
+        ))
+        .map_err(|error| format!("Failed to send viewer response: {error}"))
+}
+
+fn inject_binary_draw(html: String) -> String {
+    html.replace("gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);",
+        "for (const mesh of burrMeshes) { gl.bindVertexArray(mesh.vao); if (mesh.color) gl.vertexAttrib4fv(gl.getAttribLocation(program, 'aColor'), mesh.color); gl.drawElementsInstanced(gl.TRIANGLES, mesh.count, gl.UNSIGNED_INT, 0, mesh.instances); }\n            if (!window.burrFirstFrame) { window.burrFirstFrame = performance.now(); window.dispatchEvent(new Event('burr:first-frame')); }")
 }
 
 fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
@@ -1045,47 +1098,25 @@ function burrCaptureSnapshot(canvas) {
 }
 
 fn inject_viewer_motion(mut html: String, motion: &PreparedMotion) -> Result<String, String> {
-    let shader_header = format!(
-        "in vec4 aColor;\n            in float aBurrInstance;\n            uniform mat4 uMVP;\n            uniform mat4 uBurrInstanceTransforms[{MAX_MOTION_COMPONENTS}];"
-    );
-    let motion_arrays = format!(
-        "const colors = b64ToFloat32Array(colorB64);\n        const burrInstanceIds = b64ToFloat32Array(\"{}\");\n        const burrMotionFrames = b64ToFloat32Array(\"{}\");",
-        motion.instance_ids_base64, motion.frames_base64
-    );
-    let replacements = [
-        (
-            "in vec4 aColor;\n            uniform mat4 uMVP;".to_string(),
-            shader_header,
-            "motion vertex attributes",
-        ),
-        (
-            "vNormal = mat3(uModel) * aNormal;\n                vFragPos = vec3(uModel * vec4(aPosition, 1.0));\n                vColor = aColor;\n                gl_Position = uMVP * vec4(aPosition, 1.0);".to_string(),
-            "mat4 burrTransform = uBurrInstanceTransforms[int(aBurrInstance)];\n                vec4 burrPosition = burrTransform * vec4(aPosition, 1.0);\n                vNormal = mat3(burrTransform) * aNormal;\n                vFragPos = vec3(burrPosition);\n                vColor = aColor;\n                gl_Position = uMVP * burrPosition;".to_string(),
-            "motion vertex transform",
-        ),
-        (
-            "const colors = b64ToFloat32Array(colorB64);".to_string(),
-            motion_arrays,
-            "motion data arrays",
-        ),
-        (
-            "const idxBuffer = gl.createBuffer();".to_string(),
-            "const burrInstanceBuffer = gl.createBuffer();\n        gl.bindBuffer(gl.ARRAY_BUFFER, burrInstanceBuffer);\n        gl.bufferData(gl.ARRAY_BUFFER, burrInstanceIds, gl.STATIC_DRAW);\n        const aBurrInstanceLoc = gl.getAttribLocation(program, 'aBurrInstance');\n        gl.enableVertexAttribArray(aBurrInstanceLoc);\n        gl.vertexAttribPointer(aBurrInstanceLoc, 1, gl.FLOAT, false, 0, 0);\n\n        const idxBuffer = gl.createBuffer();".to_string(),
-            "motion instance buffer",
-        ),
-        (
-            "const uModelLoc = gl.getUniformLocation(program, 'uModel');".to_string(),
-            "const uModelLoc = gl.getUniformLocation(program, 'uModel');\n        const uBurrInstanceTransformsLoc = gl.getUniformLocation(program, 'uBurrInstanceTransforms[0]');".to_string(),
-            "motion transform uniform",
-        ),
-    ];
-    for (needle, replacement, label) in replacements {
-        if !html.contains(&needle) {
-            return Err(format!(
-                "Look viewer HTML did not contain the expected {label} hook."
-            ));
-        }
-        html = html.replacen(&needle, &replacement, 1);
+    if html.contains("const burrManifest") {
+        let header = format!("in float aBurrInstance;\n            uniform mat4 uBurrInstanceTransforms[{MAX_MOTION_COMPONENTS}];");
+        html = html.replace("in float aBurrInstance;", &header);
+        html = html.replace("vNormal = normalize(aNormalTransform * aNormal);",
+            "vNormal = normalize(mat3(transpose(inverse(uBurrInstanceTransforms[int(aBurrInstance)]))) * aNormal);");
+        html = html.replace(
+            "aTransform * vec4(aPosition, 1.0)",
+            "uBurrInstanceTransforms[int(aBurrInstance)] * vec4(aPosition, 1.0)",
+        );
+        let arrays = "const burrManifest =";
+        let frames = format!(
+            "const burrMotionFrames = burrDecodeFrames(\"{}\");\n        const burrManifest =",
+            motion.frames_base64
+        );
+        html = html.replacen(arrays, &frames, 1);
+        html = html.replace("const uModelLoc = gl.getUniformLocation(program, 'uModel');",
+            "const uModelLoc = gl.getUniformLocation(program, 'uModel');\n        window.uBurrInstanceTransformsLoc = gl.getUniformLocation(program, 'uBurrInstanceTransforms[0]');\n        window.burrMotionFrames = burrMotionFrames;");
+    } else {
+        return Err("Motion viewer did not contain the binary mesh manifest.".to_string());
     }
 
     let marker = "</head>";
@@ -1094,6 +1125,11 @@ fn inject_viewer_motion(mut html: String, motion: &PreparedMotion) -> Result<Str
     };
     let motion_script = format!(
         r#"<meta name="burr-motion" content="rigid-poses"><script id="burr-motion-player">
+function burrDecodeFrames(b64) {{
+    const binary = atob(b64);
+    const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+    return new Float32Array(bytes.buffer);
+}}
 const burrMotionFrameCount = {frame_count};
 const burrMotionInstanceCount = {instance_count};
 const burrMotionDuration = {duration_ms};
@@ -1525,9 +1561,40 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
     }
 
     #[test]
+    fn cached_pages_are_shared_while_load_notifications_stream_independently() {
+        let original =
+            "<!doctype html><html><head><title>雪</title></head><body>part</body></html>";
+        let html = Arc::new(original.to_string());
+        let mut cache = ModelCache::default();
+        remember_viewer(&mut cache, "part".into(), html.clone());
+        let cached = memory_viewer(&mut cache, "part").unwrap();
+        assert!(Arc::ptr_eq(&html, &cached));
+        for id in ["load-1", "load-2"] {
+            let mut body = ViewerBody::new(cached.clone(), Some(id)).unwrap();
+            assert!(Arc::ptr_eq(&html, &body.html));
+            let mut bytes = Vec::new();
+            let mut chunk = [0_u8; 7];
+            loop {
+                let count = body.read(&mut chunk).unwrap();
+                if count == 0 {
+                    break;
+                }
+                bytes.extend_from_slice(&chunk[..count]);
+            }
+            assert_eq!(bytes.len(), body.len());
+            let streamed = String::from_utf8(bytes).unwrap();
+            assert!(streamed.contains(&format!("loadId: \"{id}\"")));
+            assert!(streamed.contains("<title>雪</title>"));
+        }
+        assert_eq!(html.as_str(), original);
+    }
+
+    #[test]
     fn viewer_ready_notification_carries_the_specific_load_id() {
         let html = "<!doctype html><html><head></head><body></body></html>".to_string();
-        let rendered = inject_viewer_ready_notification(html, Some("window-3")).unwrap();
+        let mut body = ViewerBody::new(Arc::new(html), Some("window-3")).unwrap();
+        let mut rendered = String::new();
+        body.read_to_string(&mut rendered).unwrap();
 
         assert!(rendered.contains("name=\"burr-load-id\" content=\"window-3\""));
         assert!(rendered.contains("type: \"burr:viewer-ready\", loadId: \"window-3\""));
@@ -1546,12 +1613,16 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
             angle_degrees: 90.0,
         }];
         let motion = prepare_motion(&from, &joints, UpAxis::Z, 800, 0.0).unwrap();
-        let html = generate_html_viewer(
-            &motion.scene,
+        let temp = tempdir().unwrap();
+        let viewer_cache = ViewerCache::at(temp.path().join("cache"));
+        let html = crate::binary_viewer::generate_html_viewer(
+            &from,
             "motion.step",
-            &motion.scene.statistics,
             &LightingConfig::default(),
             "#0c0d10",
+            &viewer_cache,
+            None,
+            Some(&motion),
         )
         .unwrap();
         let html = inject_viewer_render_modes(html).unwrap();
@@ -1649,18 +1720,51 @@ angle_degrees = 90.0
     #[test]
     fn memory_viewer_cache_enforces_entry_and_total_byte_limits() {
         let mut cache = ModelCache::default();
-        remember_viewer_with_limits(&mut cache, "a".into(), "1234".into(), 2, 8, 6);
-        remember_viewer_with_limits(&mut cache, "b".into(), "5678".into(), 2, 8, 6);
+        remember_viewer_with_limits(
+            &mut cache,
+            "a".into(),
+            Arc::new("1234".to_string()),
+            2,
+            8,
+            6,
+        );
+        remember_viewer_with_limits(
+            &mut cache,
+            "b".into(),
+            Arc::new("5678".to_string()),
+            2,
+            8,
+            6,
+        );
         assert_eq!(cache.viewer_bytes, 8);
 
-        assert_eq!(memory_viewer(&mut cache, "a").as_deref(), Some("1234"));
-        remember_viewer_with_limits(&mut cache, "c".into(), "9012".into(), 2, 8, 6);
+        assert_eq!(
+            memory_viewer(&mut cache, "a")
+                .as_ref()
+                .map(|html| html.as_str()),
+            Some("1234")
+        );
+        remember_viewer_with_limits(
+            &mut cache,
+            "c".into(),
+            Arc::new("9012".to_string()),
+            2,
+            8,
+            6,
+        );
         assert!(cache.viewers.contains_key("a"));
         assert!(cache.viewers.contains_key("c"));
         assert!(!cache.viewers.contains_key("b"));
         assert_eq!(cache.viewer_bytes, 8);
 
-        remember_viewer_with_limits(&mut cache, "large".into(), "1234567".into(), 2, 8, 6);
+        remember_viewer_with_limits(
+            &mut cache,
+            "large".into(),
+            Arc::new("1234567".to_string()),
+            2,
+            8,
+            6,
+        );
         assert!(!cache.viewers.contains_key("large"));
         assert_eq!(cache.viewer_bytes, 8);
     }
@@ -1674,25 +1778,5 @@ angle_degrees = 90.0
         assert!(!host_is_loopback("attacker.example:43120", 43120));
         assert!(!host_is_loopback("127.0.0.1:43121", 43120));
         assert!(!host_is_loopback("localhost", 43120));
-    }
-
-    #[test]
-    fn highlighted_scene_rejects_a_missing_geometry_index() {
-        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("tests/fixtures/viewer/models/enclosure/counterbore.step");
-        let mut timings = Timings::default();
-        let mut scene = compile_scene(&path, UpAxis::Z, &mut timings).unwrap();
-        scene.instances[0].geometry = scene.geometries.len();
-
-        let error = highlighted_scene(
-            &scene,
-            FocusPair {
-                first: 0,
-                second: 0,
-            },
-        )
-        .err()
-        .unwrap();
-        assert!(error.contains("references missing geometry"));
     }
 }

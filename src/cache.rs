@@ -1,14 +1,19 @@
 use std::{
+    collections::HashSet,
     env, fs,
-    io::{self, Read},
+    io::{self, BufWriter, Read, Write},
     path::{Path, PathBuf},
-    time::{SystemTime, UNIX_EPOCH},
+    sync::{Arc, Mutex},
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
 const CACHE_MAGIC: &[u8] = b"BURR_VIEWER_CACHE_V1\n";
 const CACHE_DIRECTORY_VERSION: &str = "viewer-v1";
 const CACHE_FILE_SUFFIX: &str = ".burr-viewer";
 const MAX_CACHE_ENTRIES: usize = 128;
+const MAX_MESH_CACHE_TOTAL_BYTES: u64 = 2 * 1024 * 1024 * 1024;
+// Recent payloads may still be downloading in another viewer window.
+const MESH_DOWNLOAD_GRACE: Duration = Duration::from_secs(10 * 60);
 const MAX_CACHE_TOTAL_BYTES: u64 = 512 * 1024 * 1024;
 pub const MAX_VIEWER_HTML_BYTES: usize = 64 * 1024 * 1024;
 const MAX_CACHE_ENTRY_BYTES: usize = MAX_VIEWER_HTML_BYTES + 64 * 1024;
@@ -16,60 +21,266 @@ const MAX_CACHE_ENTRY_BYTES: usize = MAX_VIEWER_HTML_BYTES + 64 * 1024;
 #[derive(Clone, Debug)]
 pub struct ViewerCache {
     root: Option<PathBuf>,
+    session: Arc<Option<tempfile::TempDir>>,
+    fallback_meshes: Arc<Mutex<HashSet<String>>>,
 }
 
 impl ViewerCache {
     pub fn from_environment() -> Self {
+        Self::new(cache_root_from_environment())
+    }
+
+    fn new(root: Option<PathBuf>) -> Self {
+        let mut builder = tempfile::Builder::new();
+        builder.prefix("burr-session-");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            builder.permissions(fs::Permissions::from_mode(0o700));
+        }
         Self {
-            root: cache_root_from_environment(),
+            root,
+            session: Arc::new(builder.tempdir().ok()),
+            fallback_meshes: Default::default(),
         }
     }
 
     #[cfg(test)]
     pub(crate) fn at(root: PathBuf) -> Self {
-        Self { root: Some(root) }
+        Self::new(Some(root))
+    }
+
+    fn mesh_root(&self) -> Option<PathBuf> {
+        self.root
+            .as_ref()
+            .map(|root| root.join("meshes-v2"))
+            .or_else(|| self.session_mesh_root())
+    }
+
+    fn session_mesh_root(&self) -> Option<PathBuf> {
+        self.session
+            .as_ref()
+            .as_ref()
+            .map(|session| session.path().join("meshes-v2"))
+    }
+
+    pub fn mesh_path(&self, id: &str) -> Option<PathBuf> {
+        if id.len() != 64
+            || !id
+                .bytes()
+                .all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase())
+        {
+            return None;
+        }
+        let fallback = self.fallback_meshes.lock().ok()?.contains(id);
+        Some(if fallback {
+            self.session_mesh_root()?.join(id)
+        } else {
+            self.mesh_root()?.join(id)
+        })
+    }
+
+    fn create_mesh_file(&self) -> Result<(PathBuf, PathBuf, fs::File), String> {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let mut last_error = "Persistent and temporary storage are unavailable.".to_string();
+        for root in [self.mesh_root(), self.session_mesh_root()]
+            .into_iter()
+            .flatten()
+        {
+            let temporary = root.join(format!(".{}.{}.tmp", std::process::id(), nonce));
+            let opened = (|| {
+                fs::create_dir_all(&root).map_err(|e| e.to_string())?;
+                secure_directory(&root)?;
+                let file = fs::OpenOptions::new()
+                    .write(true)
+                    .create_new(true)
+                    .open(&temporary)
+                    .map_err(|e| e.to_string())?;
+                if let Err(error) = secure_file(&temporary) {
+                    let _ = fs::remove_file(&temporary);
+                    return Err(error);
+                }
+                Ok(file)
+            })();
+            match opened {
+                Ok(file) => return Ok((root, temporary, file)),
+                Err(error) => last_error = error,
+            }
+        }
+        Err(format!(
+            "Could not prepare local mesh storage: {last_error}"
+        ))
+    }
+
+    pub fn maintain_mesh_cache(&self) {
+        for root in [self.mesh_root(), self.session_mesh_root()]
+            .into_iter()
+            .flatten()
+        {
+            prune_meshes(&root, MAX_MESH_CACHE_TOTAL_BYTES, MESH_DOWNLOAD_GRACE);
+        }
+    }
+
+    /// Write one definition with bounded working memory; never expand occurrences.
+    pub fn store_mesh(
+        &self,
+        geometry: &look::scene::Geometry,
+    ) -> Result<serde_json::Value, String> {
+        // A disabled or unwritable persistent cache must not prevent viewing.
+        let (root, temporary, file) = self.create_mesh_file()?;
+        let result = (|| {
+            let mut writer = BufWriter::new(file);
+            let mut hash = blake3::Hasher::new();
+            let source_color = |index: usize| {
+                geometry
+                    .source_attributes
+                    .as_ref()
+                    .and_then(|attributes| attributes.get(index))
+                    .map(|a| a.color)
+                    .unwrap_or([1.0; 4])
+            };
+            let first_color = source_color(0);
+            let constant_color =
+                (0..geometry.vertices.len()).all(|index| source_color(index) == first_color);
+            let stride = if constant_color { 24 } else { 40 };
+            // Little endian float32 position + normal, with RGBA only when it varies.
+            for (index, vertex) in geometry.vertices.iter().enumerate() {
+                let color = source_color(index);
+                let mut record = [0_u8; 40];
+                for (offset, value) in vertex
+                    .position
+                    .into_iter()
+                    .chain(vertex.normal)
+                    .chain(color)
+                    .enumerate()
+                {
+                    record[offset * 4..offset * 4 + 4].copy_from_slice(&value.to_le_bytes());
+                }
+                hash.update(&record[..stride]);
+                writer
+                    .write_all(&record[..stride])
+                    .map_err(|e| e.to_string())?;
+            }
+            for index in &geometry.indices {
+                if *index as usize >= geometry.vertices.len() {
+                    return Err("Mesh contains an out-of-range vertex index.".to_string());
+                }
+                let bytes = index.to_le_bytes();
+                hash.update(&bytes);
+                writer.write_all(&bytes).map_err(|e| e.to_string())?;
+            }
+            writer.flush().map_err(|e| e.to_string())?;
+            let id = hash.finalize().to_hex().to_string();
+            let destination = root.join(&id);
+            // Replace even an existing entry: a truncated cached file must recover.
+            fs::rename(&temporary, destination).map_err(|e| e.to_string())?;
+            let mut fallback = self
+                .fallback_meshes
+                .lock()
+                .map_err(|_| "Local mesh cache became unavailable.".to_string())?;
+            if Some(root) != self.mesh_root() {
+                fallback.insert(id.clone());
+            } else {
+                fallback.remove(&id);
+            }
+            Ok(
+                serde_json::json!({ "id": id, "vertices": geometry.vertices.len(), "indices": geometry.indices.len(), "stride": stride, "color": constant_color.then_some(first_color) }),
+            )
+        })();
+        if result.is_err() {
+            let _ = fs::remove_file(&temporary);
+        }
+        result
+    }
+
+    pub fn meshes_available(&self, html: &str) -> bool {
+        let Some((_, json)) = html.split_once("const burrManifest = ") else {
+            return false;
+        };
+        let Some((json, _)) = json.split_once(";\n") else {
+            return false;
+        };
+        let Ok(manifest) = serde_json::from_str::<serde_json::Value>(json) else {
+            return false;
+        };
+        let Some(definitions) = manifest["definitions"].as_array() else {
+            return false;
+        };
+        definitions.iter().all(|definition| {
+            let Some(path) = definition["id"].as_str().and_then(|id| self.mesh_path(id)) else {
+                return false;
+            };
+            let Some(vertices) = definition["vertices"].as_u64() else {
+                return false;
+            };
+            let Some(indices) = definition["indices"].as_u64() else {
+                return false;
+            };
+            let Some(stride @ (24 | 40)) = definition["stride"].as_u64() else {
+                return false;
+            };
+            let expected = vertices
+                .checked_mul(stride)
+                .and_then(|v| indices.checked_mul(4).and_then(|i| v.checked_add(i)));
+            let Ok(file) = fs::OpenOptions::new().write(true).open(path) else {
+                return false;
+            };
+            let valid = file
+                .metadata()
+                .ok()
+                .is_some_and(|m| m.is_file() && Some(m.len()) == expected);
+            if valid {
+                // Cache hits renew the grace period too, before the browser fetches.
+                let _ = file.set_times(fs::FileTimes::new().set_modified(SystemTime::now()));
+            }
+            valid
+        })
     }
 
     pub fn load(&self, key: &str) -> Result<Option<String>, String> {
         let Some(path) = self.entry_path(key) else {
             return Ok(None);
         };
-        let bytes = match fs::read(&path) {
-            Ok(bytes) => bytes,
+        let mut file = match fs::File::open(&path) {
+            Ok(file) => file,
             Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(None),
             Err(error) => {
                 return Err(format!(
                     "Failed to read viewer cache {}: {error}",
                     path.display()
-                ));
+                ))
             }
         };
-        if bytes.len() > MAX_CACHE_ENTRY_BYTES || !bytes.starts_with(CACHE_MAGIC) {
+        let size = file.metadata().map_err(|error| error.to_string())?.len();
+        if size > MAX_CACHE_ENTRY_BYTES as u64 {
             return Ok(None);
         }
-        let length_start = CACHE_MAGIC.len();
-        let length_end = length_start + 8;
-        let Some(length_bytes) = bytes.get(length_start..length_end) else {
+        let mut magic = vec![0_u8; CACHE_MAGIC.len()];
+        if file.read_exact(&mut magic).is_err() || magic != CACHE_MAGIC {
             return Ok(None);
-        };
+        }
         let mut encoded_length = [0_u8; 8];
-        encoded_length.copy_from_slice(length_bytes);
-        let Ok(key_length) = usize::try_from(u64::from_le_bytes(encoded_length)) else {
-            return Ok(None);
-        };
-        let key_end = length_end.saturating_add(key_length);
-        let Some(stored_key) = bytes.get(length_end..key_end) else {
-            return Ok(None);
-        };
-        if stored_key != key.as_bytes() {
+        if file.read_exact(&mut encoded_length).is_err() {
             return Ok(None);
         }
-        let Some(html) = bytes.get(key_end..) else {
+        if u64::from_le_bytes(encoded_length) != key.len() as u64 {
             return Ok(None);
-        };
-        String::from_utf8(html.to_vec())
-            .map(Some)
-            .map_err(|error| format!("Viewer cache contained invalid UTF-8: {error}"))
+        }
+        let mut stored_key = vec![0_u8; key.len()];
+        if file.read_exact(&mut stored_key).is_err() || stored_key != key.as_bytes() {
+            return Ok(None);
+        }
+        let mut html = String::new();
+        file.take(MAX_VIEWER_HTML_BYTES as u64 + 1)
+            .read_to_string(&mut html)
+            .map_err(|error| format!("Viewer cache contained invalid HTML: {error}"))?;
+        if html.len() > MAX_VIEWER_HTML_BYTES {
+            return Ok(None);
+        }
+        Ok(Some(html))
     }
 
     pub fn store(&self, key: &str, html: &str) -> Result<bool, String> {
@@ -91,23 +302,38 @@ impl ViewerCache {
         })?;
         secure_directory(root)?;
 
-        let mut bytes = Vec::with_capacity(total_bytes);
-        bytes.extend_from_slice(CACHE_MAGIC);
-        bytes.extend_from_slice(&(key.len() as u64).to_le_bytes());
-        bytes.extend_from_slice(key.as_bytes());
-        bytes.extend_from_slice(html.as_bytes());
-
         let nonce = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap_or_default()
             .as_nanos();
         let temporary = root.join(format!(".{}.{}.tmp", std::process::id(), nonce));
-        fs::write(&temporary, bytes).map_err(|error| {
-            format!(
-                "Failed to write viewer cache {}: {error}",
-                temporary.display()
-            )
-        })?;
+        let written = (|| -> Result<(), String> {
+            let file = fs::OpenOptions::new()
+                .create_new(true)
+                .write(true)
+                .open(&temporary)
+                .map_err(|error| {
+                    format!(
+                        "Failed to create viewer cache {}: {error}",
+                        temporary.display()
+                    )
+                })?;
+            secure_file(&temporary)?;
+            let mut writer = BufWriter::new(file);
+            for bytes in [
+                CACHE_MAGIC,
+                &(key.len() as u64).to_le_bytes(),
+                key.as_bytes(),
+                html.as_bytes(),
+            ] {
+                writer.write_all(bytes).map_err(|error| error.to_string())?;
+            }
+            writer.flush().map_err(|error| error.to_string())
+        })();
+        if let Err(error) = written {
+            let _ = fs::remove_file(&temporary);
+            return Err(error);
+        }
         if let Err(error) = secure_file(&temporary) {
             let _ = fs::remove_file(&temporary);
             return Err(error);
@@ -120,6 +346,7 @@ impl ViewerCache {
             ));
         }
         prune_cache(root);
+
         Ok(true)
     }
 
@@ -187,6 +414,43 @@ fn cache_root_from_environment() -> Option<PathBuf> {
                 .join(".cache/burr")
                 .join(CACHE_DIRECTORY_VERSION)
         })
+    }
+}
+
+fn prune_meshes(root: &Path, max_bytes: u64, grace: Duration) {
+    let Ok(entries) = fs::read_dir(root) else {
+        return;
+    };
+    let mut entries = entries
+        .filter_map(Result::ok)
+        .filter_map(|entry| {
+            let name = entry.file_name();
+            let name = name.to_str()?;
+            if name.len() != 64 || !name.bytes().all(|b| b.is_ascii_hexdigit()) {
+                return None;
+            }
+            let metadata = entry.metadata().ok()?;
+            if !metadata.is_file() {
+                return None;
+            }
+            Some((metadata.modified().ok()?, entry.path(), metadata.len()))
+        })
+        .collect::<Vec<_>>();
+    let mut total = entries
+        .iter()
+        .map(|(_, _, size)| *size)
+        .fold(0_u64, u64::saturating_add);
+    entries.sort_by_key(|(modified, _, _)| *modified);
+    for (modified, path, size) in entries {
+        if total <= max_bytes {
+            break;
+        }
+        if modified.elapsed().unwrap_or_default() < grace {
+            continue;
+        }
+        if fs::remove_file(path).is_ok() {
+            total = total.saturating_sub(size);
+        }
     }
 }
 
@@ -264,6 +528,35 @@ mod tests {
     use tempfile::tempdir;
 
     #[test]
+    fn fallback_directory_is_unique_shared_and_removed_after_last_clone() {
+        let cache = ViewerCache::new(None);
+        let other = ViewerCache::new(None);
+        let root = cache.session_mesh_root().unwrap();
+        assert_ne!(root, other.session_mesh_root().unwrap());
+        fs::create_dir_all(&root).unwrap();
+        let payload = root.join("a".repeat(64));
+        fs::write(&payload, "mesh").unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            assert_eq!(
+                fs::metadata(root.parent().unwrap())
+                    .unwrap()
+                    .permissions()
+                    .mode()
+                    & 0o777,
+                0o700
+            );
+        }
+        let clone = cache.clone();
+        assert_eq!(clone.mesh_path(&"a".repeat(64)), Some(payload.clone()));
+        drop(cache);
+        assert!(payload.exists());
+        drop(clone);
+        assert!(!root.parent().unwrap().exists());
+    }
+
+    #[test]
     fn cache_round_trip_requires_the_exact_key() {
         let temp = tempdir().unwrap();
         let cache = ViewerCache::at(temp.path().to_path_buf());
@@ -319,6 +612,18 @@ mod tests {
         fs::write(path, "not a Burr viewer").unwrap();
 
         assert_eq!(cache.load("model-a").unwrap(), None);
+    }
+
+    #[test]
+    fn mesh_pruning_protects_downloads_and_reclaims_expired_payloads() {
+        let temp = tempdir().unwrap();
+        for digit in ['a', 'b', 'c'] {
+            fs::write(temp.path().join(digit.to_string().repeat(64)), "1234").unwrap();
+        }
+        prune_meshes(temp.path(), 8, MESH_DOWNLOAD_GRACE);
+        assert_eq!(fs::read_dir(temp.path()).unwrap().count(), 3);
+        prune_meshes(temp.path(), 8, Duration::ZERO);
+        assert_eq!(fs::read_dir(temp.path()).unwrap().count(), 2);
     }
 
     #[test]

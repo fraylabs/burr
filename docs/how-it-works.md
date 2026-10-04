@@ -62,13 +62,23 @@ prepared: reading the source, tessellating geometry with Look, preparing
 materials or rigid motion, and encoding the browser viewer. The local server
 uses separate workers so those updates remain available during tessellation.
 
-Burr stores the final self-contained viewer HTML rather than serializing Look's
-internal CAD scene. A BLAKE3 fingerprint of the source model, its canonical
-path, Burr version, theme, focus, and motion configuration determine reuse.
-Editing a source or upgrading Burr therefore generates a new entry.
+Burr stores a small viewer page and content-addressed binary definition meshes,
+rather than serializing Look's internal CAD scene or expanding occurrence
+geometry into HTML. Each mesh contains float32 positions and normals, uint32
+indices, and float32 colors when they vary across vertices. The browser uploads
+each definition once and draws its occurrences as instances. The local server
+streams mesh files and shares cached HTML without copying the whole page.
+A BLAKE3 fingerprint of the source model, its canonical path, Burr version,
+viewer implementation, dependencies, theme, focus, and motion configuration
+determine reuse. Editing a source or upgrading Burr generates a new entry.
+The compiled scene cache keeps only the active model; an in-flight check can
+retain its scene until it finishes.
 The process keeps up to 32 viewers and 256 MiB in memory. The platform cache
 retains up to 128 entries and 512 MiB, and ignores viewer HTML larger than
-64 MiB.
+64 MiB. Binary meshes live in `meshes-v2` under the same cache directory.
+Their disk budget is a soft 2 GiB: least recently used meshes are removed, while
+meshes accessed within ten minutes remain available for ongoing downloads.
+Cached pages with missing or truncated meshes regenerate before serving.
 
 Default cache locations are:
 
@@ -76,10 +86,12 @@ Default cache locations are:
 - Linux: `$XDG_CACHE_HOME/burr/viewer-v1`, or `~/.cache/burr/viewer-v1`;
 - Windows: `%LOCALAPPDATA%\\burr\\viewer-v1`.
 
-Cached HTML includes browser-ready model geometry and remains local. Burr uses
+Cached pages and binary meshes remain local and work without internet access.
+Burr uses
 owner-only `0700` directories and `0600` files on Unix systems. Set
 `BURR_CACHE_DIR` to an alternate base directory for diagnostics, or set it to
-an empty value to disable persistent reuse.
+an empty value to disable persistent reuse. Disabled or unwritable persistent
+storage uses temporary mesh files for the running process.
 
 ## Geometry-native assembly interference
 
