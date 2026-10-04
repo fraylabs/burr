@@ -95,6 +95,9 @@ actual pivots, axes and travel as joints. Burr cannot infer a trustworthy hinge
 from two snapshots, so old configurations fail with an explicit schema-version
 message instead of guessing.
 
+The [fold-flat hanger example](../examples/fold-flat-hanger/README.md) includes
+a v2 configuration, named hinge joints, and STEP models to try with `burr .`.
+
 While Burr is running, `GET /api/project` returns the project name,
 configuration state, portable model paths, and named motions through
 `burr.project-state.v2`. It does not expose joint internals or machine-specific
