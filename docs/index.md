@@ -10,22 +10,19 @@ skill dependency.
 
 ## Quick start
 
-Install Burr from its public Git repository:
-
-On Apple Silicon:
+Install Burr (macOS Apple Silicon or Intel, Linux x86-64; no Rust needed):
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.35.0 --locked
+curl -fsSL https://raw.githubusercontent.com/fraylabs/burr/main/install.sh | sh
 ```
 
-On x86-64, AVX and FMA CPU support is required by Look's interval-math kernel:
+x86-64 builds need a CPU with AVX and FMA. To build from source instead:
 
 ```bash
-RUSTFLAGS="-Ctarget-feature=+avx,+fma" cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.35.0 --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.35.1 --locked
 ```
 
-These flags are necessary for Git installs; local source builds use the
-repository's `.cargo/config.toml`. Older CPUs without AVX/FMA are unsupported.
+On x86-64, source installs need `RUSTFLAGS="-Ctarget-feature=+avx,+fma"`.
 
 Open a folder containing CAD models:
 
