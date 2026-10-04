@@ -1,0 +1,423 @@
+{
+  "scope": "Only the 18 confirmed Burr findings, not a complete scan of all candidate or unresolved pairs. Unique placement, identity and surface samples validated for every referenced occurrence.",
+  "look_head": "15310227a83c52e1cb9f84f4b3a57675dd6c5818",
+  "true": 9,
+  "false": 9,
+  "unresolved": 0,
+  "pairs": [
+    {
+      "type": "pair",
+      "burr_pair": [
+        3,
+        18
+      ],
+      "occt_pair": [
+        3,
+        18
+      ],
+      "names": [
+        "M3x35 BHCS",
+        "M3 Hexnut"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 0.0,
+      "result": "false",
+      "elapsed_s": 0.20547166606411338
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        4,
+        15
+      ],
+      "occt_pair": [
+        4,
+        15
+      ],
+      "names": [
+        "M3x35 BHCS",
+        "M3 Hexnut"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 0.0,
+      "result": "false",
+      "elapsed_s": 0.2204350830288604
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        5,
+        14
+      ],
+      "occt_pair": [
+        5,
+        14
+      ],
+      "names": [
+        "M3x16 BHCS",
+        "M3 Heatset Insert"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 0.996338883045693,
+      "result": "true",
+      "elapsed_s": 0.31663941591978073
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        6,
+        16
+      ],
+      "occt_pair": [
+        6,
+        16
+      ],
+      "names": [
+        "M3x8 FHCS",
+        "MB T-Nut"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 1.822123739082091,
+      "result": "true",
+      "elapsed_s": 0.016655083978548646
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        6,
+        28
+      ],
+      "occt_pair": [
+        6,
+        29
+      ],
+      "names": [
+        "M3x8 FHCS",
+        "X_Carriage"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 0.0,
+      "result": "false",
+      "elapsed_s": 0.11257312493398786
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        7,
+        29
+      ],
+      "occt_pair": [
+        7,
+        28
+      ],
+      "names": [
+        "M2x6 SHCS",
+        "MGN7-H (1)"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 0.0,
+      "result": "false",
+      "elapsed_s": 0.05653733294457197
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        8,
+        17
+      ],
+      "occt_pair": [
+        8,
+        17
+      ],
+      "names": [
+        "M3x8 FHCS",
+        "MB T-Nut"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 1.8221237390820928,
+      "result": "true",
+      "elapsed_s": 0.016012958018109202
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        8,
+        28
+      ],
+      "occt_pair": [
+        8,
+        29
+      ],
+      "names": [
+        "M3x8 FHCS",
+        "X_Carriage"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 0.0,
+      "result": "false",
+      "elapsed_s": 0.11261304200161248
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        9,
+        29
+      ],
+      "occt_pair": [
+        9,
+        28
+      ],
+      "names": [
+        "M2x6 SHCS",
+        "MGN7-H (1)"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 0.0,
+      "result": "false",
+      "elapsed_s": 0.055594666046090424
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        10,
+        29
+      ],
+      "occt_pair": [
+        10,
+        28
+      ],
+      "names": [
+        "M2x6 SHCS",
+        "MGN7-H (1)"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 0.0,
+      "result": "false",
+      "elapsed_s": 0.0631585419178009
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        11,
+        29
+      ],
+      "occt_pair": [
+        11,
+        28
+      ],
+      "names": [
+        "M2x6 SHCS",
+        "MGN7-H (1)"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 0.0,
+      "result": "false",
+      "elapsed_s": 0.30341879196930677
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        12,
+        28
+      ],
+      "occt_pair": [
+        12,
+        29
+      ],
+      "names": [
+        "M3 Heatset Insert",
+        "X_Carriage"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 2.461848230733975,
+      "result": "true",
+      "elapsed_s": 1.6769411669811234
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        13,
+        28
+      ],
+      "occt_pair": [
+        13,
+        29
+      ],
+      "names": [
+        "M3 Heatset Insert",
+        "X_Carriage"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 2.4618482307343816,
+      "result": "true",
+      "elapsed_s": 1.6032749159494415
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        22,
+        24
+      ],
+      "occt_pair": [
+        22,
+        24
+      ],
+      "names": [
+        "PC4-M6_Collet",
+        "Plunger"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 114.27805019400458,
+      "result": "true",
+      "elapsed_s": 1.3764569170307368
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        22,
+        25
+      ],
+      "occt_pair": [
+        22,
+        25
+      ],
+      "names": [
+        "PC4-M6_Collet",
+        "Collet Body"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 45.021117121058126,
+      "result": "true",
+      "elapsed_s": 0.7995157910045236
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        22,
+        26
+      ],
+      "occt_pair": [
+        22,
+        26
+      ],
+      "names": [
+        "PC4-M6_Collet",
+        "Seal Retainer"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 0.0,
+      "result": "false",
+      "elapsed_s": 4.006869958015159
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        22,
+        27
+      ],
+      "occt_pair": [
+        22,
+        27
+      ],
+      "names": [
+        "PC4-M6_Collet",
+        "Grab Ring"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 1.2793215213871802,
+      "result": "true",
+      "elapsed_s": 171.01295279199257
+    },
+    {
+      "type": "pair",
+      "burr_pair": [
+        25,
+        26
+      ],
+      "occt_pair": [
+        25,
+        26
+      ],
+      "names": [
+        "Collet Body",
+        "Seal Retainer"
+      ],
+      "valid": [
+        true,
+        true
+      ],
+      "common_valid": true,
+      "volume_mm3": 0.07039131042889635,
+      "result": "true",
+      "elapsed_s": 0.40475362492725253
+    }
+  ]
+}
