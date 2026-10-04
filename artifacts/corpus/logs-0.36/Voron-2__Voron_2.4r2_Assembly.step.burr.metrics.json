@@ -1,0 +1,32 @@
+{
+  "sha256": "06b372e40217caa1a7d1f516cb74887247f809e41e1e389f740f290e98441b55",
+  "elapsed_s": 34.015807042014785,
+  "peak_rss_mib": 2717.953125,
+  "peak_rss_method": "wait4_ru_maxrss",
+  "sampled_peak_rss_mib": 2689.78125,
+  "returncode": 0,
+  "timeout": false,
+  "cap": null,
+  "timeout_limit_s": 600,
+  "load_metadata": {
+    "geometries": 1314,
+    "load_s": 33.810412958,
+    "parts": 1428,
+    "stages_ms": {
+      "compile": 451.11125000000004,
+      "hash": 134.79595799999998,
+      "parse": 33195.139917,
+      "read": 29.327084,
+      "step_parse": 740.1034159999999,
+      "step_table": 1345.4295410000002,
+      "step_tessellate": 27101.518417000003
+    },
+    "step_import": {
+      "declared_faces": 100800,
+      "lost_faces": 34
+    },
+    "structure_errors": [],
+    "triangles": 8200624
+  },
+  "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "file": "01-assembly-pds-dollar.step",
+    "bytes": 28686,
+    "sha256": "7fe5d2ff727508f476f544f7d94b5a82b587f13720ba4af1d3b76490e85b75fc",
+    "source": "models/Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "licence": "GPL-3.0",
+    "source_url": "https://raw.githubusercontent.com/VoronDesign/Voron-0/Voron0.2r1/CAD/Electronics%20Mounts/Fly_Gemini_V2_Din_Mount_2pc.step",
+    "licence_url": "https://github.com/VoronDesign/Voron-0/blob/Voron0.2r1/LICENSE"
+  },
+  {
+    "file": "02-edge-conversion-face-1073.step",
+    "bytes": 42778,
+    "sha256": "f8c18ba9b297a7a617088b8c867a62ed00094081c265ce033e394b8ff4820874",
+    "source": "models/apollo-3d-enclosure__flat__assembly.step",
+    "licence": "CC-BY-NC-SA-4.0",
+    "source_url": "https://raw.githubusercontent.com/ThomasHFWright/apollo-3d-enclosure/main/output/flat/assembly.step",
+    "licence_url": "https://github.com/ThomasHFWright/apollo-3d-enclosure/blob/main/LICENSE.md"
+  },
+  {
+    "file": "01-assembly-pds-empty-strings.step",
+    "bytes": 28704,
+    "sha256": "1523f429147619b920b3fd425aaa69cea0f429caf91e33c56270c34bc29abd1e",
+    "source": "models/Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "licence": "GPL-3.0",
+    "source_url": "https://raw.githubusercontent.com/VoronDesign/Voron-0/Voron0.2r1/CAD/Electronics%20Mounts/Fly_Gemini_V2_Din_Mount_2pc.step",
+    "licence_url": "https://github.com/VoronDesign/Voron-0/blob/Voron0.2r1/LICENSE"
+  },
+  {
+    "file": "02-edge-conversion-minimal-face.step",
+    "bytes": 2043,
+    "sha256": "8d0984f66a035895aaada2ab4669a1e2dda44ee8b1a5ee849948540da66f1a96",
+    "source": "models/apollo-3d-enclosure__flat__assembly.step",
+    "licence": "CC-BY-NC-SA-4.0",
+    "source_url": "https://raw.githubusercontent.com/ThomasHFWright/apollo-3d-enclosure/main/output/flat/assembly.step",
+    "licence_url": "https://github.com/ThomasHFWright/apollo-3d-enclosure/blob/main/LICENSE.md"
+  },
+  {
+    "file": "04-mesh-contact-pair.step",
+    "bytes": 562379,
+    "sha256": "21733029a76cb2285f19fb2d10371fe0c6af00d823a92a9ed21eedfddbcf5630",
+    "source": "models/openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "licence": "CERN-OHL-P-2.0",
+    "source_url": "https://raw.githubusercontent.com/openAMRobot/openamr-platform-hw/main/mechanical/cad/production_files/MMP.01.00.00.000%20Cover%20assembly.STEP",
+    "licence_url": "https://github.com/openAMRobot/openamr-platform-hw/blob/main/LICENSE"
+  },
+  {
+    "file": "03-negative-torus-face.step",
+    "bytes": 3822,
+    "sha256": "a44f2a126fb15c7623fb680d0282a902d51cf8da13069e5255b8a71c2cd7c0f3",
+    "source": "models/openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+    "licence": "CERN-OHL-P-2.0",
+    "source_url": "https://raw.githubusercontent.com/openAMRobot/openamr-platform-hw/main/mechanical/cad/production_files/MMP.02.00.00.000%20Base%20assembly.STEP",
+    "licence_url": "https://github.com/openAMRobot/openamr-platform-hw/blob/main/LICENSE"
+  }
+]

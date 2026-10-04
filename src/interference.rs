@@ -102,6 +102,51 @@ impl CheckReport {
 }
 
 pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScene) -> CheckReport {
+    // Import completeness is known before any mesh preparation or pair work.
+    // Keep both diagnoses when structure and face geometry were lost together.
+    let mut import_reasons = scene
+        .assembly_structure_errors
+        .iter()
+        .map(|message| IncompleteReason {
+            code: "assembly_structure_lost",
+            message: message.clone(),
+        })
+        .collect::<Vec<_>>();
+    if let Some(stats) = scene
+        .statistics
+        .step_import
+        .filter(|stats| stats.lost_faces > 0)
+    {
+        import_reasons.push(IncompleteReason {
+            code: "step_faces_lost",
+            message: format!(
+                "{} of {} STEP faces were lost during import",
+                stats.lost_faces, stats.declared_faces
+            ),
+        });
+    }
+    if !import_reasons.is_empty() {
+        return CheckReport {
+            schema_version: REPORT_SCHEMA_VERSION,
+            model_path: model_path.to_string(),
+            model_version: model_version.to_string(),
+            check_id: CHECK_ID,
+            outcome: CheckOutcome::Incomplete,
+            summary: format!(
+                "Interference check incomplete: {}",
+                import_reasons
+                    .iter()
+                    .map(|reason| reason.message.as_str())
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            ),
+            component_count: scene.instances.len(),
+            checked_pair_count: 0,
+            candidate_pair_count: 0,
+            findings: Vec::new(),
+            incomplete_reasons: import_reasons,
+        };
+    }
     // A flattened / single-part import must never enter mesh preparation.
     if scene.instances.len() < 2 {
         return incomplete(
@@ -502,6 +547,90 @@ mod tests {
         let mut timings = Timings::default();
         let scene = compile_scene(&path, UpAxis::Z, &mut timings).unwrap();
         analyze_scene(name, "fixture", &scene)
+    }
+
+    #[test]
+    fn structure_and_face_losses_are_reported_before_mesh_preparation() {
+        let mut scene = compile_scene(
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        scene
+            .assembly_structure_errors
+            .push("Unresolved occurrence #42".into());
+        scene.statistics.step_import = Some(look::step::StepImportStats {
+            declared_faces: 13,
+            lost_faces: 1,
+        });
+        // Mesh preparation would reject this geometry reference. The import
+        // preflight must return both source diagnoses without reaching it.
+        scene.instances[0].geometry = usize::MAX;
+        let report = analyze_scene("broken.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert_eq!(report.component_count, 2);
+        assert_eq!(report.checked_pair_count, 0);
+        assert_eq!(report.candidate_pair_count, 0);
+        assert!(report.findings.is_empty());
+        assert_eq!(report.incomplete_reasons.len(), 2);
+        assert_eq!(report.incomplete_reasons[0].code, "assembly_structure_lost");
+        assert_eq!(report.incomplete_reasons[1].code, "step_faces_lost");
+        assert!(report.summary.contains("1 of 13 STEP faces"));
+    }
+
+    #[test]
+    fn lost_assembly_structure_is_incomplete_before_mesh_preparation() {
+        let mut scene = compile_scene(
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        scene
+            .assembly_structure_errors
+            .push("Unresolved product occurrence #42".into());
+        scene.instances[0].geometry = usize::MAX;
+        let report = analyze_scene("broken.step", "v1", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert_eq!(report.checked_pair_count, 0);
+        assert_eq!(report.incomplete_reasons[0].code, "assembly_structure_lost");
+        assert!(report.incomplete_reasons[0].message.contains("#42"));
+    }
+
+    #[test]
+    fn unresolved_source_occurrence_reports_import_reason() {
+        let source = std::fs::read_to_string(fixture("separated.step")).unwrap();
+        let source = source.replace(
+            "#376 = NEXT_ASSEMBLY_USAGE_OCCURRENCE('1','fixed','',#5,#31,$);",
+            "#376 = NEXT_ASSEMBLY_USAGE_OCCURRENCE('1','fixed','',#5,#99999,$);",
+        );
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("broken.step");
+        std::fs::write(&path, source).unwrap();
+        let scene = compile_scene(&path, UpAxis::Z, &mut Timings::default()).unwrap();
+        let report = analyze_scene("broken.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert_eq!(report.incomplete_reasons[0].code, "assembly_structure_lost");
+        assert!(report.incomplete_reasons[0].message.contains("assembly"));
+    }
+
+    #[test]
+    fn lost_step_faces_make_a_closed_separated_assembly_incomplete() {
+        let path = fixture("separated.step");
+        let mut timings = Timings::default();
+        let mut scene = compile_scene(&path, UpAxis::Z, &mut timings).unwrap();
+        scene.statistics.step_import = Some(look::step::StepImportStats {
+            declared_faces: 13,
+            lost_faces: 1,
+        });
+        scene.instances[0].geometry = usize::MAX;
+        let report = analyze_scene("separated.step", "fixture", &scene);
+        assert_eq!(report.checked_pair_count, 0);
+        assert_eq!(report.candidate_pair_count, 0);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert_eq!(report.incomplete_reasons[0].code, "step_faces_lost");
+        assert!(report.summary.contains("1 of 13 STEP faces"));
     }
 
     #[test]

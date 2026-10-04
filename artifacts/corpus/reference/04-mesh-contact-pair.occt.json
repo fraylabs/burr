@@ -1,0 +1,1 @@
+{"solids": 2, "parts": 2, "leaf_components": 2, "flat_multibody": false, "names": ["contact_pair/component_0", "contact_pair/component_30"], "faces": 128, "invalid_solids": 0, "import_s": 4.250667624990456, "elapsed_s": 4.403544749948196, "candidates": 1, "findings": [], "errors": [], "outcome": "pass"}

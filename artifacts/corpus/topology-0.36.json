@@ -1,0 +1,167 @@
+[
+  {
+    "boundary_edges": 0,
+    "boundary_vertices": 0,
+    "closed": true,
+    "epsilon": 2.4235607270384207e-05,
+    "geometry": 0,
+    "names": [
+      "(Unsaved)"
+    ],
+    "nonmanifold_edges": 0,
+    "prepared_triangles": 14296,
+    "source_triangles": 14296,
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "minimum_boundary_vertex_gap": null,
+    "median_boundary_vertex_gap": null
+  },
+  {
+    "boundary_edges": 8,
+    "boundary_vertices": 16,
+    "closed": false,
+    "epsilon": 3.8361547922249883e-05,
+    "geometry": 1,
+    "names": [
+      "PCB DIN Clip"
+    ],
+    "nonmanifold_edges": 30,
+    "prepared_triangles": 29006,
+    "source_triangles": 29006,
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "minimum_boundary_vertex_gap": 0.26871419084846776,
+    "median_boundary_vertex_gap": 1.4610289215207353
+  },
+  {
+    "boundary_edges": 79,
+    "boundary_vertices": 67,
+    "closed": false,
+    "epsilon": 3.921985626220703e-05,
+    "geometry": 2,
+    "names": [
+      "M2x10 self tapping screw for plastic:13",
+      "M2x10 self tapping screw for plastic:13"
+    ],
+    "nonmanifold_edges": 9,
+    "prepared_triangles": 5010,
+    "source_triangles": 5012,
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "minimum_boundary_vertex_gap": 7.780486318348365e-05,
+    "median_boundary_vertex_gap": 0.017433886022765337
+  },
+  {
+    "boundary_edges": 77,
+    "boundary_vertices": 65,
+    "closed": false,
+    "epsilon": 3.921985626220703e-05,
+    "geometry": 3,
+    "names": [
+      "M2x10 self tapping screw for plastic:11",
+      "M2x10 self tapping screw for plastic:11"
+    ],
+    "nonmanifold_edges": 9,
+    "prepared_triangles": 5052,
+    "source_triangles": 5053,
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "minimum_boundary_vertex_gap": 7.780486318348365e-05,
+    "median_boundary_vertex_gap": 0.014975269848031556
+  },
+  {
+    "boundary_edges": 10,
+    "boundary_vertices": 9,
+    "closed": false,
+    "epsilon": 2.5689600988698658e-06,
+    "geometry": 4,
+    "names": [
+      "M3x8 BHCS",
+      "M3x8 BHCS",
+      "M3x8 BHCS",
+      "M3x8 BHCS"
+    ],
+    "nonmanifold_edges": 23,
+    "prepared_triangles": 1447,
+    "source_triangles": 1447,
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "minimum_boundary_vertex_gap": 0.25190797448158264,
+    "median_boundary_vertex_gap": 0.3030458589688172
+  },
+  {
+    "boundary_edges": 0,
+    "boundary_vertices": 0,
+    "closed": false,
+    "epsilon": 2.1255375031614676e-05,
+    "geometry": 5,
+    "names": [
+      "Fly_Gemini_V2_Bracket"
+    ],
+    "nonmanifold_edges": 2,
+    "prepared_triangles": 14362,
+    "source_triangles": 14362,
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "minimum_boundary_vertex_gap": null,
+    "median_boundary_vertex_gap": null
+  },
+  {
+    "boundary_edges": 128,
+    "boundary_vertices": 96,
+    "closed": false,
+    "epsilon": 2.046752160822507e-05,
+    "geometry": 0,
+    "names": [
+      "Solid #15"
+    ],
+    "nonmanifold_edges": 100,
+    "prepared_triangles": 39750,
+    "source_triangles": 39750,
+    "model": "apollo-3d-enclosure__corner__assembly.step",
+    "minimum_boundary_vertex_gap": 0.05640321610498934,
+    "median_boundary_vertex_gap": 0.1341419219970703
+  },
+  {
+    "boundary_edges": 0,
+    "boundary_vertices": 0,
+    "closed": true,
+    "epsilon": 2.4053946617641486e-05,
+    "geometry": 1,
+    "names": [
+      "Solid #16203"
+    ],
+    "nonmanifold_edges": 0,
+    "prepared_triangles": 27096,
+    "source_triangles": 27096,
+    "model": "apollo-3d-enclosure__corner__assembly.step",
+    "minimum_boundary_vertex_gap": null,
+    "median_boundary_vertex_gap": null
+  },
+  {
+    "boundary_edges": 120,
+    "boundary_vertices": 121,
+    "closed": false,
+    "epsilon": 1.4305773973087614e-05,
+    "geometry": 0,
+    "names": [
+      "Solid #15"
+    ],
+    "nonmanifold_edges": 100,
+    "prepared_triangles": 38248,
+    "source_triangles": 38261,
+    "model": "apollo-3d-enclosure__flat__assembly.step",
+    "minimum_boundary_vertex_gap": 0.04059519145913031,
+    "median_boundary_vertex_gap": 0.4167903932300744
+  },
+  {
+    "boundary_edges": 0,
+    "boundary_vertices": 0,
+    "closed": true,
+    "epsilon": 1.3085879800200928e-05,
+    "geometry": 1,
+    "names": [
+      "Solid #16147"
+    ],
+    "nonmanifold_edges": 0,
+    "prepared_triangles": 27228,
+    "source_triangles": 27228,
+    "model": "apollo-3d-enclosure__flat__assembly.step",
+    "minimum_boundary_vertex_gap": null,
+    "median_boundary_vertex_gap": null
+  }
+]

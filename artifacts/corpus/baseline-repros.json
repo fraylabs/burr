@@ -1,0 +1,141 @@
+{
+  "01-assembly-pds-dollar.step": {
+    "check_s": 0.169198875,
+    "geometries": 1,
+    "load_s": 0.074464583,
+    "parts": 1,
+    "report": {
+      "check_id": "assembly-interference",
+      "checked_pair_count": 0,
+      "component_count": 1,
+      "findings": [],
+      "incomplete_reasons": [
+        {
+          "code": "assembly_required",
+          "message": "The selected STEP file does not expose at least two component occurrences."
+        }
+      ],
+      "model_path": "artifacts/corpus/repros/01-assembly-pds-dollar.step",
+      "model_version": "c487df76970a51adb679790ea16b6c7d4409fc9ece7b62590d55f67ee4823b49",
+      "outcome": "incomplete",
+      "schema_version": "burr.checks.v1",
+      "summary": "Interference check requires a STEP assembly"
+    },
+    "stages_ms": {
+      "compile": 0.057333,
+      "hash": 2.888208,
+      "parse": 59.925375,
+      "read": 2.716375,
+      "step_parse": 0.594625,
+      "step_table": 0.888417,
+      "step_tessellate": 39.888125
+    },
+    "triangles": 3849
+  },
+  "01-assembly-pds-empty-strings.step": {
+    "check_s": 0.572693875,
+    "geometries": 1,
+    "load_s": 0.014851958,
+    "parts": 2,
+    "report": {
+      "check_id": "assembly-interference",
+      "checked_pair_count": 1,
+      "component_count": 2,
+      "findings": [],
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components are not closed: M3x8 BHCS, M3x8 BHCS."
+        }
+      ],
+      "model_path": "artifacts/corpus/repros/01-assembly-pds-empty-strings.step",
+      "model_version": "21f5cedc71cefa5358dc3821a99dd2d6ba20a1f0ed5a9c26329ff91402ec2d15",
+      "outcome": "incomplete",
+      "schema_version": "burr.checks.v1",
+      "summary": "Interference check not completed"
+    },
+    "stages_ms": {
+      "compile": 0.1655,
+      "hash": 0.027791,
+      "parse": 14.59275,
+      "read": 0.051875,
+      "step_parse": 0.15970900000000002,
+      "step_table": 0.287584,
+      "step_tessellate": 13.73675
+    },
+    "triangles": 3849
+  },
+  "02-edge-conversion-face-1073.step": {
+    "error": "failed to load STEP scene 'artifacts/corpus/repros/02-edge-conversion-face-1073.step': STEP tessellation produced no triangles",
+    "load_s": 0.003452542
+  },
+  "02-edge-conversion-minimal-face.step": {
+    "error": "failed to load STEP scene 'artifacts/corpus/repros/02-edge-conversion-minimal-face.step': STEP tessellation produced no triangles",
+    "load_s": 0.018346916
+  },
+  "03-negative-torus-face.step": {},
+  "04-mesh-contact-pair.step": {
+    "check_s": 0.370728792,
+    "geometries": 2,
+    "load_s": 0.065674792,
+    "parts": 2,
+    "report": {
+      "check_id": "assembly-interference",
+      "checked_pair_count": 1,
+      "component_count": 2,
+      "findings": [
+        {
+          "code": "component_interference",
+          "components": [
+            {
+              "id": "occurrence:0",
+              "name": "component_0",
+              "occurrence_index": 0
+            },
+            {
+              "id": "occurrence:1",
+              "name": "component_30",
+              "occurrence_index": 1
+            }
+          ],
+          "id": "assembly-interference:0:1",
+          "message": "component_0 overlaps component_30.",
+          "witness": {
+            "end": [
+              314.54998779296875,
+              22.69758215296824,
+              -245.58923306746567
+            ],
+            "kind": "surface_crossing",
+            "start": [
+              314.54998779296875,
+              22.395092898713518,
+              -245.54940856918688
+            ]
+          }
+        }
+      ],
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components are not closed: component_0."
+        }
+      ],
+      "model_path": "artifacts/corpus/repros/04-mesh-contact-pair.step",
+      "model_version": "c7561411dc4c0aadcfd9f1ae567a1177c4ae0a58bc4fdcac9741dccb122284ca",
+      "outcome": "fail",
+      "schema_version": "burr.checks.v1",
+      "summary": "1 interfering component pair detected"
+    },
+    "stages_ms": {
+      "compile": 0.233708,
+      "hash": 0.9758749999999999,
+      "parse": 63.907958,
+      "read": 0.5445,
+      "step_parse": 5.4833750000000006,
+      "step_table": 11.736833,
+      "step_tessellate": 33.814583
+    },
+    "triangles": 8650
+  }
+}
