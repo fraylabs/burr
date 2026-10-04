@@ -1,0 +1,26 @@
+{
+  "model": "Voron-2__Voron_2.4r2_Assembly.step",
+  "before_binary_sha256": "3513ac14fdb523afa4898121e79e74ff4d2817b6912ae3cd0f068134efe72ab2",
+  "after_binary_sha256": "1f92a40a314524983e9914eaa0d33f27fcb3f342fc83beba46cf8ae59dd6dabf",
+  "source_sha256": "06b372e40217caa1a7d1f516cb74887247f809e41e1e389f740f290e98441b55",
+  "reports_identical": true,
+  "report": {
+    "schema_version": "burr.checks.v1",
+    "model_path": "Voron-2__Voron_2.4r2_Assembly.step",
+    "model_version": "241522213-1791109969-406121863",
+    "check_id": "assembly-interference",
+    "outcome": "incomplete",
+    "summary": "Interference check incomplete: 4 of 100800 STEP faces were lost during import",
+    "component_count": 1428,
+    "checked_pair_count": 0,
+    "candidate_pair_count": 0,
+    "findings": [],
+    "pair_set_complete": false,
+    "incomplete_reasons": [
+      {
+        "code": "step_faces_lost",
+        "message": "4 of 100800 STEP faces were lost during import"
+      }
+    ]
+  }
+}

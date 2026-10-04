@@ -1,0 +1,34 @@
+[
+  {
+    "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+    "outcome": "incomplete",
+    "confirmed_pairs": 0,
+    "lost_faces": 6,
+    "declared_faces": 60543,
+    "load_s": 13.917599791
+  },
+  {
+    "model": "Voron-2__Voron_2.4r2_Assembly.step",
+    "outcome": "incomplete",
+    "confirmed_pairs": 0,
+    "lost_faces": 4,
+    "declared_faces": 100800,
+    "load_s": 41.885073667
+  },
+  {
+    "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+    "outcome": "incomplete",
+    "confirmed_pairs": 0,
+    "lost_faces": 46,
+    "declared_faces": 35873,
+    "load_s": 7.821453958
+  },
+  {
+    "model": "openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+    "outcome": "incomplete",
+    "confirmed_pairs": 0,
+    "lost_faces": 17,
+    "declared_faces": 7223,
+    "load_s": 1.311691167
+  }
+]
