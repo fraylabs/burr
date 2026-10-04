@@ -36,10 +36,13 @@ path remains available on hover.
 
 On a cold model, Burr reports the actual local stage: reading source,
 tessellating geometry, preparing materials or motion, and building the viewer.
-After generation, Burr reuses the self-contained viewer from a bounded local
-cache, including after the process restarts. Source content, Burr version,
-theme, component focus, and motion configuration are part of the cache key.
-Memory reuse is capped at 256 MiB and persistent reuse at 512 MiB.
+The browser fetches each part definition as a local binary mesh and draws its
+occurrences with their transforms. Burr shares cached pages in memory and
+streams pages and meshes from the local server. Source content, Burr and viewer
+versions, dependencies, theme, component focus, and motion configuration are
+part of the cache key. Page reuse is capped at 256 MiB in memory and 512 MiB on
+disk. Mesh storage has a 2 GiB target with a ten-minute download grace period;
+missing meshes regenerate automatically.
 
 The cache contains browser-ready model geometry but never leaves the machine.
 On Unix systems its directory and files are owner-only. See
@@ -168,6 +171,7 @@ GET /api/tree
 GET /api/load-status?id=<viewer-load-id>
 GET /api/checks?path=<project-relative-model-path>
 GET /viewer?path=<project-relative-model-path>&motion=<motion-id>
+GET /mesh/<content-hash>
 ```
 
 Check reports use schema `burr.checks.v1` and check id
