@@ -34,6 +34,15 @@ def pair(finding):
     return tuple(sorted(c['occurrence_index'] for c in finding['components']))
 
 
+def diagnostic_reason(record):
+    if 'terminal_reason' in record:
+        return record['terminal_reason']
+    if 'conversion_failure_kind' in record:
+        detail = record.get('refusal_tag') or record['conversion_failure_kind']
+        return f"conversion:{record['conversion_stage']}:{detail}"
+    raise ValueError(f'Unrecognized face diagnostic schema: {record}')
+
+
 def facts(result):
     report = result.get('report', {})
     return dict(parts=result.get('parts'), faces=result.get('step_import'),
@@ -163,7 +172,7 @@ def main():
         diagnostics = args.after / (name + '.diagnostics.jsonl')
         if diagnostics.exists() and not row['after_measurement_capped']:
             row['face_refusal_reasons'] = dict(Counter(
-                json.loads(line)['terminal_reason']
+                diagnostic_reason(json.loads(line))
                 for line in diagnostics.read_text().splitlines()))
         if changed or name in protected:
             if any(r['code'] == 'measurement_cap' for r in b['reasons']):
