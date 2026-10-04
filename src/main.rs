@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+mod binary_viewer;
 mod cache;
 mod interference;
 mod load_status;

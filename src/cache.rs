@@ -1,6 +1,6 @@
 use std::{
     env, fs,
-    io::{self, Read},
+    io::{self, BufWriter, Read, Write},
     path::{Path, PathBuf},
     time::{SystemTime, UNIX_EPOCH},
 };
@@ -28,6 +28,121 @@ impl ViewerCache {
     #[cfg(test)]
     pub(crate) fn at(root: PathBuf) -> Self {
         Self { root: Some(root) }
+    }
+
+    fn mesh_root(&self) -> PathBuf {
+        self.root
+            .clone()
+            .unwrap_or_else(|| {
+                std::env::temp_dir().join(format!("burr-session-{}", std::process::id()))
+            })
+            .join("meshes-v1")
+    }
+
+    pub fn mesh_path(&self, id: &str) -> Option<PathBuf> {
+        (id.len() == 64
+            && id
+                .bytes()
+                .all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase()))
+        .then(|| self.mesh_root().join(id))
+    }
+
+    /// Write one definition with bounded working memory; never expand occurrences.
+    pub fn store_mesh(
+        &self,
+        geometry: &look::scene::Geometry,
+    ) -> Result<serde_json::Value, String> {
+        let root = self.mesh_root();
+        fs::create_dir_all(&root).map_err(|e| e.to_string())?;
+        secure_directory(&root)?;
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let temporary = root.join(format!(".{}.{}.tmp", std::process::id(), nonce));
+        let result = (|| {
+            let file = fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&temporary)
+                .map_err(|e| e.to_string())?;
+            secure_file(&temporary)?;
+            let mut writer = BufWriter::new(file);
+            let mut hash = blake3::Hasher::new();
+            // Explicit little endian float32 layout: position, normal, source RGBA.
+            for (index, vertex) in geometry.vertices.iter().enumerate() {
+                let color = geometry
+                    .source_attributes
+                    .as_ref()
+                    .and_then(|a| a.get(index))
+                    .map(|a| a.color)
+                    .unwrap_or([1.0; 4]);
+                let mut record = [0_u8; 40];
+                for (offset, value) in vertex
+                    .position
+                    .into_iter()
+                    .chain(vertex.normal)
+                    .chain(color)
+                    .enumerate()
+                {
+                    record[offset * 4..offset * 4 + 4].copy_from_slice(&value.to_le_bytes());
+                }
+                hash.update(&record);
+                writer.write_all(&record).map_err(|e| e.to_string())?;
+            }
+            for index in &geometry.indices {
+                if *index as usize >= geometry.vertices.len() {
+                    return Err("Mesh contains an out-of-range vertex index.".to_string());
+                }
+                let bytes = index.to_le_bytes();
+                hash.update(&bytes);
+                writer.write_all(&bytes).map_err(|e| e.to_string())?;
+            }
+            writer.flush().map_err(|e| e.to_string())?;
+            let id = hash.finalize().to_hex().to_string();
+            let destination = root.join(&id);
+            // Replace even an existing entry: a truncated cached file must recover.
+            fs::rename(&temporary, destination).map_err(|e| e.to_string())?;
+            Ok(
+                serde_json::json!({ "id": id, "vertices": geometry.vertices.len(), "indices": geometry.indices.len() }),
+            )
+        })();
+        if result.is_err() {
+            let _ = fs::remove_file(&temporary);
+        }
+        result
+    }
+
+    pub fn meshes_available(&self, html: &str) -> bool {
+        let Some((_, json)) = html.split_once("const burrManifest = ") else {
+            return false;
+        };
+        let Some((json, _)) = json.split_once(";\n") else {
+            return false;
+        };
+        let Ok(manifest) = serde_json::from_str::<serde_json::Value>(json) else {
+            return false;
+        };
+        let Some(definitions) = manifest["definitions"].as_array() else {
+            return false;
+        };
+        definitions.iter().all(|definition| {
+            let Some(path) = definition["id"].as_str().and_then(|id| self.mesh_path(id)) else {
+                return false;
+            };
+            let Some(vertices) = definition["vertices"].as_u64() else {
+                return false;
+            };
+            let Some(indices) = definition["indices"].as_u64() else {
+                return false;
+            };
+            let expected = vertices
+                .checked_mul(40)
+                .and_then(|v| indices.checked_mul(4).and_then(|i| v.checked_add(i)));
+            fs::metadata(path)
+                .ok()
+                .is_some_and(|m| m.is_file() && Some(m.len()) == expected)
+        })
     }
 
     pub fn load(&self, key: &str) -> Result<Option<String>, String> {

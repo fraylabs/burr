@@ -247,6 +247,24 @@ try {
   expectIncludes(viewerHtml, "burr:export-snapshot", "snapshot request listener")
   expectIncludes(viewerHtml, "canvas.toBlob", "canvas PNG export")
   expectIncludes(viewerHtml, 'type: "burr:viewer-ready"', "specific load completion message")
+  expectEqual(viewerHtml.length < 100_000, true, "small page without embedded geometry")
+  expectEqual(viewerHtml.includes("const posB64"), false, "no embedded mesh base64")
+  expectIncludes(viewerHtml, "drawElementsInstanced", "definition mesh instancing")
+  const manifest = JSON.parse(viewerHtml.match(/const burrManifest = (.*);/)[1])
+  expectEqual(manifest.definitions.length > 0, true, "definition manifest")
+  for (const definition of manifest.definitions) {
+    const mesh = await fetch(`${baseUrl}/mesh/${definition.id}`)
+    expectEqual(mesh.status, 200, "binary mesh status")
+    expectEqual(mesh.headers.get("content-type"), "application/octet-stream", "binary mesh type")
+    const payload = await mesh.arrayBuffer()
+    expectEqual(payload.byteLength, definition.vertices * 40 + definition.indices * 4, "binary layout size")
+    const indices = new DataView(payload, definition.vertices * 40)
+    for (let offset = 0; offset < indices.byteLength; offset += 4) {
+      expectEqual(indices.getUint32(offset, true) < definition.vertices, true, "binary index bounds")
+    }
+  }
+  expectEqual((await fetch(`${baseUrl}/mesh/not-a-hash`)).status, 400, "invalid mesh id")
+  expectEqual((await fetch(`${baseUrl}/mesh/${"0".repeat(64)}`)).status, 404, "missing mesh id")
   const generatedStatus = await getJson("/api/load-status?id=proof-generated")
   expectEqual(generatedStatus.schema_version, "burr.load-status.v1", "load status schema")
   expectEqual(generatedStatus.state, "ready", "generated viewer ready state")

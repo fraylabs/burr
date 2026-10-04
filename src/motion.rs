@@ -1,5 +1,5 @@
 use crate::project::MotionJoint;
-use glam::{Mat3, Mat4, Vec3};
+use glam::{Mat4, Vec3};
 use look::{
     config::UpAxis,
     scene::{Bounds, CompiledScene, Geometry},
@@ -11,8 +11,8 @@ const MOTION_FRAMES_PER_SECOND: usize = 60;
 
 #[derive(Debug)]
 pub struct PreparedMotion {
-    pub scene: CompiledScene,
-    pub instance_ids_base64: String,
+    pub bounds: Bounds,
+    pub fit_radius: f32,
     pub frames_base64: String,
     pub frame_count: usize,
     pub instance_count: usize,
@@ -43,36 +43,9 @@ pub fn prepare_motion(
         joints,
         source_up_axis,
     )?;
-    let mut geometries = Vec::with_capacity(source.instances.len());
-    let mut instance_ids = Vec::new();
-
-    for (instance_index, source_instance) in source.instances.iter().enumerate() {
-        let name = source_instance
-            .node_name
-            .as_deref()
-            .ok_or_else(|| "Motion components must have non-empty names.".to_string())?;
-        let geometry = source
-            .geometries
-            .get(source_instance.geometry)
-            .ok_or_else(|| format!("Motion source component '{name}' has no geometry."))?;
-        instance_ids.extend(std::iter::repeat_n(
-            instance_index as f32,
-            geometry.vertices.len(),
-        ));
-        geometries.push(geometry.clone());
-    }
-
-    let mut scene = source.clone();
-    scene.geometries = geometries;
-    for (index, instance) in scene.instances.iter_mut().enumerate() {
-        instance.geometry = index;
-        instance.transform = Mat4::IDENTITY;
-        instance.normal_transform = Mat3::IDENTITY;
-    }
-
     let frame_count = (duration_ms as usize * MOTION_FRAMES_PER_SECOND).div_ceil(1_000) + 1;
     let mut frames = Vec::with_capacity(
-        frame_count * scene.instances.len() * Mat4::IDENTITY.to_cols_array().len(),
+        frame_count * source.instances.len() * Mat4::IDENTITY.to_cols_array().len(),
     );
     let mut animated_bounds = EmptyBounds::new();
     for frame in 0..frame_count {
@@ -85,15 +58,19 @@ pub fn prepare_motion(
                 return Err("Motion generated a non-finite component transform.".to_string());
             }
             frames.extend(transform.to_cols_array());
-            animated_bounds.include_geometry_bounds(&scene.geometries[index], transform);
+            let geometry = source
+                .geometries
+                .get(source_instance.geometry)
+                .ok_or_else(|| "Motion source component has no geometry.".to_string())?;
+            animated_bounds.include_geometry_bounds(geometry, transform);
         }
     }
-    scene.bounds = animated_bounds.finish()?;
-    scene.fit_radius = bounds_radius(scene.bounds) * 1.3;
+    let bounds = animated_bounds.finish()?;
+    let fit_radius = bounds_radius(bounds) * 1.3;
 
     Ok(PreparedMotion {
-        scene,
-        instance_ids_base64: base64_f32(&instance_ids),
+        bounds,
+        fit_radius,
         frames_base64: base64_f32(&frames),
         frame_count,
         instance_count: source.instances.len(),
@@ -322,13 +299,9 @@ mod tests {
         assert_eq!(prepared.instance_count, source.instances.len());
         assert_eq!(prepared.frame_count, 55);
         assert_eq!(prepared.initial_progress, 0.25);
-        assert!(prepared.instance_ids_base64.len() > 16);
         assert!(prepared.frames_base64.len() > 16);
-        assert!(prepared
-            .scene
-            .instances
-            .iter()
-            .all(|instance| instance.transform == Mat4::IDENTITY));
+        assert!(prepared.fit_radius.is_finite());
+        assert!(prepared.fit_radius > 0.0);
     }
 
     #[test]
