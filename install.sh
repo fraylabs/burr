@@ -57,9 +57,9 @@ install -m 755 "$tmp/burr" "$staged"
 mv -f "$staged" "$dir/burr"
 staged=
 printf 'Installed Burr %s to %s/burr\n' "$installed_version" "$dir"
+# Print a literal $PATH for the user to paste into their shell profile.
+# shellcheck disable=SC2016
 case ":$PATH:" in
     *":$dir:"*) ;;
-    # Print a literal $PATH for the user to paste into their shell profile.
-    # shellcheck disable=SC2016
     *) printf 'Add this directory to PATH (and your shell profile):\n  export PATH="%s:$PATH"\n' "$dir" ;;
 esac
