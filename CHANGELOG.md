@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 0.38.3 - 2026-10-05
+
+- Fix a load-time regression from 0.38.0: STEP spline faces stored reversed
+  could be meshed with the wrong closure axes, asking for grids of over
+  100,000 points. The Voron Switchwire assembly took more than two minutes to
+  import on 0.38.0 to 0.38.2; it loads in about 7 seconds again (6.8 s on
+  0.37.0). Voron V0 and 2.4 load times are unchanged or slightly faster.
+- The same fix halves the open edges on the Adafruit arcade button dome.
+- Interference results are unchanged: 64 real pairs and 0 false on the
+  benchmark models, 9 real and 0 false on the Bowden mount.
+- Known limitation: one face of the Meanwell power supply in the Voron 2.4
+  assembly now has one non-manifold seam edge. That model's check result is
+  identical to 0.38.2 (incomplete because of four lost source faces).
+- Add the fold-flat hanger example with a `burr.project.v2` hinge-motion
+  configuration.
+
 ## 0.38.2 - 2026-10-05
 
 - Large assemblies now open in the browser. The viewer no longer embeds every

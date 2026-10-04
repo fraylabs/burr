@@ -63,7 +63,7 @@ curl -fsSL https://raw.githubusercontent.com/fraylabs/burr/main/install.sh | sh
 
 The POSIX installer selects the host target, downloads the latest release's
 binary and checksum, verifies the checksum, and installs to `~/.local/bin`.
-Set `BURR_VERSION=0.38.2` (also accepts `v0.38.2` or `burr-v0.38.2`) to pin a
+Set `BURR_VERSION=0.38.3` (also accepts `v0.38.3` or `burr-v0.38.3`) to pin a
 release, and `BURR_INSTALL_DIR` to change the destination. It prints a PATH
 instruction if necessary. No Rust toolchain is used.
 
@@ -77,7 +77,7 @@ published, the new install command is not available on `main`.
 Users can still install from source:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.38.2 --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.38.3 --locked
 ```
 
 On x86-64, prefix the command with `RUSTFLAGS="-Ctarget-feature=+avx,+fma"`.
