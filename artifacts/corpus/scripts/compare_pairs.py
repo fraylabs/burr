@@ -24,7 +24,7 @@ def identity(name):
 
 
 def compare(model, scene_path, burr_path, occt_path, reference_complete=False):
-    scene = json.loads(scene_path.read_text())['parts']
+    scene = json.loads(scene_path.read_text(encoding="utf-8"))['parts']
     exact = components(model)
     if len(exact) == 1 and len(cq.Shape.cast(exact[0][1]).Solids()) > 1:
         exact = [('solid:' + str(i), s.wrapped)
@@ -44,7 +44,7 @@ def compare(model, scene_path, burr_path, occt_path, reference_complete=False):
     evidence = []
     for i, j in zip(rows.tolist(), cols.tolist()):
         distance = float(cost[i, j])
-        alternative = float(min(cost[i, k] for k in range(len(exact)) if k != j))
+        alternative = float(min((cost[i, k] for k in range(len(exact)) if k != j), default=float("inf")))
         # The corpus tessellation can deviate by up to 0.065 mm in these bounds.
         # A 0.1 mm bound and an independent 0.2 mm alternative margin must both
         # hold. These are matching limits, not interference tolerances.
@@ -64,10 +64,10 @@ def compare(model, scene_path, burr_path, occt_path, reference_complete=False):
             raise ValueError(f'Geometry mismatch for occurrence {i}: {sample_error}')
         mapping[i] = j
         evidence.append(dict(burr=i, occt=j, burr_name=left_name, occt_name=right_name,
-                             box_error_mm=distance, alternative_box_error_mm=alternative,
+                             box_error_mm=distance, alternative_box_error_mm=alternative if len(exact) > 1 else None,
                              surface_sample_error_mm=sample_error, source_identity=left_id or right_id))
-    report = json.loads(burr_path.read_text())['report']
-    reference = json.loads(occt_path.read_text())
+    report = json.loads(burr_path.read_text(encoding="utf-8"))['report']
+    reference = json.loads(occt_path.read_text(encoding="utf-8"))
     if not reference.get('pair_check_complete', reference_complete):
         raise ValueError('OCCT reference did not finish its pair scan')
     if reference['names'] != [n for n, _ in exact]:
@@ -96,7 +96,7 @@ def main():
     parser.add_argument('--reference-complete', action='store_true', help='Assert a documented full scan for legacy OCCT logs without a completion flag')
     args = parser.parse_args()
     result = compare(args.model, args.scene, args.burr, args.occt, args.reference_complete)
-    args.output.write_text(json.dumps(result, indent=2) + '\n')
+    args.output.write_text(json.dumps(result, indent=2) + '\n', encoding="utf-8")
     print(args.model.name, 'matched', len(result['matched_pairs']), 'extra', len(result['extra_pairs']),
           'missing', len(result['missing_pairs']), 'unresolved', len(result['unresolved_pairs']))
 

@@ -438,8 +438,9 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
 
     if !unresolved_pairs.is_empty() {
         summary.push_str(&format!(
-            "; {} component pairs unresolved",
-            unresolved_pairs.len()
+            "; {} component pair{} unresolved",
+            unresolved_pairs.len(),
+            if unresolved_pairs.len() == 1 { "" } else { "s" }
         ));
     }
     CheckReport {
