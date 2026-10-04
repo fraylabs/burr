@@ -23,8 +23,11 @@ def identity(name):
     return ''.join(re.findall('[a-z0-9]+', leaf.lower()))
 
 
-def compare(model, scene_path, burr_path, occt_path, reference_complete=False):
+def compare(model, scene_path, burr_path, occt_path, reference_complete=False, reported_pairs_only=False):
     scene = json.loads(scene_path.read_text(encoding="utf-8"))['parts']
+    report = json.loads(burr_path.read_text(encoding="utf-8"))['report']
+    reported_occurrences = {c['occurrence_index'] for finding in report['findings']
+                            for c in finding['components']}
     exact = components(model)
     if len(exact) == 1 and len(cq.Shape.cast(exact[0][1]).Solids()) > 1:
         exact = [('solid:' + str(i), s.wrapped)
@@ -43,6 +46,8 @@ def compare(model, scene_path, burr_path, occt_path, reference_complete=False):
     mapping = {}
     evidence = []
     for i, j in zip(rows.tolist(), cols.tolist()):
+        if reported_pairs_only and i not in reported_occurrences:
+            continue
         distance = float(cost[i, j])
         alternative = float(min((cost[i, k] for k in range(len(exact)) if k != j), default=float("inf")))
         # The corpus tessellation can deviate by up to 0.065 mm in these bounds.
@@ -66,7 +71,6 @@ def compare(model, scene_path, burr_path, occt_path, reference_complete=False):
         evidence.append(dict(burr=i, occt=j, burr_name=left_name, occt_name=right_name,
                              box_error_mm=distance, alternative_box_error_mm=alternative if len(exact) > 1 else None,
                              surface_sample_error_mm=sample_error, source_identity=left_id or right_id))
-    report = json.loads(burr_path.read_text(encoding="utf-8"))['report']
     reference = json.loads(occt_path.read_text(encoding="utf-8"))
     if not reference.get('pair_check_complete', reference_complete):
         raise ValueError('OCCT reference did not finish its pair scan')
@@ -76,8 +80,10 @@ def compare(model, scene_path, burr_path, occt_path, reference_complete=False):
     def pair(f):
         return tuple(sorted(mapping[c['occurrence_index']] for c in f['components']))
     found = {pair(f): f for f in report['findings']}
-    unresolved = {pair(f): f for f in report.get('unresolved_pairs', [])}
-    return dict(model=model.name, mapping=evidence, exact_pair_count=len(positives),
+    unresolved = {pair(f): f for f in report.get('unresolved_pairs', [])
+                  if all(c['occurrence_index'] in mapping for c in f['components'])}
+    return dict(model=model.name, comparison_mode='reported_pairs_only' if reported_pairs_only else 'all_occurrences',
+                occurrence_mapping_complete=len(mapping) == len(scene), mapping=evidence, exact_pair_count=len(positives),
                 confirmed_pair_count=len(found), matched_pairs=sorted(found.keys() & positives.keys()),
                 extra_pairs=[dict(pair=p, burr=found[p]) for p in sorted(found.keys() - positives.keys())],
                 missing_pairs=[dict(pair=p, occt=positives[p], unresolved=unresolved.get(p))
@@ -94,8 +100,9 @@ def main():
     parser.add_argument('--occt', type=pathlib.Path, required=True)
     parser.add_argument('--output', type=pathlib.Path, required=True)
     parser.add_argument('--reference-complete', action='store_true', help='Assert a documented full scan for legacy OCCT logs without a completion flag')
+    parser.add_argument('--reported-pairs-only', action='store_true', help='Validate every confirmed pair using the same strict occurrence checks; leave unrelated occurrences and unresolved pairs unverified')
     args = parser.parse_args()
-    result = compare(args.model, args.scene, args.burr, args.occt, args.reference_complete)
+    result = compare(args.model, args.scene, args.burr, args.occt, args.reference_complete, args.reported_pairs_only)
     args.output.write_text(json.dumps(result, indent=2) + '\n', encoding="utf-8")
     print(args.model.name, 'matched', len(result['matched_pairs']), 'extra', len(result['extra_pairs']),
           'missing', len(result['missing_pairs']), 'unresolved', len(result['unresolved_pairs']))

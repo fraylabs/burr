@@ -1,5 +1,7 @@
 # Manifold-surface assembly import
 
+This records the first import stage. The subsequent signed-major torus fix and its measurements are in [negative-tori.md](negative-tori.md).
+
 The full openAMR robot now retains all 688 placed components instead of falling back to one flattened body. The two source `MANIFOLD_SURFACE_SHAPE_REPRESENTATION` records (#55392 and #288197) have the same attributes as `SHAPE_REPRESENTATION`. Their shell models were already supported; decoding the representations makes the existing source relationships resolve.
 
 Look branch: `fix/manifold-surface-assembly`, commit `e5066137f6d21d370e5c80af3a8e4e434fc78841`, based on `burr` at `08735d52d38c3782fa9f2157256bf2aa9f9d1e51`. Burr starts at origin/main `4f7f51796c1c8bbe9a3cd9a91ace96b7d3ee1be8` (0.37.0).
