@@ -20,7 +20,7 @@ struct Face {
     faces: Vec<Vec<usize>>,
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    for path in std::env::args().skip(1) {
+    'files: for path in std::env::args().skip(1) {
         let shell: Shell = serde_json::from_slice(&std::fs::read(&path)?)?;
         let mut vertices = Vec::new();
         let mut indices = Vec::new();
@@ -35,7 +35,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     [0, 2, 1]
                 };
                 for i in order {
-                    let p = face.positions[triangle[i]];
+                    let Some(&p) = face.positions.get(triangle[i]) else {
+                        println!(
+                            "{}",
+                            serde_json::json!({"file":path,"error":"triangle index out of range"})
+                        );
+                        continue 'files;
+                    };
                     indices.push(vertices.len() as u32);
                     vertices.push(Vertex {
                         position: p.map(|x| x as f32),
@@ -47,6 +53,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let bounds =
             Bounds::from_positions(&vertices.iter().map(|v| v.position).collect::<Vec<_>>());
         let geometry = Geometry {
+            surface_normals: None,
             vertices,
             indices,
             source_attributes: None,

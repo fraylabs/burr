@@ -78,10 +78,10 @@
       "nonmanifold_edges": 0
     },
     "occt_pairs": 8,
-    "confirmed_true": 8,
+    "confirmed_true": 7,
     "confirmed_false": 0,
-    "occt_positive_unresolved": 0,
-    "unresolved_candidates": 6,
+    "occt_positive_unresolved": 1,
+    "unresolved_candidates": 7,
     "before_source_solid_topology": {
       "boundary_edges": 174,
       "nonmanifold_edges": 73
@@ -228,5 +228,24 @@
     "confirmed_false": 0,
     "occt_positive_unresolved": 0,
     "unresolved_candidates": 5
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "before_verdict": "incomplete",
+    "after_verdict": "fail",
+    "occt_verdict": "fail (pair-limited reference)",
+    "confirmed_true": 9,
+    "confirmed_false": 0,
+    "reference_scope": "All 18 previously reported pairs; full candidate completeness remains unknown",
+    "reference_negative_unresolved": 9,
+    "unresolved_candidates": 76,
+    "before_source_solid_topology": {
+      "boundary_edges": 3021,
+      "nonmanifold_edges": 217
+    },
+    "after_source_solid_topology": {
+      "boundary_edges": 933,
+      "nonmanifold_edges": 5
+    }
   }
 ]

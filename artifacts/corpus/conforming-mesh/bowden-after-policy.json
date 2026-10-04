@@ -1,0 +1,170 @@
+{
+  "scope": "The 18 previous reported pairs only; not a full pair scan",
+  "confirmed_true": 9,
+  "confirmed_false": 0,
+  "reference_negative_unresolved": 9,
+  "pairs": [
+    {
+      "burr_pair": [
+        3,
+        18
+      ],
+      "occt_result": "false",
+      "current_result": "unresolved",
+      "reason": "below_tessellation_resolution"
+    },
+    {
+      "burr_pair": [
+        4,
+        15
+      ],
+      "occt_result": "false",
+      "current_result": "unresolved",
+      "reason": "below_tessellation_resolution"
+    },
+    {
+      "burr_pair": [
+        5,
+        14
+      ],
+      "occt_result": "true",
+      "current_result": "confirmed",
+      "reason": null
+    },
+    {
+      "burr_pair": [
+        6,
+        16
+      ],
+      "occt_result": "true",
+      "current_result": "confirmed",
+      "reason": null
+    },
+    {
+      "burr_pair": [
+        6,
+        28
+      ],
+      "occt_result": "false",
+      "current_result": "unresolved",
+      "reason": "below_tessellation_resolution"
+    },
+    {
+      "burr_pair": [
+        7,
+        29
+      ],
+      "occt_result": "false",
+      "current_result": "unresolved",
+      "reason": "below_tessellation_resolution"
+    },
+    {
+      "burr_pair": [
+        8,
+        17
+      ],
+      "occt_result": "true",
+      "current_result": "confirmed",
+      "reason": null
+    },
+    {
+      "burr_pair": [
+        8,
+        28
+      ],
+      "occt_result": "false",
+      "current_result": "unresolved",
+      "reason": "below_tessellation_resolution"
+    },
+    {
+      "burr_pair": [
+        9,
+        29
+      ],
+      "occt_result": "false",
+      "current_result": "unresolved",
+      "reason": "below_tessellation_resolution"
+    },
+    {
+      "burr_pair": [
+        10,
+        29
+      ],
+      "occt_result": "false",
+      "current_result": "unresolved",
+      "reason": "below_tessellation_resolution"
+    },
+    {
+      "burr_pair": [
+        11,
+        29
+      ],
+      "occt_result": "false",
+      "current_result": "unresolved",
+      "reason": "below_tessellation_resolution"
+    },
+    {
+      "burr_pair": [
+        12,
+        28
+      ],
+      "occt_result": "true",
+      "current_result": "confirmed",
+      "reason": null
+    },
+    {
+      "burr_pair": [
+        13,
+        28
+      ],
+      "occt_result": "true",
+      "current_result": "confirmed",
+      "reason": null
+    },
+    {
+      "burr_pair": [
+        22,
+        24
+      ],
+      "occt_result": "true",
+      "current_result": "confirmed",
+      "reason": null
+    },
+    {
+      "burr_pair": [
+        22,
+        25
+      ],
+      "occt_result": "true",
+      "current_result": "confirmed",
+      "reason": null
+    },
+    {
+      "burr_pair": [
+        22,
+        26
+      ],
+      "occt_result": "false",
+      "current_result": "unresolved",
+      "reason": "below_tessellation_resolution"
+    },
+    {
+      "burr_pair": [
+        22,
+        27
+      ],
+      "occt_result": "true",
+      "current_result": "confirmed",
+      "reason": null
+    },
+    {
+      "burr_pair": [
+        25,
+        26
+      ],
+      "occt_result": "true",
+      "current_result": "confirmed",
+      "reason": null
+    }
+  ]
+}
