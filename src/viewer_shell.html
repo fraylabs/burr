@@ -1646,6 +1646,10 @@
           acceptViewerReady(event.data.loadId);
           return;
         }
+        if (type === "burr:viewer-error") {
+          failViewerLoad(event.data.loadId);
+          return;
+        }
         if (type === "burr:motion-state") {
           const progress = Number(event.data.progress);
           if (!Number.isFinite(progress)) return;

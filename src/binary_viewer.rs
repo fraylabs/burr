@@ -158,7 +158,14 @@ pub fn generate_html_viewer(
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title} - look 3D Interactive Viewer</title>
+    <title>{title} - Burr 3D Interactive Viewer</title>
+    <script>
+        function burrReportViewerError(message) {{
+            window.parent.postMessage({{type: 'burr:viewer-error', message,
+                loadId: new URLSearchParams(location.search).get('load')}}, location.origin);
+        }}
+        window.addEventListener('error', event => burrReportViewerError(event.message));
+    </script>
     <style>
         * {{ box-sizing: border-box; margin: 0; padding: 0; user-select: none; }}
         body {{
@@ -323,7 +330,7 @@ pub fn generate_html_viewer(
 
         const canvas = document.getElementById('gl-canvas');
         const gl = canvas.getContext('webgl2', {{ antialias: true }});
-        if (!gl) alert('WebGL 2.0 is required');
+        if (!gl) throw new Error('WebGL 2.0 is required');
 
         const vsSource = `#version 300 es
             in vec3 aPosition;
@@ -377,21 +384,21 @@ pub fn generate_html_viewer(
                 const response = await fetch('/mesh/' + definition.id);
                 if (!response.ok) throw new Error('Could not load mesh: ' + response.status);
                 const bytes = await response.arrayBuffer();
-                if (bytes.byteLength !== definition.vertices * 40 + definition.indices * 4)
+                if (bytes.byteLength !== definition.vertices * definition.stride + definition.indices * 4)
                     throw new Error('Mesh length did not match its manifest');
                 const meshVao = gl.createVertexArray();
                 gl.bindVertexArray(meshVao);
                 const vertices = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vertices);
-                gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(bytes, 0, definition.vertices * 40), gl.STATIC_DRAW);
-                for (const [name, size, offset] of [['aPosition',3,0], ['aNormal',3,12], ['aColor',4,24]]) {{
+                gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(bytes, 0, definition.vertices * definition.stride), gl.STATIC_DRAW);
+                for (const [name, size, offset] of [['aPosition',3,0], ['aNormal',3,12], ...(definition.color ? [] : [['aColor',4,24]])]) {{
                     const location = gl.getAttribLocation(program, name);
                     gl.enableVertexAttribArray(location);
-                    gl.vertexAttribPointer(location, size, gl.FLOAT, false, 40, offset);
+                    gl.vertexAttribPointer(location, size, gl.FLOAT, false, definition.stride, offset);
                 }}
                 const elements = gl.createBuffer();
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elements);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(bytes, definition.vertices * 40), gl.STATIC_DRAW);
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(bytes, definition.vertices * definition.stride), gl.STATIC_DRAW);
                 const instanceData = new Float32Array(occurrences.length * 30);
                 occurrences.forEach((instance, index) => {{
                     instanceData.set(instance.transform, index * 30);
@@ -411,7 +418,7 @@ pub fn generate_html_viewer(
                         gl.vertexAttribDivisor(location + column, 1);
                     }}
                 }}
-                burrMeshes.push({{ vao: meshVao, count: definition.indices, instances: occurrences.length }});
+                burrMeshes.push({{ vao: meshVao, count: definition.indices, instances: occurrences.length, color: definition.color }});
             }}
         }}
 
@@ -596,7 +603,7 @@ pub fn generate_html_viewer(
             requestAnimationFrame(render);
         }}).catch(error => {{
             document.body.textContent = 'Could not open model: ' + error.message;
-            window.parent.postMessage({{ type: 'burr:viewer-error', message: error.message }}, window.location.origin);
+            burrReportViewerError(error.message);
         }});
     </script>
 </body>
@@ -696,6 +703,43 @@ mod tests {
         .unwrap();
         assert_eq!(html, rebuilt);
         assert!(cache.meshes_available(&rebuilt));
+    }
+
+    #[test]
+    fn constant_color_payloads_do_not_repeat_rgba_per_vertex() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/viewer/models/enclosure/counterbore.step");
+        let mut scene = compile_scene(&path, UpAxis::Z, &mut Timings::default()).unwrap();
+        let temp = tempdir().unwrap();
+        let cache = crate::cache::ViewerCache::at(temp.path().join("cache"));
+        let geometry = &mut scene.geometries[0];
+        geometry.source_attributes = None;
+        let constant = cache.store_mesh(geometry).unwrap();
+        assert_eq!(constant["stride"], 24);
+        let mut attributes = vec![
+            look::scene::SourceVertexAttributes {
+                tex_coord_0: [0.0; 2],
+                tex_coord_1: [0.0; 2],
+                color: [1.0; 4],
+            };
+            geometry.vertices.len()
+        ];
+        attributes[0].color = [0.25, 0.5, 0.75, 1.0];
+        geometry.source_attributes = Some(attributes);
+        let varied = cache.store_mesh(geometry).unwrap();
+        assert_eq!(varied["stride"], 40);
+        assert!(varied["color"].is_null());
+        let bytes =
+            std::fs::read(cache.mesh_path(varied["id"].as_str().unwrap()).unwrap()).unwrap();
+        assert_eq!(f32::from_le_bytes(bytes[24..28].try_into().unwrap()), 0.25);
+        let constant_size =
+            std::fs::metadata(cache.mesh_path(constant["id"].as_str().unwrap()).unwrap())
+                .unwrap()
+                .len();
+        assert_eq!(
+            bytes.len() as u64 - constant_size,
+            geometry.vertices.len() as u64 * 16
+        );
     }
 
     #[test]

@@ -257,8 +257,8 @@ try {
     expectEqual(mesh.status, 200, "binary mesh status")
     expectEqual(mesh.headers.get("content-type"), "application/octet-stream", "binary mesh type")
     const payload = await mesh.arrayBuffer()
-    expectEqual(payload.byteLength, definition.vertices * 40 + definition.indices * 4, "binary layout size")
-    const indices = new DataView(payload, definition.vertices * 40)
+    expectEqual(payload.byteLength, definition.vertices * definition.stride + definition.indices * 4, "binary layout size")
+    const indices = new DataView(payload, definition.vertices * definition.stride)
     for (let offset = 0; offset < indices.byteLength; offset += 4) {
       expectEqual(indices.getUint32(offset, true) < definition.vertices, true, "binary index bounds")
     }

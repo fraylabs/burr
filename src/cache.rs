@@ -2,13 +2,16 @@ use std::{
     env, fs,
     io::{self, BufWriter, Read, Write},
     path::{Path, PathBuf},
-    time::{SystemTime, UNIX_EPOCH},
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
 const CACHE_MAGIC: &[u8] = b"BURR_VIEWER_CACHE_V1\n";
 const CACHE_DIRECTORY_VERSION: &str = "viewer-v1";
 const CACHE_FILE_SUFFIX: &str = ".burr-viewer";
 const MAX_CACHE_ENTRIES: usize = 128;
+const MAX_MESH_CACHE_TOTAL_BYTES: u64 = 2 * 1024 * 1024 * 1024;
+// Recent payloads may still be downloading in another viewer window.
+const MESH_DOWNLOAD_GRACE: Duration = Duration::from_secs(10 * 60);
 const MAX_CACHE_TOTAL_BYTES: u64 = 512 * 1024 * 1024;
 pub const MAX_VIEWER_HTML_BYTES: usize = 64 * 1024 * 1024;
 const MAX_CACHE_ENTRY_BYTES: usize = MAX_VIEWER_HTML_BYTES + 64 * 1024;
@@ -36,7 +39,7 @@ impl ViewerCache {
             .unwrap_or_else(|| {
                 std::env::temp_dir().join(format!("burr-session-{}", std::process::id()))
             })
-            .join("meshes-v1")
+            .join("meshes-v2")
     }
 
     pub fn mesh_path(&self, id: &str) -> Option<PathBuf> {
@@ -69,14 +72,21 @@ impl ViewerCache {
             secure_file(&temporary)?;
             let mut writer = BufWriter::new(file);
             let mut hash = blake3::Hasher::new();
-            // Explicit little endian float32 layout: position, normal, source RGBA.
-            for (index, vertex) in geometry.vertices.iter().enumerate() {
-                let color = geometry
+            let source_color = |index| {
+                geometry
                     .source_attributes
                     .as_ref()
-                    .and_then(|a| a.get(index))
+                    .and_then(|attributes| attributes.get(index))
                     .map(|a| a.color)
-                    .unwrap_or([1.0; 4]);
+                    .unwrap_or([1.0; 4])
+            };
+            let first_color = source_color(0);
+            let constant_color =
+                (0..geometry.vertices.len()).all(|index| source_color(index) == first_color);
+            let stride = if constant_color { 24 } else { 40 };
+            // Little endian float32 position + normal, with RGBA only when it varies.
+            for (index, vertex) in geometry.vertices.iter().enumerate() {
+                let color = source_color(index);
                 let mut record = [0_u8; 40];
                 for (offset, value) in vertex
                     .position
@@ -87,8 +97,10 @@ impl ViewerCache {
                 {
                     record[offset * 4..offset * 4 + 4].copy_from_slice(&value.to_le_bytes());
                 }
-                hash.update(&record);
-                writer.write_all(&record).map_err(|e| e.to_string())?;
+                hash.update(&record[..stride]);
+                writer
+                    .write_all(&record[..stride])
+                    .map_err(|e| e.to_string())?;
             }
             for index in &geometry.indices {
                 if *index as usize >= geometry.vertices.len() {
@@ -104,7 +116,7 @@ impl ViewerCache {
             // Replace even an existing entry: a truncated cached file must recover.
             fs::rename(&temporary, destination).map_err(|e| e.to_string())?;
             Ok(
-                serde_json::json!({ "id": id, "vertices": geometry.vertices.len(), "indices": geometry.indices.len() }),
+                serde_json::json!({ "id": id, "vertices": geometry.vertices.len(), "indices": geometry.indices.len(), "stride": stride, "color": constant_color.then_some(first_color) }),
             )
         })();
         if result.is_err() {
@@ -136,8 +148,11 @@ impl ViewerCache {
             let Some(indices) = definition["indices"].as_u64() else {
                 return false;
             };
+            let Some(stride @ (24 | 40)) = definition["stride"].as_u64() else {
+                return false;
+            };
             let expected = vertices
-                .checked_mul(40)
+                .checked_mul(stride)
                 .and_then(|v| indices.checked_mul(4).and_then(|i| v.checked_add(i)));
             fs::metadata(path)
                 .ok()
@@ -149,42 +164,43 @@ impl ViewerCache {
         let Some(path) = self.entry_path(key) else {
             return Ok(None);
         };
-        let bytes = match fs::read(&path) {
-            Ok(bytes) => bytes,
+        let mut file = match fs::File::open(&path) {
+            Ok(file) => file,
             Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(None),
             Err(error) => {
                 return Err(format!(
                     "Failed to read viewer cache {}: {error}",
                     path.display()
-                ));
+                ))
             }
         };
-        if bytes.len() > MAX_CACHE_ENTRY_BYTES || !bytes.starts_with(CACHE_MAGIC) {
+        let size = file.metadata().map_err(|error| error.to_string())?.len();
+        if size > MAX_CACHE_ENTRY_BYTES as u64 {
             return Ok(None);
         }
-        let length_start = CACHE_MAGIC.len();
-        let length_end = length_start + 8;
-        let Some(length_bytes) = bytes.get(length_start..length_end) else {
+        let mut magic = vec![0_u8; CACHE_MAGIC.len()];
+        if file.read_exact(&mut magic).is_err() || magic != CACHE_MAGIC {
             return Ok(None);
-        };
+        }
         let mut encoded_length = [0_u8; 8];
-        encoded_length.copy_from_slice(length_bytes);
-        let Ok(key_length) = usize::try_from(u64::from_le_bytes(encoded_length)) else {
-            return Ok(None);
-        };
-        let key_end = length_end.saturating_add(key_length);
-        let Some(stored_key) = bytes.get(length_end..key_end) else {
-            return Ok(None);
-        };
-        if stored_key != key.as_bytes() {
+        if file.read_exact(&mut encoded_length).is_err() {
             return Ok(None);
         }
-        let Some(html) = bytes.get(key_end..) else {
+        if u64::from_le_bytes(encoded_length) != key.len() as u64 {
             return Ok(None);
-        };
-        String::from_utf8(html.to_vec())
-            .map(Some)
-            .map_err(|error| format!("Viewer cache contained invalid UTF-8: {error}"))
+        }
+        let mut stored_key = vec![0_u8; key.len()];
+        if file.read_exact(&mut stored_key).is_err() || stored_key != key.as_bytes() {
+            return Ok(None);
+        }
+        let mut html = String::new();
+        file.take(MAX_VIEWER_HTML_BYTES as u64 + 1)
+            .read_to_string(&mut html)
+            .map_err(|error| format!("Viewer cache contained invalid HTML: {error}"))?;
+        if html.len() > MAX_VIEWER_HTML_BYTES {
+            return Ok(None);
+        }
+        Ok(Some(html))
     }
 
     pub fn store(&self, key: &str, html: &str) -> Result<bool, String> {
@@ -206,23 +222,38 @@ impl ViewerCache {
         })?;
         secure_directory(root)?;
 
-        let mut bytes = Vec::with_capacity(total_bytes);
-        bytes.extend_from_slice(CACHE_MAGIC);
-        bytes.extend_from_slice(&(key.len() as u64).to_le_bytes());
-        bytes.extend_from_slice(key.as_bytes());
-        bytes.extend_from_slice(html.as_bytes());
-
         let nonce = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap_or_default()
             .as_nanos();
         let temporary = root.join(format!(".{}.{}.tmp", std::process::id(), nonce));
-        fs::write(&temporary, bytes).map_err(|error| {
-            format!(
-                "Failed to write viewer cache {}: {error}",
-                temporary.display()
-            )
-        })?;
+        let written = (|| -> Result<(), String> {
+            let file = fs::OpenOptions::new()
+                .create_new(true)
+                .write(true)
+                .open(&temporary)
+                .map_err(|error| {
+                    format!(
+                        "Failed to create viewer cache {}: {error}",
+                        temporary.display()
+                    )
+                })?;
+            secure_file(&temporary)?;
+            let mut writer = BufWriter::new(file);
+            for bytes in [
+                CACHE_MAGIC,
+                &(key.len() as u64).to_le_bytes(),
+                key.as_bytes(),
+                html.as_bytes(),
+            ] {
+                writer.write_all(bytes).map_err(|error| error.to_string())?;
+            }
+            writer.flush().map_err(|error| error.to_string())
+        })();
+        if let Err(error) = written {
+            let _ = fs::remove_file(&temporary);
+            return Err(error);
+        }
         if let Err(error) = secure_file(&temporary) {
             let _ = fs::remove_file(&temporary);
             return Err(error);
@@ -235,6 +266,11 @@ impl ViewerCache {
             ));
         }
         prune_cache(root);
+        prune_meshes(
+            &self.mesh_root(),
+            MAX_MESH_CACHE_TOTAL_BYTES,
+            MESH_DOWNLOAD_GRACE,
+        );
         Ok(true)
     }
 
@@ -302,6 +338,43 @@ fn cache_root_from_environment() -> Option<PathBuf> {
                 .join(".cache/burr")
                 .join(CACHE_DIRECTORY_VERSION)
         })
+    }
+}
+
+fn prune_meshes(root: &Path, max_bytes: u64, grace: Duration) {
+    let Ok(entries) = fs::read_dir(root) else {
+        return;
+    };
+    let mut entries = entries
+        .filter_map(Result::ok)
+        .filter_map(|entry| {
+            let name = entry.file_name();
+            let name = name.to_str()?;
+            if name.len() != 64 || !name.bytes().all(|b| b.is_ascii_hexdigit()) {
+                return None;
+            }
+            let metadata = entry.metadata().ok()?;
+            if !metadata.is_file() {
+                return None;
+            }
+            Some((metadata.modified().ok()?, entry.path(), metadata.len()))
+        })
+        .collect::<Vec<_>>();
+    let mut total = entries
+        .iter()
+        .map(|(_, _, size)| *size)
+        .fold(0_u64, u64::saturating_add);
+    entries.sort_by_key(|(modified, _, _)| *modified);
+    for (modified, path, size) in entries {
+        if total <= max_bytes {
+            break;
+        }
+        if modified.elapsed().unwrap_or_default() < grace {
+            continue;
+        }
+        if fs::remove_file(path).is_ok() {
+            total = total.saturating_sub(size);
+        }
     }
 }
 
@@ -434,6 +507,18 @@ mod tests {
         fs::write(path, "not a Burr viewer").unwrap();
 
         assert_eq!(cache.load("model-a").unwrap(), None);
+    }
+
+    #[test]
+    fn mesh_pruning_protects_downloads_and_reclaims_expired_payloads() {
+        let temp = tempdir().unwrap();
+        for digit in ['a', 'b', 'c'] {
+            fs::write(temp.path().join(digit.to_string().repeat(64)), "1234").unwrap();
+        }
+        prune_meshes(temp.path(), 8, MESH_DOWNLOAD_GRACE);
+        assert_eq!(fs::read_dir(temp.path()).unwrap().count(), 3);
+        prune_meshes(temp.path(), 8, Duration::ZERO);
+        assert_eq!(fs::read_dir(temp.path()).unwrap().count(), 2);
     }
 
     #[test]

@@ -15,6 +15,7 @@ use serde_json::json;
 use std::{
     collections::{HashMap, VecDeque},
     fs,
+    io::Read,
     path::{Component, Path, PathBuf},
     process::Command,
     sync::{mpsc, Arc, Mutex, MutexGuard},
@@ -59,7 +60,7 @@ struct CachedModel {
 #[derive(Default)]
 struct ModelCache {
     models: HashMap<PathBuf, CachedModel>,
-    viewers: HashMap<String, String>,
+    viewers: HashMap<String, Arc<String>>,
     viewer_order: VecDeque<String>,
     viewer_bytes: usize,
     #[cfg(test)]
@@ -67,7 +68,7 @@ struct ModelCache {
 }
 
 struct RenderedViewer {
-    html: String,
+    html: Arc<String>,
     cache: &'static str,
 }
 
@@ -446,18 +447,16 @@ fn handle_request(
                 )
             };
             match rendered {
-                Ok(rendered) => {
-                    match inject_viewer_ready_notification(rendered.html, load_id.as_deref()) {
-                        Ok(html) => {
-                            reporter.ready(rendered.cache);
-                            respond(request, 200, "text/html; charset=utf-8", html)
-                        }
-                        Err(error) => {
-                            reporter.failed(&error);
-                            respond_html_error(request, 422, &error)
-                        }
+                Ok(rendered) => match ViewerBody::new(rendered.html, load_id.as_deref()) {
+                    Ok(html) => {
+                        reporter.ready(rendered.cache);
+                        respond_viewer(request, html)
                     }
-                }
+                    Err(error) => {
+                        reporter.failed(&error);
+                        respond_html_error(request, 422, &error)
+                    }
+                },
                 Err(error) => {
                     reporter.failed(&error);
                     respond_html_error(request, 422, &error)
@@ -528,6 +527,7 @@ fn render_model(
     }
     match viewer_cache.load(&viewer_key) {
         Ok(Some(html)) if viewer_cache.meshes_available(&html) => {
+            let html = Arc::new(html);
             remember_viewer(cache, viewer_key, html.clone());
             return Ok(RenderedViewer {
                 html,
@@ -570,6 +570,7 @@ fn render_model(
         let html = inject_binary_draw(inject_viewer_render_modes(html)?);
         inject_viewer_theme(html, selection.theme, selection.focus)?
     };
+    let html = Arc::new(html);
     persist_viewer(viewer_cache, &viewer_key, &html);
     remember_viewer(cache, viewer_key, html.clone());
     Ok(RenderedViewer {
@@ -620,6 +621,7 @@ fn render_motion_model(
     }
     match viewer_cache.load(&viewer_key) {
         Ok(Some(html)) if viewer_cache.meshes_available(&html) => {
+            let html = Arc::new(html);
             remember_viewer(cache, viewer_key, html.clone());
             return Ok(RenderedViewer {
                 html,
@@ -662,6 +664,7 @@ fn render_motion_model(
     let html = inject_binary_draw(inject_viewer_render_modes(html)?);
     let html = inject_viewer_motion(html, &prepared)?;
     let html = inject_viewer_theme(html, theme, None)?;
+    let html = Arc::new(html);
     persist_viewer(viewer_cache, &viewer_key, &html);
     remember_viewer(cache, viewer_key, html.clone());
     Ok(RenderedViewer {
@@ -785,7 +788,7 @@ fn viewer_cache_key(
     motion: Option<&str>,
 ) -> String {
     format!(
-        "burr-viewer-v5-binary\nburr={}\nsource={}\nfingerprint={}\nrelative={}\ntheme={}\nfocus={}\nmotion={}",
+        "burr-viewer-v6-binary\nburr={}\nsource={}\nfingerprint={}\nrelative={}\ntheme={}\nfocus={}\nmotion={}",
         env!("CARGO_PKG_VERSION"),
         source_path.display(),
         source_fingerprint,
@@ -803,7 +806,7 @@ fn persist_viewer(cache: &ViewerCache, key: &str, html: &str) {
     }
 }
 
-fn remember_viewer(cache: &mut ModelCache, key: String, html: String) {
+fn remember_viewer(cache: &mut ModelCache, key: String, html: Arc<String>) {
     remember_viewer_with_limits(
         cache,
         key,
@@ -814,7 +817,7 @@ fn remember_viewer(cache: &mut ModelCache, key: String, html: String) {
     );
 }
 
-fn memory_viewer(cache: &mut ModelCache, key: &str) -> Option<String> {
+fn memory_viewer(cache: &mut ModelCache, key: &str) -> Option<Arc<String>> {
     let html = cache.viewers.get(key)?.clone();
     cache.viewer_order.retain(|candidate| candidate != key);
     cache.viewer_order.push_back(key.to_string());
@@ -824,7 +827,7 @@ fn memory_viewer(cache: &mut ModelCache, key: &str) -> Option<String> {
 fn remember_viewer_with_limits(
     cache: &mut ModelCache,
     key: String,
-    html: String,
+    html: Arc<String>,
     max_entries: usize,
     max_total_bytes: usize,
     max_entry_bytes: usize,
@@ -903,27 +906,76 @@ fn inject_viewer_theme(
     Ok(themed)
 }
 
-fn inject_viewer_ready_notification(
-    mut html: String,
-    load_id: Option<&str>,
-) -> Result<String, String> {
-    let Some(load_id) = load_id else {
-        return Ok(html);
-    };
-    let marker = "</head>";
-    let Some(index) = html.find(marker) else {
-        return Err("Look viewer HTML did not contain a head element.".to_string());
-    };
-    let notification = format!(
-        r#"<!--burr-load-id-start--><meta name="burr-load-id" content="{load_id}"><script>window.addEventListener("burr:first-frame", () => {{ window.parent.postMessage({{ type: "burr:viewer-ready", loadId: "{load_id}" }}, window.location.origin); }}, {{ once: true }});</script><!--burr-load-id-end-->"#
-    );
-    html.insert_str(index, &notification);
-    Ok(html)
+/// Stream the cached page around a small request-specific load notification.
+struct ViewerBody {
+    html: Arc<String>,
+    notification: Vec<u8>,
+    split: usize,
+    offset: usize,
+}
+
+impl ViewerBody {
+    fn new(html: Arc<String>, load_id: Option<&str>) -> Result<Self, String> {
+        let (split, notification) = if let Some(load_id) = load_id {
+            let index = html
+                .find("</head>")
+                .ok_or("Viewer HTML did not contain a head element.")?;
+            let script = format!(
+                r#"<!--burr-load-id-start--><meta name="burr-load-id" content="{load_id}"><script>window.addEventListener("burr:first-frame", () => {{ window.parent.postMessage({{ type: "burr:viewer-ready", loadId: "{load_id}" }}, window.location.origin); }}, {{ once: true }});</script><!--burr-load-id-end-->"#
+            );
+            (index, script.into_bytes())
+        } else {
+            (0, Vec::new())
+        };
+        Ok(Self {
+            html,
+            notification,
+            split,
+            offset: 0,
+        })
+    }
+
+    fn len(&self) -> usize {
+        self.html.len() + self.notification.len()
+    }
+}
+
+impl Read for ViewerBody {
+    fn read(&mut self, output: &mut [u8]) -> std::io::Result<usize> {
+        let bytes = if self.offset < self.split {
+            &self.html.as_bytes()[self.offset..self.split]
+        } else if self.offset < self.split + self.notification.len() {
+            &self.notification[self.offset - self.split..]
+        } else {
+            &self.html.as_bytes()[self.offset - self.notification.len()..]
+        };
+        let count = output.len().min(bytes.len());
+        output[..count].copy_from_slice(&bytes[..count]);
+        self.offset += count;
+        Ok(count)
+    }
+}
+
+fn respond_viewer(request: Request, body: ViewerBody) -> Result<(), String> {
+    let content_type = Header::from_bytes("Content-Type", "text/html; charset=utf-8")
+        .map_err(|_| "Failed to create viewer content type.".to_string())?;
+    let cache_control = Header::from_bytes("Cache-Control", "no-store")
+        .map_err(|_| "Failed to create viewer cache header.".to_string())?;
+    let length = body.len();
+    request
+        .respond(Response::new(
+            StatusCode(200),
+            vec![content_type, cache_control],
+            body,
+            Some(length),
+            None,
+        ))
+        .map_err(|error| format!("Failed to send viewer response: {error}"))
 }
 
 fn inject_binary_draw(html: String) -> String {
     html.replace("gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);",
-        "for (const mesh of burrMeshes) { gl.bindVertexArray(mesh.vao); gl.drawElementsInstanced(gl.TRIANGLES, mesh.count, gl.UNSIGNED_INT, 0, mesh.instances); }\n            if (!window.burrFirstFrame) { window.burrFirstFrame = performance.now(); window.dispatchEvent(new Event('burr:first-frame')); }")
+        "for (const mesh of burrMeshes) { gl.bindVertexArray(mesh.vao); if (mesh.color) gl.vertexAttrib4fv(gl.getAttribLocation(program, 'aColor'), mesh.color); gl.drawElementsInstanced(gl.TRIANGLES, mesh.count, gl.UNSIGNED_INT, 0, mesh.instances); }\n            if (!window.burrFirstFrame) { window.burrFirstFrame = performance.now(); window.dispatchEvent(new Event('burr:first-frame')); }")
 }
 
 fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {
@@ -1497,7 +1549,9 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
     #[test]
     fn viewer_ready_notification_carries_the_specific_load_id() {
         let html = "<!doctype html><html><head></head><body></body></html>".to_string();
-        let rendered = inject_viewer_ready_notification(html, Some("window-3")).unwrap();
+        let mut body = ViewerBody::new(Arc::new(html), Some("window-3")).unwrap();
+        let mut rendered = String::new();
+        body.read_to_string(&mut rendered).unwrap();
 
         assert!(rendered.contains("name=\"burr-load-id\" content=\"window-3\""));
         assert!(rendered.contains("type: \"burr:viewer-ready\", loadId: \"window-3\""));
@@ -1623,18 +1677,51 @@ angle_degrees = 90.0
     #[test]
     fn memory_viewer_cache_enforces_entry_and_total_byte_limits() {
         let mut cache = ModelCache::default();
-        remember_viewer_with_limits(&mut cache, "a".into(), "1234".into(), 2, 8, 6);
-        remember_viewer_with_limits(&mut cache, "b".into(), "5678".into(), 2, 8, 6);
+        remember_viewer_with_limits(
+            &mut cache,
+            "a".into(),
+            Arc::new("1234".to_string()),
+            2,
+            8,
+            6,
+        );
+        remember_viewer_with_limits(
+            &mut cache,
+            "b".into(),
+            Arc::new("5678".to_string()),
+            2,
+            8,
+            6,
+        );
         assert_eq!(cache.viewer_bytes, 8);
 
-        assert_eq!(memory_viewer(&mut cache, "a").as_deref(), Some("1234"));
-        remember_viewer_with_limits(&mut cache, "c".into(), "9012".into(), 2, 8, 6);
+        assert_eq!(
+            memory_viewer(&mut cache, "a")
+                .as_ref()
+                .map(|html| html.as_str()),
+            Some("1234")
+        );
+        remember_viewer_with_limits(
+            &mut cache,
+            "c".into(),
+            Arc::new("9012".to_string()),
+            2,
+            8,
+            6,
+        );
         assert!(cache.viewers.contains_key("a"));
         assert!(cache.viewers.contains_key("c"));
         assert!(!cache.viewers.contains_key("b"));
         assert_eq!(cache.viewer_bytes, 8);
 
-        remember_viewer_with_limits(&mut cache, "large".into(), "1234567".into(), 2, 8, 6);
+        remember_viewer_with_limits(
+            &mut cache,
+            "large".into(),
+            Arc::new("1234567".to_string()),
+            2,
+            8,
+            6,
+        );
         assert!(!cache.viewers.contains_key("large"));
         assert_eq!(cache.viewer_bytes, 8);
     }
