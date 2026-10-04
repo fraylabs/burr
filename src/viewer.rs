@@ -53,7 +53,7 @@ struct ModelFile {
 
 struct CachedModel {
     version: String,
-    scene: CompiledScene,
+    scene: Arc<CompiledScene>,
     report: Option<CheckReport>,
 }
 
@@ -523,7 +523,7 @@ fn render_model(
         }
 
         let scene = match selection.focus {
-            Some(focus) => highlighted_scene(&cached.scene, focus)?,
+            Some(focus) => Arc::new(highlighted_scene(&cached.scene, focus)?),
             None => cached.scene.clone(),
         };
         reporter.stage(
@@ -736,7 +736,7 @@ fn load_model<'a>(
         path.clone(),
         CachedModel {
             version,
-            scene,
+            scene: Arc::new(scene),
             report: None,
         },
     );
