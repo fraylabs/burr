@@ -149,6 +149,11 @@ def main():
                    before_triangles=a['triangles'], after_triangles=b['triangles'],
                    incomplete_reasons=b['reasons'],
                    structure_errors=b['structure_errors'])
+        diagnostics = args.after / (name + '.diagnostics.jsonl')
+        if diagnostics.exists() and not row['after_measurement_capped']:
+            row['face_refusal_reasons'] = dict(Counter(
+                json.loads(line)['terminal_reason']
+                for line in diagnostics.read_text().splitlines()))
         if changed or name in protected:
             if any(r['code'] == 'measurement_cap' for r in b['reasons']):
                 row.update(comparison_mode='refused', confirmed_true=0, confirmed_false=0,
