@@ -23,6 +23,22 @@ def identity(name):
     return ''.join(re.findall('[a-z0-9]+', leaf.lower()))
 
 
+def validate_reference_scope(reference, found, reported_pairs_only):
+    scope = reference.get('pair_check_scope', 'all_pairs')
+    if scope == 'reported_pairs':
+        if not reported_pairs_only:
+            raise ValueError('Pair-limited OCCT reference requires --reported-pairs-only')
+        checked = {tuple(sorted(p)) for p in reference['checked_pairs']}
+        if not found <= checked:
+            raise ValueError('OCCT reference did not check every reported pair')
+        positives = {tuple(f['pair']) for f in reference['findings']}
+        if not positives <= checked:
+            raise ValueError('OCCT reference contains an unchecked positive pair')
+    elif scope != 'all_pairs':
+        raise ValueError(f'Unknown OCCT pair-check scope: {scope}')
+    return scope
+
+
 def compare(model, scene_path, burr_path, occt_path, reference_complete=False, reported_pairs_only=False):
     scene = json.loads(scene_path.read_text(encoding="utf-8"))['parts']
     report = json.loads(burr_path.read_text(encoding="utf-8"))['report']
@@ -80,9 +96,11 @@ def compare(model, scene_path, burr_path, occt_path, reference_complete=False, r
     def pair(f):
         return tuple(sorted(mapping[c['occurrence_index']] for c in f['components']))
     found = {pair(f): f for f in report['findings']}
+    scope = validate_reference_scope(reference, found.keys(), reported_pairs_only)
     unresolved = {pair(f): f for f in report.get('unresolved_pairs', [])
                   if all(c['occurrence_index'] in mapping for c in f['components'])}
     return dict(model=model.name, comparison_mode='reported_pairs_only' if reported_pairs_only else 'all_occurrences',
+                reference_scope=scope,
                 occurrence_mapping_complete=len(mapping) == len(scene), mapping=evidence, exact_pair_count=len(positives),
                 confirmed_pair_count=len(found), matched_pairs=sorted(found.keys() & positives.keys()),
                 extra_pairs=[dict(pair=p, burr=found[p]) for p in sorted(found.keys() - positives.keys())],
