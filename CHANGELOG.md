@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.38.1 - 2026-10-05
+
+- Unresolved pairs now carry the right reason: a planar overlap that is only
+  found at coordinate resolution is no longer labelled as below tessellation
+  resolution.
+- Nearest-surface lookups compare true distances and treat ties
+  consistently, so results no longer depend on mesh traversal order.
+- Corpus results are unchanged from 0.38.0: 64 real pairs and 0 false on the
+  benchmark models, 9 real and 0 false on the Bowden mount.
+
 ## 0.38.0 - 2026-10-05
 
 - Tessellate STEP solids into closed meshes: neighbouring faces now share the
