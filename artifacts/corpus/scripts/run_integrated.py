@@ -9,6 +9,7 @@ parser.add_argument("--output", type=pathlib.Path, required=True)
 parser.add_argument("--binary", type=pathlib.Path, required=True)
 parser.add_argument("--timeout", type=float, default=600)
 parser.add_argument("--switchwire-timeout", type=float, help="Cap the pre-existing 0.38 slow Switchwire import separately")
+parser.add_argument("--preexisting-switchwire-slow", action="store_true", help="Label a capped pre-0.38.2 Switchwire baseline as the known slowdown")
 args = parser.parse_args()
 args.output.mkdir(parents=True, exist_ok=True)
 binary_sha = hashlib.sha256(args.binary.read_bytes()).hexdigest()
@@ -82,7 +83,8 @@ for file, expected_sha in files:
                   returncode=process.returncode, timeout=bool(cap), cap=cap,
                   timeout_limit_s=timeout_limit)
     if cap and file.name.startswith("Voron-Switchwire__"):
-        record["cap_reason"] = "slow, pre-existing in 0.38"
+        record["cap_reason"] = ("slow, pre-existing in 0.38" if args.preexisting_switchwire_slow
+                                else "Switchwire load did not complete within the measurement cap")
     match = re.search(r"BENCH_LOADED (\{[^\n]*\})", err.read_text(errors="replace"))
     if match:
         record["load_metadata"] = json.loads(match.group(1))

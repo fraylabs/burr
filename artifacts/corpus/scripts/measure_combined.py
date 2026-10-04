@@ -117,6 +117,8 @@ def main():
     for option in ('corpus', 'reference-logs', 'before', 'after', 'scene-binary', 'output'):
         parser.add_argument('--' + option, type=pathlib.Path, required=True)
     parser.add_argument('--current-main', type=pathlib.Path)
+    parser.add_argument("--require-switchwire-complete", action="store_true",
+                        help="Reject a capped Switchwire load after the closure-axis fix")
     args = parser.parse_args()
     tracked = pathlib.Path(__file__).resolve().parent.parent
     args.output.mkdir(parents=True, exist_ok=True)
@@ -129,6 +131,10 @@ def main():
         new = measured(args.after, name)
         a, b = facts(old), facts(new)
         current = facts(measured(args.current_main, name)) if args.current_main else None
+        if args.require_switchwire_complete and name.startswith('Voron-Switchwire__'):
+            for label, directory in [('combined', args.after), ('current main', args.current_main)]:
+                if directory is None or read(directory / (name + '.burr.metrics.json'))['timeout']:
+                    raise RuntimeError(f'Switchwire did not complete on the closure-axis {label}')
         changed = a != b or (current is not None and current != b)
         outcome = b['outcome']
         if outcome in ('pass', 'fail') and source['occt_verdict'] in ('pass', 'fail') and outcome != source['occt_verdict']:
