@@ -25,7 +25,7 @@ Unresolved pairs are shown and can be highlighted in the Checks tab. A fail summ
 
 ## Remaining exact pairs
 
-Indices below are **OCCT occurrence indices**, connected to Burr indices by each JSON file's placement/identity mapping. They are not matched by name order.
+Indices below are **OCCT occurrence indices**, connected to Burr indices by each locally generated comparison's placement/identity mapping. They are not matched by name order.
 
 - Cover nut/screw pairs: `[3,4]`, `[20,24]`, `[21,25]`, `[22,26]`, `[23,27]`, `[28,29]`, `[45,49]`, `[46,50]`, `[47,51]`, `[48,52]`. Each exact Common volume is approximately 4.762140007 mm³. The shared screw definition has 26 boundary edges and 11 nonmanifold edges. Its source BREP is OCCT-valid and no declared faces were lost, but the tessellation is not watertight. Every pair appears in `unresolved_pairs` as `open_component_mesh`; these are not shallow overlaps.
 - Switch `[0,7]`: bottom copper against C0805 capacitor, exact Common volume 0.003859468662 mm³. The capacitor mesh has 27 boundary edges. Its source BREP is valid, but its mesh remains open. It is explicitly `open_component_mesh`.
@@ -36,16 +36,38 @@ There are no unexplained missing OCCT-positive pairs and no confirmed extra pair
 
 `compare_pairs.py` requires equal occurrence counts, a unique placement match, compatible source names where informative, and world-space surface samples agreeing with the exact placed OCCT geometry. It refuses bounding-box errors above 0.1 mm or an alternative placement margin below 0.2 mm. Those are **matching limits**, not interference tolerances. The smallest alternative margin in this corpus was about 0.469 mm. Names of repeated screws/resistors alone never determine the mapping. Flat exports use the same OCCT solid split as the baseline reference.
 
-The JSON files retain the model SHA-256, both pair sets, the occurrence mapping with identity/placement/sample checks, and every remaining pair's explicit reason. No third-party STEP or mesh files are added. Source attribution/licences remain in [sources.csv](../sources.csv): openAMRobot/openamr-platform-hw, Adafruit/Adafruit_CAD_Parts, Faze4-Robotic-arm, the build123d assembly examples, VoronDesign/Voron-0 and Annex-Engineering/TradRack.
+Only `summary.json`, this README and the comparison scripts are tracked. Detailed per-model JSON remains local under the ignored `artifacts/corpus/pair-evidence/` directory. Those files retain the model SHA-256, both pair sets, the occurrence mapping with identity/placement/sample checks, and every remaining pair's explicit reason. No third-party STEP or mesh files are added. Source attribution/licences remain in [sources.csv](../sources.csv): openAMRobot/openamr-platform-hw, Adafruit/Adafruit_CAD_Parts, Faze4-Robotic-arm, the build123d assembly examples, VoronDesign/Voron-0 and Annex-Engineering/TradRack.
 
 Use the original corpus's CadQuery 2.8.0 / OCCT 7.9.3.1.1 environment, with NumPy and SciPy. Copy `scripts/corpus-bench.rs` and `scripts/scene-dump.rs` into a temporary worktree's `examples/` directory, then build the two examples with the shared build lock, four Cargo jobs and `/tmp/burr-target`. Run one model per process under the same lock and capture its bench JSON and scene-dump JSON. Then:
 
 ```sh
 python artifacts/corpus/scripts/compare_pairs.py MODEL.step \
   --scene MODEL.scene.json --burr MODEL.burr.json \
-  --occt MODEL.occt.json --output MODEL.pair-comparison.json \
+  --occt MODEL.occt.json --output artifacts/corpus/pair-evidence/MODEL.after-comparison.json \
   --reference-complete
 ```
+
+Run the same commands in a Burr 0.36.0 checkout for the baseline bench report, using the same scene dump and OCCT reference, and save its comparison as `MODEL.before-comparison.json`. To regenerate a detailed local `MODEL.json` bundle, combine those outputs with the current bench report and source hash:
+
+```python
+import hashlib, json
+from pathlib import Path
+
+model = Path("MODEL.step")
+evidence = Path("artifacts/corpus/pair-evidence")
+def read(path):
+    return json.loads(path.read_text(encoding="utf-8"))
+report = read(Path("MODEL.burr.json"))["report"]
+report["model_path"] = "models/" + model.name
+report.pop("unresolved_pairs", None)  # retained in the after comparison
+bundle = dict(model=model.name, sha256=hashlib.sha256(model.read_bytes()).hexdigest(),
+              before=read(evidence / "MODEL.before-comparison.json"),
+              after=read(evidence / "MODEL.after-comparison.json"), after_report=report)
+(evidence / (model.name + ".json")).write_text(
+    json.dumps(bundle, indent=2) + "\n", encoding="utf-8")
+```
+
+Keep these generated files ignored; the compact tracked summary and table record their counts.
 
 `--reference-complete` is required only for legacy OCCT logs without a completion flag, and asserts the full scan documented by the original corpus baseline. Partial reference scans are rejected. The OCCT positive-volume floor remains `max(1e-6 mm³, smaller-part volume × 1e-9)`.
 
