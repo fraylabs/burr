@@ -25,7 +25,7 @@ def measured(directory, name):
         result = dict(metrics.get('load_metadata', {}))
         result['report'] = dict(outcome='incomplete', findings=[], unresolved_pairs=[],
                               incomplete_reasons=[dict(code='measurement_cap',
-                                                       message=f"{metrics['cap']} cap; no completed Burr check")])
+                                                       message=f"{metrics['timeout_limit_s']:g} s {metrics['cap']} cap; {metrics.get('cap_reason', 'measurement incomplete')}; no completed Burr check")])
         return result
     return read(directory / (name + '.burr.json'))
 
@@ -116,6 +116,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for option in ('corpus', 'reference-logs', 'before', 'after', 'scene-binary', 'output'):
         parser.add_argument('--' + option, type=pathlib.Path, required=True)
+    parser.add_argument('--current-main', type=pathlib.Path)
     args = parser.parse_args()
     tracked = pathlib.Path(__file__).resolve().parent.parent
     args.output.mkdir(parents=True, exist_ok=True)
@@ -127,13 +128,15 @@ def main():
         old = measured(args.before, name)
         new = measured(args.after, name)
         a, b = facts(old), facts(new)
-        changed = a != b
+        current = facts(measured(args.current_main, name)) if args.current_main else None
+        changed = a != b or (current is not None and current != b)
         outcome = b['outcome']
         if outcome in ('pass', 'fail') and source['occt_verdict'] in ('pass', 'fail') and outcome != source['occt_verdict']:
             raise RuntimeError(f'Wrong conclusive verdict: {name}')
         if outcome == 'pass' and source['occt_verdict'] != 'pass':
             raise RuntimeError(f'Pass has no completed exact clearance reference: {name}')
-        removed = set(a['confirmed']) - set(b['confirmed'])
+        previous_pairs = set(a['confirmed']) | (set(current['confirmed']) if current else set())
+        removed = previous_pairs - set(b['confirmed'])
         if removed:
             raise RuntimeError(f'Confirmed pair disappeared: {name}: {removed}')
         row = dict(model=name, source_sha256=source['sha256'], changed=changed,

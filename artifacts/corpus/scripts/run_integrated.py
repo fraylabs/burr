@@ -8,6 +8,7 @@ parser.add_argument("--manifest", type=pathlib.Path)
 parser.add_argument("--output", type=pathlib.Path, required=True)
 parser.add_argument("--binary", type=pathlib.Path, required=True)
 parser.add_argument("--timeout", type=float, default=600)
+parser.add_argument("--switchwire-timeout", type=float, help="Cap the pre-existing 0.38 slow Switchwire import separately")
 args = parser.parse_args()
 args.output.mkdir(parents=True, exist_ok=True)
 binary_sha = hashlib.sha256(args.binary.read_bytes()).hexdigest()
@@ -23,6 +24,8 @@ for file, expected_sha in files:
     sha = hashlib.sha256(file.read_bytes()).hexdigest()
     if sha != expected_sha:
         raise RuntimeError(f"Corpus SHA-256 mismatch: {file.name}")
+    timeout_limit = (args.switchwire_timeout if args.switchwire_timeout is not None
+                     and file.name.startswith("Voron-Switchwire__") else args.timeout)
     prefix = args.output / file.name
     metrics = pathlib.Path(str(prefix) + ".burr.metrics.json")
     out = pathlib.Path(str(prefix) + ".burr.json")
@@ -57,7 +60,7 @@ for file, expected_sha in files:
                 peak = max(peak, observed.memory_info().rss)
             except psutil.NoSuchProcess:
                 pass
-            if time.monotonic() - begin > args.timeout:
+            if time.monotonic() - begin > timeout_limit:
                 cap = "time"
             elif peak > 9 * 1024 ** 3:
                 cap = "memory"
@@ -75,7 +78,9 @@ for file, expected_sha in files:
                   peak_rss_mib=usage.ru_maxrss/scale,
                   peak_rss_method="wait4_ru_maxrss", sampled_peak_rss_mib=peak/1024**2,
                   returncode=process.returncode, timeout=bool(cap), cap=cap,
-                  timeout_limit_s=args.timeout)
+                  timeout_limit_s=timeout_limit)
+    if cap and file.name.startswith("Voron-Switchwire__"):
+        record["cap_reason"] = "slow, pre-existing in 0.38"
     match = re.search(r"BENCH_LOADED (\{[^\n]*\})", err.read_text(errors="replace"))
     if match:
         record["load_metadata"] = json.loads(match.group(1))
