@@ -1,0 +1,534 @@
+{
+  "binary_sha256": "f7ab460f8cdc85aedb4cd1249bf2203ad0f69e920805fffab29264e83530d0b3",
+  "scene_binary_sha256": "a999be35cf1d264704a6fb7ceca014070d0ecef54e9b7455ead4804d7ee3a7ad",
+  "models": [
+    {
+      "model": "openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+      "source_sha256": "cc8faadf3f14ccf96d92525ee19044f44fd4855d4fae4896de019bb0e4b9a7e5",
+      "before_parts": 1,
+      "after_parts": 688,
+      "occt_parts": 688,
+      "before_lost_faces": 18,
+      "after_lost_faces": 6,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+      "source_sha256": "729e55f6794448f7b17a120aaec1aaedaa74518537e9e96a20b2f675b743bedb",
+      "before_parts": 53,
+      "after_parts": 53,
+      "occt_parts": 53,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+      "source_sha256": "e93dffa50a652267aa610056464222d6a51fcb290bfeed322705be7689dd20fa",
+      "before_parts": 43,
+      "after_parts": 43,
+      "occt_parts": 43,
+      "before_lost_faces": 4,
+      "after_lost_faces": 0,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+      "source_sha256": "aa6e37556754cd7baec59cbacdc50c13becb1929b2e6dccc3a6efeade836d748",
+      "before_parts": 97,
+      "after_parts": 97,
+      "occt_parts": 97,
+      "before_lost_faces": 14,
+      "after_lost_faces": 6,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+      "source_sha256": "033e94b2e131b0170adb4cee88899e89148c0cd216669982311e45ce543bc2fa",
+      "before_parts": 33,
+      "after_parts": 33,
+      "occt_parts": 33,
+      "before_lost_faces": 2,
+      "after_lost_faces": 0,
+      "before_outcome": "incomplete",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "Voron-0__MiniSB_Bowden.step",
+      "source_sha256": "d19b2896e3f22074ceb3c5a2b80cca682de1942b57017a8f0d1e833dd3be3d4f",
+      "before_parts": 31,
+      "after_parts": 31,
+      "occt_parts": 31,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "timeout",
+      "structure_errors": []
+    },
+    {
+      "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+      "source_sha256": "7d672b454a75d2fd84710507b41f611f6420eb1cb499b678e01f52c3a6d7f103",
+      "before_parts": 11,
+      "after_parts": 11,
+      "occt_parts": 11,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+      "source_sha256": "e721951b8eaa091b78bb5d6202152956e83767955d7c30b121d0bd7f65f56427",
+      "before_parts": 2,
+      "after_parts": 2,
+      "occt_parts": 2,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "pass",
+      "after_outcome": "pass",
+      "occt_outcome": "pass",
+      "structure_errors": []
+    },
+    {
+      "model": "Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+      "source_sha256": "b05ef95b24d53812192d32643d8eefd01c933526b99193d640b10cf47a505e8d",
+      "before_parts": 11,
+      "after_parts": 11,
+      "occt_parts": 11,
+      "before_lost_faces": 1,
+      "after_lost_faces": 1,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "source_sha256": "d5a9d40db82c55eee20203608a5a4e784b54b87ae339861af577c5aeb182d61f",
+      "before_parts": 1691,
+      "after_parts": 1691,
+      "occt_parts": 1691,
+      "before_lost_faces": 8,
+      "after_lost_faces": 8,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "structure_errors": [
+        "STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry",
+        "STEP leaf component 'Threaded Inserts (1)' has no definition geometry"
+      ]
+    },
+    {
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "source_sha256": "06b372e40217caa1a7d1f516cb74887247f809e41e1e389f740f290e98441b55",
+      "before_parts": 1428,
+      "after_parts": 1428,
+      "occt_parts": 1428,
+      "before_lost_faces": 34,
+      "after_lost_faces": 34,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "source_sha256": "523f1848bb424c8f34876c215e2ef854cd0389dc2affbf640691b9c0cc226700",
+      "before_parts": 712,
+      "after_parts": 712,
+      "occt_parts": 712,
+      "before_lost_faces": 51,
+      "after_lost_faces": 51,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "TradRack__tr-lower-carabiner-distribution-board.STEP",
+      "source_sha256": "934686aa4ebeb85625b9f446773146b51cf59ac3baf0f319061148ed7a48a931",
+      "before_parts": 6,
+      "after_parts": 6,
+      "occt_parts": 6,
+      "before_lost_faces": 2,
+      "after_lost_faces": 2,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "TradRack__tr-toolhead-board.STEP",
+      "source_sha256": "fe502c59d239a848198aa791e3e8bdbe17dd044d5410eaa38ea941e29da0c7aa",
+      "before_parts": 7,
+      "after_parts": 7,
+      "occt_parts": 7,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "before_parts": 136,
+      "after_parts": 136,
+      "occt_parts": 136,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "apollo-3d-enclosure__flat__assembly.step",
+      "source_sha256": "d4814b9d2a14606696be3a3aba9576a26cd29ce23f4a41a366ec30aa4843108c",
+      "before_parts": 2,
+      "after_parts": 2,
+      "occt_parts": 2,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "pass",
+      "structure_errors": []
+    },
+    {
+      "model": "apollo-3d-enclosure__corner__assembly.step",
+      "source_sha256": "d54f63a2994fb32cd32ee67ad6c4ffb1af24312c27a63825c1c6e27ba574a3fb",
+      "before_parts": 2,
+      "after_parts": 2,
+      "occt_parts": 2,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "pass",
+      "structure_errors": []
+    },
+    {
+      "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+      "source_sha256": "60c69cf0b2f1bf5dcb0ef87c7c6b1203a5a94cc60188691d80a1167106554aed",
+      "before_parts": 15,
+      "after_parts": 15,
+      "occt_parts": 15,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+      "source_sha256": "85d61649551b187a005b07ad21950e92f5aec3fa457825805bab1994058c46d6",
+      "before_parts": 5,
+      "after_parts": 5,
+      "occt_parts": 5,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "incomplete",
+      "structure_errors": []
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "source_sha256": "c31fd1adb88029a18a22028ecab3e776011126db2f1fe80624b77860719009d3",
+      "before_parts": 17,
+      "after_parts": 17,
+      "occt_parts": 17,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    },
+    {
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "source_sha256": "cf8fc68d8f32a1bdf3e68cddeaf0b67c040b47946cabc67021b94b9b8229757f",
+      "before_parts": 20,
+      "after_parts": 20,
+      "occt_parts": 20,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "structure_errors": []
+    }
+  ],
+  "pairs": [
+    {
+      "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+      "comparison_complete": true,
+      "occt_pairs": 22,
+      "before_true": 12,
+      "before_false": 0,
+      "after_true": 12,
+      "after_false": 0,
+      "remaining_exact_pairs": 10
+    },
+    {
+      "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+      "comparison_complete": true,
+      "occt_pairs": 11,
+      "before_true": 10,
+      "before_false": 0,
+      "after_true": 10,
+      "after_false": 0,
+      "remaining_exact_pairs": 1
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "comparison_complete": true,
+      "occt_pairs": 9,
+      "before_true": 9,
+      "before_false": 0,
+      "after_true": 9,
+      "after_false": 0,
+      "remaining_exact_pairs": 0
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "comparison_complete": true,
+      "occt_pairs": 3,
+      "before_true": 3,
+      "before_false": 0,
+      "after_true": 3,
+      "after_false": 0,
+      "remaining_exact_pairs": 0
+    },
+    {
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "comparison_complete": true,
+      "occt_pairs": 12,
+      "before_true": 12,
+      "before_false": 0,
+      "after_true": 12,
+      "after_false": 0,
+      "remaining_exact_pairs": 0
+    },
+    {
+      "model": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+      "comparison_complete": true,
+      "occt_pairs": 0,
+      "before_true": 0,
+      "before_false": 0,
+      "after_true": 0,
+      "after_false": 0,
+      "remaining_exact_pairs": 0
+    },
+    {
+      "model": "TradRack__tr-toolhead-board.STEP",
+      "comparison_complete": true,
+      "occt_pairs": 6,
+      "before_true": 6,
+      "before_false": 0,
+      "after_true": 6,
+      "after_false": 0,
+      "remaining_exact_pairs": 0
+    },
+    {
+      "model": "openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+      "comparison_complete": false,
+      "reason": "ValueError: Ambiguous placement for occurrence 0: 0.26194526370703236, 121.62264837652312"
+    },
+    {
+      "model": "openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+      "comparison_complete": false,
+      "reason": "ValueError: Ambiguous placement for occurrence 9: 0.6130486035399375, 9.793152133655049"
+    },
+    {
+      "model": "openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+      "comparison_complete": false,
+      "reason": "ValueError: Ambiguous placement for occurrence 0: 0.3025705432846158, 70.71132553467953"
+    }
+  ],
+  "measured_look_revision": "0a89c3535f26cb51bc38c0db9faebc7cfc62030c",
+  "pinned_look_revision": "5a838db65125830ccd472661507ac71b6dcc5cc5",
+  "pin_delta": "STEP metadata cache identity only",
+  "reported_pairs_verification": [
+    {
+      "model": "openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+      "mode": "reported_pairs_only",
+      "verified_occurrences": 9,
+      "occurrence_mapping_complete": false,
+      "true_pairs": 8,
+      "false_pairs": 0,
+      "remaining_exact_pairs": 8,
+      "max_box_error_mm": 2.3490600581727376e-05,
+      "max_surface_error_mm": 2.3777618219993613e-05
+    }
+  ],
+  "confirmed_pair_deltas_from_manifold_stage": [
+    {
+      "model": "openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+      "before_confirmed_pairs": 12,
+      "after_confirmed_pairs": 12,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 8,
+      "added_pairs": 8,
+      "removed_pairs": 0
+    },
+    {
+      "model": "Voron-0__MiniSB_Bowden.step",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "TradRack__tr-lower-carabiner-distribution-board.STEP",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "TradRack__tr-toolhead-board.STEP",
+      "before_confirmed_pairs": 6,
+      "after_confirmed_pairs": 6,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "before_confirmed_pairs": 9,
+      "after_confirmed_pairs": 9,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "apollo-3d-enclosure__flat__assembly.step",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "apollo-3d-enclosure__corner__assembly.step",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+      "before_confirmed_pairs": 10,
+      "after_confirmed_pairs": 10,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+      "before_confirmed_pairs": 0,
+      "after_confirmed_pairs": 0,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "before_confirmed_pairs": 3,
+      "after_confirmed_pairs": 3,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    },
+    {
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "before_confirmed_pairs": 12,
+      "after_confirmed_pairs": 12,
+      "added_pairs": 0,
+      "removed_pairs": 0
+    }
+  ]
+}

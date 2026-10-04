@@ -1,0 +1,3780 @@
+{
+  "models": [
+    {
+      "model": "openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+      "source_sha256": "cc8faadf3f14ccf96d92525ee19044f44fd4855d4fae4896de019bb0e4b9a7e5",
+      "changed": true,
+      "before_parts": 1,
+      "after_parts": 688,
+      "before_lost_faces": 17,
+      "after_lost_faces": 5,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 0,
+      "before_unresolved": 0,
+      "unresolved": 0,
+      "unresolved_codes": {},
+      "before_triangles": 915351,
+      "after_triangles": 918812,
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "5 of 7223 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 1,
+        "faces": {
+          "declared_faces": 7223,
+          "lost_faces": 17
+        },
+        "triangles": 915351,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "assembly_structure_lost",
+            "message": "STEP assembly structure could not be resolved: failed to build the STEP assembly graph: failed to reference the geometry `shape_representation`"
+          },
+          {
+            "code": "step_faces_lost",
+            "message": "17 of 7223 STEP faces were lost during import"
+          }
+        ],
+        "structure_errors": [
+          "STEP assembly structure could not be resolved: failed to build the STEP assembly graph: failed to reference the geometry `shape_representation`"
+        ],
+        "error": null
+      },
+      "face_refusal_reasons": {
+        "RejectedDegenerate": 3,
+        "NoOddParityRegion": 2
+      },
+      "confirmed_true": 0,
+      "confirmed_false": 0,
+      "comparison_mode": "refused",
+      "unverified_reason": "Geometry mismatch for occurrence 87: 0.7662080017210326; OCCT reference did not finish its pair scan",
+      "full_comparison_refusal": "Geometry mismatch for occurrence 87: 0.7662080017210326"
+    },
+    {
+      "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+      "source_sha256": "729e55f6794448f7b17a120aaec1aaedaa74518537e9e96a20b2f675b743bedb",
+      "changed": true,
+      "before_parts": 53,
+      "after_parts": 53,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 16,
+      "after_confirmed": 16,
+      "before_unresolved": 25,
+      "unresolved": 25,
+      "unresolved_codes": {
+        "below_coordinate_resolution": 6,
+        "below_tessellation_resolution": 19
+      },
+      "before_triangles": 35296,
+      "after_triangles": 35292,
+      "incomplete_reasons": [
+        {
+          "code": "below_coordinate_resolution",
+          "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+        },
+        {
+          "code": "below_tessellation_resolution",
+          "message": "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs."
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 53,
+        "faces": {
+          "declared_faces": 291,
+          "lost_faces": 0
+        },
+        "triangles": 35296,
+        "outcome": "fail",
+        "confirmed": [
+          [
+            0,
+            14
+          ],
+          [
+            3,
+            15
+          ],
+          [
+            3,
+            36
+          ],
+          [
+            3,
+            41
+          ],
+          [
+            5,
+            30
+          ],
+          [
+            6,
+            52
+          ],
+          [
+            7,
+            31
+          ],
+          [
+            8,
+            32
+          ],
+          [
+            10,
+            46
+          ],
+          [
+            11,
+            34
+          ],
+          [
+            16,
+            25
+          ],
+          [
+            18,
+            42
+          ],
+          [
+            24,
+            45
+          ],
+          [
+            31,
+            41
+          ],
+          [
+            31,
+            51
+          ],
+          [
+            40,
+            44
+          ]
+        ],
+        "unresolved": [
+          [
+            [
+              0,
+              22
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              2,
+              46
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              3,
+              18
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              3,
+              20
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              23
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              43
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              3,
+              52
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              4,
+              52
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              5,
+              12
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              8,
+              29
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              9,
+              24
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              10,
+              19
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              10,
+              31
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              13,
+              40
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              14,
+              31
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              14,
+              37
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              16,
+              39
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              18,
+              21
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              25,
+              26
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              28,
+              31
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              30,
+              48
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              31,
+              35
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              31,
+              49
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              33,
+              45
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              34,
+              50
+            ],
+            "below_tessellation_resolution"
+          ]
+        ],
+        "reasons": [
+          {
+            "code": "below_coordinate_resolution",
+            "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+          },
+          {
+            "code": "below_tessellation_resolution",
+            "message": "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 16,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 6,
+      "max_box_error_mm": 0.006161817816802548,
+      "max_surface_error_mm": 2.762783688946722e-05
+    },
+    {
+      "model": "openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+      "source_sha256": "e93dffa50a652267aa610056464222d6a51fcb290bfeed322705be7689dd20fa",
+      "changed": true,
+      "before_parts": 43,
+      "after_parts": 43,
+      "before_lost_faces": 4,
+      "after_lost_faces": 0,
+      "before_outcome": "incomplete",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 16,
+      "before_unresolved": 0,
+      "unresolved": 26,
+      "unresolved_codes": {
+        "below_tessellation_resolution": 26
+      },
+      "before_triangles": 97012,
+      "after_triangles": 97752,
+      "incomplete_reasons": [
+        {
+          "code": "below_tessellation_resolution",
+          "message": "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs."
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 43,
+        "faces": {
+          "declared_faces": 422,
+          "lost_faces": 4
+        },
+        "triangles": 97012,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "step_faces_lost",
+            "message": "4 of 422 STEP faces were lost during import"
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 16,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 26,
+      "max_box_error_mm": 0.0029407074170782204,
+      "max_surface_error_mm": 2.021724657615941e-05
+    },
+    {
+      "model": "openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+      "source_sha256": "aa6e37556754cd7baec59cbacdc50c13becb1929b2e6dccc3a6efeade836d748",
+      "changed": true,
+      "before_parts": 97,
+      "after_parts": 97,
+      "before_lost_faces": 13,
+      "after_lost_faces": 5,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 0,
+      "before_unresolved": 0,
+      "unresolved": 0,
+      "unresolved_codes": {},
+      "before_triangles": 279693,
+      "after_triangles": 282035,
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "5 of 2411 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 97,
+        "faces": {
+          "declared_faces": 2411,
+          "lost_faces": 13
+        },
+        "triangles": 279693,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "step_faces_lost",
+            "message": "13 of 2411 STEP faces were lost during import"
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "face_refusal_reasons": {
+        "NoOddParityRegion": 2,
+        "RejectedDegenerate": 3
+      },
+      "confirmed_true": 0,
+      "confirmed_false": 0,
+      "comparison_mode": "reported_pairs_only",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": false,
+      "occt_positives_unconfirmed": 62,
+      "max_box_error_mm": null,
+      "max_surface_error_mm": null,
+      "full_comparison_refusal": "Ambiguous placement for occurrence 18: 0.13997259353104094, 56.113409375377"
+    },
+    {
+      "model": "openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+      "source_sha256": "033e94b2e131b0170adb4cee88899e89148c0cd216669982311e45ce543bc2fa",
+      "changed": true,
+      "before_parts": 33,
+      "after_parts": 33,
+      "before_lost_faces": 2,
+      "after_lost_faces": 0,
+      "before_outcome": "incomplete",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 8,
+      "before_unresolved": 0,
+      "unresolved": 8,
+      "unresolved_codes": {
+        "below_tessellation_resolution": 8
+      },
+      "before_triangles": 125590,
+      "after_triangles": 125614,
+      "incomplete_reasons": [
+        {
+          "code": "below_tessellation_resolution",
+          "message": "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs."
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 33,
+        "faces": {
+          "declared_faces": 570,
+          "lost_faces": 2
+        },
+        "triangles": 125590,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "step_faces_lost",
+            "message": "2 of 570 STEP faces were lost during import"
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 8,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 8,
+      "max_box_error_mm": 0.00014941756117022582,
+      "max_surface_error_mm": 2.1484511808204748e-05,
+      "original_eight_retained": true
+    },
+    {
+      "model": "Voron-0__MiniSB_Bowden.step",
+      "source_sha256": "d19b2896e3f22074ceb3c5a2b80cca682de1942b57017a8f0d1e833dd3be3d4f",
+      "changed": true,
+      "before_parts": 31,
+      "after_parts": 31,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "timeout",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 9,
+      "after_confirmed": 9,
+      "before_unresolved": 76,
+      "unresolved": 76,
+      "unresolved_codes": {
+        "open_component_mesh": 65,
+        "below_tessellation_resolution": 10,
+        "below_coordinate_resolution": 1
+      },
+      "before_triangles": 490939,
+      "after_triangles": 491533,
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components do not form closed solids: Cowling_ECAS04 v6, Cowling_PC4_M6 v6, Cowling_PC4_M10 v6, 3010 Blower Fan (1), 3010 Blower Fan (1), M10 Coupler."
+        },
+        {
+          "code": "below_coordinate_resolution",
+          "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+        },
+        {
+          "code": "below_tessellation_resolution",
+          "message": "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs."
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 31,
+        "faces": {
+          "declared_faces": 3293,
+          "lost_faces": 0
+        },
+        "triangles": 491815,
+        "outcome": "fail",
+        "confirmed": [
+          [
+            5,
+            14
+          ],
+          [
+            6,
+            16
+          ],
+          [
+            8,
+            17
+          ],
+          [
+            12,
+            28
+          ],
+          [
+            13,
+            28
+          ],
+          [
+            22,
+            24
+          ],
+          [
+            22,
+            25
+          ],
+          [
+            22,
+            27
+          ],
+          [
+            25,
+            26
+          ]
+        ],
+        "unresolved": [
+          [
+            [
+              0,
+              1
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              2
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              3
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              4
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              5
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              6
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              8
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              14
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              15
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              18
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              19
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              20
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              21
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              22
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              23
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              24
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              25
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              26
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              27
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              28
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              30
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              2
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              3
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              4
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              5
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              6
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              8
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              14
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              15
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              18
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              19
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              20
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              21
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              22
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              23
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              24
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              25
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              26
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              27
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              28
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              30
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              3
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              4
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              5
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              6
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              8
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              14
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              15
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              18
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              19
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              20
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              21
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              22
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              23
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              24
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              25
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              26
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              27
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              28
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              30
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              3,
+              18
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              4,
+              15
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              6,
+              28
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              7,
+              29
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              8,
+              28
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              9,
+              29
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              10,
+              29
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              11,
+              29
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              22,
+              23
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              22,
+              26
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              23,
+              24
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              23,
+              25
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              23,
+              26
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              23,
+              27
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              24,
+              25
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              24,
+              27
+            ],
+            "below_coordinate_resolution"
+          ]
+        ],
+        "reasons": [
+          {
+            "code": "open_component_mesh",
+            "message": "Could not prove a clean result because these tessellated components do not form closed solids: Cowling_ECAS04 v6, Cowling_PC4_M6 v6, Cowling_PC4_M10 v6, 3010 Blower Fan (1), 3010 Blower Fan (1), M10 Coupler."
+          },
+          {
+            "code": "below_coordinate_resolution",
+            "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+          },
+          {
+            "code": "below_tessellation_resolution",
+            "message": "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 9,
+      "confirmed_false": 0,
+      "comparison_mode": "reported_pairs_only",
+      "reference_scope": "reported_pairs",
+      "occurrence_mapping_complete": false,
+      "occt_positives_unconfirmed": 0,
+      "max_box_error_mm": 0.04741433459376892,
+      "max_surface_error_mm": 6.417242092911195e-06
+    },
+    {
+      "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+      "source_sha256": "7d672b454a75d2fd84710507b41f611f6420eb1cb499b678e01f52c3a6d7f103",
+      "changed": true,
+      "before_parts": 11,
+      "after_parts": 11,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 7,
+      "after_confirmed": 7,
+      "before_unresolved": 7,
+      "unresolved": 7,
+      "unresolved_codes": {
+        "below_coordinate_resolution": 2,
+        "below_tessellation_resolution": 5
+      },
+      "before_triangles": 105690,
+      "after_triangles": 105562,
+      "incomplete_reasons": [
+        {
+          "code": "below_coordinate_resolution",
+          "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+        },
+        {
+          "code": "below_tessellation_resolution",
+          "message": "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs."
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 11,
+        "faces": {
+          "declared_faces": 943,
+          "lost_faces": 0
+        },
+        "triangles": 105690,
+        "outcome": "fail",
+        "confirmed": [
+          [
+            0,
+            8
+          ],
+          [
+            0,
+            9
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            6,
+            10
+          ]
+        ],
+        "unresolved": [
+          [
+            [
+              0,
+              1
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              2
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              0,
+              3
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              1,
+              10
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              4,
+              10
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              5,
+              10
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              7,
+              10
+            ],
+            "below_tessellation_resolution"
+          ]
+        ],
+        "reasons": [
+          {
+            "code": "below_coordinate_resolution",
+            "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+          },
+          {
+            "code": "below_tessellation_resolution",
+            "message": "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 7,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 1,
+      "max_box_error_mm": 9.58344202147262e-06,
+      "max_surface_error_mm": 1.3064324195878204e-05
+    },
+    {
+      "model": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+      "source_sha256": "e721951b8eaa091b78bb5d6202152956e83767955d7c30b121d0bd7f65f56427",
+      "changed": false,
+      "before_parts": 2,
+      "after_parts": 2,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "pass",
+      "after_outcome": "pass",
+      "occt_outcome": "pass",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 0,
+      "before_unresolved": 0,
+      "unresolved": 0,
+      "unresolved_codes": {},
+      "before_triangles": 49186,
+      "after_triangles": 49186,
+      "incomplete_reasons": [],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 2,
+        "faces": {
+          "declared_faces": 388,
+          "lost_faces": 0
+        },
+        "triangles": 49186,
+        "outcome": "pass",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 0,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 0,
+      "max_box_error_mm": 5.174468433959232e-06,
+      "max_surface_error_mm": 3.771666982963086e-06
+    },
+    {
+      "model": "Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+      "source_sha256": "b05ef95b24d53812192d32643d8eefd01c933526b99193d640b10cf47a505e8d",
+      "changed": true,
+      "before_parts": 11,
+      "after_parts": 11,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 0,
+      "before_unresolved": 13,
+      "unresolved": 13,
+      "unresolved_codes": {
+        "open_component_mesh": 10,
+        "below_coordinate_resolution": 3
+      },
+      "before_triangles": 354413,
+      "after_triangles": 354381,
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components do not form closed solids: MiniSB_adxl_mount_adafruit_19mm_c_c (1), Male Pin Header v1:9 (1)."
+        },
+        {
+          "code": "below_coordinate_resolution",
+          "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 11,
+        "faces": {
+          "declared_faces": 3672,
+          "lost_faces": 0
+        },
+        "triangles": 354413,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [
+          [
+            [
+              0,
+              1
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              2
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              3
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              6
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              8
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              2
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              3
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              4
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              5
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              8
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              5
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              4
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              7,
+              8
+            ],
+            "below_coordinate_resolution"
+          ]
+        ],
+        "reasons": [
+          {
+            "code": "open_component_mesh",
+            "message": "Could not prove a clean result because these tessellated components do not form closed solids: MiniSB_adxl_mount_adafruit_19mm_c_c (1), Male Pin Header v1:9 (1)."
+          },
+          {
+            "code": "below_coordinate_resolution",
+            "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 0,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 3,
+      "max_box_error_mm": 0.05590826562966169,
+      "max_surface_error_mm": 1.963886881866015e-05
+    },
+    {
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "source_sha256": "d5a9d40db82c55eee20203608a5a4e784b54b87ae339861af577c5aeb182d61f",
+      "changed": true,
+      "before_parts": 1691,
+      "after_parts": 1691,
+      "before_lost_faces": 6,
+      "after_lost_faces": 6,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 0,
+      "before_unresolved": 0,
+      "unresolved": 0,
+      "unresolved_codes": {},
+      "before_triangles": 6892476,
+      "after_triangles": 6894718,
+      "incomplete_reasons": [
+        {
+          "code": "assembly_structure_lost",
+          "message": "STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry"
+        },
+        {
+          "code": "assembly_structure_lost",
+          "message": "STEP leaf component 'Threaded Inserts (1)' has no definition geometry"
+        },
+        {
+          "code": "step_faces_lost",
+          "message": "6 of 60543 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [
+        "STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry",
+        "STEP leaf component 'Threaded Inserts (1)' has no definition geometry"
+      ],
+      "current_main": {
+        "parts": 1691,
+        "faces": {
+          "declared_faces": 60543,
+          "lost_faces": 6
+        },
+        "triangles": 6892549,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "assembly_structure_lost",
+            "message": "STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry"
+          },
+          {
+            "code": "assembly_structure_lost",
+            "message": "STEP leaf component 'Threaded Inserts (1)' has no definition geometry"
+          },
+          {
+            "code": "step_faces_lost",
+            "message": "6 of 60543 STEP faces were lost during import"
+          }
+        ],
+        "structure_errors": [
+          "STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry",
+          "STEP leaf component 'Threaded Inserts (1)' has no definition geometry"
+        ],
+        "error": null
+      },
+      "face_refusal_reasons": {
+        "NoOddParityRegion": 5,
+        "ContradictoryDualParity": 1
+      },
+      "confirmed_true": 0,
+      "confirmed_false": 0,
+      "comparison_mode": "refused",
+      "unverified_reason": "OCCT source occurrence 598 ('(Unsaved)/Skirts/Feet/Mains Inlet Foot/Hardware (28)/Threaded Inserts (2)/M3 Threaded Insert (1)/Threaded Inserts (1)') has no usable bounding box: Bnd_Box is void; OCCT source occurrence 598 ('(Unsaved)/Skirts/Feet/Mains Inlet Foot/Hardware (28)/Threaded Inserts (2)/M3 Threaded Insert (1)/Threaded Inserts (1)') has no usable bounding box: Bnd_Box is void",
+      "full_comparison_refusal": "OCCT source occurrence 598 ('(Unsaved)/Skirts/Feet/Mains Inlet Foot/Hardware (28)/Threaded Inserts (2)/M3 Threaded Insert (1)/Threaded Inserts (1)') has no usable bounding box: Bnd_Box is void"
+    },
+    {
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "source_sha256": "06b372e40217caa1a7d1f516cb74887247f809e41e1e389f740f290e98441b55",
+      "changed": true,
+      "before_parts": 1428,
+      "after_parts": 1428,
+      "before_lost_faces": 4,
+      "after_lost_faces": 4,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 0,
+      "before_unresolved": 0,
+      "unresolved": 0,
+      "unresolved_codes": {},
+      "before_triangles": 12229514,
+      "after_triangles": 12229456,
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "4 of 100800 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 1428,
+        "faces": {
+          "declared_faces": 100800,
+          "lost_faces": 4
+        },
+        "triangles": 12229608,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "step_faces_lost",
+            "message": "4 of 100800 STEP faces were lost during import"
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "face_refusal_reasons": {
+        "RejectedDegenerate": 1,
+        "NoOddParityRegion": 1,
+        "ConstraintInsertionIncomplete": 2
+      },
+      "confirmed_true": 0,
+      "confirmed_false": 0,
+      "comparison_mode": "refused",
+      "unverified_reason": "Ambiguous placement for occurrence 30: 1.292938617170019, 30.39555388816504; OCCT reference did not finish its pair scan",
+      "full_comparison_refusal": "Ambiguous placement for occurrence 30: 1.292938617170019, 30.39555388816504"
+    },
+    {
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "source_sha256": "523f1848bb424c8f34876c215e2ef854cd0389dc2affbf640691b9c0cc226700",
+      "changed": true,
+      "before_parts": null,
+      "after_parts": 712,
+      "before_lost_faces": null,
+      "after_lost_faces": 46,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "before_measurement_capped": true,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 0,
+      "before_unresolved": 0,
+      "unresolved": 0,
+      "unresolved_codes": {},
+      "before_triangles": null,
+      "after_triangles": 4274269,
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "46 of 35873 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 712,
+        "faces": {
+          "declared_faces": 35873,
+          "lost_faces": 46
+        },
+        "triangles": 4276903,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "step_faces_lost",
+            "message": "46 of 35873 STEP faces were lost during import"
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "face_refusal_reasons": {
+        "conversion:edge_conversion:WireNotClosed": 42,
+        "NoOddParityRegion": 1,
+        "ContradictoryDualParity": 2,
+        "RejectedDegenerate": 1
+      },
+      "confirmed_true": 0,
+      "confirmed_false": 0,
+      "comparison_mode": "refused",
+      "unverified_reason": "Ambiguous placement for occurrence 146: 0.43297790499616234, 27.836017871854406; OCCT reference did not finish its pair scan",
+      "full_comparison_refusal": "Ambiguous placement for occurrence 146: 0.43297790499616234, 27.836017871854406"
+    },
+    {
+      "model": "TradRack__tr-lower-carabiner-distribution-board.STEP",
+      "source_sha256": "934686aa4ebeb85625b9f446773146b51cf59ac3baf0f319061148ed7a48a931",
+      "changed": false,
+      "before_parts": 6,
+      "after_parts": 6,
+      "before_lost_faces": 2,
+      "after_lost_faces": 2,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 0,
+      "before_unresolved": 0,
+      "unresolved": 0,
+      "unresolved_codes": {},
+      "before_triangles": 157992,
+      "after_triangles": 157992,
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "2 of 1527 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 6,
+        "faces": {
+          "declared_faces": 1527,
+          "lost_faces": 2
+        },
+        "triangles": 157992,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "step_faces_lost",
+            "message": "2 of 1527 STEP faces were lost during import"
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "face_refusal_reasons": {
+        "ContradictoryDualParity": 2
+      }
+    },
+    {
+      "model": "TradRack__tr-toolhead-board.STEP",
+      "source_sha256": "fe502c59d239a848198aa791e3e8bdbe17dd044d5410eaa38ea941e29da0c7aa",
+      "changed": false,
+      "before_parts": 7,
+      "after_parts": 7,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 6,
+      "after_confirmed": 6,
+      "before_unresolved": 0,
+      "unresolved": 0,
+      "unresolved_codes": {},
+      "before_triangles": 126356,
+      "after_triangles": 126356,
+      "incomplete_reasons": [],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 7,
+        "faces": {
+          "declared_faces": 1237,
+          "lost_faces": 0
+        },
+        "triangles": 126356,
+        "outcome": "fail",
+        "confirmed": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ]
+        ],
+        "unresolved": [],
+        "reasons": [],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 6,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 0,
+      "max_box_error_mm": 1.207078459587056e-05,
+      "max_surface_error_mm": 9.044630462684448e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "changed": false,
+      "before_parts": 136,
+      "after_parts": 136,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 9,
+      "after_confirmed": 9,
+      "before_unresolved": 126,
+      "unresolved": 126,
+      "unresolved_codes": {
+        "below_coordinate_resolution": 126
+      },
+      "before_triangles": 138900,
+      "after_triangles": 138900,
+      "incomplete_reasons": [
+        {
+          "code": "below_coordinate_resolution",
+          "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 136,
+        "faces": {
+          "declared_faces": 416,
+          "lost_faces": 0
+        },
+        "triangles": 138900,
+        "outcome": "fail",
+        "confirmed": [
+          [
+            6,
+            7
+          ],
+          [
+            103,
+            104
+          ],
+          [
+            106,
+            107
+          ],
+          [
+            109,
+            110
+          ],
+          [
+            112,
+            113
+          ],
+          [
+            115,
+            116
+          ],
+          [
+            117,
+            118
+          ],
+          [
+            122,
+            123
+          ],
+          [
+            125,
+            126
+          ]
+        ],
+        "unresolved": [
+          [
+            [
+              0,
+              1
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              2
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              3
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              4
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              5
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              6
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              8
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              9
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              10
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              11
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              12
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              13
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              14
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              15
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              16
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              17
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              18
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              19
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              20
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              21
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              22
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              23
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              24
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              25
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              26
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              27
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              28
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              29
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              30
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              31
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              32
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              33
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              34
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              35
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              36
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              37
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              38
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              39
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              40
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              41
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              42
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              43
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              44
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              45
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              46
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              47
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              48
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              49
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              50
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              51
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              52
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              53
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              54
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              55
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              56
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              57
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              58
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              59
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              60
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              61
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              62
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              63
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              64
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              65
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              66
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              67
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              68
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              69
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              70
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              71
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              72
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              73
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              74
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              75
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              76
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              77
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              78
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              79
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              80
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              81
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              82
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              83
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              84
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              85
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              86
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              87
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              88
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              89
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              90
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              91
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              92
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              93
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              94
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              95
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              96
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              97
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              98
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              99
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              100
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              101
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              102
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              103
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              105
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              106
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              108
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              109
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              111
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              112
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              114
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              115
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              118
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              119
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              120
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              121
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              123
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              124
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              126
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              127
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              128
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              129
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              130
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              131
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              132
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              133
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              134
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              135
+            ],
+            "below_coordinate_resolution"
+          ]
+        ],
+        "reasons": [
+          {
+            "code": "below_coordinate_resolution",
+            "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 9,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 0,
+      "max_box_error_mm": 1.576704040057028e-05,
+      "max_surface_error_mm": 9.62122653407481e-06
+    },
+    {
+      "model": "apollo-3d-enclosure__flat__assembly.step",
+      "source_sha256": "d4814b9d2a14606696be3a3aba9576a26cd29ce23f4a41a366ec30aa4843108c",
+      "changed": true,
+      "before_parts": 2,
+      "after_parts": 2,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "pass",
+      "after_outcome": "pass",
+      "occt_outcome": "pass",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 0,
+      "before_unresolved": 0,
+      "unresolved": 0,
+      "unresolved_codes": {},
+      "before_triangles": 75386,
+      "after_triangles": 75402,
+      "incomplete_reasons": [],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 2,
+        "faces": {
+          "declared_faces": 707,
+          "lost_faces": 0
+        },
+        "triangles": 75402,
+        "outcome": "pass",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 0,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 0,
+      "max_box_error_mm": 0.0027936255600768925,
+      "max_surface_error_mm": 2.763549804996046e-06
+    },
+    {
+      "model": "apollo-3d-enclosure__corner__assembly.step",
+      "source_sha256": "d54f63a2994fb32cd32ee67ad6c4ffb1af24312c27a63825c1c6e27ba574a3fb",
+      "changed": true,
+      "before_parts": 2,
+      "after_parts": 2,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "pass",
+      "after_outcome": "pass",
+      "occt_outcome": "pass",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 0,
+      "before_unresolved": 0,
+      "unresolved": 0,
+      "unresolved_codes": {},
+      "before_triangles": 79462,
+      "after_triangles": 79438,
+      "incomplete_reasons": [],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 2,
+        "faces": {
+          "declared_faces": 764,
+          "lost_faces": 0
+        },
+        "triangles": 79438,
+        "outcome": "pass",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 0,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 0,
+      "max_box_error_mm": 0.09689839081297286,
+      "max_surface_error_mm": 4.500850958207623e-06
+    },
+    {
+      "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+      "source_sha256": "60c69cf0b2f1bf5dcb0ef87c7c6b1203a5a94cc60188691d80a1167106554aed",
+      "changed": false,
+      "before_parts": 15,
+      "after_parts": 15,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 11,
+      "after_confirmed": 11,
+      "before_unresolved": 13,
+      "unresolved": 13,
+      "unresolved_codes": {
+        "below_coordinate_resolution": 12,
+        "below_tessellation_resolution": 1
+      },
+      "before_triangles": 368970,
+      "after_triangles": 368970,
+      "incomplete_reasons": [
+        {
+          "code": "below_coordinate_resolution",
+          "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+        },
+        {
+          "code": "below_tessellation_resolution",
+          "message": "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs."
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 15,
+        "faces": {
+          "declared_faces": 2671,
+          "lost_faces": 0
+        },
+        "triangles": 368970,
+        "outcome": "fail",
+        "confirmed": [
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            10
+          ],
+          [
+            1,
+            11
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            1,
+            13
+          ],
+          [
+            1,
+            14
+          ],
+          [
+            2,
+            4
+          ]
+        ],
+        "unresolved": [
+          [
+            [
+              0,
+              1
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              2
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              3
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              0,
+              4
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              2,
+              6
+            ],
+            "below_tessellation_resolution"
+          ],
+          [
+            [
+              3,
+              5
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              8
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              9
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              10
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              11
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              12
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              13
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              14
+            ],
+            "below_coordinate_resolution"
+          ]
+        ],
+        "reasons": [
+          {
+            "code": "below_coordinate_resolution",
+            "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+          },
+          {
+            "code": "below_tessellation_resolution",
+            "message": "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 11,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 0,
+      "max_box_error_mm": 0.00886357565300381,
+      "max_surface_error_mm": 1.2941832206725663e-06
+    },
+    {
+      "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+      "source_sha256": "85d61649551b187a005b07ad21950e92f5aec3fa457825805bab1994058c46d6",
+      "changed": true,
+      "before_parts": 5,
+      "after_parts": 5,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "incomplete",
+      "after_outcome": "incomplete",
+      "occt_outcome": "incomplete",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 0,
+      "after_confirmed": 0,
+      "before_unresolved": 7,
+      "unresolved": 7,
+      "unresolved_codes": {
+        "open_component_mesh": 6,
+        "below_coordinate_resolution": 1
+      },
+      "before_triangles": 104813,
+      "after_triangles": 104810,
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components do not form closed solids: Holder, Spring, Dome."
+        },
+        {
+          "code": "below_coordinate_resolution",
+          "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 5,
+        "faces": {
+          "declared_faces": 244,
+          "lost_faces": 0
+        },
+        "triangles": 104810,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [
+          [
+            [
+              0,
+              1
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              0,
+              2
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              1,
+              2
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              3
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              1,
+              4
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              3
+            ],
+            "open_component_mesh"
+          ],
+          [
+            [
+              2,
+              4
+            ],
+            "open_component_mesh"
+          ]
+        ],
+        "reasons": [
+          {
+            "code": "open_component_mesh",
+            "message": "Could not prove a clean result because these tessellated components do not form closed solids: Holder, Spring, Dome."
+          },
+          {
+            "code": "below_coordinate_resolution",
+            "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 0,
+      "confirmed_false": 0,
+      "comparison_mode": "reported_pairs_only",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": false,
+      "occt_positives_unconfirmed": 0,
+      "max_box_error_mm": null,
+      "max_surface_error_mm": null,
+      "full_comparison_refusal": "Ambiguous placement for occurrence 0: 0.15328055885790287, 24.382849991900024"
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "source_sha256": "c31fd1adb88029a18a22028ecab3e776011126db2f1fe80624b77860719009d3",
+      "changed": false,
+      "before_parts": 17,
+      "after_parts": 17,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 3,
+      "after_confirmed": 3,
+      "before_unresolved": 5,
+      "unresolved": 5,
+      "unresolved_codes": {
+        "below_coordinate_resolution": 5
+      },
+      "before_triangles": 15554,
+      "after_triangles": 15554,
+      "incomplete_reasons": [
+        {
+          "code": "below_coordinate_resolution",
+          "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 17,
+        "faces": {
+          "declared_faces": 157,
+          "lost_faces": 0
+        },
+        "triangles": 15554,
+        "outcome": "fail",
+        "confirmed": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            7
+          ],
+          [
+            0,
+            15
+          ]
+        ],
+        "unresolved": [
+          [
+            [
+              0,
+              16
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              1,
+              2
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              2,
+              3
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              4
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              3,
+              5
+            ],
+            "below_coordinate_resolution"
+          ]
+        ],
+        "reasons": [
+          {
+            "code": "below_coordinate_resolution",
+            "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 3,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 0,
+      "max_box_error_mm": 0.06473731997438706,
+      "max_surface_error_mm": 9.059906005859375e-06
+    },
+    {
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "source_sha256": "cf8fc68d8f32a1bdf3e68cddeaf0b67c040b47946cabc67021b94b9b8229757f",
+      "changed": false,
+      "before_parts": 20,
+      "after_parts": 20,
+      "before_lost_faces": 0,
+      "after_lost_faces": 0,
+      "before_outcome": "fail",
+      "after_outcome": "fail",
+      "occt_outcome": "fail",
+      "before_measurement_capped": false,
+      "after_measurement_capped": false,
+      "before_confirmed": 12,
+      "after_confirmed": 12,
+      "before_unresolved": 2,
+      "unresolved": 2,
+      "unresolved_codes": {
+        "below_coordinate_resolution": 2
+      },
+      "before_triangles": 89918,
+      "after_triangles": 89918,
+      "incomplete_reasons": [
+        {
+          "code": "below_coordinate_resolution",
+          "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+        }
+      ],
+      "structure_errors": [],
+      "current_main": {
+        "parts": 20,
+        "faces": {
+          "declared_faces": 278,
+          "lost_faces": 0
+        },
+        "triangles": 89918,
+        "outcome": "fail",
+        "confirmed": [
+          [
+            0,
+            11
+          ],
+          [
+            0,
+            12
+          ],
+          [
+            0,
+            14
+          ],
+          [
+            0,
+            15
+          ],
+          [
+            0,
+            18
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            3,
+            6
+          ],
+          [
+            3,
+            7
+          ],
+          [
+            3,
+            8
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            3,
+            10
+          ]
+        ],
+        "unresolved": [
+          [
+            [
+              0,
+              1
+            ],
+            "below_coordinate_resolution"
+          ],
+          [
+            [
+              12,
+              13
+            ],
+            "below_coordinate_resolution"
+          ]
+        ],
+        "reasons": [
+          {
+            "code": "below_coordinate_resolution",
+            "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "confirmed_true": 12,
+      "confirmed_false": 0,
+      "comparison_mode": "all_occurrences",
+      "reference_scope": "all_pairs",
+      "occurrence_mapping_complete": true,
+      "occt_positives_unconfirmed": 0,
+      "max_box_error_mm": 9.357118356091067e-06,
+      "max_surface_error_mm": 9.051079632224041e-06
+    }
+  ],
+  "repros": [
+    {
+      "model": "01-assembly-pds-dollar.step",
+      "before": {
+        "parts": 2,
+        "faces": {
+          "declared_faces": 20,
+          "lost_faces": 0
+        },
+        "triangles": 6224,
+        "outcome": "pass",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [],
+        "structure_errors": [],
+        "error": null
+      },
+      "after": {
+        "parts": 2,
+        "faces": {
+          "declared_faces": 20,
+          "lost_faces": 0
+        },
+        "triangles": 6224,
+        "outcome": "pass",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [],
+        "structure_errors": [],
+        "error": null
+      },
+      "comparison_mode": "all_occurrences"
+    },
+    {
+      "model": "02-edge-conversion-face-1073.step",
+      "before": {
+        "parts": 1,
+        "faces": {
+          "declared_faces": 1,
+          "lost_faces": 0
+        },
+        "triangles": 504,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "assembly_required",
+            "message": "The selected STEP file does not expose at least two component occurrences."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "after": {
+        "parts": 1,
+        "faces": {
+          "declared_faces": 1,
+          "lost_faces": 0
+        },
+        "triangles": 504,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "assembly_required",
+            "message": "The selected STEP file does not expose at least two component occurrences."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      }
+    },
+    {
+      "model": "01-assembly-pds-empty-strings.step",
+      "before": {
+        "parts": 2,
+        "faces": {
+          "declared_faces": 20,
+          "lost_faces": 0
+        },
+        "triangles": 6224,
+        "outcome": "pass",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [],
+        "structure_errors": [],
+        "error": null
+      },
+      "after": {
+        "parts": 2,
+        "faces": {
+          "declared_faces": 20,
+          "lost_faces": 0
+        },
+        "triangles": 6224,
+        "outcome": "pass",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [],
+        "structure_errors": [],
+        "error": null
+      },
+      "comparison_mode": "all_occurrences"
+    },
+    {
+      "model": "02-edge-conversion-minimal-face.step",
+      "before": {
+        "parts": 1,
+        "faces": {
+          "declared_faces": 1,
+          "lost_faces": 0
+        },
+        "triangles": 23,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "assembly_required",
+            "message": "The selected STEP file does not expose at least two component occurrences."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      },
+      "after": {
+        "parts": 1,
+        "faces": {
+          "declared_faces": 1,
+          "lost_faces": 0
+        },
+        "triangles": 23,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "assembly_required",
+            "message": "The selected STEP file does not expose at least two component occurrences."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      }
+    },
+    {
+      "model": "04-mesh-contact-pair.step",
+      "before": {
+        "parts": 2,
+        "faces": {
+          "declared_faces": 128,
+          "lost_faces": 0
+        },
+        "triangles": 19000,
+        "outcome": "pass",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [],
+        "structure_errors": [],
+        "error": null
+      },
+      "after": {
+        "parts": 2,
+        "faces": {
+          "declared_faces": 128,
+          "lost_faces": 0
+        },
+        "triangles": 19000,
+        "outcome": "pass",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [],
+        "structure_errors": [],
+        "error": null
+      },
+      "comparison_mode": "all_occurrences"
+    },
+    {
+      "model": "03-negative-torus-face.step",
+      "before": {
+        "parts": null,
+        "faces": null,
+        "triangles": null,
+        "outcome": "load error",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [],
+        "structure_errors": [],
+        "error": "failed to load STEP scene '/Users/brianlim/coding/fray/repos/burr/artifacts/corpus/repros/03-negative-torus-face.step': STEP tessellation produced no triangles: 1 of 1 STEP faces were lost"
+      },
+      "after": {
+        "parts": 1,
+        "faces": {
+          "declared_faces": 1,
+          "lost_faces": 0
+        },
+        "triangles": 179,
+        "outcome": "incomplete",
+        "confirmed": [],
+        "unresolved": [],
+        "reasons": [
+          {
+            "code": "assembly_required",
+            "message": "The selected STEP file does not expose at least two component occurrences."
+          }
+        ],
+        "structure_errors": [],
+        "error": null
+      }
+    }
+  ],
+  "protected_true": 64,
+  "protected_false": 0,
+  "measured_binary_sha256": "cec6f7c215c5cb09d151103b4021df21440122b3887950aaeac1a7d748284068",
+  "baseline_binary_sha256": "1d2793e00ef90593114940235c92560c1a19479c5cb0504051dc41a8db002e03",
+  "scene_binary_sha256": "d67db476de0cce28f5ebd16a4218f5c00bb78d9ae71508a831dd47a3aca300d9",
+  "current_main_binary_sha256": "ae35d760ae7762c840a49db610ef95c32c2a0b0688f46ee3474e526609f0df52",
+  "burr_baseline_revision": "d41b884",
+  "look_baseline_revision": "d1583a7cb4325ee311dd8cea93dbbce97548e577",
+  "burr_measured_code_revision": "b485c47712372109e9b88cc37acf54f7edbcb600",
+  "burr_rebased_code_revision": "b485c47712372109e9b88cc37acf54f7edbcb600",
+  "look_combined_revision": "58c39f4ba9ebabd28832e5c55193f85d9cc5286d",
+  "burr_current_main_revision": "1c17a588f6aca8bbe7bac4f5c794c95383fd92cd",
+  "look_current_main_revision": "45f1d77986a59aef48357c6aa0ad4c5edff28e72",
+  "source_metadata": {
+    "main": {
+      "burr_revision": "1c17a588f6aca8bbe7bac4f5c794c95383fd92cd",
+      "look_revision": "45f1d77986a59aef48357c6aa0ad4c5edff28e72",
+      "package_version": "0.38.3",
+      "benchmark_source_sha256": "0f56bee495a1fc35b9d1fa4c20f214a92a121f7f8cc3b9e4c0d5505ce8cfd8d5",
+      "scene_dump_source_sha256": "30013764bb57b690b74b5d007bd940a821200bd7ef1d84f0acd738bda15119c4"
+    },
+    "combined": {
+      "burr_revision": "b485c47712372109e9b88cc37acf54f7edbcb600",
+      "look_revision": "58c39f4ba9ebabd28832e5c55193f85d9cc5286d",
+      "package_version": "0.38.3",
+      "benchmark_source_sha256": "0f56bee495a1fc35b9d1fa4c20f214a92a121f7f8cc3b9e4c0d5505ce8cfd8d5",
+      "scene_dump_source_sha256": "30013764bb57b690b74b5d007bd940a821200bd7ef1d84f0acd738bda15119c4"
+    }
+  },
+  "gate_script_sha256": {
+    "measure_combined.py": "17fbd7efbe487bf68f99091d7fa0ca20c3e504f0616b55535c9dd4937d5a9fd1",
+    "compare_pairs.py": "c64a84160a1f4343aa45ff15da338b33b460866f2f69077a85f8ab050630e0d6",
+    "run_integrated.py": "62ef1311d37253f46c91881b932dde112bcac7d2a023f2562531ad76b50fddd7"
+  },
+  "wrong_conclusive_verdicts": 0,
+  "checks": {
+    "npm_run_check": "passed",
+    "burr_tests": 79,
+    "reference_scope_tests": 8,
+    "look_focused_suites": {
+      "geometry_torus": 2,
+      "normal_derivatives": 1,
+      "stepio_lib": 58,
+      "real_step_faces": 11,
+      "step_input": 59,
+      "meshalgo_lib": 221,
+      "import_resilience": 3,
+      "mesh_conformity": 3,
+      "look_lib": 189,
+      "assembly": 13,
+      "step": 9,
+      "step_mesh_conformity": 4,
+      "meshalgo_existing_ignored": 1,
+      "step_input_existing_exclusions": 3
+    },
+    "import_evidence_cli_tests": 3
+  },
+  "import_timings": [
+    {
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "main": {
+        "load_s": 13.558667458,
+        "binary_sha256": "ae35d760ae7762c840a49db610ef95c32c2a0b0688f46ee3474e526609f0df52"
+      },
+      "combined": {
+        "load_s": 13.45290375,
+        "binary_sha256": "cec6f7c215c5cb09d151103b4021df21440122b3887950aaeac1a7d748284068"
+      }
+    },
+    {
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "main": {
+        "load_s": 39.63392425,
+        "binary_sha256": "ae35d760ae7762c840a49db610ef95c32c2a0b0688f46ee3474e526609f0df52"
+      },
+      "combined": {
+        "load_s": 37.360442,
+        "binary_sha256": "cec6f7c215c5cb09d151103b4021df21440122b3887950aaeac1a7d748284068"
+      }
+    },
+    {
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "main": {
+        "load_s": 8.045158458,
+        "binary_sha256": "ae35d760ae7762c840a49db610ef95c32c2a0b0688f46ee3474e526609f0df52"
+      },
+      "combined": {
+        "load_s": 7.114732959,
+        "binary_sha256": "cec6f7c215c5cb09d151103b4021df21440122b3887950aaeac1a7d748284068"
+      }
+    }
+  ],
+  "review_followup": {
+    "rust_and_look_changes": false,
+    "reproduction_exit_status": "Preserved before lock cleanup",
+    "missing_boundary_nearest": "Now rejects analytic agreement; all 26 historical face rows already have zero missing results",
+    "step_reduction_encoding": "Latin-1 reads and writes preserve original source bytes in both reducers",
+    "look_pin_finding": "Rejected: the combined pin contains cherry-picked decoder 033488f and signed-torus implementation 539936c plus the mesh and closure-axis fixes"
+  }
+}

@@ -1,0 +1,868 @@
+{
+  "source": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+  "source_sha256": "523f1848bb424c8f34876c215e2ef854cd0389dc2affbf640691b9c0cc226700",
+  "occt_version": "7.9.3.1",
+  "note": "Original source vertex positions projected onto each OCCT carrier; standard OCCT STEP transfer defaults retained; no application-level wire repair, snapping, or inferred replacement edge. Local reductions retain source headers and IDs.",
+  "owner": {
+    "shell": 652923,
+    "solid": 21846,
+    "product_definition": 1353852,
+    "path": "(Unsaved)/Gantry/X Axis Assembly/CW2_Assembly/CW2_Printed/Main_Body"
+  },
+  "counts": {
+    "wire_not_closed_faces": 42,
+    "balanced_foreign_edge_faces": 14,
+    "odd_endpoint_faces": 28,
+    "raw_occt_invalid_faces": 41,
+    "recovered_faces": 0
+  },
+  "faces": [
+    {
+      "face": 644450,
+      "bound": 73812,
+      "loop": 112426,
+      "surface": 614228,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 16.033449088307282,
+      "off_carrier_component_edges": [
+        [
+          395954
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": -1.1147227719649025e-13
+    },
+    {
+      "face": 644488,
+      "bound": 73850,
+      "loop": 112467,
+      "surface": 614248,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 13.08232032003158,
+      "off_carrier_component_edges": [
+        [
+          395922
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 0.0
+    },
+    {
+      "face": 644493,
+      "bound": 73855,
+      "loop": 112472,
+      "surface": 614251,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 19.097590092841905,
+      "off_carrier_component_edges": [
+        [
+          396011
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 0.0
+    },
+    {
+      "face": 644500,
+      "bound": 73862,
+      "loop": 112481,
+      "surface": 10758,
+      "surface_kind": "CONICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 23.415379828636414,
+      "off_carrier_component_edges": [
+        [
+          395925
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 0.0
+    },
+    {
+      "face": 644502,
+      "bound": 73864,
+      "loop": 112484,
+      "surface": 614255,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 14.27520701862443,
+      "off_carrier_component_edges": [
+        [
+          395933
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": -11.56502911195611
+    },
+    {
+      "face": 644553,
+      "bound": 73915,
+      "loop": 112537,
+      "surface": 614261,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        2.898275348791351,
+        7.6163711252795
+      ],
+      "max_source_vertex_surface_distance": 6.007032967644636,
+      "off_carrier_component_edges": [
+        [
+          396029
+        ],
+        [
+          396051
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 1.3500869868847494
+    },
+    {
+      "face": 644563,
+      "bound": 73925,
+      "loop": 112547,
+      "surface": 614266,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        2.3999984741213676,
+        7.8088882011877345
+      ],
+      "max_source_vertex_surface_distance": 17.079659848190595,
+      "off_carrier_component_edges": [
+        [
+          396077
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 103.70247057882588
+    },
+    {
+      "face": 644564,
+      "bound": 73926,
+      "loop": 112548,
+      "surface": 614267,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 6.739075501590192,
+      "off_carrier_component_edges": [
+        [
+          395981
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 27.628992833785087
+    },
+    {
+      "face": 644591,
+      "bound": 73953,
+      "loop": 112576,
+      "surface": 10763,
+      "surface_kind": "CONICAL_SURFACE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        2.3999984741213676,
+        7.8088882011877345
+      ],
+      "max_source_vertex_surface_distance": 5.762676681808221,
+      "off_carrier_component_edges": [
+        [
+          396077
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 884.5996190750133
+    },
+    {
+      "face": 644592,
+      "bound": 73954,
+      "loop": 112577,
+      "surface": 10764,
+      "surface_kind": "CONICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 0.4397873102583391,
+      "off_carrier_component_edges": [
+        [
+          396125
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 1.2891161968639898e-13
+    },
+    {
+      "face": 644614,
+      "bound": 73976,
+      "loop": 112600,
+      "surface": 42681,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        3.40000000000023,
+        6.991396241865203
+      ],
+      "max_source_vertex_surface_distance": 39.75173485899259,
+      "off_carrier_component_edges": [
+        [
+          396404
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 0.6800120156285241
+    },
+    {
+      "face": 644622,
+      "bound": 73984,
+      "loop": 112608,
+      "surface": 614292,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 2.6000000000006485,
+      "off_carrier_component_edges": [
+        [
+          396137
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": -3.9287109354044264e-13
+    },
+    {
+      "face": 644646,
+      "bound": 74008,
+      "loop": 112634,
+      "surface": 42702,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        1.699999999966325,
+        1.7272484906361993
+      ],
+      "max_source_vertex_surface_distance": 20.14018697306594,
+      "off_carrier_component_edges": [
+        [
+          396401
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 44.40643121288027
+    },
+    {
+      "face": 644662,
+      "bound": 74024,
+      "loop": 112650,
+      "surface": 614306,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 39.12306377062131,
+      "off_carrier_component_edges": [
+        [
+          396034
+        ]
+      ],
+      "raw_occt_valid": true,
+      "raw_occt_area": 0.0
+    },
+    {
+      "face": 644666,
+      "bound": 74028,
+      "loop": 112654,
+      "surface": 42717,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        3.40000000000023,
+        6.991396241865203
+      ],
+      "max_source_vertex_surface_distance": 4.400000166891028,
+      "off_carrier_component_edges": [
+        [
+          396404
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": -3.844222112529883
+    },
+    {
+      "face": 644667,
+      "bound": 74029,
+      "loop": 112655,
+      "surface": 42718,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 6,
+      "nearest_odd_endpoint_gap_range": [
+        3.0039450548041913,
+        10.894265751747977
+      ],
+      "max_source_vertex_surface_distance": 3.159553012229273,
+      "off_carrier_component_edges": [
+        [
+          396610
+        ],
+        [
+          396617
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 0.6800120156283775
+    },
+    {
+      "face": 644668,
+      "bound": 74030,
+      "loop": 112656,
+      "surface": 42719,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        3.0039450548041913,
+        4.943682837723998
+      ],
+      "max_source_vertex_surface_distance": 4.600004675179601,
+      "off_carrier_component_edges": [
+        [
+          396610
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 20.13277274212394
+    },
+    {
+      "face": 644671,
+      "bound": 74033,
+      "loop": 112659,
+      "surface": 42722,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        2.898275348791351,
+        7.6163711252795
+      ],
+      "max_source_vertex_surface_distance": 20.799995179769244,
+      "off_carrier_component_edges": [
+        [
+          396051
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 60.57414978331482
+    },
+    {
+      "face": 644698,
+      "bound": 74060,
+      "loop": 112686,
+      "surface": 2397,
+      "surface_kind": "B_SPLINE_SURFACE_WITH_KNOTS",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        0.23320097412120194,
+        1.272794364058946
+      ],
+      "max_source_vertex_surface_distance": 36.6133757076364,
+      "off_carrier_component_edges": [
+        [
+          396495
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 0.1332258795687205
+    },
+    {
+      "face": 644705,
+      "bound": 74067,
+      "loop": 112693,
+      "surface": 42735,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        1.7000000000110183,
+        2.792848008754815
+      ],
+      "max_source_vertex_surface_distance": 2.0501688872622665,
+      "off_carrier_component_edges": [
+        [
+          396674
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 1.6653734578490496
+    },
+    {
+      "face": 644706,
+      "bound": 74068,
+      "loop": 112694,
+      "surface": 42736,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        0.7718414188725368,
+        2.1401114233138783
+      ],
+      "max_source_vertex_surface_distance": 5.213163234429885e-12,
+      "off_carrier_component_edges": [],
+      "raw_occt_valid": false,
+      "raw_occt_area": -0.18781548068860143
+    },
+    {
+      "face": 644710,
+      "bound": 74072,
+      "loop": 112699,
+      "surface": 8541,
+      "surface_kind": "TOROIDAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 16.80660553549459,
+      "off_carrier_component_edges": [
+        [
+          396098
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 0.0
+    },
+    {
+      "face": 644711,
+      "bound": 74073,
+      "loop": 112700,
+      "surface": 10765,
+      "surface_kind": "CONICAL_SURFACE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        0.23320097412120194,
+        1.272794364058946
+      ],
+      "max_source_vertex_surface_distance": 38.02143958823946,
+      "off_carrier_component_edges": [
+        [
+          396495
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 88.76733752187042
+    },
+    {
+      "face": 644718,
+      "bound": 74080,
+      "loop": 112707,
+      "surface": 42742,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        1.699999999966325,
+        1.7272484906361993
+      ],
+      "max_source_vertex_surface_distance": 3.80098558417008,
+      "off_carrier_component_edges": [
+        [
+          396401
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 37.78640680288971
+    },
+    {
+      "face": 644721,
+      "bound": 74083,
+      "loop": 112710,
+      "surface": 42745,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        1.7000000000110183,
+        2.792848008754815
+      ],
+      "max_source_vertex_surface_distance": 0.7990145827213384,
+      "off_carrier_component_edges": [
+        [
+          396674
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 51.22970081816871
+    },
+    {
+      "face": 644725,
+      "bound": 74087,
+      "loop": 112714,
+      "surface": 614319,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 31.469577219768034,
+      "off_carrier_component_edges": [
+        [
+          396158
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 1.4458911201198936
+    },
+    {
+      "face": 644726,
+      "bound": 74088,
+      "loop": 112715,
+      "surface": 614320,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 26.145983320774913,
+      "off_carrier_component_edges": [
+        [
+          396514
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 1.4380505022183965
+    },
+    {
+      "face": 644730,
+      "bound": 74092,
+      "loop": 112719,
+      "surface": 10770,
+      "surface_kind": "CONICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 53.326146608526386,
+      "off_carrier_component_edges": [
+        [
+          396801
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 0.0
+    },
+    {
+      "face": 644731,
+      "bound": 74093,
+      "loop": 112720,
+      "surface": 614321,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        0.1999999999995099,
+        10.894265751747977
+      ],
+      "max_source_vertex_surface_distance": 11.020440310680394,
+      "off_carrier_component_edges": [
+        [
+          396617
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 71.77018675221218
+    },
+    {
+      "face": 644752,
+      "bound": 74114,
+      "loop": 112741,
+      "surface": 42758,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        2.982815512907557,
+        6.884885067567125
+      ],
+      "max_source_vertex_surface_distance": 12.320886900086757,
+      "off_carrier_component_edges": [
+        [
+          396649
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 48.56348097873058
+    },
+    {
+      "face": 644764,
+      "bound": 74126,
+      "loop": 112753,
+      "surface": 614327,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        0.7718414188725368,
+        2.1401114233138783
+      ],
+      "max_source_vertex_surface_distance": 0.5958369439903435,
+      "off_carrier_component_edges": [
+        [
+          396628
+        ],
+        [
+          396623
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 1.4458876863395744
+    },
+    {
+      "face": 644770,
+      "bound": 74132,
+      "loop": 112759,
+      "surface": 614330,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        2.982815512907557,
+        6.884885067567125
+      ],
+      "max_source_vertex_surface_distance": 8.412586206856206,
+      "off_carrier_component_edges": [
+        [
+          396649
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": -11.160219089995904
+    },
+    {
+      "face": 644776,
+      "bound": 74138,
+      "loop": 112765,
+      "surface": 614332,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": true,
+      "odd_endpoint_count": 0,
+      "nearest_odd_endpoint_gap_range": null,
+      "max_source_vertex_surface_distance": 62.36426884374981,
+      "off_carrier_component_edges": [
+        [
+          396387
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 16.79380184687287
+    },
+    {
+      "face": 644778,
+      "bound": 74140,
+      "loop": 112767,
+      "surface": 42773,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        3.59999648301308,
+        11.529641100099
+      ],
+      "max_source_vertex_surface_distance": 26.602363841308506,
+      "off_carrier_component_edges": [
+        [
+          396832
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 112.65719156468877
+    },
+    {
+      "face": 644780,
+      "bound": 74142,
+      "loop": 112769,
+      "surface": 42775,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        0.6836752830878199,
+        4.19999665231555
+      ],
+      "max_source_vertex_surface_distance": 7.210016305176927,
+      "off_carrier_component_edges": [
+        [
+          396891
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 24.153488848498423
+    },
+    {
+      "face": 644781,
+      "bound": 74143,
+      "loop": 112770,
+      "surface": 42776,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        0.6836752830878199,
+        4.19999665231555
+      ],
+      "max_source_vertex_surface_distance": 8.196880668366077,
+      "off_carrier_component_edges": [
+        [
+          396891
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 4.221479570114391
+    },
+    {
+      "face": 644804,
+      "bound": 74166,
+      "loop": 112793,
+      "surface": 10780,
+      "surface_kind": "CONICAL_SURFACE",
+      "balanced": false,
+      "odd_endpoint_count": 2,
+      "nearest_odd_endpoint_gap_range": [
+        2.5000000000000098,
+        2.5000000000000098
+      ],
+      "max_source_vertex_surface_distance": 15.408733708865931,
+      "off_carrier_component_edges": [
+        [
+          396434
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": -665.8507911245366
+    },
+    {
+      "face": 644806,
+      "bound": 24725,
+      "loop": 112800,
+      "surface": 42793,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        3.59999648301308,
+        11.529641100099
+      ],
+      "max_source_vertex_surface_distance": 3.5999964830129896,
+      "off_carrier_component_edges": [
+        [
+          396832
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 2034.1083961482102
+    },
+    {
+      "face": 644813,
+      "bound": 74175,
+      "loop": 112818,
+      "surface": 614337,
+      "surface_kind": "CYLINDRICAL_SURFACE",
+      "balanced": false,
+      "odd_endpoint_count": 2,
+      "nearest_odd_endpoint_gap_range": [
+        2.5000000000000098,
+        2.5000000000000098
+      ],
+      "max_source_vertex_surface_distance": 19.891243540166453,
+      "off_carrier_component_edges": [
+        [
+          396434
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 75.23200643637489
+    },
+    {
+      "face": 644826,
+      "bound": 74188,
+      "loop": 112831,
+      "surface": 2407,
+      "surface_kind": "B_SPLINE_SURFACE_WITH_KNOTS",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        0.5999999999999899,
+        3.0355889637825055
+      ],
+      "max_source_vertex_surface_distance": 13.286904375676713,
+      "off_carrier_component_edges": [
+        [
+          396632
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 21.541325504631377
+    },
+    {
+      "face": 644835,
+      "bound": 74197,
+      "loop": 112841,
+      "surface": 42810,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 4,
+      "nearest_odd_endpoint_gap_range": [
+        1.6165807537309738,
+        7.72417896609342
+      ],
+      "max_source_vertex_surface_distance": 6.5209644717427775,
+      "off_carrier_component_edges": [
+        [
+          396817
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 27.317044277906447
+    },
+    {
+      "face": 644881,
+      "bound": 74243,
+      "loop": 112889,
+      "surface": 42837,
+      "surface_kind": "PLANE",
+      "balanced": false,
+      "odd_endpoint_count": 6,
+      "nearest_odd_endpoint_gap_range": [
+        2.1571586249818013,
+        7.72417896609342
+      ],
+      "max_source_vertex_surface_distance": 5.7501914500847136,
+      "off_carrier_component_edges": [
+        [
+          396632,
+          396817
+        ]
+      ],
+      "raw_occt_valid": false,
+      "raw_occt_area": 252.49703671156567
+    }
+  ],
+  "local_detail_sha256": "18b45b9ce237a634282d6c48502fbe6944bc73489880890e3b4ad13c25042d41"
+}

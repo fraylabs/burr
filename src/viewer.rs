@@ -801,9 +801,10 @@ fn viewer_cache_key(
     }
     let implementation = implementation.finalize().to_hex();
     format!(
-        "burr-viewer-v7-binary\nburr={}\nimplementation={}\nsource={}\nfingerprint={}\nrelative={}\ntheme={}\nfocus={}\nmotion={}",
+        "burr-viewer-v7-binary\nburr={}\nimplementation={}\nstep-policy={}\nsource={}\nfingerprint={}\nrelative={}\ntheme={}\nfocus={}\nmotion={}",
         env!("CARGO_PKG_VERSION"),
         implementation,
+        look::step::meshing_policy::current_identity(),
         source_path.display(),
         source_fingerprint,
         relative_path,
