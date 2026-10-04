@@ -6,6 +6,7 @@ or Boolean tolerances are changed. Pair-limited references certify reported
 pairs only, and cannot certify the rest of an assembly.
 """
 import argparse
+from collections import Counter
 import hashlib
 import json
 import pathlib
@@ -85,6 +86,32 @@ def bowden_reference(model, scene, burr, output, tracked):
     return path
 
 
+def two_part_reference(model, output):
+    """Complete exact pair proof for the two assembly-decoder repros."""
+    import cadquery as cq
+    from OCP.BRepAlgoAPI import BRepAlgoAPI_Common
+    from OCP.BRepCheck import BRepCheck_Analyzer
+    from occt_components import components
+    exact = components(model)
+    if len(exact) != 2:
+        raise RuntimeError(f'Repro must expose two exact occurrences: {model.name}')
+    shapes = [cq.Shape.cast(s) for _, s in exact]
+    if not all(BRepCheck_Analyzer(s.wrapped).IsValid() for s in shapes):
+        raise RuntimeError(f'Invalid exact repro solid: {model.name}')
+    common = BRepAlgoAPI_Common(shapes[0].wrapped, shapes[1].wrapped)
+    common.Build()
+    if not common.IsDone() or not BRepCheck_Analyzer(common.Shape()).IsValid():
+        raise RuntimeError(f'Unverified exact repro Common: {model.name}')
+    volume = abs(cq.Shape.cast(common.Shape()).Volume())
+    threshold = max(1e-6, min(abs(s.Volume()) for s in shapes) * 1e-9)
+    findings = [dict(pair=[0, 1], volume_mm3=volume)] if volume > threshold else []
+    path = output / (model.name + '.occt.json')
+    path.write_text(json.dumps(dict(names=[n for n, _ in exact], findings=findings,
+                                   pair_check_complete=True, pair_check_scope='all_pairs',
+                                   common_volume_mm3=volume, threshold_mm3=threshold), indent=2) + '\n')
+    return path
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for option in ('corpus', 'reference-logs', 'before', 'after', 'scene-binary', 'output'):
@@ -117,7 +144,10 @@ def main():
                    before_measurement_capped=any(r['code'] == 'measurement_cap' for r in a['reasons']),
                    after_measurement_capped=any(r['code'] == 'measurement_cap' for r in b['reasons']),
                    before_confirmed=len(a['confirmed']), after_confirmed=len(b['confirmed']),
-                   unresolved=len(b['unresolved']), incomplete_reasons=b['reasons'],
+                   before_unresolved=len(a['unresolved']), unresolved=len(b['unresolved']),
+                   unresolved_codes=dict(Counter(code for _, code in b['unresolved'])),
+                   before_triangles=a['triangles'], after_triangles=b['triangles'],
+                   incomplete_reasons=b['reasons'],
                    structure_errors=b['structure_errors'])
         if changed or name in protected:
             if any(r['code'] == 'measurement_cap' for r in b['reasons']):
@@ -148,7 +178,9 @@ def main():
                 row.update(confirmed_true=len(exact['matched_pairs']), confirmed_false=len(exact['extra_pairs']),
                            comparison_mode=exact['comparison_mode'], reference_scope=exact['reference_scope'],
                            occurrence_mapping_complete=exact['occurrence_mapping_complete'],
-                           occt_positives_unconfirmed=len(exact['missing_pairs']))
+                           occt_positives_unconfirmed=len(exact['missing_pairs']),
+                           max_box_error_mm=max((r['box_error_mm'] for r in exact['mapping']), default=None),
+                           max_surface_error_mm=max((r['surface_sample_error_mm'] for r in exact['mapping']), default=None))
                 if row['confirmed_false']:
                     raise RuntimeError(f'False confirmed pairs: {name}: {exact["extra_pairs"]}')
                 break
@@ -168,26 +200,39 @@ def main():
         if checked[name]['confirmed_true'] < expected['confirmed_true']:
             raise RuntimeError(f'Protected pair regression: {name}')
     center = next(r for r in rows if 'Center_bracket' in r['model'])
-    if center.get('confirmed_true') != 8:
+    # PR #45's eight M8/bracket pairs are protected by occurrence identity,
+    # rather than an exact count that would reject newly verified M5 pairs.
+    center_report = facts(measured(args.after, center['model']))
+    original_center_pairs = {tuple(sorted((i, 25))) for i in (9, 10, 12, 15, 17, 18, 22, 27)}
+    if (center.get('confirmed_true', 0) < 8
+            or not original_center_pairs <= set(center_report['confirmed'])):
         raise RuntimeError(f'Center must retain its eight true pairs: {center}')
+    center['original_eight_retained'] = True
     repros = []
     for source in read(tracked / 'repros-manifest.json'):
         name = source['file']
         a = facts(measured(args.before, name))
         b = facts(measured(args.after, name))
         repros.append(dict(model=name, before=a, after=b))
-        if name.startswith('04-') and (b['outcome'] != 'pass' or b['confirmed']):
-            raise RuntimeError('Contact repro regressed')
-        if name.startswith('04-'):
+        if name.startswith(('01-', '04-')):
+            if b['outcome'] != 'pass' or b['confirmed']:
+                raise RuntimeError(f'Clearance repro regressed: {name}')
             model = args.corpus / 'repros' / name
             scene = args.output / (name + '.scene.json')
             with scene.open('w') as out, scene.with_suffix('.stderr').open('w') as err:
                 subprocess.run([str(args.scene_binary.resolve()), str(model)], stdout=out, stderr=err, check=True)
-            exact = compare(model, scene, args.after / (name + '.burr.json'),
-                            tracked / 'reference/04-mesh-contact-pair.occt.json', True)
+            reference = (tracked / 'reference/04-mesh-contact-pair.occt.json'
+                         if name.startswith('04-') else two_part_reference(model, args.output))
+            exact = compare(model, scene, args.after / (name + '.burr.json'), reference, True)
             if exact['extra_pairs'] or exact['missing_pairs']:
                 raise RuntimeError('Contact repro pair comparison regressed')
             (args.output / (name + '.comparison.json')).write_text(json.dumps(exact, indent=2) + '\n')
+            repros[-1]['comparison_mode'] = exact['comparison_mode']
+        else:
+            if b['outcome'] != 'incomplete' or b['confirmed']:
+                raise RuntimeError(f'Face-only repro must remain incomplete: {name}')
+            if not any(r['code'] == 'assembly_required' for r in b['reasons']):
+                raise RuntimeError(f'Face-only repro needs an assembly refusal: {name}')
     summary = dict(models=rows, repros=repros,
                    protected_true=sum(checked[n]['confirmed_true'] for n in protected if 'MiniSB_Bowden' not in n),
                    protected_false=sum(checked[n]['confirmed_false'] for n in protected),

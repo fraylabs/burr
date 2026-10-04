@@ -252,8 +252,11 @@ impl Mesh {
                     if normals[i].cross(normals[j]).length_squared() > roundoff.powi(2)
                         && normals[i].dot(normals[j]).abs() + roundoff >= angular_cosine
                     {
-                        legacy_curve[i] = true;
-                        legacy_curve[j] = true;
+                        // STEP evaluator normals identify planar patches even
+                        // beside a gentle dihedral. Use this geometric guess
+                        // only when the source supplies no usable normals.
+                        legacy_curve[i] |= surface_curvature[i].is_none();
+                        legacy_curve[j] |= surface_curvature[j].is_none();
                     }
                 } else {
                     neighbor.insert(edge, i);
@@ -787,6 +790,49 @@ mod tests {
         let point = mesh.triangle(0).iter().sum::<DVec3>() / 3.0;
         assert!(mesh.nonplanar_near_surface(point, 0.01));
         assert!(mesh.triangle_surface_sample(0).1 > 0.02);
+    }
+
+    #[test]
+    fn source_planar_normals_override_the_neighbor_curvature_guess() {
+        let positions = [
+            [0., 0., 0.],
+            [1., 0., 0.],
+            [0., 1., 0.],
+            [1., 0., 0.],
+            [0., 0., 0.],
+            [0., -1., 0.1],
+        ];
+        let vertices = positions
+            .map(|position| look::scene::Vertex {
+                position,
+                normal: [0.; 3],
+            })
+            .to_vec();
+        let tilted = glam::Vec3::new(0., 0.1, 1.).normalize().to_array();
+        let mut geometry = look::scene::Geometry {
+            surface_normals: Some(vec![
+                [0., 0., 1.],
+                [0., 0., 1.],
+                [0., 0., 1.],
+                tilted,
+                tilted,
+                tilted,
+            ]),
+            bounds: look::scene::Bounds::from_positions(&positions),
+            vertices,
+            indices: vec![0, 1, 2, 3, 4, 5],
+            source_attributes: None,
+            bounding_center: [0.; 3],
+            bounding_radius: 0.,
+        };
+        let point = DVec3::new(1. / 3., 1. / 3., 0.);
+        let mesh = Mesh::prepare(&geometry).unwrap();
+        assert!(!mesh.nonplanar_near_surface(point, 0.01));
+        assert!(!mesh.legacy_nonplanar_near_surface(point, 0.01));
+        geometry.surface_normals = None;
+        let fallback = Mesh::prepare(&geometry).unwrap();
+        assert!(fallback.nonplanar_near_surface(point, 0.01));
+        assert!(fallback.legacy_nonplanar_near_surface(point, 0.01));
     }
 
     #[test]

@@ -635,8 +635,23 @@ fn penetrating_surface(
             .unwrap_or_else(|| source_mesh.nearest_surface_sample(source_point));
         let target_sample = target_mesh.nearest_surface_sample(point);
         let curved = source_sample.0 || target_sample.0;
+        // An evaluator-identified planar patch adds no curved sampling error.
+        // Including a large flat component's full extent here can hide a
+        // resolved overlap against a much smaller curved component. Retain
+        // the existing component scale for each curved side and the measured
+        // normal/chord deviation; unknown surfaces keep the legacy guard.
+        let curved_resolution = (if source_sample.0 {
+            source_mesh.bounds.diagonal() * source.scale
+        } else {
+            0.0
+        } + if target_sample.0 {
+            target_mesh.bounds.diagonal() * target.scale
+        } else {
+            0.0
+        }) * look::step::meshing_policy::MeshingPolicy::DEFAULT
+            .relative_linear_deflection;
         let local_resolution =
-            nominal_resolution.max(source_sample.1 * source.scale + target_sample.1 * target.scale);
+            curved_resolution.max(source_sample.1 * source.scale + target_sample.1 * target.scale);
         let uncertain = unoriented_pair && curved;
         let target_margin = if uncertain {
             local_tolerance.max(uncertain_margin / target.scale)
@@ -1174,6 +1189,26 @@ mod tests {
         let report = analyze_scene("curved-overlap.step", "fixture", &scene);
         assert_eq!(report.outcome, CheckOutcome::Fail);
         assert_eq!(report.findings.len(), 1);
+    }
+
+    #[test]
+    fn a_large_planar_extent_does_not_hide_a_resolved_curved_overlap() {
+        let mut scene = compile_scene(
+            &fixture("multiscale-planar.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        assert_eq!(scene.instances.len(), 2);
+        let report = analyze_scene("multiscale-planar.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Fail);
+        assert_eq!(report.findings.len(), 1);
+        // The same exact surfaces become tangent after removing the authored
+        // 0.2 mm overlap; the curved-side margin must still reject contact.
+        scene.instances[1].transform = glam::Mat4::from_translation(glam::Vec3::new(0.2, 0.0, 0.0))
+            * scene.instances[1].transform;
+        let contact = analyze_scene("multiscale-planar-contact.step", "fixture", &scene);
+        assert!(contact.findings.is_empty());
     }
 
     #[test]
