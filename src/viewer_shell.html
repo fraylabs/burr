@@ -1563,7 +1563,7 @@
       }
 
       function witnessLabel(kind) {
-        if (kind === "containment") return "Contained component";
+        if (kind === "containment" || kind === "interior_overlap") return "Interior overlap";
         if (kind === "coincident_occurrence") return "Coincident components";
         return "Overlapping solid surfaces";
       }

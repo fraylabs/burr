@@ -18,7 +18,7 @@ metadata for the basic experience.
 ```text
 open a STEP assembly
   -> identify its bodies or components
-  -> detect crossing surfaces, containment, or coincident occurrences
+  -> detect positive interior overlap, containment, or coincident occurrences
   -> distinguish face contact from interference
   -> report the involved components
   -> highlight the selected pair in the viewer
@@ -26,8 +26,8 @@ open a STEP assembly
 
 The check returns `incomplete` instead of a clean result when the model is not a
 supported STEP assembly or component meshes are not closed. It does not claim
-exact Boolean overlap volume; surface-crossing witnesses and containment are
-the current evidence boundary.
+exact BREP Boolean overlap volume; positive interior overlap of the tessellated
+solids is the current evidence boundary.
 
 ## Next
 

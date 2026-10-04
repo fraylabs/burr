@@ -217,7 +217,6 @@ dependencies = [
  "tempfile",
  "tiny_http",
  "toml",
- "truck-meshalgo",
 ]
 
 [[package]]
