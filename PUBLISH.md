@@ -29,6 +29,9 @@ workflow uses standard GitHub-hosted runners (free for this public repository):
 Builds use `cargo build --release --locked` with the pinned Git dependencies.
 The repository's `.cargo/config.toml` enables AVX/FMA only on x86-64.
 `MACOSX_DEPLOYMENT_TARGET=11.0` sets the macOS compatibility floor.
+`LZMA_API_STATIC=1` builds liblzma into the binaries instead of linking to the
+runner's Homebrew xz. Packaging rejects Mac binaries that link to anything
+outside `/usr/lib` or `/System/Library`.
 
 Each target produces `burr-<target>.tar.gz` (the binary and MIT license) and
 `burr-<target>.tar.gz.sha256`. After all three succeed, the workflow creates the
@@ -65,10 +68,11 @@ release, and `BURR_INSTALL_DIR` to change the destination. It prints a PATH
 instruction if necessary. No Rust toolchain is used.
 
 The installer requires a release containing the new binary assets. Existing
-source-only releases must be rebuilt through the tag workflow by a maintainer
-before their versions can be installed this way. Until the workflow and script
-are merged and a binary release is published, the new install command is not
-available on `main`.
+source-only tags predate this workflow, so a maintainer must manually upload
+validated binaries built from the matching version to backfill those releases.
+Alternatively, publish the next version with a new tag after merging the
+workflow. Until the workflow and script are merged and a binary release is
+published, the new install command is not available on `main`.
 
 Users can still install from source:
 
