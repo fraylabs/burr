@@ -1,0 +1,22 @@
+schema_version = "burr.project.v2"
+[project]
+models = ["."]
+[[motions]]
+id = "fold"
+label = "Fold hanger"
+model = "hanger-deployed.step"
+from_label = "Deployed"
+to_label = "Folded"
+duration_ms = 1200
+[[motions.joints]]
+type = "revolute"
+components = ["left_folding_arm"]
+origin_mm = [-26.0, 0.0, 0.0]
+axis = [0.0, 0.0, 1.0]
+angle_degrees = 70.0
+[[motions.joints]]
+type = "revolute"
+components = ["right_folding_arm"]
+origin_mm = [26.0, 0.0, 0.0]
+axis = [0.0, 0.0, 1.0]
+angle_degrees = -70.0
