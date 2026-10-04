@@ -1,0 +1,34 @@
+{
+  "sha256": "cc8faadf3f14ccf96d92525ee19044f44fd4855d4fae4896de019bb0e4b9a7e5",
+  "elapsed_s": 1.619209999917075,
+  "peak_rss_mib": 518.75,
+  "peak_rss_method": "wait4_ru_maxrss",
+  "sampled_peak_rss_mib": 434.171875,
+  "returncode": 0,
+  "timeout": false,
+  "cap": null,
+  "timeout_limit_s": 600,
+  "load_metadata": {
+    "geometries": 1,
+    "load_s": 1.14906375,
+    "parts": 1,
+    "stages_ms": {
+      "compile": 12.735209000000001,
+      "hash": 25.441875,
+      "parse": 1095.6736250000001,
+      "read": 5.424417,
+      "step_parse": 82.49416599999999,
+      "step_table": 117.752208,
+      "step_tessellate": 550.906833
+    },
+    "step_import": {
+      "declared_faces": 7223,
+      "lost_faces": 18
+    },
+    "structure_errors": [
+      "STEP assembly structure could not be resolved: failed to build the STEP assembly graph: failed to reference the geometry `shape_representation`"
+    ],
+    "triangles": 511750
+  },
+  "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+}

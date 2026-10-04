@@ -1,0 +1,12 @@
+{
+  "sha256": "a44f2a126fb15c7623fb680d0282a902d51cf8da13069e5255b8a71c2cd7c0f3",
+  "elapsed_s": 0.11214416602160782,
+  "peak_rss_mib": 8.09375,
+  "peak_rss_method": "wait4_ru_maxrss",
+  "sampled_peak_rss_mib": 0.453125,
+  "returncode": 2,
+  "timeout": false,
+  "cap": null,
+  "timeout_limit_s": 600,
+  "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+}

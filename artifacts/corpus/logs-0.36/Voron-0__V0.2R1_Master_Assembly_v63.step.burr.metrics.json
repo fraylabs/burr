@@ -1,0 +1,35 @@
+{
+  "sha256": "d5a9d40db82c55eee20203608a5a4e784b54b87ae339861af577c5aeb182d61f",
+  "elapsed_s": 12.252029000082985,
+  "peak_rss_mib": 2558.125,
+  "peak_rss_method": "wait4_ru_maxrss",
+  "sampled_peak_rss_mib": 2541.71875,
+  "returncode": 0,
+  "timeout": false,
+  "cap": null,
+  "timeout_limit_s": 600,
+  "load_metadata": {
+    "geometries": 392,
+    "load_s": 12.077100958,
+    "parts": 1691,
+    "stages_ms": {
+      "compile": 263.359958,
+      "hash": 115.654083,
+      "parse": 11671.753208,
+      "read": 26.300082999999997,
+      "step_parse": 600.126042,
+      "step_table": 1170.514875,
+      "step_tessellate": 7846.212083
+    },
+    "step_import": {
+      "declared_faces": 60543,
+      "lost_faces": 8
+    },
+    "structure_errors": [
+      "STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry",
+      "STEP leaf component 'Threaded Inserts (1)' has no definition geometry"
+    ],
+    "triangles": 5122612
+  },
+  "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+}

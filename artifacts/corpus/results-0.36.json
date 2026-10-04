@@ -1,0 +1,2527 @@
+{
+  "burr_head": "ecdb30dc7668de21b8e7d5ce5b9d1ff30d0b4b72",
+  "look_head": "08735d52d38c3782fa9f2157256bf2aa9f9d1e51",
+  "counts": {
+    "incomplete": 14,
+    "correct": 7
+  },
+  "verdicts": {
+    "incomplete": 14,
+    "fail": 6,
+    "pass": 1
+  },
+  "models": [
+    {
+      "name": "openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+      "burr_verdict": "incomplete",
+      "burr_parts": 1,
+      "burr_pairs": 0,
+      "load_s": 1.14906375,
+      "check_s": 3.0666e-05,
+      "peak_rss_mib": 518.75,
+      "step_import": {
+        "declared_faces": 7223,
+        "lost_faces": 18
+      },
+      "incomplete_reasons": [
+        {
+          "code": "assembly_structure_lost",
+          "message": "STEP assembly structure could not be resolved: failed to build the STEP assembly graph: failed to reference the geometry `shape_representation`"
+        },
+        {
+          "code": "step_faces_lost",
+          "message": "18 of 7223 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [
+        "STEP assembly structure could not be resolved: failed to build the STEP assembly graph: failed to reference the geometry `shape_representation`"
+      ],
+      "error": null,
+      "diagnostic_tags": {
+        "SurfaceConversionFailed": 12,
+        "ContradictoryDualParity": 1,
+        "RejectedDegenerate": 3,
+        "NoOddParityRegion": 2
+      },
+      "metrics": {
+        "sha256": "cc8faadf3f14ccf96d92525ee19044f44fd4855d4fae4896de019bb0e4b9a7e5",
+        "elapsed_s": 1.619209999917075,
+        "peak_rss_mib": 518.75,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 434.171875,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 1,
+          "load_s": 1.14906375,
+          "parts": 1,
+          "stages_ms": {
+            "compile": 12.735209000000001,
+            "hash": 25.441875,
+            "parse": 1095.6736250000001,
+            "read": 5.424417,
+            "step_parse": 82.49416599999999,
+            "step_table": 117.752208,
+            "step_tessellate": 550.906833
+          },
+          "step_import": {
+            "declared_faces": 7223,
+            "lost_faces": 18
+          },
+          "structure_errors": [
+            "STEP assembly structure could not be resolved: failed to build the STEP assembly graph: failed to reference the geometry `shape_representation`"
+          ],
+          "triangles": 511750
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+      "size_mib": 24.774319648742676,
+      "before": {
+        "file": "models/openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+        "url": "https://raw.githubusercontent.com/openAMRobot/openamr-platform-hw/main/mechanical/cad/Full_assembly_STEP/MMP.00.00.00.000_full_assembly.STEP",
+        "licence": "CERN-OHL-P-2.0",
+        "exporting_tool": "SolidWorks 2017",
+        "sha256": "cc8faadf3f14ccf96d92525ee19044f44fd4855d4fae4896de019bb0e4b9a7e5",
+        "archive_member": "",
+        "repository_revision_at_audit": "9703a5f13ffc009db8ff3fa979470179afe3d26b",
+        "licence_url": "https://github.com/openAMRobot/openamr-platform-hw/blob/main/LICENSE",
+        "included": "yes",
+        "name": "openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+        "size_mib": 24.774319648742676,
+        "burr_parts": null,
+        "occt_parts": 688,
+        "occt_solids": 824,
+        "load_s": null,
+        "check_s": null,
+        "elapsed_s": 0.627213416970335,
+        "peak_rss_mib": 313.515625,
+        "dropped_faces": null,
+        "declared_faces_if_loss": null,
+        "empty_definitions": 0,
+        "burr_verdict": "crash",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 1,
+        "occt_pair_scan_complete": false,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": true,
+        "partial_face_refusals": 33,
+        "diagnostic_tags": {
+          "EdgeCurveConversionFailed": 33
+        }
+      },
+      "occt_parts": 688,
+      "occt_verdict": "fail",
+      "occt_pairs": 1,
+      "occt_pair_scan_complete": false,
+      "classification": "incomplete"
+    },
+    {
+      "name": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+      "burr_verdict": "fail",
+      "burr_parts": 53,
+      "burr_pairs": 17,
+      "load_s": 0.028728375,
+      "check_s": 0.31076725,
+      "peak_rss_mib": 34.140625,
+      "step_import": {
+        "declared_faces": 291,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components do not form closed solids: \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C."
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "729e55f6794448f7b17a120aaec1aaedaa74518537e9e96a20b2f675b743bedb",
+        "elapsed_s": 0.43528316693846136,
+        "peak_rss_mib": 34.140625,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 34.0625,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 6,
+          "load_s": 0.028728375,
+          "parts": 53,
+          "stages_ms": {
+            "compile": 0.476917,
+            "hash": 0.511458,
+            "parse": 27.54775,
+            "read": 0.1805,
+            "step_parse": 3.1757500000000003,
+            "step_table": 3.75475,
+            "step_tessellate": 16.259083
+          },
+          "step_import": {
+            "declared_faces": 291,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 18830
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+      "size_mib": 0.8558082580566406,
+      "before": {
+        "file": "models/openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+        "url": "https://raw.githubusercontent.com/openAMRobot/openamr-platform-hw/main/mechanical/cad/production_files/MMP.01.00.00.000%20Cover%20assembly.STEP",
+        "licence": "CERN-OHL-P-2.0",
+        "exporting_tool": "SolidWorks 2017",
+        "sha256": "729e55f6794448f7b17a120aaec1aaedaa74518537e9e96a20b2f675b743bedb",
+        "archive_member": "",
+        "repository_revision_at_audit": "9703a5f13ffc009db8ff3fa979470179afe3d26b",
+        "licence_url": "https://github.com/openAMRobot/openamr-platform-hw/blob/main/LICENSE",
+        "included": "yes",
+        "name": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+        "size_mib": 0.8558082580566406,
+        "burr_parts": 53,
+        "occt_parts": 53,
+        "occt_solids": 53,
+        "load_s": 0.038762,
+        "check_s": 0.573214458,
+        "elapsed_s": 0.643369666999206,
+        "peak_rss_mib": 73.515625,
+        "dropped_faces": 0,
+        "declared_faces_if_loss": null,
+        "empty_definitions": 0,
+        "burr_verdict": "fail",
+        "burr_pairs": 14,
+        "occt_verdict": "fail",
+        "occt_pairs": 22,
+        "occt_pair_scan_complete": true,
+        "classification": "correct",
+        "open_mesh": true,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {}
+      },
+      "occt_parts": 53,
+      "occt_verdict": "fail",
+      "occt_pairs": 22,
+      "occt_pair_scan_complete": true,
+      "classification": "correct"
+    },
+    {
+      "name": "openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+      "burr_verdict": "incomplete",
+      "burr_parts": 43,
+      "burr_pairs": 0,
+      "load_s": 0.057141375,
+      "check_s": 4.25e-06,
+      "peak_rss_mib": 50.140625,
+      "step_import": {
+        "declared_faces": 422,
+        "lost_faces": 4
+      },
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "4 of 422 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {
+        "SurfaceConversionFailed": 4
+      },
+      "metrics": {
+        "sha256": "e93dffa50a652267aa610056464222d6a51fcb290bfeed322705be7689dd20fa",
+        "elapsed_s": 0.10417529195547104,
+        "peak_rss_mib": 50.140625,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 0.03125,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 3,
+          "load_s": 0.057141375,
+          "parts": 43,
+          "stages_ms": {
+            "compile": 1.0037500000000001,
+            "hash": 0.729167,
+            "parse": 55.088167,
+            "read": 0.304541,
+            "step_parse": 4.111166,
+            "step_table": 4.287833,
+            "step_tessellate": 39.658041
+          },
+          "step_import": {
+            "declared_faces": 422,
+            "lost_faces": 4
+          },
+          "structure_errors": [],
+          "triangles": 28730
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+      "size_mib": 1.1361207962036133,
+      "before": {
+        "file": "models/openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+        "url": "https://raw.githubusercontent.com/openAMRobot/openamr-platform-hw/main/mechanical/cad/production_files/MMP.02.00.00.000%20Base%20assembly.STEP",
+        "licence": "CERN-OHL-P-2.0",
+        "exporting_tool": "SolidWorks 2017",
+        "sha256": "e93dffa50a652267aa610056464222d6a51fcb290bfeed322705be7689dd20fa",
+        "archive_member": "",
+        "repository_revision_at_audit": "9703a5f13ffc009db8ff3fa979470179afe3d26b",
+        "licence_url": "https://github.com/openAMRobot/openamr-platform-hw/blob/main/LICENSE",
+        "included": "yes",
+        "name": "openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+        "size_mib": 1.1361207962036133,
+        "burr_parts": null,
+        "occt_parts": 43,
+        "occt_solids": 43,
+        "load_s": null,
+        "check_s": null,
+        "elapsed_s": 0.11210237501654774,
+        "peak_rss_mib": 23.703125,
+        "dropped_faces": null,
+        "declared_faces_if_loss": null,
+        "empty_definitions": 0,
+        "burr_verdict": "crash",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 42,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": true,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {}
+      },
+      "occt_parts": 43,
+      "occt_verdict": "fail",
+      "occt_pairs": 42,
+      "occt_pair_scan_complete": true,
+      "classification": "incomplete"
+    },
+    {
+      "name": "openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+      "burr_verdict": "incomplete",
+      "burr_parts": 97,
+      "burr_pairs": 0,
+      "load_s": 0.359420375,
+      "check_s": 9.208e-06,
+      "peak_rss_mib": 180.203125,
+      "step_import": {
+        "declared_faces": 2411,
+        "lost_faces": 14
+      },
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "14 of 2411 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {
+        "SurfaceConversionFailed": 8,
+        "NoOddParityRegion": 2,
+        "RejectedDegenerate": 3,
+        "ContradictoryDualParity": 1
+      },
+      "metrics": {
+        "sha256": "aa6e37556754cd7baec59cbacdc50c13becb1929b2e6dccc3a6efeade836d748",
+        "elapsed_s": 0.4201795420376584,
+        "peak_rss_mib": 180.203125,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 149.859375,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 33,
+          "load_s": 0.359420375,
+          "parts": 97,
+          "stages_ms": {
+            "compile": 6.4530840000000005,
+            "hash": 4.947,
+            "parse": 346.812084,
+            "read": 1.181417,
+            "step_parse": 27.251792000000002,
+            "step_table": 34.73025,
+            "step_tessellate": 231.242791
+          },
+          "step_import": {
+            "declared_faces": 2411,
+            "lost_faces": 14
+          },
+          "structure_errors": [],
+          "triangles": 170104
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+      "size_mib": 7.84266471862793,
+      "before": {
+        "file": "models/openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+        "url": "https://raw.githubusercontent.com/openAMRobot/openamr-platform-hw/main/mechanical/cad/production_files/MMP.03.00.00.000%20Wheel%20assembly.STEP",
+        "licence": "CERN-OHL-P-2.0",
+        "exporting_tool": "SolidWorks 2017",
+        "sha256": "aa6e37556754cd7baec59cbacdc50c13becb1929b2e6dccc3a6efeade836d748",
+        "archive_member": "",
+        "repository_revision_at_audit": "9703a5f13ffc009db8ff3fa979470179afe3d26b",
+        "licence_url": "https://github.com/openAMRobot/openamr-platform-hw/blob/main/LICENSE",
+        "included": "yes",
+        "name": "openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+        "size_mib": 7.84266471862793,
+        "burr_parts": null,
+        "occt_parts": 97,
+        "occt_solids": 126,
+        "load_s": null,
+        "check_s": null,
+        "elapsed_s": 0.8488938329974189,
+        "peak_rss_mib": 85.640625,
+        "dropped_faces": null,
+        "declared_faces_if_loss": null,
+        "empty_definitions": 0,
+        "burr_verdict": "crash",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 62,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": true,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {}
+      },
+      "occt_parts": 97,
+      "occt_verdict": "fail",
+      "occt_pairs": 62,
+      "occt_pair_scan_complete": true,
+      "classification": "incomplete"
+    },
+    {
+      "name": "openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+      "burr_verdict": "incomplete",
+      "burr_parts": 33,
+      "burr_pairs": 0,
+      "load_s": 0.048677667,
+      "check_s": 5.167e-06,
+      "peak_rss_mib": 64.140625,
+      "step_import": {
+        "declared_faces": 570,
+        "lost_faces": 2
+      },
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "2 of 570 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {
+        "SurfaceConversionFailed": 2
+      },
+      "metrics": {
+        "sha256": "033e94b2e131b0170adb4cee88899e89148c0cd216669982311e45ce543bc2fa",
+        "elapsed_s": 0.10326404205989093,
+        "peak_rss_mib": 64.140625,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 0.03125,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 4,
+          "load_s": 0.048677667,
+          "parts": 33,
+          "stages_ms": {
+            "compile": 1.507625,
+            "hash": 0.978666,
+            "parse": 45.872084,
+            "read": 0.305458,
+            "step_parse": 5.3109589999999995,
+            "step_table": 6.2693330000000005,
+            "step_tessellate": 25.94625
+          },
+          "step_import": {
+            "declared_faces": 570,
+            "lost_faces": 2
+          },
+          "structure_errors": [],
+          "triangles": 40764
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+      "size_mib": 1.382009506225586,
+      "before": {
+        "file": "models/openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+        "url": "https://raw.githubusercontent.com/openAMRobot/openamr-platform-hw/main/mechanical/cad/production_files/MMP.04.00.00.000%20Center%20bracket%20assembly.STEP",
+        "licence": "CERN-OHL-P-2.0",
+        "exporting_tool": "SolidWorks 2017",
+        "sha256": "033e94b2e131b0170adb4cee88899e89148c0cd216669982311e45ce543bc2fa",
+        "archive_member": "",
+        "repository_revision_at_audit": "9703a5f13ffc009db8ff3fa979470179afe3d26b",
+        "licence_url": "https://github.com/openAMRobot/openamr-platform-hw/blob/main/LICENSE",
+        "included": "yes",
+        "name": "openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+        "size_mib": 1.382009506225586,
+        "burr_parts": null,
+        "occt_parts": 33,
+        "occt_solids": 49,
+        "load_s": null,
+        "check_s": null,
+        "elapsed_s": 0.10469608404673636,
+        "peak_rss_mib": 26.734375,
+        "dropped_faces": null,
+        "declared_faces_if_loss": null,
+        "empty_definitions": 0,
+        "burr_verdict": "crash",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 16,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": true,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {}
+      },
+      "occt_parts": 33,
+      "occt_verdict": "fail",
+      "occt_pairs": 16,
+      "occt_pair_scan_complete": true,
+      "classification": "incomplete"
+    },
+    {
+      "name": "Voron-0__MiniSB_Bowden.step",
+      "burr_verdict": "incomplete",
+      "burr_parts": 31,
+      "burr_pairs": 0,
+      "load_s": 0.872947916,
+      "check_s": 0.320676959,
+      "peak_rss_mib": 345.265625,
+      "step_import": {
+        "declared_faces": 3293,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components do not form closed solids: Cowling_ECAS04 v6, Cowling_PC4_M6 v6, Cowling_PC4_M10 v6, M3x35 BHCS, M3x35 BHCS, M3x16 BHCS, M3x8 FHCS, M2x6 SHCS, M3x8 FHCS, M2x6 SHCS, M2x6 SHCS, M2x6 SHCS, M3 Heatset Insert, M3 Heatset Insert, M3 Heatset Insert, M3 Hexnut, M3 Hexnut, 3010 Blower Fan (1), 3010 Blower Fan (1), PC4-M6_Collet, M10 Coupler, Plunger, Collet Body, Seal Retainer, X_Carriage, MGN7-H (1)."
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "d19b2896e3f22074ceb3c5a2b80cca682de1942b57017a8f0d1e833dd3be3d4f",
+        "elapsed_s": 1.310890541994013,
+        "peak_rss_mib": 345.265625,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 337.71875,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 21,
+          "load_s": 0.872947916,
+          "parts": 31,
+          "stages_ms": {
+            "compile": 13.092292,
+            "hash": 7.832667,
+            "parse": 849.919667,
+            "read": 2.076708,
+            "step_parse": 41.958792,
+            "step_table": 46.9245,
+            "step_tessellate": 675.084417
+          },
+          "step_import": {
+            "declared_faces": 3293,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 363223
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/Voron-0__MiniSB_Bowden.step",
+      "size_mib": 12.87429428100586,
+      "before": {
+        "file": "models/Voron-0__MiniSB_Bowden.step",
+        "url": "https://raw.githubusercontent.com/VoronDesign/Voron-0/Voron0.2r1/CAD/Bowden%20Toolhead/MiniSB_Bowden.step",
+        "licence": "GPL-3.0",
+        "exporting_tool": "Autodesk Translation Framework v13.14.0.145",
+        "sha256": "d19b2896e3f22074ceb3c5a2b80cca682de1942b57017a8f0d1e833dd3be3d4f",
+        "archive_member": "",
+        "repository_revision_at_audit": "a53fc87562fd630c846af38d7de850c894dc3d85",
+        "licence_url": "https://github.com/VoronDesign/Voron-0/blob/Voron0.2r1/LICENSE",
+        "included": "yes",
+        "name": "Voron-0__MiniSB_Bowden.step",
+        "size_mib": 12.87429428100586,
+        "burr_parts": 1,
+        "occt_parts": 31,
+        "occt_solids": 44,
+        "load_s": 2.113055375,
+        "check_s": 7.034089833,
+        "elapsed_s": 9.245834541041404,
+        "peak_rss_mib": 581.625,
+        "dropped_faces": 480,
+        "declared_faces_if_loss": 3293,
+        "empty_definitions": 0,
+        "burr_verdict": "incomplete",
+        "burr_pairs": 0,
+        "occt_verdict": "timeout",
+        "occt_pairs": null,
+        "occt_pair_scan_complete": null,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {
+          "EdgeCurveConversionFailed": 480
+        }
+      },
+      "occt_parts": 31,
+      "occt_verdict": "timeout",
+      "occt_pairs": null,
+      "occt_pair_scan_complete": null,
+      "classification": "incomplete"
+    },
+    {
+      "name": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+      "burr_verdict": "incomplete",
+      "burr_parts": 11,
+      "burr_pairs": 0,
+      "load_s": 0.1137585,
+      "check_s": 0.061343833,
+      "peak_rss_mib": 84.515625,
+      "step_import": {
+        "declared_faces": 943,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components do not form closed solids: PCB DIN Clip, M2x10 self tapping screw for plastic:11, M2x10 self tapping screw for plastic:13, M2x10 self tapping screw for plastic:13, M2x10 self tapping screw for plastic:11, M3x8 BHCS, M3x8 BHCS, M3x8 BHCS, M3x8 BHCS, Fly_Gemini_V2_Bracket."
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "7d672b454a75d2fd84710507b41f611f6420eb1cb499b678e01f52c3a6d7f103",
+        "elapsed_s": 0.21607462503015995,
+        "peak_rss_mib": 84.515625,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 77.515625,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 6,
+          "load_s": 0.1137585,
+          "parts": 11,
+          "stages_ms": {
+            "compile": 2.053083,
+            "hash": 1.604417,
+            "parse": 109.68124999999999,
+            "read": 0.40495899999999996,
+            "step_parse": 9.169083,
+            "step_table": 8.978041000000001,
+            "step_tessellate": 78.000666
+          },
+          "step_import": {
+            "declared_faces": 943,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 69176
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+      "size_mib": 2.2251110076904297,
+      "before": {
+        "file": "models/Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+        "url": "https://raw.githubusercontent.com/VoronDesign/Voron-0/Voron0.2r1/CAD/Electronics%20Mounts/Fly_Gemini_V2_Din_Mount_2pc.step",
+        "licence": "GPL-3.0",
+        "exporting_tool": "Autodesk Translation Framework v11.17.0.187",
+        "sha256": "7d672b454a75d2fd84710507b41f611f6420eb1cb499b678e01f52c3a6d7f103",
+        "archive_member": "",
+        "repository_revision_at_audit": "a53fc87562fd630c846af38d7de850c894dc3d85",
+        "licence_url": "https://github.com/VoronDesign/Voron-0/blob/Voron0.2r1/LICENSE",
+        "included": "yes",
+        "name": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+        "size_mib": 2.2251110076904297,
+        "burr_parts": 1,
+        "occt_parts": 11,
+        "occt_solids": 12,
+        "load_s": 0.115464917,
+        "check_s": 0.706363792,
+        "elapsed_s": 0.9272287080530077,
+        "peak_rss_mib": 278.140625,
+        "dropped_faces": 31,
+        "declared_faces_if_loss": 943,
+        "empty_definitions": 0,
+        "burr_verdict": "incomplete",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 8,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {
+          "EdgeCurveConversionFailed": 31
+        }
+      },
+      "occt_parts": 11,
+      "occt_verdict": "fail",
+      "occt_pairs": 8,
+      "occt_pair_scan_complete": true,
+      "classification": "incomplete"
+    },
+    {
+      "name": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+      "burr_verdict": "pass",
+      "burr_parts": 2,
+      "burr_pairs": 0,
+      "load_s": 0.026724666,
+      "check_s": 0.047994208,
+      "peak_rss_mib": 42.984375,
+      "step_import": {
+        "declared_faces": 388,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "e721951b8eaa091b78bb5d6202152956e83767955d7c30b121d0bd7f65f56427",
+        "elapsed_s": 0.10721920907963067,
+        "peak_rss_mib": 42.984375,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 0.03125,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 2,
+          "load_s": 0.026724666,
+          "parts": 2,
+          "stages_ms": {
+            "compile": 0.781583,
+            "hash": 0.351333,
+            "parse": 25.447167,
+            "read": 0.132583,
+            "step_parse": 2.303083,
+            "step_table": 2.531583,
+            "step_tessellate": 19.331666000000002
+          },
+          "step_import": {
+            "declared_faces": 388,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 27652
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/Voron-0__Manta_M4P_Din_Mount_2pc.step",
+      "size_mib": 0.564906120300293,
+      "before": {
+        "file": "models/Voron-0__Manta_M4P_Din_Mount_2pc.step",
+        "url": "https://raw.githubusercontent.com/VoronDesign/Voron-0/Voron0.2r1/CAD/Electronics%20Mounts/Manta_M4P_Din_Mount_2pc.step",
+        "licence": "GPL-3.0",
+        "exporting_tool": "Autodesk Translation Framework v11.17.0.187",
+        "sha256": "e721951b8eaa091b78bb5d6202152956e83767955d7c30b121d0bd7f65f56427",
+        "archive_member": "",
+        "repository_revision_at_audit": "a53fc87562fd630c846af38d7de850c894dc3d85",
+        "licence_url": "https://github.com/VoronDesign/Voron-0/blob/Voron0.2r1/LICENSE",
+        "included": "yes",
+        "name": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+        "size_mib": 0.564906120300293,
+        "burr_parts": 1,
+        "occt_parts": 2,
+        "occt_solids": 2,
+        "load_s": 0.032935125,
+        "check_s": 0.327720541,
+        "elapsed_s": 0.42238766700029373,
+        "peak_rss_mib": 123.796875,
+        "dropped_faces": 0,
+        "declared_faces_if_loss": null,
+        "empty_definitions": 0,
+        "burr_verdict": "incomplete",
+        "burr_pairs": 0,
+        "occt_verdict": "pass",
+        "occt_pairs": 0,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": false,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {}
+      },
+      "occt_parts": 2,
+      "occt_verdict": "pass",
+      "occt_pairs": 0,
+      "occt_pair_scan_complete": true,
+      "classification": "correct"
+    },
+    {
+      "name": "Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+      "burr_verdict": "incomplete",
+      "burr_parts": 11,
+      "burr_pairs": 0,
+      "load_s": 1.00810775,
+      "check_s": 7.5e-06,
+      "peak_rss_mib": 329.890625,
+      "step_import": {
+        "declared_faces": 3672,
+        "lost_faces": 1
+      },
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "1 of 3672 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {
+        "RejectedDegenerate": 1
+      },
+      "metrics": {
+        "sha256": "b05ef95b24d53812192d32643d8eefd01c933526b99193d640b10cf47a505e8d",
+        "elapsed_s": 1.0767366660293192,
+        "peak_rss_mib": 329.890625,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 257.640625,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 11,
+          "load_s": 1.00810775,
+          "parts": 11,
+          "stages_ms": {
+            "compile": 13.27725,
+            "hash": 4.585875,
+            "parse": 989.074958,
+            "read": 1.147459,
+            "step_parse": 27.6525,
+            "step_table": 31.587999999999997,
+            "step_tessellate": 854.4508750000001
+          },
+          "step_import": {
+            "declared_faces": 3672,
+            "lost_faces": 1
+          },
+          "structure_errors": [],
+          "triangles": 305099
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+      "size_mib": 7.784178733825684,
+      "before": {
+        "file": "models/Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+        "url": "https://raw.githubusercontent.com/VoronDesign/Voron-0/Voron0.2r1/CAD/ADXL_Mounts/MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+        "licence": "GPL-3.0",
+        "exporting_tool": "Autodesk Translation Framework v11.17.0.187",
+        "sha256": "b05ef95b24d53812192d32643d8eefd01c933526b99193d640b10cf47a505e8d",
+        "archive_member": "",
+        "repository_revision_at_audit": "a53fc87562fd630c846af38d7de850c894dc3d85",
+        "licence_url": "https://github.com/VoronDesign/Voron-0/blob/Voron0.2r1/LICENSE",
+        "included": "yes",
+        "name": "Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+        "size_mib": 7.784178733825684,
+        "burr_parts": 1,
+        "occt_parts": 11,
+        "occt_solids": 12,
+        "load_s": 2.310460875,
+        "check_s": 31.234707833,
+        "elapsed_s": 33.9670772079844,
+        "peak_rss_mib": 692.515625,
+        "dropped_faces": 98,
+        "declared_faces_if_loss": 3672,
+        "empty_definitions": 0,
+        "burr_verdict": "incomplete",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 3,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {
+          "EdgeCurveConversionFailed": 97,
+          "tessellation": 1
+        }
+      },
+      "occt_parts": 11,
+      "occt_verdict": "fail",
+      "occt_pairs": 3,
+      "occt_pair_scan_complete": true,
+      "classification": "incomplete"
+    },
+    {
+      "name": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "burr_verdict": "incomplete",
+      "burr_parts": 1691,
+      "burr_pairs": 0,
+      "load_s": 12.077100958,
+      "check_s": 9.4208e-05,
+      "peak_rss_mib": 2558.125,
+      "step_import": {
+        "declared_faces": 60543,
+        "lost_faces": 8
+      },
+      "incomplete_reasons": [
+        {
+          "code": "assembly_structure_lost",
+          "message": "STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry"
+        },
+        {
+          "code": "assembly_structure_lost",
+          "message": "STEP leaf component 'Threaded Inserts (1)' has no definition geometry"
+        },
+        {
+          "code": "step_faces_lost",
+          "message": "8 of 60543 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [
+        "STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry",
+        "STEP leaf component 'Threaded Inserts (1)' has no definition geometry"
+      ],
+      "error": null,
+      "diagnostic_tags": {
+        "NoOddParityRegion": 5,
+        "ContradictoryDualParity": 3
+      },
+      "metrics": {
+        "sha256": "d5a9d40db82c55eee20203608a5a4e784b54b87ae339861af577c5aeb182d61f",
+        "elapsed_s": 12.252029000082985,
+        "peak_rss_mib": 2558.125,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 2541.71875,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 392,
+          "load_s": 12.077100958,
+          "parts": 1691,
+          "stages_ms": {
+            "compile": 263.359958,
+            "hash": 115.654083,
+            "parse": 11671.753208,
+            "read": 26.300082999999997,
+            "step_parse": 600.126042,
+            "step_table": 1170.514875,
+            "step_tessellate": 7846.212083
+          },
+          "step_import": {
+            "declared_faces": 60543,
+            "lost_faces": 8
+          },
+          "structure_errors": [
+            "STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry",
+            "STEP leaf component 'Threaded Inserts (1)' has no definition geometry"
+          ],
+          "triangles": 5122612
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "size_mib": 170.93147373199463,
+      "before": {
+        "file": "models/Voron-0__V0.2R1_Master_Assembly_v63.step",
+        "url": "https://raw.githubusercontent.com/VoronDesign/Voron-0/Voron0.2r1/CAD/V0.2R1_Master_Assembly_STEP.zip",
+        "licence": "GPL-3.0",
+        "exporting_tool": "Autodesk Translation Framework v12.6.0.85",
+        "sha256": "d5a9d40db82c55eee20203608a5a4e784b54b87ae339861af577c5aeb182d61f",
+        "archive_member": "V0.2R1 Master Assembly v63.step",
+        "repository_revision_at_audit": "a53fc87562fd630c846af38d7de850c894dc3d85",
+        "licence_url": "https://github.com/VoronDesign/Voron-0/blob/Voron0.2r1/LICENSE",
+        "included": "yes",
+        "name": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+        "size_mib": 170.93147373199463,
+        "burr_parts": 1,
+        "occt_parts": 1691,
+        "occt_solids": 3092,
+        "load_s": 25.478873709,
+        "check_s": null,
+        "elapsed_s": 601.3763383339392,
+        "peak_rss_mib": 3293.109375,
+        "dropped_faces": 1045,
+        "declared_faces_if_loss": 60543,
+        "empty_definitions": 0,
+        "burr_verdict": "timeout",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 1,
+        "occt_pair_scan_complete": false,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {
+          "EdgeCurveConversionFailed": 1036,
+          "tessellation": 9
+        }
+      },
+      "occt_parts": 1691,
+      "occt_verdict": "fail",
+      "occt_pairs": 1,
+      "occt_pair_scan_complete": false,
+      "classification": "incomplete"
+    },
+    {
+      "name": "Voron-2__Voron_2.4r2_Assembly.step",
+      "burr_verdict": "incomplete",
+      "burr_parts": 1428,
+      "burr_pairs": 0,
+      "load_s": 33.810412958,
+      "check_s": 5.9833e-05,
+      "peak_rss_mib": 2717.953125,
+      "step_import": {
+        "declared_faces": 100800,
+        "lost_faces": 34
+      },
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "34 of 100800 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {
+        "ContradictoryDualParity": 21,
+        "ConstraintInsertionIncomplete": 11,
+        "RejectedDegenerate": 1,
+        "NoOddParityRegion": 1
+      },
+      "metrics": {
+        "sha256": "06b372e40217caa1a7d1f516cb74887247f809e41e1e389f740f290e98441b55",
+        "elapsed_s": 34.015807042014785,
+        "peak_rss_mib": 2717.953125,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 2689.78125,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 1314,
+          "load_s": 33.810412958,
+          "parts": 1428,
+          "stages_ms": {
+            "compile": 451.11125000000004,
+            "hash": 134.79595799999998,
+            "parse": 33195.139917,
+            "read": 29.327084,
+            "step_parse": 740.1034159999999,
+            "step_table": 1345.4295410000002,
+            "step_tessellate": 27101.518417000003
+          },
+          "step_import": {
+            "declared_faces": 100800,
+            "lost_faces": 34
+          },
+          "structure_errors": [],
+          "triangles": 8200624
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/Voron-2__Voron_2.4r2_Assembly.step",
+      "size_mib": 230.3335313796997,
+      "before": {
+        "file": "models/Voron-2__Voron_2.4r2_Assembly.step",
+        "url": "https://raw.githubusercontent.com/VoronDesign/Voron-2/Voron2.4/CAD/Voron_2.4r2_Assembly_STEP.zip",
+        "licence": "GPL-3.0",
+        "exporting_tool": "Autodesk Translation Framework v12.9.0.99",
+        "sha256": "06b372e40217caa1a7d1f516cb74887247f809e41e1e389f740f290e98441b55",
+        "archive_member": "Voron_2.4r2_Assembly.step",
+        "repository_revision_at_audit": "a192410e27ea345644ae5c4b29b4c9c40cbe1a73",
+        "licence_url": "https://github.com/VoronDesign/Voron-2/blob/Voron2.4/LICENSE",
+        "included": "yes",
+        "name": "Voron-2__Voron_2.4r2_Assembly.step",
+        "size_mib": 230.3335313796997,
+        "burr_parts": 1,
+        "occt_parts": 1428,
+        "occt_solids": 1715,
+        "load_s": 18.654066,
+        "check_s": null,
+        "elapsed_s": 601.3065713749966,
+        "peak_rss_mib": 3356.890625,
+        "dropped_faces": 11099,
+        "declared_faces_if_loss": 100800,
+        "empty_definitions": 0,
+        "burr_verdict": "timeout",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 1,
+        "occt_pair_scan_complete": false,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {
+          "EdgeCurveConversionFailed": 10957,
+          "tessellation": 142
+        }
+      },
+      "occt_parts": 1428,
+      "occt_verdict": "fail",
+      "occt_pairs": 1,
+      "occt_pair_scan_complete": false,
+      "classification": "incomplete"
+    },
+    {
+      "name": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "burr_verdict": "incomplete",
+      "burr_parts": 712,
+      "burr_pairs": 0,
+      "load_s": 5.995724625,
+      "check_s": 1.4292e-05,
+      "peak_rss_mib": 2191.984375,
+      "step_import": {
+        "declared_faces": 35873,
+        "lost_faces": 51
+      },
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "51 of 35873 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {
+        "WireNotClosed": 42,
+        "ContradictoryDualParity": 5,
+        "NoOddParityRegion": 1,
+        "ConstraintRoleMissing": 1,
+        "RejectedDegenerate": 1,
+        "ConstraintInsertionIncomplete": 1
+      },
+      "metrics": {
+        "sha256": "523f1848bb424c8f34876c215e2ef854cd0389dc2affbf640691b9c0cc226700",
+        "elapsed_s": 6.092474167002365,
+        "peak_rss_mib": 2191.984375,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 2174.75,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 345,
+          "load_s": 5.995724625,
+          "parts": 712,
+          "stages_ms": {
+            "compile": 117.0715,
+            "hash": 51.180208,
+            "parse": 5815.965708000001,
+            "read": 11.485958,
+            "step_parse": 278.354875,
+            "step_table": 406.702125,
+            "step_tessellate": 4346.7710830000005
+          },
+          "step_import": {
+            "declared_faces": 35873,
+            "lost_faces": 51
+          },
+          "structure_errors": [],
+          "triangles": 2848365
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "size_mib": 86.26700115203857,
+      "before": {
+        "file": "models/Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+        "url": "https://raw.githubusercontent.com/VoronDesign/Voron-Switchwire/master/CAD/Switchwire_Assembly_v1_STEP.zip",
+        "licence": "GPL-3.0",
+        "exporting_tool": "Autodesk Translation Framework v12.6.0.85",
+        "sha256": "523f1848bb424c8f34876c215e2ef854cd0389dc2affbf640691b9c0cc226700",
+        "archive_member": "Switchwire_Assembly_v1_STEP.step",
+        "repository_revision_at_audit": "92cc013ca2af94e6c09950dbe05c0973ee49aa00",
+        "licence_url": "https://github.com/VoronDesign/Voron-Switchwire/blob/master/LICENSE",
+        "included": "yes",
+        "name": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+        "size_mib": 86.26700115203857,
+        "burr_parts": 1,
+        "occt_parts": 712,
+        "occt_solids": 997,
+        "load_s": 7.463098209,
+        "check_s": null,
+        "elapsed_s": 600.4367764169583,
+        "peak_rss_mib": 2405.90625,
+        "dropped_faces": 3347,
+        "declared_faces_if_loss": 35873,
+        "empty_definitions": 0,
+        "burr_verdict": "timeout",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 1,
+        "occt_pair_scan_complete": false,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {
+          "EdgeCurveConversionFailed": 3300,
+          "WireNotClosed": 36,
+          "tessellation": 11
+        }
+      },
+      "occt_parts": 712,
+      "occt_verdict": "fail",
+      "occt_pairs": 1,
+      "occt_pair_scan_complete": false,
+      "classification": "incomplete"
+    },
+    {
+      "name": "TradRack__tr-lower-carabiner-distribution-board.STEP",
+      "burr_verdict": "incomplete",
+      "burr_parts": 6,
+      "burr_pairs": 0,
+      "load_s": 0.119280792,
+      "check_s": 5.125e-06,
+      "peak_rss_mib": 147.3125,
+      "step_import": {
+        "declared_faces": 1527,
+        "lost_faces": 2
+      },
+      "incomplete_reasons": [
+        {
+          "code": "step_faces_lost",
+          "message": "2 of 1527 STEP faces were lost during import"
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {
+        "ContradictoryDualParity": 2
+      },
+      "metrics": {
+        "sha256": "934686aa4ebeb85625b9f446773146b51cf59ac3baf0f319061148ed7a48a931",
+        "elapsed_s": 0.21437404199969023,
+        "peak_rss_mib": 147.3125,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 107.765625,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 6,
+          "load_s": 0.119280792,
+          "parts": 6,
+          "stages_ms": {
+            "compile": 4.588417,
+            "hash": 2.957,
+            "parse": 110.977625,
+            "read": 0.740875,
+            "step_parse": 17.455125,
+            "step_table": 27.130958,
+            "step_tessellate": 57.138374999999996
+          },
+          "step_import": {
+            "declared_faces": 1527,
+            "lost_faces": 2
+          },
+          "structure_errors": [],
+          "triangles": 127767
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/TradRack__tr-lower-carabiner-distribution-board.STEP",
+      "size_mib": 5.033402442932129,
+      "before": {
+        "file": "models/TradRack__tr-lower-carabiner-distribution-board.STEP",
+        "url": "https://raw.githubusercontent.com/Annex-Engineering/TradRack/main/PCBs/CAD/tr-lower-carabiner-distribution-board.STEP",
+        "licence": "CC-BY-NC-SA-4.0",
+        "exporting_tool": "SolidWorks 2022",
+        "sha256": "934686aa4ebeb85625b9f446773146b51cf59ac3baf0f319061148ed7a48a931",
+        "archive_member": "",
+        "repository_revision_at_audit": "f89dc0b115adfc49195d782c5d7ecd348a574891",
+        "licence_url": "https://github.com/Annex-Engineering/TradRack/blob/main/LICENSE.md",
+        "included": "yes",
+        "name": "TradRack__tr-lower-carabiner-distribution-board.STEP",
+        "size_mib": 5.033402442932129,
+        "burr_parts": 1,
+        "occt_parts": 6,
+        "occt_solids": 6,
+        "load_s": 0.289909,
+        "check_s": 7.608944333,
+        "elapsed_s": 8.135711957933381,
+        "peak_rss_mib": 406.4375,
+        "dropped_faces": 2,
+        "declared_faces_if_loss": 1527,
+        "empty_definitions": 0,
+        "burr_verdict": "incomplete",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 5,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": false,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {
+          "tessellation": 2
+        }
+      },
+      "occt_parts": 6,
+      "occt_verdict": "fail",
+      "occt_pairs": 5,
+      "occt_pair_scan_complete": true,
+      "classification": "incomplete"
+    },
+    {
+      "name": "TradRack__tr-toolhead-board.STEP",
+      "burr_verdict": "fail",
+      "burr_parts": 7,
+      "burr_pairs": 6,
+      "load_s": 0.104897,
+      "check_s": 0.091896458,
+      "peak_rss_mib": 118.203125,
+      "step_import": {
+        "declared_faces": 1237,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "fe502c59d239a848198aa791e3e8bdbe17dd044d5410eaa38ea941e29da0c7aa",
+        "elapsed_s": 0.21396458300296217,
+        "peak_rss_mib": 118.203125,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 88.71875,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 7,
+          "load_s": 0.104897,
+          "parts": 7,
+          "stages_ms": {
+            "compile": 3.24675,
+            "hash": 2.974583,
+            "parse": 97.916333,
+            "read": 0.74175,
+            "step_parse": 16.167625,
+            "step_table": 21.977459,
+            "step_tessellate": 55.059167
+          },
+          "step_import": {
+            "declared_faces": 1237,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 103676
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/TradRack__tr-toolhead-board.STEP",
+      "size_mib": 4.067420959472656,
+      "before": {
+        "file": "models/TradRack__tr-toolhead-board.STEP",
+        "url": "https://raw.githubusercontent.com/Annex-Engineering/TradRack/main/PCBs/CAD/tr-toolhead-board.STEP",
+        "licence": "CC-BY-NC-SA-4.0",
+        "exporting_tool": "SolidWorks 2022",
+        "sha256": "fe502c59d239a848198aa791e3e8bdbe17dd044d5410eaa38ea941e29da0c7aa",
+        "archive_member": "",
+        "repository_revision_at_audit": "f89dc0b115adfc49195d782c5d7ecd348a574891",
+        "licence_url": "https://github.com/Annex-Engineering/TradRack/blob/main/LICENSE.md",
+        "included": "yes",
+        "name": "TradRack__tr-toolhead-board.STEP",
+        "size_mib": 4.067420959472656,
+        "burr_parts": 1,
+        "occt_parts": 7,
+        "occt_solids": 7,
+        "load_s": 0.275069833,
+        "check_s": 5.200333875,
+        "elapsed_s": 5.627283249981701,
+        "peak_rss_mib": 336.3125,
+        "dropped_faces": 0,
+        "declared_faces_if_loss": null,
+        "empty_definitions": 0,
+        "burr_verdict": "incomplete",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 6,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": false,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {}
+      },
+      "occt_parts": 7,
+      "occt_verdict": "fail",
+      "occt_pairs": 6,
+      "occt_pair_scan_complete": true,
+      "classification": "correct"
+    },
+    {
+      "name": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "burr_verdict": "fail",
+      "burr_parts": 136,
+      "burr_pairs": 9,
+      "load_s": 0.051552625,
+      "check_s": 0.044427042,
+      "peak_rss_mib": 62.03125,
+      "step_import": {
+        "declared_faces": 416,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components do not form closed solids: 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, sot-23-3, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor, 0603_resistor."
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+        "elapsed_s": 0.11195083404891193,
+        "peak_rss_mib": 62.03125,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 0.03125,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 6,
+          "load_s": 0.051552625,
+          "parts": 136,
+          "stages_ms": {
+            "compile": 1.219,
+            "hash": 0.598875,
+            "parse": 49.551041,
+            "read": 0.1655,
+            "step_parse": 3.9813330000000002,
+            "step_table": 5.3608329999999995,
+            "step_tessellate": 34.410791
+          },
+          "step_import": {
+            "declared_faces": 416,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 40898
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "size_mib": 1.010122299194336,
+      "before": {
+        "file": "models/Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+        "url": "https://raw.githubusercontent.com/PCrnjak/Faze4-Robotic-arm/master/Faze4_DIST_board_v2_files/Faze4_dist_v2_STEP.step",
+        "licence": "CERN-OHL-S-2.0",
+        "exporting_tool": "Open CASCADE (authoring tool unspecified)",
+        "sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+        "archive_member": "",
+        "repository_revision_at_audit": "674f46cb608d25899c46fc2ea67741f008a8f016",
+        "licence_url": "https://github.com/Source-Robotics/Faze4-Robotic-arm/blob/master/LICENSE",
+        "included": "yes",
+        "name": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+        "size_mib": 1.010122299194336,
+        "burr_parts": 136,
+        "occt_parts": 136,
+        "occt_solids": 229,
+        "load_s": 0.082705792,
+        "check_s": 5.129308166,
+        "elapsed_s": 5.298850166029297,
+        "peak_rss_mib": 209.625,
+        "dropped_faces": 0,
+        "declared_faces_if_loss": null,
+        "empty_definitions": 0,
+        "burr_verdict": "fail",
+        "burr_pairs": 9,
+        "occt_verdict": "fail",
+        "occt_pairs": 9,
+        "occt_pair_scan_complete": true,
+        "classification": "correct",
+        "open_mesh": true,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {}
+      },
+      "occt_parts": 136,
+      "occt_verdict": "fail",
+      "occt_pairs": 9,
+      "occt_pair_scan_complete": true,
+      "classification": "correct"
+    },
+    {
+      "name": "apollo-3d-enclosure__flat__assembly.step",
+      "burr_verdict": "incomplete",
+      "burr_parts": 2,
+      "burr_pairs": 0,
+      "load_s": 0.519547333,
+      "check_s": 0.059972834,
+      "peak_rss_mib": 88.15625,
+      "step_import": {
+        "declared_faces": 707,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components do not form closed solids: Solid #15."
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "d4814b9d2a14606696be3a3aba9576a26cd29ce23f4a41a366ec30aa4843108c",
+        "elapsed_s": 0.6560689170146361,
+        "peak_rss_mib": 88.15625,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 85.890625,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 2,
+          "load_s": 0.519547333,
+          "parts": 2,
+          "stages_ms": {
+            "compile": 3.2138750000000003,
+            "hash": 0.756625,
+            "parse": 515.351167,
+            "read": 0.211292,
+            "step_parse": 5.012499999999999,
+            "step_table": 5.789834,
+            "step_tessellate": 501.041583
+          },
+          "step_import": {
+            "declared_faces": 707,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 65489
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/apollo-3d-enclosure__flat__assembly.step",
+      "size_mib": 1.2916250228881836,
+      "before": {
+        "file": "models/apollo-3d-enclosure__flat__assembly.step",
+        "url": "https://raw.githubusercontent.com/ThomasHFWright/apollo-3d-enclosure/main/output/flat/assembly.step",
+        "licence": "CC-BY-NC-SA-4.0",
+        "exporting_tool": "FreeCAD Model",
+        "sha256": "d4814b9d2a14606696be3a3aba9576a26cd29ce23f4a41a366ec30aa4843108c",
+        "archive_member": "",
+        "repository_revision_at_audit": "4af5920f049f254a225d7978a1970bb156209904",
+        "licence_url": "https://github.com/ThomasHFWright/apollo-3d-enclosure/blob/main/LICENSE.md",
+        "included": "yes",
+        "name": "apollo-3d-enclosure__flat__assembly.step",
+        "size_mib": 1.2916250228881836,
+        "burr_parts": 1,
+        "occt_parts": 2,
+        "occt_solids": 2,
+        "load_s": 0.061357917,
+        "check_s": 0.779865041,
+        "elapsed_s": 0.9305058750323951,
+        "peak_rss_mib": 244.03125,
+        "dropped_faces": 68,
+        "declared_faces_if_loss": 707,
+        "empty_definitions": 0,
+        "burr_verdict": "incomplete",
+        "burr_pairs": 0,
+        "occt_verdict": "pass",
+        "occt_pairs": 0,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": false,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {
+          "EdgeCurveConversionFailed": 68
+        }
+      },
+      "occt_parts": 2,
+      "occt_verdict": "pass",
+      "occt_pairs": 0,
+      "occt_pair_scan_complete": true,
+      "classification": "incomplete"
+    },
+    {
+      "name": "apollo-3d-enclosure__corner__assembly.step",
+      "burr_verdict": "incomplete",
+      "burr_parts": 2,
+      "burr_pairs": 0,
+      "load_s": 0.322544542,
+      "check_s": 0.062216833,
+      "peak_rss_mib": 84.5,
+      "step_import": {
+        "declared_faces": 764,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components do not form closed solids: Solid #15."
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "d54f63a2994fb32cd32ee67ad6c4ffb1af24312c27a63825c1c6e27ba574a3fb",
+        "elapsed_s": 0.42853066697716713,
+        "peak_rss_mib": 84.5,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 77.828125,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 2,
+          "load_s": 0.322544542,
+          "parts": 2,
+          "stages_ms": {
+            "compile": 2.3000410000000002,
+            "hash": 0.9848330000000001,
+            "parse": 318.96962499999995,
+            "read": 0.274541,
+            "step_parse": 5.97025,
+            "step_table": 5.95225,
+            "step_tessellate": 303.81475
+          },
+          "step_import": {
+            "declared_faces": 764,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 66846
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/apollo-3d-enclosure__corner__assembly.step",
+      "size_mib": 1.3046913146972656,
+      "before": {
+        "file": "models/apollo-3d-enclosure__corner__assembly.step",
+        "url": "https://raw.githubusercontent.com/ThomasHFWright/apollo-3d-enclosure/main/output/corner/assembly.step",
+        "licence": "CC-BY-NC-SA-4.0",
+        "exporting_tool": "FreeCAD Model",
+        "sha256": "d54f63a2994fb32cd32ee67ad6c4ffb1af24312c27a63825c1c6e27ba574a3fb",
+        "archive_member": "",
+        "repository_revision_at_audit": "4af5920f049f254a225d7978a1970bb156209904",
+        "licence_url": "https://github.com/ThomasHFWright/apollo-3d-enclosure/blob/main/LICENSE.md",
+        "included": "yes",
+        "name": "apollo-3d-enclosure__corner__assembly.step",
+        "size_mib": 1.3046913146972656,
+        "burr_parts": 1,
+        "occt_parts": 2,
+        "occt_solids": 2,
+        "load_s": 0.054348291,
+        "check_s": 0.655107834,
+        "elapsed_s": 0.7306300830096006,
+        "peak_rss_mib": 251.015625,
+        "dropped_faces": 45,
+        "declared_faces_if_loss": 764,
+        "empty_definitions": 0,
+        "burr_verdict": "incomplete",
+        "burr_pairs": 0,
+        "occt_verdict": "pass",
+        "occt_pairs": 0,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": false,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {
+          "EdgeCurveConversionFailed": 45
+        }
+      },
+      "occt_parts": 2,
+      "occt_verdict": "pass",
+      "occt_pairs": 0,
+      "occt_pair_scan_complete": true,
+      "classification": "incomplete"
+    },
+    {
+      "name": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+      "burr_verdict": "fail",
+      "burr_parts": 15,
+      "burr_pairs": 4,
+      "load_s": 0.2140065,
+      "check_s": 0.326072417,
+      "peak_rss_mib": 202.046875,
+      "step_import": {
+        "declared_faces": 2671,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components do not form closed solids: Board, Copper (Bottom), Copper (Top), C0805-3D."
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "60c69cf0b2f1bf5dcb0ef87c7c6b1203a5a94cc60188691d80a1167106554aed",
+        "elapsed_s": 0.638052541995421,
+        "peak_rss_mib": 202.046875,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 201.96875,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 12,
+          "load_s": 0.2140065,
+          "parts": 15,
+          "stages_ms": {
+            "compile": 9.043459,
+            "hash": 2.114167,
+            "parse": 202.2715,
+            "read": 0.558917,
+            "step_parse": 14.279958,
+            "step_table": 16.688875,
+            "step_tessellate": 135.292834
+          },
+          "step_import": {
+            "declared_faces": 2671,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 220725
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+      "size_mib": 3.5941085815429688,
+      "before": {
+        "file": "models/Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+        "url": "https://raw.githubusercontent.com/adafruit/Adafruit_CAD_Parts/main/1400%20Push%20Button%20Power%20Switch/1400%20Push%20Button%20Power%20Switch.step",
+        "licence": "MIT",
+        "exporting_tool": "Autodesk Translation Framework v11.7.0.108",
+        "sha256": "60c69cf0b2f1bf5dcb0ef87c7c6b1203a5a94cc60188691d80a1167106554aed",
+        "archive_member": "",
+        "repository_revision_at_audit": "c128bceb1f96b6ea8b68f250bda986ba85da24ea",
+        "licence_url": "https://github.com/adafruit/Adafruit_CAD_Parts/blob/main/LICENSE",
+        "included": "yes",
+        "name": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+        "size_mib": 3.5941085815429688,
+        "burr_parts": 1,
+        "occt_parts": 15,
+        "occt_solids": 133,
+        "load_s": 0.270471875,
+        "check_s": 6.860342791,
+        "elapsed_s": 7.211140834027901,
+        "peak_rss_mib": 756.921875,
+        "dropped_faces": 0,
+        "declared_faces_if_loss": null,
+        "empty_definitions": 0,
+        "burr_verdict": "incomplete",
+        "burr_pairs": 0,
+        "occt_verdict": "fail",
+        "occt_pairs": 11,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {}
+      },
+      "occt_parts": 15,
+      "occt_verdict": "fail",
+      "occt_pairs": 11,
+      "occt_pair_scan_complete": true,
+      "classification": "correct"
+    },
+    {
+      "name": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+      "burr_verdict": "incomplete",
+      "burr_parts": 5,
+      "burr_pairs": 0,
+      "load_s": 0.414016125,
+      "check_s": 0.086734041,
+      "peak_rss_mib": 95.78125,
+      "step_import": {
+        "declared_faces": 244,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [
+        {
+          "code": "open_component_mesh",
+          "message": "Could not prove a clean result because these tessellated components do not form closed solids: Holder, Actuator, Spring, Dome."
+        }
+      ],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "85d61649551b187a005b07ad21950e92f5aec3fa457825805bab1994058c46d6",
+        "elapsed_s": 0.546792707988061,
+        "peak_rss_mib": 95.78125,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 94.265625,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 5,
+          "load_s": 0.414016125,
+          "parts": 5,
+          "stages_ms": {
+            "compile": 3.609416,
+            "hash": 0.46299999999999997,
+            "parse": 409.77175,
+            "read": 0.157041,
+            "step_parse": 2.7207500000000002,
+            "step_table": 2.773125,
+            "step_tessellate": 399.77925
+          },
+          "step_import": {
+            "declared_faces": 244,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 96614
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+      "size_mib": 0.7652530670166016,
+      "before": {
+        "file": "models/Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+        "url": "https://raw.githubusercontent.com/adafruit/Adafruit_CAD_Parts/main/1185%20Massive%20Arcade%20Button%20100mm/1185%20Massive%20Arcade%20Button%20100mm.step",
+        "licence": "MIT",
+        "exporting_tool": "Autodesk Translation Framework v7.1.0.215",
+        "sha256": "85d61649551b187a005b07ad21950e92f5aec3fa457825805bab1994058c46d6",
+        "archive_member": "",
+        "repository_revision_at_audit": "c128bceb1f96b6ea8b68f250bda986ba85da24ea",
+        "licence_url": "https://github.com/adafruit/Adafruit_CAD_Parts/blob/main/LICENSE",
+        "included": "yes",
+        "name": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+        "size_mib": 0.7652530670166016,
+        "burr_parts": 1,
+        "occt_parts": 5,
+        "occt_solids": 5,
+        "load_s": 0.166881208,
+        "check_s": 0.258461791,
+        "elapsed_s": 0.5350747919874266,
+        "peak_rss_mib": 118.59375,
+        "dropped_faces": 36,
+        "declared_faces_if_loss": 244,
+        "empty_definitions": 0,
+        "burr_verdict": "incomplete",
+        "burr_pairs": 0,
+        "occt_verdict": "incomplete",
+        "occt_pairs": 0,
+        "occt_pair_scan_complete": true,
+        "classification": "incomplete",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {
+          "EdgeCurveConversionFailed": 36
+        }
+      },
+      "occt_parts": 5,
+      "occt_verdict": "incomplete",
+      "occt_pairs": 0,
+      "occt_pair_scan_complete": true,
+      "classification": "incomplete"
+    },
+    {
+      "name": "text-to-cad-assembly__pick_place_arm.step",
+      "burr_verdict": "fail",
+      "burr_parts": 17,
+      "burr_pairs": 3,
+      "load_s": 0.015738291,
+      "check_s": 0.012393916,
+      "peak_rss_mib": 28.1875,
+      "step_import": {
+        "declared_faces": 157,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "c31fd1adb88029a18a22028ecab3e776011126db2f1fe80624b77860719009d3",
+        "elapsed_s": 0.10981179098598659,
+        "peak_rss_mib": 28.1875,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 0.03125,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 17,
+          "load_s": 0.015738291,
+          "parts": 17,
+          "stages_ms": {
+            "compile": 0.448334,
+            "hash": 0.324458,
+            "parse": 14.835833,
+            "read": 0.11683299999999999,
+            "step_parse": 2.1218339999999998,
+            "step_table": 3.078583,
+            "step_tessellate": 7.104291000000001
+          },
+          "step_import": {
+            "declared_faces": 157,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 15554
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/text-to-cad-assembly__pick_place_arm.step",
+      "size_mib": 0.4546327590942383,
+      "before": {
+        "file": "models/text-to-cad-assembly__pick_place_arm.step",
+        "url": "https://media.githubusercontent.com/media/MountainClimberJiwen/text-to-cad-assembly/main/models/assemblies/pick_place_arm.step",
+        "licence": "MIT",
+        "exporting_tool": "build123d",
+        "sha256": "c31fd1adb88029a18a22028ecab3e776011126db2f1fe80624b77860719009d3",
+        "archive_member": "",
+        "repository_revision_at_audit": "f0c768537e3d1ef6b9f8cd49618905ae5152f64d",
+        "licence_url": "https://github.com/MountainClimberJiwen/text-to-cad-assembly/blob/main/LICENSE",
+        "included": "yes",
+        "name": "text-to-cad-assembly__pick_place_arm.step",
+        "size_mib": 0.4546327590942383,
+        "burr_parts": 17,
+        "occt_parts": 17,
+        "occt_solids": 17,
+        "load_s": 0.028119375,
+        "check_s": 0.083850791,
+        "elapsed_s": 0.2121155000058934,
+        "peak_rss_mib": 43.890625,
+        "dropped_faces": 0,
+        "declared_faces_if_loss": null,
+        "empty_definitions": 0,
+        "burr_verdict": "fail",
+        "burr_pairs": 3,
+        "occt_verdict": "fail",
+        "occt_pairs": 3,
+        "occt_pair_scan_complete": true,
+        "classification": "correct",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {}
+      },
+      "occt_parts": 17,
+      "occt_verdict": "fail",
+      "occt_pairs": 3,
+      "occt_pair_scan_complete": true,
+      "classification": "correct"
+    },
+    {
+      "name": "text-to-cad-assembly__automation_control_unit.step",
+      "burr_verdict": "fail",
+      "burr_parts": 20,
+      "burr_pairs": 12,
+      "load_s": 0.038986125,
+      "check_s": 0.02998275,
+      "peak_rss_mib": 48.5,
+      "step_import": {
+        "declared_faces": 278,
+        "lost_faces": 0
+      },
+      "incomplete_reasons": [],
+      "structure_errors": [],
+      "error": null,
+      "diagnostic_tags": {},
+      "metrics": {
+        "sha256": "cf8fc68d8f32a1bdf3e68cddeaf0b67c040b47946cabc67021b94b9b8229757f",
+        "elapsed_s": 0.10619083303026855,
+        "peak_rss_mib": 48.5,
+        "peak_rss_method": "wait4_ru_maxrss",
+        "sampled_peak_rss_mib": 0.03125,
+        "returncode": 0,
+        "timeout": false,
+        "cap": null,
+        "timeout_limit_s": 600,
+        "load_metadata": {
+          "geometries": 20,
+          "load_s": 0.038986125,
+          "parts": 20,
+          "stages_ms": {
+            "compile": 0.9535830000000001,
+            "hash": 0.684,
+            "parse": 37.141167,
+            "read": 0.190875,
+            "step_parse": 4.411959,
+            "step_table": 5.597042,
+            "step_tessellate": 21.966292
+          },
+          "step_import": {
+            "declared_faces": 278,
+            "lost_faces": 0
+          },
+          "structure_errors": [],
+          "triangles": 31122
+        },
+        "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+      },
+      "file": "models/text-to-cad-assembly__automation_control_unit.step",
+      "size_mib": 0.8551645278930664,
+      "before": {
+        "file": "models/text-to-cad-assembly__automation_control_unit.step",
+        "url": "https://media.githubusercontent.com/media/MountainClimberJiwen/text-to-cad-assembly/main/models/assemblies/automation_control_unit.step",
+        "licence": "MIT",
+        "exporting_tool": "build123d",
+        "sha256": "cf8fc68d8f32a1bdf3e68cddeaf0b67c040b47946cabc67021b94b9b8229757f",
+        "archive_member": "",
+        "repository_revision_at_audit": "f0c768537e3d1ef6b9f8cd49618905ae5152f64d",
+        "licence_url": "https://github.com/MountainClimberJiwen/text-to-cad-assembly/blob/main/LICENSE",
+        "included": "yes",
+        "name": "text-to-cad-assembly__automation_control_unit.step",
+        "size_mib": 0.8551645278930664,
+        "burr_parts": 20,
+        "occt_parts": 20,
+        "occt_solids": 20,
+        "load_s": 0.052926208,
+        "check_s": 0.276336209,
+        "elapsed_s": 0.413345041917637,
+        "peak_rss_mib": 83.15625,
+        "dropped_faces": 0,
+        "declared_faces_if_loss": null,
+        "empty_definitions": 0,
+        "burr_verdict": "fail",
+        "burr_pairs": 12,
+        "occt_verdict": "fail",
+        "occt_pairs": 12,
+        "occt_pair_scan_complete": true,
+        "classification": "correct",
+        "open_mesh": false,
+        "has_occurrence_records": true,
+        "panic_torus": false,
+        "partial_face_refusals": null,
+        "diagnostic_tags": {}
+      },
+      "occt_parts": 20,
+      "occt_verdict": "fail",
+      "occt_pairs": 12,
+      "occt_pair_scan_complete": true,
+      "classification": "correct"
+    }
+  ],
+  "repros": [
+    {
+      "file": "01-assembly-pds-dollar.step",
+      "before": {
+        "check_s": 0.169198875,
+        "geometries": 1,
+        "load_s": 0.074464583,
+        "parts": 1,
+        "report": {
+          "check_id": "assembly-interference",
+          "checked_pair_count": 0,
+          "component_count": 1,
+          "findings": [],
+          "incomplete_reasons": [
+            {
+              "code": "assembly_required",
+              "message": "The selected STEP file does not expose at least two component occurrences."
+            }
+          ],
+          "model_path": "artifacts/corpus/repros/01-assembly-pds-dollar.step",
+          "model_version": "c487df76970a51adb679790ea16b6c7d4409fc9ece7b62590d55f67ee4823b49",
+          "outcome": "incomplete",
+          "schema_version": "burr.checks.v1",
+          "summary": "Interference check requires a STEP assembly"
+        },
+        "stages_ms": {
+          "compile": 0.057333,
+          "hash": 2.888208,
+          "parse": 59.925375,
+          "read": 2.716375,
+          "step_parse": 0.594625,
+          "step_table": 0.888417,
+          "step_tessellate": 39.888125
+        },
+        "triangles": 3849
+      },
+      "after": {
+        "name": "01-assembly-pds-dollar.step",
+        "burr_verdict": "incomplete",
+        "burr_parts": 2,
+        "burr_pairs": 0,
+        "load_s": 0.007064458,
+        "check_s": 0.003378833,
+        "peak_rss_mib": 15.484375,
+        "step_import": {
+          "declared_faces": 20,
+          "lost_faces": 0
+        },
+        "incomplete_reasons": [
+          {
+            "code": "open_component_mesh",
+            "message": "Could not prove a clean result because these tessellated components do not form closed solids: M3x8 BHCS, M3x8 BHCS."
+          }
+        ],
+        "structure_errors": [],
+        "error": null,
+        "diagnostic_tags": {},
+        "metrics": {
+          "sha256": "7fe5d2ff727508f476f544f7d94b5a82b587f13720ba4af1d3b76490e85b75fc",
+          "elapsed_s": 0.1117871250025928,
+          "peak_rss_mib": 15.484375,
+          "peak_rss_method": "wait4_ru_maxrss",
+          "sampled_peak_rss_mib": 0.03125,
+          "returncode": 0,
+          "timeout": false,
+          "cap": null,
+          "timeout_limit_s": 600,
+          "load_metadata": {
+            "geometries": 1,
+            "load_s": 0.007064458,
+            "parts": 2,
+            "stages_ms": {
+              "compile": 0.094458,
+              "hash": 0.027209,
+              "parse": 6.876792,
+              "read": 0.051917,
+              "step_parse": 0.148667,
+              "step_table": 0.2605,
+              "step_tessellate": 6.112125000000001
+            },
+            "step_import": {
+              "declared_faces": 20,
+              "lost_faces": 0
+            },
+            "structure_errors": [],
+            "triangles": 3849
+          },
+          "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+        }
+      }
+    },
+    {
+      "file": "01-assembly-pds-empty-strings.step",
+      "before": {
+        "check_s": 0.572693875,
+        "geometries": 1,
+        "load_s": 0.014851958,
+        "parts": 2,
+        "report": {
+          "check_id": "assembly-interference",
+          "checked_pair_count": 1,
+          "component_count": 2,
+          "findings": [],
+          "incomplete_reasons": [
+            {
+              "code": "open_component_mesh",
+              "message": "Could not prove a clean result because these tessellated components are not closed: M3x8 BHCS, M3x8 BHCS."
+            }
+          ],
+          "model_path": "artifacts/corpus/repros/01-assembly-pds-empty-strings.step",
+          "model_version": "21f5cedc71cefa5358dc3821a99dd2d6ba20a1f0ed5a9c26329ff91402ec2d15",
+          "outcome": "incomplete",
+          "schema_version": "burr.checks.v1",
+          "summary": "Interference check not completed"
+        },
+        "stages_ms": {
+          "compile": 0.1655,
+          "hash": 0.027791,
+          "parse": 14.59275,
+          "read": 0.051875,
+          "step_parse": 0.15970900000000002,
+          "step_table": 0.287584,
+          "step_tessellate": 13.73675
+        },
+        "triangles": 3849
+      },
+      "after": {
+        "name": "01-assembly-pds-empty-strings.step",
+        "burr_verdict": "incomplete",
+        "burr_parts": 2,
+        "burr_pairs": 0,
+        "load_s": 0.007648958,
+        "check_s": 0.003535459,
+        "peak_rss_mib": 15.28125,
+        "step_import": {
+          "declared_faces": 20,
+          "lost_faces": 0
+        },
+        "incomplete_reasons": [
+          {
+            "code": "open_component_mesh",
+            "message": "Could not prove a clean result because these tessellated components do not form closed solids: M3x8 BHCS, M3x8 BHCS."
+          }
+        ],
+        "structure_errors": [],
+        "error": null,
+        "diagnostic_tags": {},
+        "metrics": {
+          "sha256": "1523f429147619b920b3fd425aaa69cea0f429caf91e33c56270c34bc29abd1e",
+          "elapsed_s": 0.11125870898831636,
+          "peak_rss_mib": 15.28125,
+          "peak_rss_method": "wait4_ru_maxrss",
+          "sampled_peak_rss_mib": 0.03125,
+          "returncode": 0,
+          "timeout": false,
+          "cap": null,
+          "timeout_limit_s": 600,
+          "load_metadata": {
+            "geometries": 1,
+            "load_s": 0.007648958,
+            "parts": 2,
+            "stages_ms": {
+              "compile": 0.10450000000000001,
+              "hash": 0.029833000000000002,
+              "parse": 7.440874999999999,
+              "read": 0.060208,
+              "step_parse": 0.163542,
+              "step_table": 0.29025,
+              "step_tessellate": 6.6472500000000005
+            },
+            "step_import": {
+              "declared_faces": 20,
+              "lost_faces": 0
+            },
+            "structure_errors": [],
+            "triangles": 3849
+          },
+          "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+        }
+      }
+    },
+    {
+      "file": "02-edge-conversion-face-1073.step",
+      "before": {
+        "error": "failed to load STEP scene 'artifacts/corpus/repros/02-edge-conversion-face-1073.step': STEP tessellation produced no triangles",
+        "load_s": 0.003452542
+      },
+      "after": {
+        "name": "02-edge-conversion-face-1073.step",
+        "burr_verdict": "incomplete",
+        "burr_parts": 1,
+        "burr_pairs": 0,
+        "load_s": 0.041864458,
+        "check_s": 1.416e-06,
+        "peak_rss_mib": 17.78125,
+        "step_import": {
+          "declared_faces": 1,
+          "lost_faces": 0
+        },
+        "incomplete_reasons": [
+          {
+            "code": "assembly_required",
+            "message": "The selected STEP file does not expose at least two component occurrences."
+          }
+        ],
+        "structure_errors": [],
+        "error": null,
+        "diagnostic_tags": {},
+        "metrics": {
+          "sha256": "f8c18ba9b297a7a617088b8c867a62ed00094081c265ce033e394b8ff4820874",
+          "elapsed_s": 0.10496095800772309,
+          "peak_rss_mib": 17.78125,
+          "peak_rss_method": "wait4_ru_maxrss",
+          "sampled_peak_rss_mib": 0.171875,
+          "returncode": 0,
+          "timeout": false,
+          "cap": null,
+          "timeout_limit_s": 600,
+          "load_metadata": {
+            "geometries": 1,
+            "load_s": 0.041864458,
+            "parts": 1,
+            "stages_ms": {
+              "compile": 0.007208,
+              "hash": 0.046667,
+              "parse": 41.726667,
+              "read": 0.063834,
+              "step_parse": 0.28150000000000003,
+              "step_table": 0.277959,
+              "step_tessellate": 41.111833
+            },
+            "step_import": {
+              "declared_faces": 1,
+              "lost_faces": 0
+            },
+            "structure_errors": [],
+            "triangles": 518
+          },
+          "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+        }
+      }
+    },
+    {
+      "file": "02-edge-conversion-minimal-face.step",
+      "before": {
+        "error": "failed to load STEP scene 'artifacts/corpus/repros/02-edge-conversion-minimal-face.step': STEP tessellation produced no triangles",
+        "load_s": 0.018346916
+      },
+      "after": {
+        "name": "02-edge-conversion-minimal-face.step",
+        "burr_verdict": "incomplete",
+        "burr_parts": 1,
+        "burr_pairs": 0,
+        "load_s": 0.000639625,
+        "check_s": 1.916e-06,
+        "peak_rss_mib": 8.6875,
+        "step_import": {
+          "declared_faces": 1,
+          "lost_faces": 0
+        },
+        "incomplete_reasons": [
+          {
+            "code": "assembly_required",
+            "message": "The selected STEP file does not expose at least two component occurrences."
+          }
+        ],
+        "structure_errors": [],
+        "error": null,
+        "diagnostic_tags": {},
+        "metrics": {
+          "sha256": "8d0984f66a035895aaada2ab4669a1e2dda44ee8b1a5ee849948540da66f1a96",
+          "elapsed_s": 0.1119857500307262,
+          "peak_rss_mib": 8.6875,
+          "peak_rss_method": "wait4_ru_maxrss",
+          "sampled_peak_rss_mib": 0.625,
+          "returncode": 0,
+          "timeout": false,
+          "cap": null,
+          "timeout_limit_s": 600,
+          "load_metadata": {
+            "geometries": 1,
+            "load_s": 0.000639625,
+            "parts": 1,
+            "stages_ms": {
+              "compile": 0.001458,
+              "hash": 0.011250000000000001,
+              "parse": 0.5541670000000001,
+              "read": 0.059667000000000005,
+              "step_parse": 0.022167,
+              "step_table": 0.067125,
+              "step_tessellate": 0.43833300000000003
+            },
+            "step_import": {
+              "declared_faces": 1,
+              "lost_faces": 0
+            },
+            "structure_errors": [],
+            "triangles": 23
+          },
+          "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+        }
+      }
+    },
+    {
+      "file": "03-negative-torus-face.step",
+      "before": {},
+      "after": {
+        "name": "03-negative-torus-face.step",
+        "burr_verdict": "load error",
+        "burr_parts": null,
+        "burr_pairs": 0,
+        "load_s": 0.000584291,
+        "check_s": null,
+        "peak_rss_mib": 8.09375,
+        "step_import": {
+          "lost_faces": 1,
+          "declared_faces": 1
+        },
+        "incomplete_reasons": [],
+        "structure_errors": [],
+        "error": "failed to load STEP scene '/Users/brianlim/coding/fray/repos/burr/artifacts/corpus/repros/03-negative-torus-face.step': STEP tessellation produced no triangles: 1 of 1 STEP faces were lost",
+        "diagnostic_tags": {
+          "SurfaceConversionFailed": 1
+        },
+        "metrics": {
+          "sha256": "a44f2a126fb15c7623fb680d0282a902d51cf8da13069e5255b8a71c2cd7c0f3",
+          "elapsed_s": 0.11214416602160782,
+          "peak_rss_mib": 8.09375,
+          "peak_rss_method": "wait4_ru_maxrss",
+          "sampled_peak_rss_mib": 0.453125,
+          "returncode": 2,
+          "timeout": false,
+          "cap": null,
+          "timeout_limit_s": 600,
+          "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+        }
+      }
+    },
+    {
+      "file": "04-mesh-contact-pair.step",
+      "before": {
+        "check_s": 0.370728792,
+        "geometries": 2,
+        "load_s": 0.065674792,
+        "parts": 2,
+        "report": {
+          "check_id": "assembly-interference",
+          "checked_pair_count": 1,
+          "component_count": 2,
+          "findings": [
+            {
+              "code": "component_interference",
+              "components": [
+                {
+                  "id": "occurrence:0",
+                  "name": "component_0",
+                  "occurrence_index": 0
+                },
+                {
+                  "id": "occurrence:1",
+                  "name": "component_30",
+                  "occurrence_index": 1
+                }
+              ],
+              "id": "assembly-interference:0:1",
+              "message": "component_0 overlaps component_30.",
+              "witness": {
+                "end": [
+                  314.54998779296875,
+                  22.69758215296824,
+                  -245.58923306746567
+                ],
+                "kind": "surface_crossing",
+                "start": [
+                  314.54998779296875,
+                  22.395092898713518,
+                  -245.54940856918688
+                ]
+              }
+            }
+          ],
+          "incomplete_reasons": [
+            {
+              "code": "open_component_mesh",
+              "message": "Could not prove a clean result because these tessellated components are not closed: component_0."
+            }
+          ],
+          "model_path": "artifacts/corpus/repros/04-mesh-contact-pair.step",
+          "model_version": "c7561411dc4c0aadcfd9f1ae567a1177c4ae0a58bc4fdcac9741dccb122284ca",
+          "outcome": "fail",
+          "schema_version": "burr.checks.v1",
+          "summary": "1 interfering component pair detected"
+        },
+        "stages_ms": {
+          "compile": 0.233708,
+          "hash": 0.9758749999999999,
+          "parse": 63.907958,
+          "read": 0.5445,
+          "step_parse": 5.4833750000000006,
+          "step_table": 11.736833,
+          "step_tessellate": 33.814583
+        },
+        "triangles": 8650
+      },
+      "after": {
+        "name": "04-mesh-contact-pair.step",
+        "burr_verdict": "pass",
+        "burr_parts": 2,
+        "burr_pairs": 0,
+        "load_s": 0.018931666,
+        "check_s": 0.01082675,
+        "peak_rss_mib": 26.96875,
+        "step_import": {
+          "declared_faces": 128,
+          "lost_faces": 0
+        },
+        "incomplete_reasons": [],
+        "structure_errors": [],
+        "error": null,
+        "diagnostic_tags": {},
+        "metrics": {
+          "sha256": "21733029a76cb2285f19fb2d10371fe0c6af00d823a92a9ed21eedfddbcf5630",
+          "elapsed_s": 0.10270874993875623,
+          "peak_rss_mib": 26.96875,
+          "peak_rss_method": "wait4_ru_maxrss",
+          "sampled_peak_rss_mib": 0.03125,
+          "returncode": 0,
+          "timeout": false,
+          "cap": null,
+          "timeout_limit_s": 600,
+          "load_metadata": {
+            "geometries": 2,
+            "load_s": 0.018931666,
+            "parts": 2,
+            "stages_ms": {
+              "compile": 0.271458,
+              "hash": 0.320917,
+              "parse": 18.20375,
+              "read": 0.12345800000000001,
+              "step_parse": 2.153542,
+              "step_table": 2.5859170000000002,
+              "step_tessellate": 11.108458
+            },
+            "step_import": {
+              "declared_faces": 128,
+              "lost_faces": 0
+            },
+            "structure_errors": [],
+            "triangles": 8650
+          },
+          "binary_sha256": "6031383460f972fc19ddb17ac06fc7336717c329a60c678af1a93bac7a274501"
+        }
+      }
+    }
+  ]
+}
