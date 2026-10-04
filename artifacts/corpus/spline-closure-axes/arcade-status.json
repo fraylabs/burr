@@ -1,0 +1,86 @@
+[
+  {
+    "phase": "before",
+    "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+    "model_version": "66a2fdd1f1cb879c14c59b10eaa17dd400cf39442c69e506424e63af9812dda2",
+    "raw_report_sha256": "f38f97671b19909b077faa1782d06c23d6a26ff14744e3d0f9c15334151506cd",
+    "look_revision": "d1583a7cb4325ee311dd8cea93dbbce97548e577",
+    "outcome": "incomplete",
+    "candidate_pair_count": 7,
+    "checked_pair_count": 10,
+    "finding_count": 0,
+    "unresolved_pair_count": 7,
+    "unresolved_pairs": [
+      {
+        "id": "assembly-interference:unresolved:0:1",
+        "code": "open_component_mesh"
+      },
+      {
+        "id": "assembly-interference:unresolved:0:2",
+        "code": "below_coordinate_resolution"
+      },
+      {
+        "id": "assembly-interference:unresolved:1:2",
+        "code": "open_component_mesh"
+      },
+      {
+        "id": "assembly-interference:unresolved:1:3",
+        "code": "open_component_mesh"
+      },
+      {
+        "id": "assembly-interference:unresolved:1:4",
+        "code": "open_component_mesh"
+      },
+      {
+        "id": "assembly-interference:unresolved:2:3",
+        "code": "open_component_mesh"
+      },
+      {
+        "id": "assembly-interference:unresolved:2:4",
+        "code": "open_component_mesh"
+      }
+    ]
+  },
+  {
+    "phase": "after",
+    "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+    "model_version": "66a2fdd1f1cb879c14c59b10eaa17dd400cf39442c69e506424e63af9812dda2",
+    "raw_report_sha256": "ec777a9669f0e354c0340509f00fe16bb9f4ebf595f35a0fb3c40a877d72a289",
+    "look_revision": "45f1d77986a59aef48357c6aa0ad4c5edff28e72",
+    "outcome": "incomplete",
+    "candidate_pair_count": 7,
+    "checked_pair_count": 10,
+    "finding_count": 0,
+    "unresolved_pair_count": 7,
+    "unresolved_pairs": [
+      {
+        "id": "assembly-interference:unresolved:0:1",
+        "code": "open_component_mesh"
+      },
+      {
+        "id": "assembly-interference:unresolved:0:2",
+        "code": "below_coordinate_resolution"
+      },
+      {
+        "id": "assembly-interference:unresolved:1:2",
+        "code": "open_component_mesh"
+      },
+      {
+        "id": "assembly-interference:unresolved:1:3",
+        "code": "open_component_mesh"
+      },
+      {
+        "id": "assembly-interference:unresolved:1:4",
+        "code": "open_component_mesh"
+      },
+      {
+        "id": "assembly-interference:unresolved:2:3",
+        "code": "open_component_mesh"
+      },
+      {
+        "id": "assembly-interference:unresolved:2:4",
+        "code": "open_component_mesh"
+      }
+    ]
+  }
+]

@@ -12,7 +12,7 @@ The real arcade button still has open valid parts. This change reduces those bou
 | Spring | 29 → 29 | 0 → 0 |
 | Dome | 240 → 121 | 0 → 0 |
 
-Arcade remains incomplete with zero confirmed pairs and seven unresolved pairs before and after. Spring and Dome need further boundary diagnosis; Holder remains an invalid source solid.
+Arcade remains incomplete before and after. Its own reports each record seven candidate pairs, ten checked pairs, zero confirmed pairs and seven unresolved pairs; [arcade-status.json](arcade-status.json) archives these distinct metrics and the unresolved-pair IDs. Spring and Dome need further boundary diagnosis; Holder remains an invalid source solid.
 
 All ten protected models were compared against the existing OCCT pair references using fresh scene dumps and the unchanged placement, identity and surface-sample checks. They retain 64 true pairs and zero false pairs. Bowden retains its same nine confirmed OCCT-positive pairs, while all nine previously false reported pairs stay unresolved. The Bowden reference covers those eighteen reported pairs; full pair completeness remains unknown. The attached pair-summary.json contains per-model counts, not CAD coordinates.
 
