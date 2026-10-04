@@ -6,6 +6,8 @@ All 21 corpus models and six repros were rerun sequentially under the shared bui
 
 The manifold-surface representation decoder restores all 688 full-robot occurrences. Incomplete imports and unresolved contacts retain explicit reasons.
 
+The combined Look pin contains the cherry-picked manifold decoder at `033488f32abd36d14f70e999083ebdc62efde2e8` and signed-torus implementation at `539936c79e72a4732bc9c1efb3bdfd682971e710`, together with the 0.38 mesh policy and #49 closure axes. The original `5a838db` pin in the historical evidence is a separate branch lineage; restoring that pin would discard the combined mesh work.
+
 ## Combined pair and verdict table
 
 Each arrow shows **0.38.0 → current main → combined**. Exact pair checks refer to the combined result.
@@ -91,7 +93,7 @@ These are individual scene-import measurements from sequential release runs on t
 
 ## Validation and historical evidence
 
-`npm run check` passes strict Clippy, all 79 Burr tests, and the viewer proof. The eight reference-scope and source-bound tests pass. Focused Look results: {'geometry_torus': 2, 'normal_derivatives': 1, 'stepio_lib': 58, 'real_step_faces': 11, 'step_input': 59, 'meshalgo_lib': 221, 'import_resilience': 3, 'mesh_conformity': 3, 'look_lib': 189, 'assembly': 13, 'step': 9, 'step_mesh_conformity': 4, 'meshalgo_existing_ignored': 1, 'step_input_existing_exclusions': 3}.
+`npm run check` passes strict Clippy, all 79 Burr tests, and the viewer proof. The eight reference-scope and source-bound tests pass. Three additional CLI regressions pass: missing boundary-nearest evidence rejects analytic agreement, and both reducers preserve Latin-1 source headers. All 26 historical face rows already have zero missing boundary-nearest results; the stricter assertion preserves their recorded result. Focused Look results: {'geometry_torus': 2, 'normal_derivatives': 1, 'stepio_lib': 58, 'real_step_faces': 11, 'step_input': 59, 'meshalgo_lib': 221, 'import_resilience': 3, 'mesh_conformity': 3, 'look_lib': 189, 'assembly': 13, 'step': 9, 'step_mesh_conformity': 4, 'meshalgo_existing_ignored': 1, 'step_input_existing_exclusions': 3}.
 
 The combination corrects stale tests already failing on the exact 0.38 Look head: analytic source carriers versus snapped shared endpoints, and a tiny cylinder whose retained vertices exceed the unchanged source surface bound. A redundant test qualification blocked release compilation under `deny(warnings)`. Source-carrier assertions and typed refusal are preserved; admission limits are unchanged.
 

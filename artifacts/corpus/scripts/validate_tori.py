@@ -40,7 +40,7 @@ for model in sorted((a.corpus / 'models').glob('openamr*.STEP')):
         shell = max(ents) + 1
         extra = f"#{shell}=OPEN_SHELL('',(#{face}));\n#{shell + 1}=SHELL_BASED_SURFACE_MODEL('',(#{shell}));\n#{shell + 2}=MANIFOLD_SURFACE_SHAPE_REPRESENTATION('',(#{shell + 1}),#{context});\n#{shell + 3}=APPLICATION_CONTEXT('automotive_design');\n#{shell + 4}=PRODUCT_CONTEXT('',#{shell + 3},'mechanical');\n#{shell + 5}=PRODUCT('face','face','', (#{shell + 4}));\n#{shell + 6}=PRODUCT_DEFINITION_FORMATION('','',#{shell + 5});\n#{shell + 7}=PRODUCT_DEFINITION_CONTEXT('part definition',#{shell + 3},'design');\n#{shell + 8}=PRODUCT_DEFINITION('design','',#{shell + 6},#{shell + 7});\n#{shell + 9}=PRODUCT_DEFINITION_SHAPE('','',#{shell + 8});\n#{shell + 10}=SHAPE_DEFINITION_REPRESENTATION(#{shell + 9},#{shell + 2});\n"
         reduced = a.output / (model.stem + '-face-' + str(face) + '.step')
-        reduced.write_text(text.split('DATA;', 1)[0] + 'DATA;\n' + '\n'.join((f'#{i}={ents[i]};' for i in sorted(seen))) + '\n' + extra + 'ENDSEC;\nEND-ISO-10303-21;\n')
+        reduced.write_text(text.split('DATA;', 1)[0] + 'DATA;\n' + '\n'.join((f'#{i}={ents[i]};' for i in sorted(seen))) + '\n' + extra + 'ENDSEC;\nEND-ISO-10303-21;\n', encoding='latin1')
         reader = STEPControl_Reader()
         assert reader.ReadFile(str(reduced)) == IFSelect_RetDone
         reader.TransferRoots()

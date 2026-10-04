@@ -30,7 +30,7 @@ for exact, actual in zip(reference, look):
     row['missing_boundary_nearest'] = sum((s['nearest_error'] is None for s in actual['boundary']))
     row['max_boundary_inverse_error'] = max((s['inverse_error'] or 0 for s in actual['boundary']))
     row['max_boundary_nearest_error'] = max((s['nearest_error'] or 0 for s in actual['boundary']))
-    row['analytic_agrees'] = all((row[k] < 1e-07 for k in ('max_point_error', 'max_normal_error', 'max_inverse_error', 'max_nearest_error', 'max_boundary_inverse_error', 'max_boundary_nearest_error'))) and (not any((row[k] for k in ('missing_interior_inverse', 'missing_interior_nearest', 'missing_boundary_inverse'))))
+    row['analytic_agrees'] = all((row[k] < 1e-07 for k in ('max_point_error', 'max_normal_error', 'max_inverse_error', 'max_nearest_error', 'max_boundary_inverse_error', 'max_boundary_nearest_error'))) and (not any((row[k] for k in ('missing_interior_inverse', 'missing_interior_nearest', 'missing_boundary_inverse', 'missing_boundary_nearest'))))
     row['face_losses'] = actual['losses']
     row['triangles'] = 0
     if actual['mesh']:

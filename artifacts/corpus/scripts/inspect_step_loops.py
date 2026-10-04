@@ -20,7 +20,7 @@ a = parser.parse_args()
 model = a.model
 out = a.output
 out.mkdir(parents=True, exist_ok=True)
-text = model.read_text()
+text = model.read_text(encoding='latin1')
 data = text.split('DATA;', 1)[1].rsplit('ENDSEC;', 1)[0]
 ents = {int(m[1]): m[2].strip() for m in re.finditer("#\\s*(\\d+)\\s*=\\s*((?:[^;']|'(?:[^']|'')*')*);", data, re.S)}
 refs = lambda s: [int(x) for x in re.findall('#\\s*(\\d+)', re.sub("'(?:[^']|'')*'", "''", s))]
@@ -80,7 +80,7 @@ for f in faces:
     n = max(ents) + 1
     extra = f"#{n}=OPEN_SHELL('',(#{fid}));\n#{n + 1}=SHELL_BASED_SURFACE_MODEL('',(#{n}));\n#{n + 2}=MANIFOLD_SURFACE_SHAPE_REPRESENTATION('',(#{n + 1}),#{context});\n#{n + 3}=APPLICATION_CONTEXT('automotive_design');\n#{n + 4}=PRODUCT_CONTEXT('',#{n + 3},'mechanical');\n#{n + 5}=PRODUCT('face','face','',(#{n + 4}));\n#{n + 6}=PRODUCT_DEFINITION_FORMATION('','',#{n + 5});\n#{n + 7}=PRODUCT_DEFINITION_CONTEXT('part definition',#{n + 3},'design');\n#{n + 8}=PRODUCT_DEFINITION('design','',#{n + 6},#{n + 7});\n#{n + 9}=PRODUCT_DEFINITION_SHAPE('','',#{n + 8});\n#{n + 10}=SHAPE_DEFINITION_REPRESENTATION(#{n + 9},#{n + 2});\n"
     path = out / f'face-{fid}.step'
-    path.write_text(text.split('DATA;', 1)[0] + 'DATA;\n' + '\n'.join((f'#{i}={ents[i]};' for i in sorted(seen))) + '\n' + extra + 'ENDSEC;\nEND-ISO-10303-21;\n')
+    path.write_text(text.split('DATA;', 1)[0] + 'DATA;\n' + '\n'.join((f'#{i}={ents[i]};' for i in sorted(seen))) + '\n' + extra + 'ENDSEC;\nEND-ISO-10303-21;\n', encoding='latin1')
     r = STEPControl_Reader()
     assert r.ReadFile(str(path)) == IFSelect_RetDone
     r.TransferRoots()

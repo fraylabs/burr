@@ -31,7 +31,9 @@ until mkdir /tmp/burr-build.lock 2>/dev/null; do sleep 15; done
 CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=/tmp/burr-target python artifacts/corpus/scripts/measure_imports.py \
   --corpus CORPUS_DIRECTORY --reference-logs OCCT_LOGS_DIRECTORY \
   --binary LOCAL_CORPUS_BENCH --scene-binary LOCAL_SCENE_DUMP --output LOCAL_EVIDENCE_DIRECTORY
+measurement_status=$?
 rmdir /tmp/burr-build.lock
+exit "$measurement_status"
 ```
 
 The harness verifies source hashes, refuses incomplete OCCT scans for pair comparisons, and stops on a new false pair, lost confirmed pair or wrong conclusive verdict. Its compact summary is intended for version control; its detailed outputs are local evidence.

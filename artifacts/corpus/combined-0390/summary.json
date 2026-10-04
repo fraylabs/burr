@@ -3732,7 +3732,8 @@
       "step_mesh_conformity": 4,
       "meshalgo_existing_ignored": 1,
       "step_input_existing_exclusions": 3
-    }
+    },
+    "import_evidence_cli_tests": 3
   },
   "import_timings": [
     {
@@ -3768,5 +3769,12 @@
         "binary_sha256": "cec6f7c215c5cb09d151103b4021df21440122b3887950aaeac1a7d748284068"
       }
     }
-  ]
+  ],
+  "review_followup": {
+    "rust_and_look_changes": false,
+    "reproduction_exit_status": "Preserved before lock cleanup",
+    "missing_boundary_nearest": "Now rejects analytic agreement; all 26 historical face rows already have zero missing results",
+    "step_reduction_encoding": "Latin-1 reads and writes preserve original source bytes in both reducers",
+    "look_pin_finding": "Rejected: the combined pin contains cherry-picked decoder 033488f and signed-torus implementation 539936c plus the mesh and closure-axis fixes"
+  }
 }
