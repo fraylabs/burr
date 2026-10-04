@@ -1,7 +1,7 @@
 //! Definition-local meshes. Triangle BVHs and topology are shared by occurrences.
 use glam::DVec3;
 use look::scene::Geometry;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Clone, Copy, Debug)]
 pub(super) struct Bounds {
@@ -69,6 +69,7 @@ pub(super) struct Mesh {
     pub triangles: Vec<[u32; 3]>,
     pub bounds: Bounds,
     pub closed: bool,
+    oriented: bool,
     pub epsilon: f64,
     order: Vec<usize>,
     nodes: Vec<Node>,
@@ -190,13 +191,73 @@ impl Mesh {
             triangles,
             bounds,
             closed,
+            oriented: false,
             epsilon,
             order,
             nodes: Vec::new(),
         };
         mesh.build(0, mesh.triangles.len());
+        mesh.oriented = mesh.geometrically_closed();
+        mesh.closed |= six_volume.abs() > bounds.diagonal().powi(3) * 6e-12 && mesh.oriented;
         Ok(mesh)
     }
+    // Tessellated faces may sample a common straight edge differently. Check
+    // the geometric boundary after splitting only unbalanced edges at existing
+    // collinear endpoints. No triangle or position is invented or moved.
+    fn geometrically_closed(&self) -> bool {
+        let mut balance: HashMap<[u32; 2], i32> = HashMap::new();
+        for &[a, b, c] in &self.triangles {
+            for [a, b] in [[a, b], [b, c], [c, a]] {
+                *balance.entry([a.min(b), a.max(b)]).or_default() += if a < b { 1 } else { -1 };
+            }
+        }
+        balance.retain(|_, count| *count != 0);
+        if balance.is_empty() {
+            return true;
+        }
+        let mut endpoints = balance.keys().flatten().copied().collect::<Vec<_>>();
+        endpoints.sort_unstable();
+        endpoints.dedup();
+        let endpoints: HashSet<_> = endpoints.into_iter().collect();
+        let mut split_balance: HashMap<[u32; 2], i32> = HashMap::new();
+        for ([a, b], count) in balance {
+            let origin = self.points[a as usize];
+            let direction = self.points[b as usize] - origin;
+            let length_squared = direction.length_squared();
+            let mut cuts = vec![(0.0, a), (1.0, b)];
+            let mut edge_bounds = Bounds::empty();
+            edge_bounds.add(origin);
+            edge_bounds.add(origin + direction);
+            let nearby: HashSet<_> = self
+                .candidate_triangles(edge_bounds)
+                .into_iter()
+                .flat_map(|i| self.triangles[i])
+                .filter(|id| endpoints.contains(id))
+                .collect();
+            for id in nearby {
+                if id == a || id == b {
+                    continue;
+                }
+                let point = self.points[id as usize];
+                let t = (point - origin).dot(direction) / length_squared;
+                if t > 0.0
+                    && t < 1.0
+                    && point.distance_squared(origin + direction * t) <= self.epsilon.powi(2)
+                {
+                    cuts.push((t, id));
+                }
+            }
+            cuts.sort_unstable_by(|a, b| a.0.total_cmp(&b.0).then_with(|| a.1.cmp(&b.1)));
+            for interval in cuts.windows(2) {
+                let a = interval[0].1;
+                let b = interval[1].1;
+                *split_balance.entry([a.min(b), a.max(b)]).or_default() +=
+                    count * if a < b { 1 } else { -1 };
+            }
+        }
+        split_balance.values().all(|&count| count == 0)
+    }
+
     pub fn triangle(&self, index: usize) -> [DVec3; 3] {
         self.triangles[index].map(|i| self.points[i as usize])
     }
@@ -249,8 +310,14 @@ impl Mesh {
     pub fn ray_hits(&self, origin: DVec3, direction: DVec3, limit: f64) -> Vec<f64> {
         self.cast_ray(origin, direction, limit).0
     }
-    fn cast_ray(&self, origin: DVec3, direction: DVec3, limit: f64) -> (Vec<f64>, bool) {
+    fn cast_ray(
+        &self,
+        origin: DVec3,
+        direction: DVec3,
+        limit: f64,
+    ) -> (Vec<f64>, bool, i32, usize) {
         let mut ambiguous = false;
+        let mut winding = 0;
         let mut hits = Vec::new();
         let mut stack = vec![0];
         while let Some(i) = stack.pop() {
@@ -262,10 +329,12 @@ impl Mesh {
                 stack.extend(children);
             } else {
                 for &t in &self.order[node.start..node.end] {
-                    if let Some((hit, boundary)) = ray_triangle(origin, direction, self.triangle(t))
+                    if let Some((hit, boundary, sign)) =
+                        ray_triangle(origin, direction, self.triangle(t))
                     {
                         if hit >= 0.0 && hit <= limit {
                             ambiguous |= boundary;
+                            winding += sign;
                             hits.push(hit);
                         }
                     }
@@ -274,8 +343,9 @@ impl Mesh {
         }
         hits.sort_unstable_by(f64::total_cmp);
         let epsilon = self.epsilon / direction.length();
+        let crossing_count = hits.len();
         hits.dedup_by(|a, b| (*a - *b).abs() <= epsilon);
-        (hits, ambiguous)
+        (hits, ambiguous, winding, crossing_count)
     }
     pub fn near_surface(&self, p: DVec3, tolerance: f64) -> bool {
         let squared = tolerance * tolerance;
@@ -301,6 +371,10 @@ impl Mesh {
         if !self.bounds.contains(p) || self.near_surface(p, tolerance) {
             return false;
         }
+        // Count oriented crossings before distance deduplication. A component
+        // may contain touching solids: their coincident exit/entry faces cancel.
+        // Deduplicated odd parity incorrectly counts that shared face only once
+        // and can classify a point outside both solids as interior.
         // An edge/vertex hit can be a tangency rather than a crossing. Never
         // turn deduplicating such a hit into odd parity: recast in a different
         // direction and use only a ray whose crossings are face-interior hits.
@@ -309,9 +383,14 @@ impl Mesh {
             DVec3::new(0.219513694312, 1.0, 0.51789347219),
             DVec3::new(0.754877666247, 0.324717957245, 1.0),
         ] {
-            let (hits, ambiguous) = self.cast_ray(p, direction, f64::INFINITY);
+            let (_, ambiguous, winding, crossing_count) =
+                self.cast_ray(p, direction, f64::INFINITY);
             if !ambiguous {
-                return hits.len() % 2 == 1;
+                return if self.oriented {
+                    winding != 0
+                } else {
+                    crossing_count % 2 == 1
+                };
             }
         }
         false
@@ -335,7 +414,7 @@ impl Mesh {
     }
 }
 
-fn ray_triangle(o: DVec3, d: DVec3, [a, b, c]: [DVec3; 3]) -> Option<(f64, bool)> {
+fn ray_triangle(o: DVec3, d: DVec3, [a, b, c]: [DVec3; 3]) -> Option<(f64, bool, i32)> {
     let e1 = b - a;
     let e2 = c - a;
     let h = d.cross(e2);
@@ -356,6 +435,7 @@ fn ray_triangle(o: DVec3, d: DVec3, [a, b, c]: [DVec3; 3]) -> Option<(f64, bool)
     Some((
         e2.dot(q) / det,
         u <= 1e-9 || v <= 1e-9 || 1.0 - u - v <= 1e-9,
+        if det > 0.0 { 1 } else { -1 },
     ))
 }
 
@@ -402,6 +482,66 @@ mod tests {
     use super::*;
 
     #[test]
+    fn touching_solids_do_not_turn_an_exterior_point_into_interior() {
+        let rotation = glam::DMat4::from_rotation_z(std::f64::consts::FRAC_PI_4);
+        let cube = [
+            [-1., -1., -1.],
+            [1., -1., -1.],
+            [1., 1., -1.],
+            [-1., 1., -1.],
+            [-1., -1., 1.],
+            [1., -1., 1.],
+            [1., 1., 1.],
+            [-1., 1., 1.],
+        ];
+        let faces = [
+            [0, 2, 1],
+            [0, 3, 2],
+            [4, 5, 6],
+            [4, 6, 7],
+            [0, 1, 5],
+            [0, 5, 4],
+            [1, 2, 6],
+            [1, 6, 5],
+            [2, 3, 7],
+            [2, 7, 6],
+            [3, 0, 4],
+            [3, 4, 7],
+        ];
+        let mut points = Vec::new();
+        let mut triangles = Vec::new();
+        for offset in [0., 2.] {
+            let base = points.len() as u32;
+            points.extend(
+                cube.map(|p| rotation.transform_point3(DVec3::from_array(p) + DVec3::X * offset)),
+            );
+            triangles.extend(faces.map(|t| t.map(|i| i + base)));
+        }
+        let mut bounds = Bounds::empty();
+        for &point in &points {
+            bounds.add(point);
+        }
+        let mut mesh = Mesh {
+            points,
+            triangles,
+            bounds,
+            closed: true,
+            oriented: true,
+            epsilon: 1e-7,
+            order: (0..24).collect(),
+            nodes: Vec::new(),
+        };
+        mesh.build(0, 24);
+        let outside = rotation.transform_point3(DVec3::new(0., 1.1, 0.));
+        assert!(mesh.bounds.contains(outside));
+        assert!(!mesh.inside(outside, mesh.epsilon));
+        assert!(mesh.inside(
+            rotation.transform_point3(DVec3::new(0., 0., 0.)),
+            mesh.epsilon
+        ));
+    }
+
+    #[test]
     fn a_ray_tangent_to_a_shared_edge_does_not_make_an_outside_point_inside() {
         let rotation = glam::DMat4::from_rotation_z(std::f64::consts::FRAC_PI_4);
         let points = [
@@ -439,6 +579,7 @@ mod tests {
             triangles,
             bounds,
             closed: true,
+            oriented: true,
             epsilon: 1e-7,
             order: (0..12).collect(),
             nodes: Vec::new(),

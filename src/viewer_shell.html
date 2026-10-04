@@ -1475,10 +1475,11 @@
           checksContent.append(message);
         }
 
-        if (report.findings?.length) {
+        const pairs = [...(report.findings || []), ...(report.unresolved_pairs || [])];
+        if (pairs.length) {
           const list = document.createElement("div");
           list.className = "finding-list";
-          for (const finding of report.findings) {
+          for (const finding of pairs) {
             const button = document.createElement("button");
             button.type = "button";
             button.className = "finding";
@@ -1492,7 +1493,13 @@
             const title = document.createElement("strong");
             title.textContent = `${finding.components[0].name} × ${finding.components[1].name}`;
             const kind = document.createElement("span");
-            kind.textContent = witnessLabel(finding.witness?.kind);
+            kind.textContent = finding.code === "open_component_mesh"
+              ? "Unresolved · Open mesh"
+              : finding.code === "below_tessellation_resolution"
+                ? "Unresolved · Below mesh sampling resolution"
+              : finding.code === "below_coordinate_resolution"
+                ? "Unresolved · Below coordinate resolution"
+                : witnessLabel(finding.witness?.kind);
             content.append(title, kind);
             button.append(content);
             button.addEventListener("click", () => focusFinding(finding));
@@ -1583,7 +1590,7 @@
         if (reloadViewer && state.selectedPath) {
           const selected = state.files.find((file) => file.path === state.selectedPath);
           if (selected) {
-            const finding = state.checkReport?.findings?.find(
+            const finding = [...(state.checkReport?.findings || []), ...(state.checkReport?.unresolved_pairs || [])].find(
               (candidate) => candidate.id === state.focusedFinding,
             );
             const focus = finding

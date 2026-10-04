@@ -1,0 +1,86 @@
+[
+  {
+    "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "label": "openAMR robot cover",
+    "occt_pairs": 22,
+    "before_true": 12,
+    "before_false": 5,
+    "after_true": 12,
+    "after_false": 0,
+    "remaining_exact_pairs": 10,
+    "unresolved_candidates": 65,
+    "pair_set_complete": false
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "label": "Adafruit 1400 switch",
+    "occt_pairs": 11,
+    "before_true": 0,
+    "before_false": 4,
+    "after_true": 10,
+    "after_false": 0,
+    "remaining_exact_pairs": 1,
+    "unresolved_candidates": 15,
+    "pair_set_complete": false
+  },
+  {
+    "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+    "label": "Faze4",
+    "occt_pairs": 9,
+    "before_true": 9,
+    "before_false": 0,
+    "after_true": 9,
+    "after_false": 0,
+    "remaining_exact_pairs": 0,
+    "unresolved_candidates": 126,
+    "pair_set_complete": false
+  },
+  {
+    "model": "text-to-cad-assembly__pick_place_arm.step",
+    "label": "build123d pick/place arm",
+    "occt_pairs": 3,
+    "before_true": 3,
+    "before_false": 0,
+    "after_true": 3,
+    "after_false": 0,
+    "remaining_exact_pairs": 0,
+    "unresolved_candidates": 5,
+    "pair_set_complete": false
+  },
+  {
+    "model": "text-to-cad-assembly__automation_control_unit.step",
+    "label": "build123d control unit",
+    "occt_pairs": 12,
+    "before_true": 12,
+    "before_false": 0,
+    "after_true": 12,
+    "after_false": 0,
+    "remaining_exact_pairs": 0,
+    "unresolved_candidates": 2,
+    "pair_set_complete": false
+  },
+  {
+    "model": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+    "label": "Manta mount",
+    "occt_pairs": 0,
+    "before_true": 0,
+    "before_false": 0,
+    "after_true": 0,
+    "after_false": 0,
+    "remaining_exact_pairs": 0,
+    "unresolved_candidates": 0,
+    "pair_set_complete": true
+  },
+  {
+    "model": "TradRack__tr-toolhead-board.STEP",
+    "label": "TradRack toolhead",
+    "occt_pairs": 6,
+    "before_true": 6,
+    "before_false": 0,
+    "after_true": 6,
+    "after_false": 0,
+    "remaining_exact_pairs": 0,
+    "unresolved_candidates": 0,
+    "pair_set_complete": true
+  }
+]
