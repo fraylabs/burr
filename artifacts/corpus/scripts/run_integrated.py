@@ -33,6 +33,8 @@ for file, expected_sha in files:
         existing = json.loads(metrics.read_text())
         if existing.get("sha256") != sha or existing.get("binary_sha256") != binary_sha:
             raise RuntimeError(f"Recorded run has different source or binary: {file.name}")
+        if existing.get("timeout_limit_s") != timeout_limit:
+            raise RuntimeError(f"Recorded run has a different measurement cap: {file.name}")
         try:
             recorded_result = out.read_text()
             if existing.get("returncode") == 0:
