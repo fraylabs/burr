@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 0.39.0 - 2026-10-05
+
+- Read STEP assemblies whose shapes use `MANIFOLD_SURFACE_SHAPE_REPRESENTATION`:
+  the full openAMR robot platform now loads all 688 components instead of one
+  flattened body.
+- Read toroidal faces with a negative major radius (the spindle convention
+  OpenCascade accepts) instead of refusing them.
+- More conclusive results on real models, still with no false pairs. On the
+  21-model corpus checked pair by pair against OpenCascade: 97 real
+  interference pairs found and 0 false. The openAMR base now reports 16 real
+  overlaps and the center bracket 8; both were previously incomplete.
+- Import times are unchanged or slightly faster (Voron V0 13.5 s, Voron 2.4
+  37 s, Switchwire 7 s on the test machine).
+- Incomplete imports and unresolved pairs keep explicit reasons.
+
 ## 0.38.3 - 2026-10-05
 
 - Fix a load-time regression from 0.38.0: STEP spline faces stored reversed
