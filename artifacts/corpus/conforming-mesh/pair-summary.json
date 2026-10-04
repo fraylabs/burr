@@ -1,0 +1,232 @@
+[
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "before_verdict": "fail",
+    "after_verdict": "fail",
+    "occt_verdict": "fail",
+    "before_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "after_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 4519
+    },
+    "occt_pairs": 11,
+    "confirmed_true": 11,
+    "confirmed_false": 0,
+    "occt_positive_unresolved": 0,
+    "unresolved_candidates": 13,
+    "before_source_solid_topology": {
+      "boundary_edges": 27,
+      "nonmanifold_edges": 0
+    },
+    "after_source_solid_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    }
+  },
+  {
+    "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+    "before_verdict": "fail",
+    "after_verdict": "fail",
+    "occt_verdict": "fail",
+    "before_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "after_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 235
+    },
+    "occt_pairs": 9,
+    "confirmed_true": 9,
+    "confirmed_false": 0,
+    "occt_positive_unresolved": 0,
+    "unresolved_candidates": 126
+  },
+  {
+    "model": "TradRack__tr-toolhead-board.STEP",
+    "before_verdict": "fail",
+    "after_verdict": "fail",
+    "occt_verdict": "fail",
+    "before_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "after_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "occt_pairs": 6,
+    "confirmed_true": 6,
+    "confirmed_false": 0,
+    "occt_positive_unresolved": 0,
+    "unresolved_candidates": 0
+  },
+  {
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "before_verdict": "incomplete",
+    "after_verdict": "fail",
+    "occt_verdict": "fail",
+    "before_topology": {
+      "boundary_edges": 174,
+      "nonmanifold_edges": 73
+    },
+    "after_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "occt_pairs": 8,
+    "confirmed_true": 8,
+    "confirmed_false": 0,
+    "occt_positive_unresolved": 0,
+    "unresolved_candidates": 6,
+    "before_source_solid_topology": {
+      "boundary_edges": 174,
+      "nonmanifold_edges": 73
+    },
+    "after_source_solid_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    }
+  },
+  {
+    "model": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+    "before_verdict": "pass",
+    "after_verdict": "pass",
+    "occt_verdict": "pass",
+    "before_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "after_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "occt_pairs": 0,
+    "confirmed_true": 0,
+    "confirmed_false": 0,
+    "occt_positive_unresolved": 0,
+    "unresolved_candidates": 0
+  },
+  {
+    "model": "apollo-3d-enclosure__corner__assembly.step",
+    "before_verdict": "incomplete",
+    "after_verdict": "pass",
+    "occt_verdict": "pass",
+    "before_topology": {
+      "boundary_edges": 128,
+      "nonmanifold_edges": 100
+    },
+    "after_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "occt_pairs": 0,
+    "confirmed_true": 0,
+    "confirmed_false": 0,
+    "occt_positive_unresolved": 0,
+    "unresolved_candidates": 0,
+    "before_source_solid_topology": {
+      "boundary_edges": 128,
+      "nonmanifold_edges": 100
+    },
+    "after_source_solid_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    }
+  },
+  {
+    "model": "apollo-3d-enclosure__flat__assembly.step",
+    "before_verdict": "incomplete",
+    "after_verdict": "pass",
+    "occt_verdict": "pass",
+    "before_topology": {
+      "boundary_edges": 120,
+      "nonmanifold_edges": 100
+    },
+    "after_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "occt_pairs": 0,
+    "confirmed_true": 0,
+    "confirmed_false": 0,
+    "occt_positive_unresolved": 0,
+    "unresolved_candidates": 0,
+    "before_source_solid_topology": {
+      "boundary_edges": 120,
+      "nonmanifold_edges": 100
+    },
+    "after_source_solid_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    }
+  },
+  {
+    "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "before_verdict": "fail",
+    "after_verdict": "fail",
+    "occt_verdict": "fail",
+    "before_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "after_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "occt_pairs": 22,
+    "confirmed_true": 16,
+    "confirmed_false": 0,
+    "occt_positive_unresolved": 6,
+    "unresolved_candidates": 25,
+    "before_source_solid_topology": {
+      "boundary_edges": 26,
+      "nonmanifold_edges": 11
+    },
+    "after_source_solid_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    }
+  },
+  {
+    "model": "text-to-cad-assembly__automation_control_unit.step",
+    "before_verdict": "fail",
+    "after_verdict": "fail",
+    "occt_verdict": "fail",
+    "before_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "after_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "occt_pairs": 12,
+    "confirmed_true": 12,
+    "confirmed_false": 0,
+    "occt_positive_unresolved": 0,
+    "unresolved_candidates": 2
+  },
+  {
+    "model": "text-to-cad-assembly__pick_place_arm.step",
+    "before_verdict": "fail",
+    "after_verdict": "fail",
+    "occt_verdict": "fail",
+    "before_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "after_topology": {
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    "occt_pairs": 3,
+    "confirmed_true": 3,
+    "confirmed_false": 0,
+    "occt_positive_unresolved": 0,
+    "unresolved_candidates": 5
+  }
+]

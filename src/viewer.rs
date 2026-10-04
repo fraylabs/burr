@@ -755,7 +755,7 @@ fn viewer_cache_key(
     motion: Option<&str>,
 ) -> String {
     format!(
-        "burr-viewer-v2\nburr={}\nsource={}\nfingerprint={}\nrelative={}\ntheme={}\nfocus={}\nmotion={}",
+        "burr-viewer-v3\nburr={}\nsource={}\nfingerprint={}\nrelative={}\ntheme={}\nfocus={}\nmotion={}",
         env!("CARGO_PKG_VERSION"),
         source_path.display(),
         source_fingerprint,

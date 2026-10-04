@@ -1,3 +1,5 @@
+#[allow(dead_code)]
+// Copy this probe to examples/corpus-topology.rs before building it.
 #[path = "../src/interference/mesh.rs"]
 mod mesh;
 use std::collections::HashMap;
@@ -9,7 +11,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &mut look::timing::Timings::default(),
     )?;
     for (index, geometry) in scene.geometries.iter().enumerate() {
-        let prepared = mesh::Mesh::prepare(geometry).map_err(std::io::Error::other)?;
+        let names = scene
+            .instances
+            .iter()
+            .filter(|instance| instance.geometry == index)
+            .filter_map(|instance| instance.node_name.clone())
+            .collect::<Vec<_>>();
+        let prepared = match mesh::Mesh::prepare(geometry) {
+            Ok(prepared) => prepared,
+            Err(error) => {
+                println!(
+                    "{}",
+                    serde_json::json!({"geometry":index,"names":names,"error":error})
+                );
+                continue;
+            }
+        };
         let mut edges: HashMap<[u32; 2], usize> = HashMap::new();
         for [a, b, c] in &prepared.triangles {
             for [a, b] in [[*a, *b], [*b, *c], [*c, *a]] {
@@ -42,12 +59,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         nearest_vertex_gaps.sort_by(f64::total_cmp);
-        let names = scene
-            .instances
-            .iter()
-            .filter(|i| i.geometry == index)
-            .filter_map(|i| i.node_name.clone())
-            .collect::<Vec<_>>();
         println!(
             "{}",
             serde_json::json!({"geometry":index,"names":names,"closed":prepared.closed,"epsilon":prepared.epsilon,"source_triangles":geometry.indices.len()/3,"prepared_triangles":prepared.triangles.len(),"boundary_edges":boundary.len(),"nonmanifold_edges":nonmanifold,"boundary_vertices":endpoints.len(),"nearest_boundary_vertex_gaps":nearest_vertex_gaps})

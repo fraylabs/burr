@@ -71,6 +71,7 @@ pub(super) struct Mesh {
     pub closed: bool,
     oriented: bool,
     pub epsilon: f64,
+    sampled_curve: Vec<bool>,
     order: Vec<usize>,
     nodes: Vec<Node>,
 }
@@ -185,6 +186,40 @@ impl Mesh {
         if triangles.is_empty() {
             return Err("contains no non-degenerate triangles".into());
         }
+        // A gentle nonplanar transition can be a sampled curved boundary.
+        // Distinct planar faces meeting at a sharp corner retain the ordinary
+        // coordinate-accuracy path. This is a conservative ambiguity marker,
+        // not a reconstruction or certification of the source surface.
+        let normals = triangles
+            .iter()
+            .map(|&[a, b, c]| {
+                (points[b as usize] - points[a as usize])
+                    .cross(points[c as usize] - points[a as usize])
+                    .normalize_or_zero()
+            })
+            .collect::<Vec<_>>();
+        let roundoff = 64.0 * f64::from(f32::EPSILON);
+        let angular_cosine = look::step::meshing_policy::MeshingPolicy::DEFAULT
+            .maximum_angular_deflection
+            .cos();
+        let mut sampled_curve = vec![false; triangles.len()];
+        let mut neighbor: HashMap<[u32; 2], usize> = HashMap::new();
+        for (i, &[a, b, c]) in triangles.iter().enumerate() {
+            for [a, b] in [[a, b], [b, c], [c, a]] {
+                let edge = [a.min(b), a.max(b)];
+                if let Some(&j) = neighbor.get(&edge) {
+                    if normals[i].cross(normals[j]).length_squared() > roundoff.powi(2)
+                        && normals[i].dot(normals[j]).abs() + roundoff >= angular_cosine
+                    {
+                        sampled_curve[i] = true;
+                        sampled_curve[j] = true;
+                    }
+                } else {
+                    neighbor.insert(edge, i);
+                }
+            }
+        }
+        drop(neighbor);
         let order = (0..triangles.len()).collect();
         let mut mesh = Self {
             points,
@@ -193,6 +228,7 @@ impl Mesh {
             closed,
             oriented: false,
             epsilon,
+            sampled_curve,
             order,
             nodes: Vec::new(),
         };
@@ -367,6 +403,31 @@ impl Mesh {
         }
         false
     }
+    /// Whether the query is near a facet with a gentle nonplanar neighbor.
+    /// Such a patch may approximate a curved surface or a shallow crease.
+    pub fn nonplanar_near_surface(&self, p: DVec3, tolerance: f64) -> bool {
+        let squared = tolerance * tolerance;
+        let mut stack = vec![0];
+        while let Some(i) = stack.pop() {
+            let node = &self.nodes[i];
+            if node.bounds.distance_squared(p) > squared {
+                continue;
+            }
+            if let Some(children) = node.children {
+                stack.extend(children);
+            } else {
+                for &t in &self.order[node.start..node.end] {
+                    if self.sampled_curve[t]
+                        && point_triangle_distance_squared(p, self.triangle(t)) <= squared
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        false
+    }
+
     pub fn inside(&self, p: DVec3, tolerance: f64) -> bool {
         if !self.bounds.contains(p) || self.near_surface(p, tolerance) {
             return false;
@@ -529,6 +590,7 @@ mod tests {
             oriented: true,
             epsilon: 1e-7,
             order: (0..24).collect(),
+            sampled_curve: vec![false; 24],
             nodes: Vec::new(),
         };
         mesh.build(0, 24);
@@ -582,6 +644,7 @@ mod tests {
             oriented: true,
             epsilon: 1e-7,
             order: (0..12).collect(),
+            sampled_curve: vec![false; 12],
             nodes: Vec::new(),
         };
         mesh.build(0, 12);
