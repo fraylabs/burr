@@ -36,6 +36,7 @@ struct AnalyticBoundary {
     cylinders: Vec<CylinderSupport>,
     normals: Vec<DVec3>,
     source_tolerance: Option<f64>,
+    operand_magnitude: f64,
 }
 
 struct CylinderSupport {
@@ -465,6 +466,11 @@ impl AnalyticBoundary {
                         }
                         let (min, max) = boundary.support(DMat4::IDENTITY, normal)?;
                         let origin = point(plane.origin());
+                        out.operand_magnitude = out.operand_magnitude.max(
+                            origin.abs().max_element()
+                                + vector(plane.u_axis()).length()
+                                + vector(plane.v_axis()).length(),
+                        );
                         let offset = normal.dot(origin);
                         let error = boundary.arithmetic_error(DMat4::IDENTITY, normal, 0)
                             + origin.abs().max_element().max(1.0) * f64::EPSILON * 256.0;
@@ -529,7 +535,8 @@ impl AnalyticBoundary {
                 }
             }
         }
-        if !out.points.iter().all(|point| point.is_finite())
+        if !out.operand_magnitude.is_finite()
+            || !out.points.iter().all(|point| point.is_finite())
             || !out
                 .ellipses
                 .iter()
@@ -582,7 +589,7 @@ impl AnalyticBoundary {
             .points
             .iter()
             .map(|point| point.abs().max_element())
-            .fold(0.0, f64::max);
+            .fold(self.operand_magnitude, f64::max);
         for &[center, u, v] in &self.ellipses {
             local = local.max(center.abs().max_element() + u.length() + v.length());
         }
@@ -605,24 +612,35 @@ impl AnalyticBoundary {
             + world.y_axis.truncate().abs() * local
             + world.z_axis.truncate().abs() * local
             + world.w_axis.truncate().abs();
-        direction.abs().dot(operands).max(1.0)
-            * f64::EPSILON
-            * (256.0 + 64.0 * placement_depth as f64)
+        let magnitude = direction.abs().dot(operands);
+        if !magnitude.is_finite() {
+            return f64::INFINITY;
+        }
+        magnitude.max(1.0) * f64::EPSILON * (256.0 + 64.0 * placement_depth as f64)
     }
 
     fn support(&self, world: DMat4, normal: DVec3) -> Option<(f64, f64)> {
         let direction = world.transpose().transform_vector3(normal);
         let translation = normal.dot(world.w_axis.truncate());
+        if !direction.is_finite() || !translation.is_finite() {
+            return None;
+        }
         let mut min = f64::INFINITY;
         let mut max = f64::NEG_INFINITY;
         for point in &self.points {
             let d = direction.dot(*point) + translation;
+            if !d.is_finite() {
+                return None;
+            }
             min = min.min(d);
             max = max.max(d);
         }
         for &[center, u, v] in &self.ellipses {
             let d = direction.dot(center) + translation;
             let radius = direction.dot(u).hypot(direction.dot(v));
+            if !d.is_finite() || !radius.is_finite() {
+                return None;
+            }
             min = min.min(d - radius);
             max = max.max(d + radius);
         }
@@ -632,6 +650,9 @@ impl AnalyticBoundary {
                 .dot(u)
                 .hypot(direction.dot(v))
                 .hypot(direction.dot(w));
+            if !d.is_finite() || !radius.is_finite() {
+                return None;
+            }
             min = min.min(d - radius);
             max = max.max(d + radius);
         }
@@ -647,8 +668,13 @@ impl AnalyticBoundary {
             let axis = direction.dot(cylinder.axis);
             let a = axis * cylinder.axial_range.0;
             let b = axis * cylinder.axial_range.1;
-            min = min.min(center + a.min(b) - radial);
-            max = max.max(center + a.max(b) + radial);
+            let lower = center + a.min(b) - radial;
+            let upper = center + a.max(b) + radial;
+            if !lower.is_finite() || !upper.is_finite() {
+                return None;
+            }
+            min = min.min(lower);
+            max = max.max(upper);
         }
         (min.is_finite() && max.is_finite()).then_some((min, max))
     }
@@ -706,6 +732,19 @@ mod tests {
         assert_ne!(metres, text);
         let exchange = look::step::part21::parse(&metres).unwrap();
         assert!(!millimetre_units(&exchange.data[0]));
+    }
+
+    #[test]
+    fn nonfinite_support_arithmetic_is_refused() {
+        let boundary = AnalyticBoundary {
+            points: vec![DVec3::ZERO, DVec3::splat(f64::MAX)],
+            ..Default::default()
+        };
+        let scale = DMat4::from_scale(DVec3::splat(2.0));
+        assert!(boundary
+            .support(scale, DVec3::new(1.0, -1.0, 0.0))
+            .is_none());
+        assert!(boundary.arithmetic_error(scale, DVec3::X, 1).is_infinite());
     }
 
     #[test]

@@ -56,14 +56,15 @@ def main():
                 subprocess.run([str(args.scene_binary), str(file)], stdout=out, check=True)
             if 'Bowden' in name:
                 exact = components(file)
+                previous = read(tracked / 'conforming-mesh/bowden-reported-pairs.json')['pairs']
+                referenced = {i for p in previous for i in p['burr_pair']}
                 reference = dict(names=[n for n, _ in exact], findings=[], pair_check_complete=False,
-                                 pair_check_scope='reported_pairs')
+                                 pair_check_scope='mapping_only')
                 reference_path = args.output / 'bowden-occt.json'
                 reference_path.write_text(json.dumps(reference))
                 mapping_result = compare(file, scene, args.after / (name + '.burr.json'), reference_path,
-                                         reported_pairs_only=True)
+                                         reported_pairs_only=True, occurrence_indexes=referenced)
                 mapping = {r['burr']: r['occt'] for r in mapping_result['mapping']}
-                previous = read(tracked / 'conforming-mesh/bowden-reported-pairs.json')['pairs']
                 checked = {tuple(sorted(p['occt_pair'])) for p in previous}
                 checked.update(tuple(sorted(mapping[i] for i in pair(f)))
                                for f in report.get('findings', []) + report.get('contact_pairs', []))
@@ -86,10 +87,10 @@ def main():
                     details.append(entry)
                     if entry['positive']:
                         reference['findings'].append(entry)
-                reference.update(checked_pairs=sorted(checked), checks=details)
+                reference.update(pair_check_scope='reported_pairs', checked_pairs=sorted(checked), checks=details)
                 reference_path.write_text(json.dumps(reference, indent=2) + '\n')
                 result = compare(file, scene, args.after / (name + '.burr.json'), reference_path,
-                                 reported_pairs_only=True)
+                                 reported_pairs_only=True, occurrence_indexes=referenced)
                 row['reference_scope'] = '18 historical pairs plus all current findings and contacts'
             else:
                 result = compare(file, scene, args.after / (name + '.burr.json'),
