@@ -123,7 +123,10 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             if meshes[instance.geometry].is_none() {
                 meshes[instance.geometry] = Some(Mesh::prepare(geometry)?);
             }
-            let mesh = meshes[instance.geometry].as_ref().unwrap();
+            let mesh = meshes
+                .get(instance.geometry)
+                .and_then(Option::as_ref)
+                .ok_or_else(|| "prepared mesh is missing".to_string())?;
             let transform = instance.transform.as_dmat4();
             let inverse = transform.inverse();
             if !transform.is_finite() || !inverse.is_finite() {
@@ -192,11 +195,31 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
         }
     }
 
-    let open_components = components
-        .iter()
-        .filter(|component| !meshes[component.geometry_index].as_ref().unwrap().closed)
-        .map(|component| component.reference.name.clone())
-        .collect::<Vec<_>>();
+    let mut open_components = Vec::new();
+    // Resolve every occurrence's prepared mesh once, before checking topology
+    // or pairs. The narrow phase then holds references, not optional meshes.
+    let mut component_meshes = Vec::with_capacity(components.len());
+    for component in &components {
+        let Some(mesh) = meshes
+            .get(component.geometry_index)
+            .and_then(Option::as_ref)
+        else {
+            return incomplete(
+                model_path,
+                model_version,
+                scene.instances.len(),
+                "invalid_component_mesh",
+                format!(
+                    "Prepared mesh for component occurrence {} is missing.",
+                    component.reference.occurrence_index
+                ),
+            );
+        };
+        if !mesh.closed {
+            open_components.push(component.reference.name.clone());
+        }
+        component_meshes.push(mesh);
+    }
     let mut findings = Vec::new();
     // Sweep the axis with the widest spread. checked_pair_count includes
     // pairs rejected by the broad phase, preserving the report's meaning.
@@ -206,8 +229,8 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
     for (left_index, right_index) in candidates {
         let left = &components[left_index];
         let right = &components[right_index];
-        let left_mesh = meshes[left.geometry_index].as_ref().unwrap();
-        let right_mesh = meshes[right.geometry_index].as_ref().unwrap();
+        let left_mesh = component_meshes[left_index];
+        let right_mesh = component_meshes[right_index];
         if let Some(witness) = intersection_witness(left, left_mesh, right, right_mesh) {
             findings.push(InterferenceFinding {
                 id: format!("{CHECK_ID}:{left_index}:{right_index}"),
@@ -377,6 +400,7 @@ fn penetrating_surface(
     }
     let to_target = target.inverse * source.transform;
     let local_tolerance = (tolerance / target.scale).max(target_mesh.epsilon);
+    let source_tolerance = (tolerance / source.scale).max(source_mesh.epsilon);
     let candidates = source_mesh.candidate_triangles(transformed_bounds(
         target_mesh.bounds,
         source.inverse * target.transform,
@@ -390,7 +414,7 @@ fn penetrating_surface(
             });
         }
     }
-    for triangle in candidates {
+    for &triangle in &candidates {
         let local = source_mesh.triangle(triangle);
         let vertices = local.map(|p| to_target.transform_point3(p));
         for point in vertices
@@ -436,6 +460,28 @@ fn penetrating_surface(
             }
         }
     }
+    // Keep the existing surface/crossing witness priority and pay for interior
+    // probes only when surface samples cannot establish overlap.
+    for triangle in candidates {
+        let local = source_mesh.triangle(triangle);
+        // Coincident surfaces have no strictly interior surface sample. Probe
+        // both sides because tessellation winding need not point outward, and
+        // accept only a point confirmed strictly inside both closed meshes.
+        let [a, b, c] = local;
+        let normal = (b - a).cross(c - a).normalize_or_zero();
+        let centroid = (a + b + c) / 3.0;
+        for sign in [-1.0, 1.0] {
+            let probe = centroid + normal * (sign * 4.0 * source_tolerance);
+            if source_mesh.inside(probe, source_tolerance)
+                && target_mesh.inside(to_target.transform_point3(probe), local_tolerance)
+            {
+                return Some(InterferenceWitness::InteriorOverlap {
+                    point: source.transform.transform_point3(probe).to_array(),
+                });
+            }
+        }
+    }
+
     None
 }
 
@@ -564,9 +610,12 @@ mod tests {
     }
 
     #[test]
-    fn duplicate_solid_definitions_at_same_placement_fail() -> Result<(), Box<dyn std::error::Error>> {
+    fn duplicate_solid_definitions_at_same_placement_fail() -> Result<(), Box<dyn std::error::Error>>
+    {
         let mut scene = compile_scene(
-            &fixture("separated.step"), UpAxis::Z, &mut Timings::default(),
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
         )?;
         let original = scene.instances[0].geometry;
         let duplicate = scene.geometries.len();
@@ -578,14 +627,19 @@ mod tests {
         let report = analyze_scene("duplicate-definitions.step", "fixture", &scene);
         assert_eq!(report.outcome, CheckOutcome::Fail);
         assert_eq!(report.findings.len(), 1);
-        assert!(matches!(report.findings[0].witness, InterferenceWitness::InteriorOverlap { .. }));
+        assert!(matches!(
+            report.findings[0].witness,
+            InterferenceWitness::InteriorOverlap { .. }
+        ));
         Ok(())
     }
 
     #[test]
     fn self_mapping_cube_rotation_fails() -> Result<(), Box<dyn std::error::Error>> {
         let mut scene = compile_scene(
-            &fixture("separated.step"), UpAxis::Z, &mut Timings::default(),
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
         )?;
         let definition = scene.instances[0].geometry;
         scene.instances[1].geometry = definition;
@@ -601,7 +655,10 @@ mod tests {
         let report = analyze_scene("self-mapping-cube.step", "fixture", &scene);
         assert_eq!(report.outcome, CheckOutcome::Fail);
         assert_eq!(report.findings.len(), 1);
-        assert!(matches!(report.findings[0].witness, InterferenceWitness::InteriorOverlap { .. }));
+        assert!(matches!(
+            report.findings[0].witness,
+            InterferenceWitness::InteriorOverlap { .. }
+        ));
         Ok(())
     }
 

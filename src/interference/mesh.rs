@@ -79,7 +79,7 @@ impl Mesh {
         if geometry.indices.is_empty() || geometry.vertices.is_empty() {
             return Err("contains no triangles".into());
         }
-        if geometry.indices.len() % 3 != 0 {
+        if !geometry.indices.len().is_multiple_of(3) {
             return Err("has a non-triangular index buffer".into());
         }
         if let Some(i) = geometry
@@ -144,7 +144,7 @@ impl Mesh {
         }
         let mut triangles = Vec::with_capacity(geometry.indices.len() / 3);
         let mut edges: HashMap<[u32; 2], usize> = HashMap::new();
-        for t in geometry.indices.chunks_exact(3) {
+        for t in geometry.indices.as_chunks::<3>().0 {
             let t = [
                 remap[t[0] as usize],
                 remap[t[1] as usize],
