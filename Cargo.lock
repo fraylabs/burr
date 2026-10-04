@@ -217,6 +217,9 @@ dependencies = [
  "tempfile",
  "tiny_http",
  "toml",
+ "truck-assembly",
+ "truck-stepio",
+ "truck-topology",
 ]
 
 [[package]]

@@ -40,7 +40,7 @@ pub fn generate_html_viewer(
     lighting: &LightingConfig,
     background: &str,
     assets: &crate::cache::ViewerCache,
-    focus: Option<(usize, usize)>,
+    focus: Option<&[usize]>,
     motion: Option<&crate::motion::PreparedMotion>,
 ) -> Result<String, String> {
     for (index, instance) in scene.instances.iter().enumerate() {
@@ -65,8 +65,8 @@ pub fn generate_html_viewer(
     assets.maintain_mesh_cache();
     let occurrences = scene.instances.iter().enumerate().map(|(index, instance)| {
         let color = match focus {
-            Some((first, _)) if index == first => [1.0, 0.34, 0.08, 1.0],
-            Some((_, second)) if index == second => [0.12, 0.76, 0.94, 1.0],
+            Some(indexes) if indexes.first() == Some(&index) => [1.0, 0.34, 0.08, 1.0],
+            Some(indexes) if indexes.contains(&index) => [0.12, 0.76, 0.94, 1.0],
             Some(_) => [0.28, 0.31, 0.33, 1.0],
             None => scene.materials.get(instance.material)
                 .map(|m| m.base_color_factor).unwrap_or([1.0; 4]),
@@ -693,7 +693,7 @@ mod tests {
             &LightingConfig::default(),
             "#0c0d10",
             &cache,
-            Some((0, 1)),
+            Some(&[0, 1]),
             None,
         )
         .unwrap();

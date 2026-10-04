@@ -79,10 +79,9 @@ struct RenderSelection<'a> {
     motion_id: Option<&'a str>,
 }
 
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 struct FocusPair {
-    first: usize,
-    second: usize,
+    indexes: Vec<usize>,
 }
 
 impl FocusPair {
@@ -90,30 +89,30 @@ impl FocusPair {
         let Some(value) = value else {
             return Ok(None);
         };
-        let Some((first, second)) = value.split_once(',') else {
-            return Err("Viewer focus must contain two component indexes.".to_string());
-        };
-        let first = first
-            .parse::<usize>()
-            .map_err(|_| "Viewer focus contains an invalid component index.".to_string())?;
-        let second = second
-            .parse::<usize>()
-            .map_err(|_| "Viewer focus contains an invalid component index.".to_string())?;
-        if first == second {
-            return Err("Viewer focus must contain two different components.".to_string());
+        let mut indexes = value
+            .split(',')
+            .map(|index| {
+                index
+                    .parse::<usize>()
+                    .map_err(|_| "Viewer focus contains an invalid component index.".to_string())
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        if indexes.len() < 2 || indexes.len() > 4096 {
+            return Err("Viewer focus must contain 2 to 4096 component indexes.".to_string());
         }
-        Ok(Some(if first < second {
-            Self { first, second }
-        } else {
-            Self {
-                first: second,
-                second: first,
-            }
-        }))
+        indexes.sort_unstable();
+        if indexes.windows(2).any(|pair| pair[0] == pair[1]) {
+            return Err("Viewer focus must contain different components.".to_string());
+        }
+        Ok(Some(Self { indexes }))
     }
 
-    fn label(self) -> String {
-        format!("{},{}", self.first, self.second)
+    fn label(&self) -> String {
+        self.indexes
+            .iter()
+            .map(usize::to_string)
+            .collect::<Vec<_>>()
+            .join(",")
     }
 }
 
@@ -514,7 +513,7 @@ fn render_model(
         &path,
         &fingerprint,
         selection.theme,
-        selection.focus,
+        selection.focus.clone(),
         None,
     );
     if let Some(html) =
@@ -540,8 +539,12 @@ fn render_model(
 
     let html = {
         let cached = load_model(project, selection.relative_path, cache, Some(reporter))?;
-        if let Some(focus) = selection.focus {
-            if focus.second >= cached.scene.instances.len() {
+        if let Some(focus) = &selection.focus {
+            if focus
+                .indexes
+                .iter()
+                .any(|&index| index >= cached.scene.instances.len())
+            {
                 return Err("Viewer focus references a missing component.".to_string());
             }
         }
@@ -558,7 +561,7 @@ fn render_model(
             &lighting,
             selection.theme.canvas_background(),
             viewer_cache,
-            selection.focus.map(|f| (f.first, f.second)),
+            selection.focus.as_ref().map(|f| f.indexes.as_slice()),
             None,
         )
         .map_err(|error| {
@@ -568,7 +571,7 @@ fn render_model(
             )
         })?;
         let html = inject_binary_draw(inject_viewer_render_modes(html)?);
-        inject_viewer_theme(html, selection.theme, selection.focus)?
+        inject_viewer_theme(html, selection.theme, selection.focus.clone())?
     };
     let html = Arc::new(html);
     persist_viewer(viewer_cache, &viewer_key, &html);
@@ -690,7 +693,7 @@ fn check_model(
     };
 
     let report = if format == Some("STEP") {
-        interference::analyze_scene(relative_path, &version, &scene)
+        interference::analyze_scene_from_source(relative_path, &version, &scene, &path)
     } else {
         CheckReport::unsupported(
             relative_path,
@@ -809,7 +812,7 @@ fn viewer_cache_key(
         source_fingerprint,
         relative_path,
         theme.name(),
-        focus.map_or_else(|| "none".to_string(), FocusPair::label),
+        focus.map_or_else(|| "none".to_string(), |focus| focus.label()),
         motion.unwrap_or("none"),
     )
 }
@@ -1523,8 +1526,7 @@ mod tests {
             html,
             ViewerTheme::Light,
             Some(FocusPair {
-                first: 2,
-                second: 5,
+                indexes: vec![2, 5],
             }),
         )
         .unwrap();
@@ -1710,8 +1712,7 @@ angle_degrees = 90.0
         assert_eq!(
             FocusPair::from_query(Some("5,2")).unwrap(),
             Some(FocusPair {
-                first: 2,
-                second: 5,
+                indexes: vec![2, 5],
             })
         );
         assert!(FocusPair::from_query(Some("2,2")).is_err());

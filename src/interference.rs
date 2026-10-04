@@ -3,6 +3,8 @@ use look::scene::CompiledScene;
 use serde::Serialize;
 #[path = "interference/mesh.rs"]
 mod mesh;
+#[path = "interference/source.rs"]
+mod source;
 use mesh::{Bounds, Mesh};
 
 pub const CHECK_ID: &str = "assembly-interference";
@@ -32,6 +34,8 @@ pub struct CheckReport {
     pub pair_set_complete: bool,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub unresolved_pairs: Vec<UnresolvedPair>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub contact_pairs: Vec<ContactPair>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub incomplete_reasons: Vec<IncompleteReason>,
 }
@@ -65,10 +69,23 @@ pub struct UnresolvedPair {
 }
 
 #[derive(Clone, Debug, Serialize)]
+pub struct ContactPair {
+    pub id: String,
+    pub code: &'static str,
+    pub message: String,
+    pub components: [ComponentRef; 2],
+    pub separating_normal: [f64; 3],
+    pub signed_gap: f64,
+    pub arithmetic_error_bound: f64,
+}
+
+#[derive(Clone, Debug, Serialize)]
 pub struct ComponentRef {
     pub id: String,
     pub occurrence_index: usize,
     pub name: String,
+    pub definition_id: usize,
+    pub definition_name: String,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -113,6 +130,7 @@ impl CheckReport {
             findings: Vec::new(),
             pair_set_complete: false,
             unresolved_pairs: Vec::new(),
+            contact_pairs: Vec::new(),
             incomplete_reasons: vec![IncompleteReason {
                 code: "unsupported_model",
                 message: message.into(),
@@ -121,7 +139,22 @@ impl CheckReport {
     }
 }
 
+#[cfg(test)]
 pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScene) -> CheckReport {
+    analyze_scene_from_source(
+        model_path,
+        model_version,
+        scene,
+        std::path::Path::new(model_path),
+    )
+}
+
+pub fn analyze_scene_from_source(
+    model_path: &str,
+    model_version: &str,
+    scene: &CompiledScene,
+    source_path: &std::path::Path,
+) -> CheckReport {
     // Import completeness is known before any mesh preparation or pair work.
     // Keep both diagnoses when structure and face geometry were lost together.
     let mut import_reasons = scene
@@ -166,6 +199,7 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             findings: Vec::new(),
             pair_set_complete: false,
             unresolved_pairs: Vec::new(),
+            contact_pairs: Vec::new(),
             incomplete_reasons: import_reasons,
         };
     }
@@ -179,6 +213,19 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             "The selected STEP file does not expose at least two component occurrences.".into(),
         );
     }
+    let source = source::SourceEvidence::read(source_path, scene);
+    let definition_names = scene
+        .instances
+        .iter()
+        .enumerate()
+        .map(|(index, instance)| {
+            source
+                .as_ref()
+                .and_then(|source| source.occurrences.get(index))
+                .map(|occurrence| occurrence.name.clone())
+                .unwrap_or_else(|| source::fallback_name(instance.node_name.as_deref(), model_path))
+        })
+        .collect::<Vec<_>>();
     let mut meshes: Vec<Option<Mesh>> = (0..scene.geometries.len()).map(|_| None).collect();
     let mut components = Vec::with_capacity(scene.instances.len());
     for (index, instance) in scene.instances.iter().enumerate() {
@@ -230,16 +277,28 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             {
                 return Err("has a non-uniform scale or shear".into());
             }
-            let name = instance
-                .node_name
-                .clone()
-                .filter(|s| !s.trim().is_empty())
-                .unwrap_or_else(|| format!("Component {}", index + 1));
+            let definition_name = definition_names[index].clone();
+            let name = if definition_names
+                .iter()
+                .filter(|other| **other == definition_name)
+                .count()
+                > 1
+            {
+                let sibling = definition_names[..=index]
+                    .iter()
+                    .filter(|other| **other == definition_name)
+                    .count();
+                format!("{definition_name} #{sibling}")
+            } else {
+                definition_name.clone()
+            };
             Ok(Component {
                 reference: ComponentRef {
                     id: format!("occurrence:{index}"),
                     occurrence_index: index,
                     name,
+                    definition_id: instance.geometry,
+                    definition_name,
                 },
                 geometry_index: instance.geometry,
                 transform,
@@ -304,6 +363,7 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
     }
     let mut findings = Vec::new();
     let mut unresolved_pairs = Vec::new();
+    let mut contact_pairs = Vec::new();
     // Sweep the axis with the widest spread. checked_pair_count includes
     // pairs rejected by the broad phase, preserving the report's meaning.
     let checked_pair_count = components.len() * (components.len() - 1) / 2;
@@ -332,6 +392,18 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             * look::step::meshing_policy::MeshingPolicy::DEFAULT.relative_linear_deflection;
         if !left_mesh.oriented && !right_mesh.oriented {
             probe_resolution = probe_resolution.max(source_resolution);
+        }
+        // Additional broad-phase candidates are for source contact only.
+        // Keep the interference narrow phase and unresolved policy unchanged
+        // for every previously checked positive-bounds pair.
+        if !left.bounds.overlaps(right.bounds, 0.0) {
+            if let Some(pair) = source
+                .as_ref()
+                .and_then(|source| contact_pair(source, left, right, left_index, right_index))
+            {
+                contact_pairs.push(pair);
+            }
+            continue;
         }
         if !left_mesh.closed || !right_mesh.closed {
             unresolved_pairs.push(UnresolvedPair {
@@ -367,6 +439,13 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             let overlap =
                 left.bounds.max.min(right.bounds.max) - left.bounds.min.max(right.bounds.min);
             if mesh_witness.is_some() || overlap.min_element() <= tolerance {
+                if let Some(pair) = source
+                    .as_ref()
+                    .and_then(|source| contact_pair(source, left, right, left_index, right_index))
+                {
+                    contact_pairs.push(pair);
+                    continue;
+                }
                 let below_sampling = mesh_witness.as_ref().is_some_and(|witness| {
                     let world = match witness {
                         InterferenceWitness::SurfaceCrossing { start, end } => {
@@ -477,6 +556,13 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             if unresolved_pairs.len() == 1 { "" } else { "s" }
         ));
     }
+    if !contact_pairs.is_empty() {
+        summary.push_str(&format!(
+            "; {} contacting component pair{}",
+            contact_pairs.len(),
+            if contact_pairs.len() == 1 { "" } else { "s" }
+        ));
+    }
     CheckReport {
         schema_version: REPORT_SCHEMA_VERSION,
         model_path: model_path.to_string(),
@@ -490,6 +576,7 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
         findings,
         pair_set_complete,
         unresolved_pairs,
+        contact_pairs,
         incomplete_reasons,
     }
 }
@@ -514,8 +601,28 @@ fn incomplete(
         findings: Vec::new(),
         pair_set_complete: false,
         unresolved_pairs: Vec::new(),
+        contact_pairs: Vec::new(),
         incomplete_reasons: vec![IncompleteReason { code, message }],
     }
+}
+
+fn contact_pair(
+    source: &source::SourceEvidence,
+    left: &Component,
+    right: &Component,
+    left_index: usize,
+    right_index: usize,
+) -> Option<ContactPair> {
+    let proof = source.contact(left_index, right_index)?;
+    Some(ContactPair {
+        id: format!("{CHECK_ID}:contact:{left_index}:{right_index}"),
+        code: "planar_contact",
+        message: format!("{} and {} have coincident analytic supports within source arithmetic precision. A source separating plane proves no positive interior overlap beyond that precision.", left.reference.name, right.reference.name),
+        components: [left.reference.clone(), right.reference.clone()],
+        separating_normal: proof.normal.to_array(),
+        signed_gap: proof.gap,
+        arithmetic_error_bound: proof.error,
+    })
 }
 
 fn transformed_bounds(bounds: Bounds, transform: DMat4) -> Bounds {
@@ -548,13 +655,22 @@ fn candidate_pairs(components: &[Component]) -> Vec<(usize, usize)> {
     order.sort_unstable_by(|&a, &b| {
         components[a].bounds.min[axis].total_cmp(&components[b].bounds.min[axis])
     });
+    let max_error = components
+        .iter()
+        .map(|component| component.coordinate_error)
+        .fold(0.0, f64::max);
     let mut pairs = Vec::new();
     for (position, &a) in order.iter().enumerate() {
         for &b in &order[position + 1..] {
-            if components[b].bounds.min[axis] >= components[a].bounds.max[axis] {
+            if components[b].bounds.min[axis]
+                > components[a].bounds.max[axis] + components[a].coordinate_error + max_error
+            {
                 break;
             }
-            if components[a].bounds.overlaps(components[b].bounds, 0.0) {
+            if components[a].bounds.overlaps(
+                components[b].bounds,
+                -(components[a].coordinate_error + components[b].coordinate_error),
+            ) {
                 pairs.push((a.min(b), a.max(b)));
             }
         }
