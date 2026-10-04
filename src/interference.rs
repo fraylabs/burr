@@ -635,11 +635,11 @@ fn penetrating_surface(
             .unwrap_or_else(|| source_mesh.nearest_surface_sample(source_point));
         let target_sample = target_mesh.nearest_surface_sample(point);
         let curved = source_sample.0 || target_sample.0;
-        // An evaluator-identified planar patch adds no curved sampling error.
-        // Including a large flat component's full extent here can hide a
-        // resolved overlap against a much smaller curved component. Retain
-        // the existing component scale for each curved side and the measured
-        // normal/chord deviation; unknown surfaces keep the legacy guard.
+        // Each side with sampled curvature contributes its own nominal error.
+        // A flat normal sample keeps the independent boundary guard below;
+        // including its full component extent here can hide a resolved overlap
+        // against a much smaller curved component. Retain measured normal/chord
+        // deviation, and keep the legacy guard for ambiguous boundaries.
         let curved_resolution = (if source_sample.0 {
             source_mesh.bounds.diagonal() * source.scale
         } else {

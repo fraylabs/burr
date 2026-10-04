@@ -252,11 +252,12 @@ impl Mesh {
                     if normals[i].cross(normals[j]).length_squared() > roundoff.powi(2)
                         && normals[i].dot(normals[j]).abs() + roundoff >= angular_cosine
                     {
-                        // STEP evaluator normals identify planar patches even
-                        // beside a gentle dihedral. Use this geometric guess
-                        // only when the source supplies no usable normals.
-                        legacy_curve[i] |= surface_curvature[i].is_none();
-                        legacy_curve[j] |= surface_curvature[j].is_none();
+                        // A known curved patch has the normal/chord guard.
+                        // Flat normal samples cannot certify a planar carrier
+                        // or its trimmed boundary, so retain this ambiguity
+                        // marker for flat and missing evaluator samples.
+                        legacy_curve[i] |= surface_curvature[i] != Some(true);
+                        legacy_curve[j] |= surface_curvature[j] != Some(true);
                     }
                 } else {
                     neighbor.insert(edge, i);
@@ -793,7 +794,7 @@ mod tests {
     }
 
     #[test]
-    fn source_planar_normals_override_the_neighbor_curvature_guess() {
+    fn flat_normal_samples_keep_the_shared_boundary_ambiguity() {
         let positions = [
             [0., 0., 0.],
             [1., 0., 0.],
@@ -827,8 +828,17 @@ mod tests {
         };
         let point = DVec3::new(1. / 3., 1. / 3., 0.);
         let mesh = Mesh::prepare(&geometry).unwrap();
-        assert!(!mesh.nonplanar_near_surface(point, 0.01));
-        assert!(!mesh.legacy_nonplanar_near_surface(point, 0.01));
+        assert!(!mesh.triangle_surface_sample(0).0);
+        assert!(mesh.nonplanar_near_surface(point, 0.01));
+        assert!(mesh.legacy_nonplanar_near_surface(point, 0.01));
+        geometry.surface_normals.as_mut().unwrap()[3..].copy_from_slice(&[
+            [0., 0., 1.],
+            [0., 0., 1.],
+            tilted,
+        ]);
+        let curved_boundary = Mesh::prepare(&geometry).unwrap();
+        assert!(!curved_boundary.triangle_surface_sample(0).0);
+        assert!(curved_boundary.legacy_nonplanar_near_surface(point, 0.01));
         geometry.surface_normals = None;
         let fallback = Mesh::prepare(&geometry).unwrap();
         assert!(fallback.nonplanar_near_surface(point, 0.01));
