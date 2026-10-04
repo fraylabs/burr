@@ -84,9 +84,11 @@ an empty value to disable persistent reuse.
 ## Geometry-native assembly interference
 
 Look preserves each STEP assembly occurrence's component name, mesh, and world
-transform. Burr checks those world-space component pairs with a strict bounds
-filter followed by mesh interference and containment evidence. Face contact is
-not interference.
+transform. Burr prepares one welded mesh and triangle BVH per part definition,
+shares it across occurrences, and sweeps world bounds to reject distant pairs.
+A finding requires positive interior overlap of closed tessellated solids:
+a vertex, face sample, or edge interval must enter the other solid beyond the
+mesh coordinate tolerance. Surface contact alone is not interference.
 
 Opening the Checks tab starts analysis after the model is visible. The tab
 reports `pass`, `fail`, or `incomplete`. Selecting a finding

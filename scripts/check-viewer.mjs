@@ -191,10 +191,19 @@ try {
   )
   expectEqual(intersectingReport.outcome, "fail", "intersecting assembly outcome")
   expectEqual(intersectingReport.findings?.length, 1, "interference finding count")
+  const crossingWitness = intersectingReport.findings?.[0]?.witness
   expectEqual(
-    intersectingReport.findings?.[0]?.witness?.kind,
-    "surface_crossing",
+    ["surface_crossing", "interior_overlap"].includes(crossingWitness?.kind),
+    true,
     "interference witness kind",
+  )
+  const witnessPoints = crossingWitness.kind === "surface_crossing"
+    ? [crossingWitness.start, crossingWitness.end]
+    : [crossingWitness.point]
+  expectEqual(
+    witnessPoints.every(point => Array.isArray(point) && point.length === 3 && point.every(Number.isFinite)),
+    true,
+    "interference witness coordinates",
   )
 
   const contained = model(initialTree, "models/assemblies/contained.step")

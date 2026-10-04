@@ -27,7 +27,8 @@ remain visible. Solid mode is available from the viewport switch.
 
 For STEP assemblies with at least two component occurrences, opening the Checks
 tab runs Burr's geometry-native `assembly-interference` check. Face-touching pairs
-are accepted; surface crossings, containment, and coincident occurrences fail.
+are accepted; positive interior overlap, containment, and coincident closed
+occurrences fail.
 Unsupported or inconclusive inputs report `incomplete`, not `pass`.
 
 The selected model's versioned result is available locally at:
