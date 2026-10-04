@@ -102,6 +102,24 @@ impl CheckReport {
 }
 
 pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScene) -> CheckReport {
+    if !scene.assembly_structure_errors.is_empty() {
+        return CheckReport {
+            schema_version: REPORT_SCHEMA_VERSION,
+            model_path: model_path.to_string(),
+            model_version: model_version.to_string(),
+            check_id: CHECK_ID,
+            outcome: CheckOutcome::Incomplete,
+            summary: "STEP assembly import is incomplete".to_string(),
+            component_count: scene.instances.len(),
+            checked_pair_count: 0,
+            candidate_pair_count: 0,
+            findings: Vec::new(),
+            incomplete_reasons: scene.assembly_structure_errors.iter().map(|message| IncompleteReason {
+                code: "assembly_structure_lost",
+                message: message.clone(),
+            }).collect(),
+        };
+    }
     // A flattened / single-part import must never enter mesh preparation.
     if scene.instances.len() < 2 {
         return incomplete(
@@ -502,6 +520,41 @@ mod tests {
         let mut timings = Timings::default();
         let scene = compile_scene(&path, UpAxis::Z, &mut timings).unwrap();
         analyze_scene(name, "fixture", &scene)
+    }
+
+    #[test]
+    fn lost_assembly_structure_is_incomplete_before_mesh_preparation() {
+        let mut scene = compile_scene(
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        scene
+            .assembly_structure_errors
+            .push("Unresolved product occurrence #42".into());
+        let report = analyze_scene("broken.step", "v1", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert_eq!(report.checked_pair_count, 0);
+        assert_eq!(report.incomplete_reasons[0].code, "assembly_structure_lost");
+        assert!(report.incomplete_reasons[0].message.contains("#42"));
+    }
+
+    #[test]
+    fn unresolved_source_occurrence_reports_import_reason() {
+        let source = std::fs::read_to_string(fixture("separated.step")).unwrap();
+        let source = source.replace(
+            "#376 = NEXT_ASSEMBLY_USAGE_OCCURRENCE('1','fixed','',#5,#31,$);",
+            "#376 = NEXT_ASSEMBLY_USAGE_OCCURRENCE('1','fixed','',#5,#99999,$);",
+        );
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("broken.step");
+        std::fs::write(&path, source).unwrap();
+        let scene = compile_scene(&path, UpAxis::Z, &mut Timings::default()).unwrap();
+        let report = analyze_scene("broken.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert_eq!(report.incomplete_reasons[0].code, "assembly_structure_lost");
+        assert!(report.incomplete_reasons[0].message.contains("assembly"));
     }
 
     #[test]
