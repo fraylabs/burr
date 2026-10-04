@@ -427,7 +427,32 @@ impl AnalyticBoundary {
                 }
                 match &face.surface {
                     Surface::ElementarySurface(ElementarySurface::Plane(plane)) => {
-                        out.normals.push(vector(plane.normal()))
+                        let normal = vector(plane.normal()).normalize();
+                        if !normal.is_finite() {
+                            return None;
+                        }
+                        let mut boundary = Self::default();
+                        for edge_index in face.boundaries.iter().flatten() {
+                            let edge = shell.edges.get(edge_index.index)?;
+                            boundary.add_curve(&edge.curve)?;
+                            boundary.points.extend([
+                                point(*shell.vertices.get(edge.vertices.0)?),
+                                point(*shell.vertices.get(edge.vertices.1)?),
+                            ]);
+                        }
+                        let (min, max) = boundary.support(DMat4::IDENTITY, normal)?;
+                        let origin = point(plane.origin());
+                        let offset = normal.dot(origin);
+                        let error = boundary.arithmetic_error(DMat4::IDENTITY, normal, 0)
+                            + origin.abs().max_element().max(1.0) * f64::EPSILON * 256.0;
+                        // A planar support proof needs a coherent planar trim,
+                        // not a boundary displaced within a healing tolerance.
+                        if !error.is_finite()
+                            || (min - offset).abs().max((max - offset).abs()) > error
+                        {
+                            return None;
+                        }
+                        out.normals.push(normal);
                     }
                     Surface::ElementarySurface(ElementarySurface::Sphere(sphere)) => {
                         let m = matrix(sphere.transform());
