@@ -622,6 +622,30 @@ mod tests {
     }
 
     #[test]
+    fn float_rounding_far_from_the_origin_does_not_open_a_closed_definition() {
+        let mut scene = compile_scene(
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        let definition = scene.instances[0].geometry;
+        scene.instances[1].geometry = definition;
+        scene.instances[0].transform = glam::Mat4::IDENTITY;
+        scene.instances[1].transform =
+            glam::Mat4::from_translation(glam::Vec3::new(20.0, 0.0, 0.0));
+        let vertices = &mut scene.geometries[definition].vertices;
+        for vertex in vertices.iter_mut() {
+            vertex.position[0] += 1000.0;
+        }
+        // Two tessellated faces can round a shared endpoint to adjacent f32
+        // values. The uncertainty follows the coordinate's magnitude.
+        vertices[0].position[0] = f32::from_bits(vertices[0].position[0].to_bits() + 1);
+        let report = analyze_scene("offset-rounding.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Pass);
+    }
+
+    #[test]
     fn missing_vertex_index_is_incomplete_not_a_panic() {
         let path = fixture("intersecting.step");
         let mut timings = Timings::default();

@@ -99,7 +99,12 @@ impl Mesh {
         }
         // Hash welding replaces Truck's quadratic attribute scan. Work in local
         // coordinates so placement rounding cannot change topology per occurrence.
-        let epsilon = (bounds.diagonal() * 1e-7).max(1e-9);
+        // Look stores f32 positions: shared endpoints far from the origin can
+        // differ by an ULP even when their part's own diagonal is very small.
+        let coordinate_magnitude = bounds.min.abs().max(bounds.max.abs()).max_element();
+        let epsilon = (bounds.diagonal() * 1e-7)
+            .max(coordinate_magnitude * f64::from(f32::EPSILON) * 2.0)
+            .max(1e-9);
         let mut cells: HashMap<[i64; 3], Vec<u32>> = HashMap::new();
         let mut points: Vec<DVec3> = Vec::new();
         let mut remap = Vec::with_capacity(geometry.vertices.len());
