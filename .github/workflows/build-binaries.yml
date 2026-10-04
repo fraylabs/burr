@@ -1,0 +1,67 @@
+name: Build binaries
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            target: aarch64-apple-darwin
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+          - runner: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "11.0"
+      TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Validate release version
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          version=$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -1)
+          test "$GITHUB_REF_NAME" = "burr-v$version"
+      - name: Build
+        # .cargo/config.toml supplies AVX/FMA for both x86-64 targets.
+        run: cargo build --release --locked --bin burr --target "$TARGET"
+      - name: Package and smoke test
+        shell: bash
+        run: |
+          binary="target/$TARGET/release/burr"
+          "$binary" --version
+          if [ "$RUNNER_OS" = macOS ]; then
+            otool -L "$binary"
+            strip "$binary"
+          else
+            ldd "$binary"
+            strip "$binary"
+          fi
+          mkdir -p dist staging
+          cp "$binary" LICENSE staging/
+          archive="burr-$TARGET.tar.gz"
+          tar -czf "dist/$archive" -C staging burr LICENSE
+          cd dist
+          shasum -a 256 "$archive" > "$archive.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: burr-${{ matrix.target }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
+

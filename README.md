@@ -68,23 +68,33 @@ correctness. Those boundaries are tracked in
 
 ## Install
 
-Install the current GitHub release:
+Install a prebuilt binary with no Rust toolchain (macOS Apple Silicon or Intel,
+and Linux x86-64):
 
-On Apple Silicon:
+```bash
+curl -fsSL https://raw.githubusercontent.com/fraylabs/burr/main/install.sh | sh
+```
+
+The installer downloads the latest GitHub release, verifies its SHA-256 checksum,
+and installs to `~/.local/bin`. Follow its PATH instruction if needed. To pin a
+version or choose another directory:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/fraylabs/burr/main/install.sh | \
+  BURR_VERSION=0.35.0 BURR_INSTALL_DIR="$HOME/.local/bin" sh
+```
+
+macOS binaries support macOS 11 or newer. Linux binaries require glibc 2.35 or
+newer (for example, Ubuntu 22.04). Both x86-64 builds require a CPU with **AVX and
+FMA**; older CPUs are unsupported. Apple Silicon needs no extra CPU features.
+
+To build from source instead:
 
 ```bash
 cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.35.0 --locked
 ```
 
-On x86-64, the current Look geometry kernel requires a CPU with **AVX and
-FMA**. Cargo's Git installer does not inherit repository build configuration,
-so pass the required features explicitly:
-
-```bash
-RUSTFLAGS="-Ctarget-feature=+avx,+fma" cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.35.0 --locked
-```
-
-Older x86-64 CPUs without these features are not supported by this release.
+On x86-64, prefix that Cargo command with `RUSTFLAGS="-Ctarget-feature=+avx,+fma"`.
 Local repository builds apply the same flags through `.cargo/config.toml`.
 
 Then open any model folder:
@@ -107,7 +117,7 @@ models and [KiStack](https://github.com/American-Embedded/kistack) can own KiCad
 electronics work. Burr remains responsible for the resulting local model
 workspace, viewer, and supported checks.
 
-The first installation compiles Burr and its CAD dependencies. Starting an
+Only source installations compile Burr and its CAD dependencies. Starting an
 already-built Burr process is normally near-instant.
 
 ## Project configuration
