@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 0.38.0 - 2026-10-05
+
+- Tessellate STEP solids into closed meshes: neighbouring faces now share the
+  same points along their common edges, cone bands are no longer meshed twice,
+  and sphere poles and cylinder seams close cleanly. On the 21-model corpus
+  this closes the openAMR cover screw, the Adafruit switch capacitor, the
+  Voron Fly mount and both Apollo enclosures.
+- More conclusive results, still with no false pairs. Checked pair by pair
+  against OpenCascade on every corpus model whose result changed: 64 real
+  pairs found and 0 false across the benchmark models, both Apollo enclosures
+  now pass, and the MiniSB Bowden mount reports its 9 real overlaps.
+- Contacts between curved parts that the mesh cannot resolve (screws seated
+  in bores, rails and inserts) are listed as unresolved with a reason instead
+  of as interference. This affects 9 pairs on the Bowden mount, 1 on the Fly
+  mount and 6 shallow overlaps on the openAMR cover.
+
 ## 0.37.0 - 2026-10-04
 
 - Interference pairs are now checked pair by pair against an exact OpenCascade
