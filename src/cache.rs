@@ -1,7 +1,9 @@
 use std::{
+    collections::HashSet,
     env, fs,
     io::{self, BufWriter, Read, Write},
     path::{Path, PathBuf},
+    sync::{Arc, Mutex},
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
@@ -19,18 +21,23 @@ const MAX_CACHE_ENTRY_BYTES: usize = MAX_VIEWER_HTML_BYTES + 64 * 1024;
 #[derive(Clone, Debug)]
 pub struct ViewerCache {
     root: Option<PathBuf>,
+    fallback_meshes: Arc<Mutex<HashSet<String>>>,
 }
 
 impl ViewerCache {
     pub fn from_environment() -> Self {
         Self {
             root: cache_root_from_environment(),
+            fallback_meshes: Default::default(),
         }
     }
 
     #[cfg(test)]
     pub(crate) fn at(root: PathBuf) -> Self {
-        Self { root: Some(root) }
+        Self {
+            root: Some(root),
+            fallback_meshes: Default::default(),
+        }
     }
 
     fn mesh_root(&self) -> PathBuf {
@@ -54,9 +61,9 @@ impl ViewerCache {
         {
             return None;
         }
-        let temporary = Self::session_mesh_root().join(id);
-        Some(if temporary.is_file() {
-            temporary
+        let fallback = self.fallback_meshes.lock().ok()?.contains(id);
+        Some(if fallback {
+            Self::session_mesh_root().join(id)
         } else {
             self.mesh_root().join(id)
         })
@@ -153,6 +160,15 @@ impl ViewerCache {
             let destination = root.join(&id);
             // Replace even an existing entry: a truncated cached file must recover.
             fs::rename(&temporary, destination).map_err(|e| e.to_string())?;
+            let mut fallback = self
+                .fallback_meshes
+                .lock()
+                .map_err(|_| "Local mesh cache became unavailable.".to_string())?;
+            if root != self.mesh_root() {
+                fallback.insert(id.clone());
+            } else {
+                fallback.remove(&id);
+            }
             Ok(
                 serde_json::json!({ "id": id, "vertices": geometry.vertices.len(), "indices": geometry.indices.len(), "stride": stride, "color": constant_color.then_some(first_color) }),
             )
