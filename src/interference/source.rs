@@ -2,6 +2,7 @@
 //! Unsupported carriers or uncertain occurrence correspondence refuse contact.
 use glam::{DMat4, DVec3, DVec4};
 use look::scene::CompiledScene;
+use ruststep::ast::{DataSection, EntityInstance, Name, Parameter};
 use std::{collections::HashMap, path::Path, sync::Arc};
 use truck_assembly::assy::EdgeEntity;
 use truck_stepio::r#in::{
@@ -23,6 +24,7 @@ pub struct SourceOccurrence {
     pub name: String,
     world: DMat4,
     placement_depth: usize,
+    absolute_placement: DMat4,
     boundary: Option<Arc<AnalyticBoundary>>,
 }
 
@@ -91,7 +93,9 @@ impl SourceEvidence {
         if exchange.data.len() != 1 {
             return None;
         }
-        let table = Table::from_owned_data_section(exchange.data.remove(0));
+        let data = exchange.data.remove(0);
+        let millimetre_source = millimetre_units(&data);
+        let table = Table::from_owned_data_section(data);
         let assembly = table.step_assy().ok()?;
         // Match Look's assembly traversal and definition slots. Flat multipart
         // exports are deliberately refused here rather than matched by names.
@@ -123,7 +127,7 @@ impl SourceEvidence {
                 }
             }
             if !shells.is_empty() || node.is_terminal() {
-                let boundary = complete_boundary
+                let boundary = (complete_boundary && millimetre_source)
                     .then(|| AnalyticBoundary::from_shells(&shells))
                     .flatten()
                     .map(Arc::new);
@@ -159,7 +163,14 @@ impl SourceEvidence {
                     return None;
                 }
                 let world = normalization * source_world;
-                if !world.is_finite() {
+                let absolute_placement = absolute_matrix(normalization)
+                    * path_in_graph
+                        .edges()
+                        .iter()
+                        .fold(DMat4::IDENTITY, |bound, edge| {
+                            bound * absolute_matrix(matrix(&edge.entity().matrix))
+                        });
+                if !world.is_finite() || !absolute_placement.is_finite() {
                     return None;
                 }
                 // Own product, then nearest named ancestor occurrence/product.
@@ -182,6 +193,7 @@ impl SourceEvidence {
                     name,
                     world,
                     placement_depth: path_in_graph.edges().len(),
+                    absolute_placement,
                     boundary: boundary.clone(),
                 });
             }
@@ -207,8 +219,8 @@ impl SourceEvidence {
                 let (amin, amax) = ab.support(a.world, normal)?;
                 let (bmin, bmax) = bb.support(b.world, normal)?;
                 let gap = (bmin - amax).max(amin - bmax);
-                let error = ab.arithmetic_error(a.world, normal, a.placement_depth)
-                    + bb.arithmetic_error(b.world, normal, b.placement_depth);
+                let error = ab.arithmetic_error(a.absolute_placement, normal, a.placement_depth)
+                    + bb.arithmetic_error(b.absolute_placement, normal, b.placement_depth);
                 let source_tolerance = match (ab.source_tolerance, bb.source_tolerance) {
                     (Some(at), Some(bt)) => (at
                         * a.world.transpose().transform_vector3(normal).length())
@@ -218,8 +230,10 @@ impl SourceEvidence {
                 let maximum_overlap_depth = (-gap + error).max(0.0);
                 if !error.is_finite()
                     || !source_tolerance.is_finite()
+                    || source_tolerance <= 0.0
+                    || error > source_tolerance
                     || gap > error
-                    || maximum_overlap_depth > source_tolerance.max(error)
+                    || maximum_overlap_depth > source_tolerance
                 {
                     continue;
                 }
@@ -245,11 +259,18 @@ impl SourceEvidence {
                     direction[index] = 1.0;
                     let (amin, amax) = ab.support(a.world, direction)?;
                     let (bmin, bmax) = bb.support(b.world, direction)?;
-                    let axis_error = ab.arithmetic_error(a.world, direction, a.placement_depth)
-                        + bb.arithmetic_error(b.world, direction, b.placement_depth);
-                    area *= (amax.min(bmax) - amin.max(bmin) + axis_error).max(0.0);
+                    let axis_error =
+                        ab.arithmetic_error(a.absolute_placement, direction, a.placement_depth)
+                            + bb.arithmetic_error(
+                                b.absolute_placement,
+                                direction,
+                                b.placement_depth,
+                            );
+                    let width = (amax.min(bmax) - amin.max(bmin) + 2.0 * axis_error).max(0.0);
+                    area = (area * width).next_up();
                 }
-                let maximum_common_volume = maximum_overlap_depth * area / normal[axis].abs();
+                let maximum_common_volume =
+                    ((maximum_overlap_depth * area).next_up() / normal[axis].abs()).next_up();
                 // The corpus exact gate's absolute positive-volume floor,
                 // in source coordinate units cubed. This bounds contact only;
                 // it never relaxes the existing interference witness policy.
@@ -267,6 +288,99 @@ impl SourceEvidence {
         }
         None
     }
+}
+
+// The exact gate's absolute volume floor is in mm³. Never apply it to
+// metres/inches, mixed or unspecified contexts as if those were millimetres.
+// Refusing contact leaves source ancestry available for useful display names.
+fn millimetre_units(data: &DataSection) -> bool {
+    let mut lengths = std::collections::HashSet::new();
+    for entity in &data.entities {
+        if let EntityInstance::Complex { id, subsuper } = entity {
+            let records = &subsuper.0;
+            if !records.iter().any(|record| record.name == "LENGTH_UNIT") {
+                continue;
+            }
+            let Some(unit) = records.iter().find(|record| record.name == "SI_UNIT") else {
+                return false;
+            };
+            let Parameter::List(parameters) = &unit.parameter else {
+                return false;
+            };
+            if !matches!(parameters.as_slice(), [Parameter::Enumeration(prefix), Parameter::Enumeration(unit)]
+                if prefix == "MILLI" && unit == "METRE")
+            {
+                return false;
+            }
+            if records
+                .iter()
+                .any(|record| record.name == "CONVERSION_BASED_UNIT")
+            {
+                return false;
+            }
+            lengths.insert(*id);
+        }
+    }
+    if lengths.is_empty() {
+        return false;
+    }
+    let mut contexts = 0;
+    for entity in &data.entities {
+        match entity {
+            EntityInstance::Complex { subsuper, .. } => {
+                let records = &subsuper.0;
+                if !records
+                    .iter()
+                    .any(|record| record.name == "GEOMETRIC_REPRESENTATION_CONTEXT")
+                {
+                    continue;
+                }
+                // PCURVE parameter domains have unitless 2D contexts.
+                if records
+                    .iter()
+                    .any(|record| record.name == "PARAMETRIC_REPRESENTATION_CONTEXT")
+                {
+                    continue;
+                }
+                let Some(context) = records
+                    .iter()
+                    .find(|record| record.name == "GLOBAL_UNIT_ASSIGNED_CONTEXT")
+                else {
+                    return false;
+                };
+                let Parameter::List(parameters) = &context.parameter else {
+                    return false;
+                };
+                let [Parameter::List(units)] = parameters.as_slice() else {
+                    return false;
+                };
+                if !units.iter().any(
+                    |unit| matches!(unit, Parameter::Ref(Name::Entity(id)) if lengths.contains(id)),
+                ) {
+                    return false;
+                }
+                contexts += 1;
+            }
+            EntityInstance::Simple { record, .. }
+                if record.name == "UNCERTAINTY_MEASURE_WITH_UNIT" =>
+            {
+                let Parameter::List(parameters) = &record.parameter else {
+                    return false;
+                };
+                if !matches!(parameters.get(1), Some(Parameter::Ref(Name::Entity(id))) if lengths.contains(id))
+                {
+                    return false;
+                }
+                if let Some(Parameter::Typed { keyword, .. }) = parameters.first() {
+                    if keyword != "LENGTH_MEASURE" {
+                        return false;
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    contexts > 0
 }
 
 fn complete(table: &Table, shells: &[Shell], ids: &[u64]) -> bool {
@@ -413,8 +527,9 @@ impl AnalyticBoundary {
     fn arithmetic_error(&self, world: DMat4, direction: DVec3, placement_depth: usize) -> f64 {
         // Bound arithmetic using operand magnitudes, not just the final
         // coordinates: large local coordinates can cancel a large placement.
-        // Account for the full source placement chain as well as carrier and
-        // support evaluation. A high arithmetic bound refuses contact.
+        // `world` is the product of absolute source placement matrices.
+        // Intermediate placement cancellation cannot shrink this operand bound.
+        // Account for that chain as well as carrier/support evaluation.
         let mut local = self
             .points
             .iter()
@@ -491,6 +606,10 @@ impl AnalyticBoundary {
     }
 }
 
+fn absolute_matrix(matrix: DMat4) -> DMat4 {
+    DMat4::from_cols_array(&matrix.to_cols_array().map(f64::abs))
+}
+
 fn point(p: Point3) -> DVec3 {
     DVec3::new(p.x, p.y, p.z)
 }
@@ -514,6 +633,34 @@ mod tests {
         );
         assert_eq!(fallback_name(Some("Part"), "assembly.step"), "assembly");
         assert_eq!(fallback_name(Some("SOLID #2"), "assembly.step"), "assembly");
+    }
+
+    #[test]
+    fn contact_volume_floor_requires_declared_millimetres() {
+        let path =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/interference/touching.step");
+        let text = std::fs::read_to_string(path).unwrap();
+        let exchange = look::step::part21::parse(&text).unwrap();
+        assert!(millimetre_units(&exchange.data[0]));
+        let metres = text.replace(".MILLI.,.METRE.", "$,.METRE.");
+        assert_ne!(metres, text);
+        let exchange = look::step::part21::parse(&metres).unwrap();
+        assert!(!millimetre_units(&exchange.data[0]));
+    }
+
+    #[test]
+    fn cancelled_placements_keep_their_arithmetic_uncertainty() {
+        let forward = DMat4::from_translation(DVec3::splat(1e16));
+        let backward = DMat4::from_translation(DVec3::splat(-1e16));
+        assert_eq!((forward * backward).w_axis, DVec4::W);
+        let operands = absolute_matrix(forward) * absolute_matrix(backward);
+        assert_eq!(operands.w_axis.x, 2e16);
+        let boundary = AnalyticBoundary {
+            source_tolerance: Some(1e-7),
+            points: vec![DVec3::ZERO, DVec3::ONE],
+            ..Default::default()
+        };
+        assert!(boundary.arithmetic_error(operands, DVec3::X, 2) > 1e-7);
     }
 
     #[test]

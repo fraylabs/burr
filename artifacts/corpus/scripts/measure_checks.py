@@ -32,7 +32,7 @@ def main():
     rows = []
     confirmed_true = confirmed_false = positive_contacts = 0
     for file in sorted(list((args.corpus / 'models').glob('*')) + list((args.corpus / 'repros').glob('*.step'))):
-        if not file.is_file():
+        if not file.is_file() or file.suffix.lower() not in ('.step', '.stp'):
             continue
         name = file.name
         before = read(args.before / (name + '.burr.json'))
@@ -95,8 +95,33 @@ def main():
                 result = compare(file, scene, args.after / (name + '.burr.json'),
                                  args.corpus / 'logs' / (name + '.occt.json'), reference_complete=True)
                 row['reference_scope'] = 'full exact pair scan'
+            # Check every newly labelled contact with a fresh exact Common,
+            # rather than relying only on its absence from an older positive list.
+            exact = components(file)
+            if len(exact) == 1 and len(cq.Shape.cast(exact[0][1]).Solids()) > 1:
+                exact = [('solid:' + str(i), solid.wrapped)
+                         for i, solid in enumerate(cq.Shape.cast(exact[0][1]).Solids())]
+            mapping = {r['burr']: r['occt'] for r in result['mapping']}
+            shapes = [cq.Shape.cast(shape) for _, shape in exact]
+            verified_contacts = []
+            for contact in report.get('contact_pairs', []):
+                i, j = sorted(mapping[k] for k in pair(contact))
+                if not all(BRepCheck_Analyzer(shapes[k].wrapped).IsValid() for k in (i, j)):
+                    raise RuntimeError(f'Invalid exact source for contact: {name}: {i}:{j}')
+                common = BRepAlgoAPI_Common(shapes[i].wrapped, shapes[j].wrapped)
+                common.Build()
+                if not common.IsDone() or not BRepCheck_Analyzer(common.Shape()).IsValid():
+                    raise RuntimeError(f'Unverified exact contact: {name}: {i}:{j}')
+                volume = abs(cq.Shape.cast(common.Shape()).Volume())
+                floor = max(1e-6, min(abs(shapes[i].Volume()), abs(shapes[j].Volume())) * 1e-9)
+                if volume > floor:
+                    raise RuntimeError(f'OCCT-positive pair became contact: {name}: {i}:{j}: {volume}')
+                verified_contacts.append(dict(pair=[i, j], volume_mm3=volume, threshold_mm3=floor))
+            result['contact_verifications'] = verified_contacts
             row.update(confirmed_true=len(result['matched_pairs']), confirmed_false=len(result['extra_pairs']),
-                       positive_contacts=len(result['occt_positive_contacts']))
+                       positive_contacts=len(result['occt_positive_contacts']),
+                       occt_positive_unresolved=sum(p['occt_positive'] for p in result['unresolved_pairs']),
+                       contacts_freshly_verified=len(verified_contacts))
             if row['confirmed_true'] != protected[name]['confirmed_true'] or row['confirmed_false'] or row['positive_contacts']:
                 raise RuntimeError(f'Protected accuracy regression: {row}')
             confirmed_true += row['confirmed_true']

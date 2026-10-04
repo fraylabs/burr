@@ -626,7 +626,7 @@ fn contact_pair(
     Some(ContactPair {
         id: format!("{CHECK_ID}:contact:{left_index}:{right_index}"),
         code: "planar_contact",
-        message: format!("{} and {} contact within the STEP source tolerance. Analytic support bounds any shared interior to a depth of {:.3e} and a volume of at most {:.3e} in source units; no interference above that precision is possible.", left.reference.name, right.reference.name, proof.maximum_overlap_depth, proof.maximum_common_volume),
+        message: format!("{} and {} contact within the STEP source tolerance. Analytic support bounds any shared interior to a depth of {:.3e} mm and a volume of at most {:.3e} mm³; no interference above that precision is possible.", left.reference.name, right.reference.name, proof.maximum_overlap_depth, proof.maximum_common_volume),
         components: [left.reference.clone(), right.reference.clone()],
         separating_normal: proof.normal.to_array(),
         signed_gap: proof.gap,
