@@ -134,12 +134,28 @@ impl SourceEvidence {
                 definitions.insert(node.index(), (definitions.len(), boundary));
             }
         }
-        let normalization = DMat4::from_cols(
-            DVec4::X,
-            DVec4::new(0.0, 0.0, -1.0, 0.0),
-            DVec4::Y,
-            DVec4::W,
-        );
+        let normalizations = [
+            (glam::Mat4::IDENTITY, DMat4::IDENTITY),
+            (
+                glam::Mat4::from_rotation_x(-std::f32::consts::FRAC_PI_2),
+                DMat4::from_cols(
+                    DVec4::X,
+                    DVec4::new(0.0, 0.0, -1.0, 0.0),
+                    DVec4::Y,
+                    DVec4::W,
+                ),
+            ),
+            (
+                glam::Mat4::from_rotation_z(std::f32::consts::FRAC_PI_2),
+                DMat4::from_cols(
+                    DVec4::Y,
+                    DVec4::new(-1.0, 0.0, 0.0, 0.0),
+                    DVec4::Z,
+                    DVec4::W,
+                ),
+            ),
+        ];
+        let mut selected_normalization = None;
         let mut occurrences = Vec::new();
         for top in mapped.top_nodes() {
             for path_in_graph in mapped.paths_iter(top.index()) {
@@ -152,10 +168,17 @@ impl SourceEvidence {
                     return None;
                 }
                 let source_world = matrix(&path_in_graph.matrix());
-                let expected = glam::Mat4::from_rotation_x(-std::f32::consts::FRAC_PI_2)
-                    * glam::Mat4::from_cols_array(
-                        &source_world.to_cols_array().map(|value| value as f32),
-                    );
+                let rounded_source = glam::Mat4::from_cols_array(
+                    &source_world.to_cols_array().map(|value| value as f32),
+                );
+                if selected_normalization.is_none() {
+                    selected_normalization = normalizations.iter().copied().find(|(import, _)| {
+                        (*import * rounded_source).to_cols_array()
+                            == instance.transform.to_cols_array()
+                    });
+                }
+                let (import_normalization, normalization) = selected_normalization?;
+                let expected = import_normalization * rounded_source;
                 // Reproduce the importer's actual rounding and multiplication;
                 // matching by a loose placement threshold could attach source
                 // evidence to a different or subsequently moved occurrence.
@@ -658,6 +681,18 @@ mod tests {
         );
         assert_eq!(fallback_name(Some("Part"), "assembly.step"), "assembly");
         assert_eq!(fallback_name(Some("SOLID #2"), "assembly.step"), "assembly");
+    }
+
+    #[test]
+    fn source_names_and_contact_survive_every_supported_up_axis() {
+        let path =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/interference/touching.step");
+        for axis in [UpAxis::X, UpAxis::Y, UpAxis::Z] {
+            let scene = compile_scene(&path, axis, &mut Timings::default()).unwrap();
+            let source = SourceEvidence::read(&path, &scene).unwrap();
+            assert_eq!(source.occurrences[0].name, "fixed");
+            assert!(source.contact(0, 1).is_some());
+        }
     }
 
     #[test]
