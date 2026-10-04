@@ -389,9 +389,13 @@ pub fn generate_html_viewer(
 
         const vao = null; // Each definition owns one VAO and one GPU mesh.
         async function burrLoadMeshes() {{
+            const byGeometry = burrManifest.definitions.map(() => []);
+            for (const occurrence of burrManifest.occurrences)
+                byGeometry[occurrence.geometry].push(occurrence);
+            // Upload one payload at a time to bound transient browser mesh memory.
             for (let geometry = 0; geometry < burrManifest.definitions.length; geometry++) {{
                 const definition = burrManifest.definitions[geometry];
-                const occurrences = burrManifest.occurrences.filter(i => i.geometry === geometry);
+                const occurrences = byGeometry[geometry];
                 if (!occurrences.length) continue;
                 const response = await fetch('/mesh/' + definition.id);
                 if (!response.ok) throw new Error('Could not load mesh: ' + response.status);
@@ -430,9 +434,9 @@ pub fn generate_html_viewer(
                         gl.vertexAttribDivisor(location + column, 1);
                     }}
                 }}
-                if (gl.getError() !== gl.NO_ERROR) throw new Error('The browser could not prepare the model.');
                 burrMeshes.push({{ vao: meshVao, count: definition.indices, instances: occurrences.length, color: definition.color }});
             }}
+            if (gl.getError() !== gl.NO_ERROR) throw new Error('The browser could not prepare the model.');
         }}
 
         const uMVPLoc = gl.getUniformLocation(program, 'uMVP');
