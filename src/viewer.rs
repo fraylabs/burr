@@ -1547,6 +1547,35 @@ gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);
     }
 
     #[test]
+    fn cached_pages_are_shared_while_load_notifications_stream_independently() {
+        let original =
+            "<!doctype html><html><head><title>雪</title></head><body>part</body></html>";
+        let html = Arc::new(original.to_string());
+        let mut cache = ModelCache::default();
+        remember_viewer(&mut cache, "part".into(), html.clone());
+        let cached = memory_viewer(&mut cache, "part").unwrap();
+        assert!(Arc::ptr_eq(&html, &cached));
+        for id in ["load-1", "load-2"] {
+            let mut body = ViewerBody::new(cached.clone(), Some(id)).unwrap();
+            assert!(Arc::ptr_eq(&html, &body.html));
+            let mut bytes = Vec::new();
+            let mut chunk = [0_u8; 7];
+            loop {
+                let count = body.read(&mut chunk).unwrap();
+                if count == 0 {
+                    break;
+                }
+                bytes.extend_from_slice(&chunk[..count]);
+            }
+            assert_eq!(bytes.len(), body.len());
+            let streamed = String::from_utf8(bytes).unwrap();
+            assert!(streamed.contains(&format!("loadId: \"{id}\"")));
+            assert!(streamed.contains("<title>雪</title>"));
+        }
+        assert_eq!(html.as_str(), original);
+    }
+
+    #[test]
     fn viewer_ready_notification_carries_the_specific_load_id() {
         let html = "<!doctype html><html><head></head><body></body></html>".to_string();
         let mut body = ViewerBody::new(Arc::new(html), Some("window-3")).unwrap();

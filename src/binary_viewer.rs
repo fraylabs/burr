@@ -331,6 +331,7 @@ pub fn generate_html_viewer(
         const canvas = document.getElementById('gl-canvas');
         const gl = canvas.getContext('webgl2', {{ antialias: true }});
         if (!gl) throw new Error('WebGL 2.0 is required');
+        canvas.addEventListener('webglcontextlost', () => burrReportViewerError('The browser lost the model display.'));
 
         const vsSource = `#version 300 es
             in vec3 aPosition;
@@ -418,6 +419,7 @@ pub fn generate_html_viewer(
                         gl.vertexAttribDivisor(location + column, 1);
                     }}
                 }}
+                if (gl.getError() !== gl.NO_ERROR) throw new Error('The browser could not prepare the model.');
                 burrMeshes.push({{ vao: meshVao, count: definition.indices, instances: occurrences.length, color: definition.color }});
             }}
         }}
