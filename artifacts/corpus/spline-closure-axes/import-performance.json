@@ -1,0 +1,321 @@
+{
+  "method": "Fresh server and cache; cold HTTP /api/checks request; no viewer requested. All completed printer reports refuse on lost import faces before check preparation. One model at a time under shared build lock. Single observations on shared Mac. Released binaries installed with public one-line installer. Candidate Burr 97b974c / Look 45f1d77, release build.",
+  "measurements": [
+    {
+      "version": "0.37.0",
+      "binary_sha256": "aa1412e955a8c233597a4e4508bfef57785ef154b8a2c9b4e0a5ae8219287009",
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "source_sha256": "523f1848bb424c8f34876c215e2ef854cd0389dc2affbf640691b9c0cc226700",
+      "cap_s": 120,
+      "case": "037-switch",
+      "timeout": false,
+      "seconds": 6.768293416011147,
+      "look_revision": "08735d52d38c3782fa9f2157256bf2aa9f9d1e51",
+      "binary_kind": "public installer release asset",
+      "raw_report_sha256": "c63e6e6d8bca863cd0e3364cda98750916f68f839151e93cbcee176f36a269b3",
+      "outcome": "incomplete",
+      "summary": "Interference check incomplete: 51 of 35873 STEP faces were lost during import",
+      "confirmed_pairs": 0,
+      "checked_pairs": 0
+    },
+    {
+      "version": "0.37.0",
+      "binary_sha256": "aa1412e955a8c233597a4e4508bfef57785ef154b8a2c9b4e0a5ae8219287009",
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "source_sha256": "d5a9d40db82c55eee20203608a5a4e784b54b87ae339861af577c5aeb182d61f",
+      "cap_s": 120,
+      "case": "037-v0",
+      "timeout": false,
+      "seconds": 13.042699459008873,
+      "look_revision": "08735d52d38c3782fa9f2157256bf2aa9f9d1e51",
+      "binary_kind": "public installer release asset",
+      "raw_report_sha256": "15e073b48bd77c976800d0dc7b88dd6a34eb8b4f8ce512dd4a7338361139456e",
+      "outcome": "incomplete",
+      "summary": "Interference check incomplete: STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry; STEP leaf component 'Threaded Inserts (1)' has no definition geometry; 8 of 60543 STEP faces were lost during import",
+      "confirmed_pairs": 0,
+      "checked_pairs": 0
+    },
+    {
+      "version": "0.37.0",
+      "binary_sha256": "aa1412e955a8c233597a4e4508bfef57785ef154b8a2c9b4e0a5ae8219287009",
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "source_sha256": "06b372e40217caa1a7d1f516cb74887247f809e41e1e389f740f290e98441b55",
+      "cap_s": 120,
+      "case": "037-v2",
+      "timeout": false,
+      "seconds": 33.980224082944915,
+      "look_revision": "08735d52d38c3782fa9f2157256bf2aa9f9d1e51",
+      "binary_kind": "public installer release asset",
+      "raw_report_sha256": "73f4da79071ee7c5f345703bed6ce051d37cee4a7cc808303b9df26aa2fa9549",
+      "outcome": "incomplete",
+      "summary": "Interference check incomplete: 34 of 100800 STEP faces were lost during import",
+      "confirmed_pairs": 0,
+      "checked_pairs": 0
+    },
+    {
+      "version": "0.38.0",
+      "binary_sha256": "19674eabff63138a55ffecfc301e09ed1306b68b55134247a484d527b8d471fc",
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "source_sha256": "523f1848bb424c8f34876c215e2ef854cd0389dc2affbf640691b9c0cc226700",
+      "cap_s": 120,
+      "case": "038-switch",
+      "timeout": true,
+      "seconds": null,
+      "look_revision": "d1583a7cb4325ee311dd8cea93dbbce97548e577",
+      "binary_kind": "public installer release asset",
+      "raw_report_sha256": "296ca861665f318b63e6b815553a58a8cbb509b5f0d43d6cb55b3fa42b992bb9"
+    },
+    {
+      "version": "0.38.1",
+      "binary_sha256": "3513ac14fdb523afa4898121e79e74ff4d2817b6912ae3cd0f068134efe72ab2",
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "source_sha256": "523f1848bb424c8f34876c215e2ef854cd0389dc2affbf640691b9c0cc226700",
+      "cap_s": 120,
+      "case": "0381-switch",
+      "timeout": true,
+      "seconds": null,
+      "look_revision": "d1583a7cb4325ee311dd8cea93dbbce97548e577",
+      "binary_kind": "public installer release asset",
+      "raw_report_sha256": "40e5b2b5bfaa4dc267a139b3cdc601433330d7d0aa46c52b5dbd1905450b6c24"
+    },
+    {
+      "version": "0.38.1",
+      "binary_sha256": "3513ac14fdb523afa4898121e79e74ff4d2817b6912ae3cd0f068134efe72ab2",
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "source_sha256": "d5a9d40db82c55eee20203608a5a4e784b54b87ae339861af577c5aeb182d61f",
+      "cap_s": 120,
+      "case": "0381-v0",
+      "timeout": false,
+      "seconds": 13.55678333400283,
+      "look_revision": "d1583a7cb4325ee311dd8cea93dbbce97548e577",
+      "binary_kind": "public installer release asset",
+      "raw_report_sha256": "75cbbf9a39bbc97c05af69ccc9f9c88750d2e6e3fcb3b8cd9273d8e34d8e7ecb",
+      "outcome": "incomplete",
+      "summary": "Interference check incomplete: STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry; STEP leaf component 'Threaded Inserts (1)' has no definition geometry; 6 of 60543 STEP faces were lost during import",
+      "confirmed_pairs": 0,
+      "checked_pairs": 0
+    },
+    {
+      "version": "0.38.1",
+      "binary_sha256": "3513ac14fdb523afa4898121e79e74ff4d2817b6912ae3cd0f068134efe72ab2",
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "source_sha256": "06b372e40217caa1a7d1f516cb74887247f809e41e1e389f740f290e98441b55",
+      "cap_s": 120,
+      "case": "0381-v2",
+      "timeout": false,
+      "seconds": 38.76581699994858,
+      "look_revision": "d1583a7cb4325ee311dd8cea93dbbce97548e577",
+      "binary_kind": "public installer release asset",
+      "raw_report_sha256": "6d09720fc68d7870f424fd6d3e4c804414325831023e58c7e3513a9d6b4d6df8",
+      "outcome": "incomplete",
+      "summary": "Interference check incomplete: 4 of 100800 STEP faces were lost during import",
+      "confirmed_pairs": 0,
+      "checked_pairs": 0
+    },
+    {
+      "version": "0.38.1",
+      "binary_sha256": "1f92a40a314524983e9914eaa0d33f27fcb3f342fc83beba46cf8ae59dd6dabf",
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "source_sha256": "523f1848bb424c8f34876c215e2ef854cd0389dc2affbf640691b9c0cc226700",
+      "cap_s": 120.0,
+      "case": "axis-switch",
+      "timeout": false,
+      "seconds": 7.121324250008911,
+      "look_revision": "45f1d77986a59aef48357c6aa0ad4c5edff28e72",
+      "binary_kind": "locally built release candidate",
+      "raw_report_sha256": "6233e08ccfea3e34685e319cb4a06bbcdb692e70ebfaf17ce09d55816f1bf4b6",
+      "outcome": "incomplete",
+      "summary": "Interference check incomplete: 46 of 35873 STEP faces were lost during import",
+      "confirmed_pairs": 0,
+      "checked_pairs": 0
+    },
+    {
+      "version": "0.38.1",
+      "binary_sha256": "1f92a40a314524983e9914eaa0d33f27fcb3f342fc83beba46cf8ae59dd6dabf",
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "source_sha256": "d5a9d40db82c55eee20203608a5a4e784b54b87ae339861af577c5aeb182d61f",
+      "cap_s": 120.0,
+      "case": "axis-v0",
+      "timeout": false,
+      "seconds": 13.355790583998896,
+      "look_revision": "45f1d77986a59aef48357c6aa0ad4c5edff28e72",
+      "binary_kind": "locally built release candidate",
+      "raw_report_sha256": "b36207763946f77ffbdf4ad67ca4e5432c1687df01940f597ed60a235d784a0d",
+      "outcome": "incomplete",
+      "summary": "Interference check incomplete: STEP leaf component 'Threaded Inserts (1) (1)' has no definition geometry; STEP leaf component 'Threaded Inserts (1)' has no definition geometry; 6 of 60543 STEP faces were lost during import",
+      "confirmed_pairs": 0,
+      "checked_pairs": 0
+    },
+    {
+      "version": "0.38.1",
+      "binary_sha256": "1f92a40a314524983e9914eaa0d33f27fcb3f342fc83beba46cf8ae59dd6dabf",
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "source_sha256": "06b372e40217caa1a7d1f516cb74887247f809e41e1e389f740f290e98441b55",
+      "cap_s": 120.0,
+      "case": "axis-v2",
+      "timeout": false,
+      "seconds": 36.37532633298542,
+      "look_revision": "45f1d77986a59aef48357c6aa0ad4c5edff28e72",
+      "binary_kind": "locally built release candidate",
+      "raw_report_sha256": "4511ae080349b0750f3a73f124db91a79102c642621bab5e7a1c673932394c0c",
+      "outcome": "incomplete",
+      "summary": "Interference check incomplete: 4 of 100800 STEP faces were lost during import",
+      "confirmed_pairs": 0,
+      "checked_pairs": 0
+    }
+  ],
+  "separate_switchwire_stage_run": {
+    "load_s": 7.826530083,
+    "stages_ms": {
+      "compile": 170.453291,
+      "hash": 51.957958,
+      "parse": 7587.637666,
+      "read": 15.697709000000001,
+      "step_parse": 284.08458399999995,
+      "step_table": 450.738375,
+      "step_tessellate": 5717.5726669999995
+    },
+    "step_import": {
+      "declared_faces": 35873,
+      "lost_faces": 46
+    }
+  },
+  "protected_pair_gate": {
+    "models": 10,
+    "true": 64,
+    "false": 0
+  },
+  "bowden_pair_gate": {
+    "scope": "Existing 18 reported-pair OCCT reference; full candidate-pair completeness remains unknown. Fresh candidate report and scene, matched source occurrences.",
+    "true": 9,
+    "false": 0,
+    "formerly_false_now_unresolved": 9,
+    "true_pairs": [
+      [
+        5,
+        14
+      ],
+      [
+        6,
+        16
+      ],
+      [
+        8,
+        17
+      ],
+      [
+        12,
+        28
+      ],
+      [
+        13,
+        28
+      ],
+      [
+        22,
+        24
+      ],
+      [
+        22,
+        25
+      ],
+      [
+        22,
+        27
+      ],
+      [
+        25,
+        26
+      ]
+    ],
+    "formerly_false_pairs": [
+      [
+        3,
+        18
+      ],
+      [
+        4,
+        15
+      ],
+      [
+        6,
+        28
+      ],
+      [
+        7,
+        29
+      ],
+      [
+        8,
+        28
+      ],
+      [
+        9,
+        29
+      ],
+      [
+        10,
+        29
+      ],
+      [
+        11,
+        29
+      ],
+      [
+        22,
+        26
+      ]
+    ]
+  },
+  "topology_gate": {
+    "matched_source_shells": 185,
+    "previously_closed_manifold": 177,
+    "closed_regressions": 0,
+    "scope": "Seven-model source-shell archive only; excludes broader V2.4 audit."
+  },
+  "isolated_counterfactual": {
+    "change": "Restore only source-surface axis flags in place of converted face-specific flags before constructing PolicySurface. All other candidate code unchanged. Private diagnostic hooks restored out of working trees.",
+    "control_seconds": 9.865664375014603,
+    "legacy_flags_timeout_s": 30,
+    "source_face": 639696,
+    "source_surface": 3612,
+    "same_sense": false,
+    "source_closed_axis": "U",
+    "converted_closed_axis": "V",
+    "grid_with_legacy_flags": [
+      17,
+      6933
+    ],
+    "grid_with_correct_flags": [
+      5,
+      5
+    ],
+    "stage": "Tessellation interior grid insertion and trimming after an out-of-native-range ordinary-axis inverse",
+    "division_only_counterfactual_seconds": 7.340376500040293,
+    "diagnostic_binary_sha256": "4a8913efa08025a0b107ea3d6c5febdfbce73bbf9f9f62f015dfe3f41d0a5888"
+  },
+  "known_limitation": {
+    "model": "Voron-2__Voron_2.4r2_Assembly.step",
+    "definition": "Meanwell LRS-200-24 (1)",
+    "source_shell": 1833739,
+    "source_face": 1797059,
+    "before": {
+      "boundary_edges": 0,
+      "non_manifold_edges": 0,
+      "triangles": 4660
+    },
+    "after": {
+      "boundary_edges": 0,
+      "non_manifold_edges": 1,
+      "triangles": 4662
+    },
+    "cause": "Opposite periodic seam-side chords share one physical edge with four incident triangles, before float conversion.",
+    "check_reports_identical": true,
+    "outcome": "incomplete",
+    "lost_faces": 4,
+    "candidate_pairs": 0,
+    "checked_pairs": 0,
+    "confirmed_pairs": 0,
+    "follow_up": "Periodic seam sampling regression and fix in a separate PR."
+  }
+}

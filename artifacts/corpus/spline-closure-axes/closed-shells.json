@@ -1,0 +1,1852 @@
+[
+  {
+    "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+    "source_shell": 4338,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+    "source_shell": 4339,
+    "boundary_before": 29,
+    "boundary_after": 29,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": false,
+    "closed_after": false
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+    "source_shell": 4340,
+    "boundary_before": 240,
+    "boundary_after": 121,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": false,
+    "closed_after": false
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+    "source_shell": 4336,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+    "source_shell": 4337,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 1,
+    "nonmanifold_after": 1,
+    "closed_before": false,
+    "closed_after": false
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51394,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51361,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51333,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51358,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51342,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51423,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51451,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51403,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51352,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51359,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51424,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51406,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51425,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51427,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51407,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51408,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51360,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51409,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51454,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51453,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51348,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51418,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51455,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51421,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51363,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51456,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51405,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51458,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51420,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51452,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51404,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51457,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51419,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51347,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51441,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51442,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51331,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51411,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51428,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51443,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51364,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51444,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51329,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51429,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51445,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51412,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51365,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51332,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51446,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51336,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51430,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51345,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51366,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51426,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51377,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51434,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51378,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51338,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51413,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51367,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51379,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51380,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51334,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51431,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51330,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51381,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51368,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51396,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51435,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51369,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51382,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51447,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51432,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51414,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51370,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51337,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51436,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51383,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51433,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51384,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51385,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51339,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51386,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51371,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51437,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51438,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51335,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51387,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51372,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51388,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51373,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51415,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51439,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51389,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51374,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51353,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51375,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51410,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51416,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51397,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51376,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51390,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51354,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51391,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51417,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51392,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51393,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51448,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51395,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51398,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51440,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51340,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51343,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51399,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51355,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51349,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51344,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51356,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51449,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51362,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51346,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51341,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51350,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51400,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51402,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51357,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51401,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51351,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51422,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "source_shell": 51450,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "source_shell": 16476,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "source_shell": 16480,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "source_shell": 16477,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "source_shell": 16479,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "source_shell": 16481,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "source_shell": 16482,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "source_shell": 16478,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60231,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60211,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60228,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60209,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60207,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60218,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60215,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60208,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60220,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60223,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60224,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60225,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60233,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60226,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60221,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60206,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60222,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60214,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60213,
+    "boundary_before": 24,
+    "boundary_after": 24,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": false,
+    "closed_after": false
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60216,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60210,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60203,
+    "boundary_before": 267,
+    "boundary_after": 295,
+    "nonmanifold_before": 1,
+    "nonmanifold_after": 11,
+    "closed_before": false,
+    "closed_after": false
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60204,
+    "boundary_before": 267,
+    "boundary_after": 295,
+    "nonmanifold_before": 1,
+    "nonmanifold_after": 11,
+    "closed_before": false,
+    "closed_after": false
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60227,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60217,
+    "boundary_before": 84,
+    "boundary_after": 84,
+    "nonmanifold_before": 2,
+    "nonmanifold_after": 2,
+    "closed_before": false,
+    "closed_after": false
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60205,
+    "boundary_before": 291,
+    "boundary_after": 319,
+    "nonmanifold_before": 1,
+    "nonmanifold_after": 11,
+    "closed_before": false,
+    "closed_after": false
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60232,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60234,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60229,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60219,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60235,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60212,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "source_shell": 60230,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "apollo-3d-enclosure__corner__assembly.step",
+    "source_shell": 16204,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "apollo-3d-enclosure__corner__assembly.step",
+    "source_shell": 16,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "apollo-3d-enclosure__flat__assembly.step",
+    "source_shell": 16148,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "apollo-3d-enclosure__flat__assembly.step",
+    "source_shell": 16,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "source_shell": 6050,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "source_shell": 4488,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "source_shell": 115,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "source_shell": 6201,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "source_shell": 5443,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  },
+  {
+    "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "source_shell": 7032,
+    "boundary_before": 0,
+    "boundary_after": 0,
+    "nonmanifold_before": 0,
+    "nonmanifold_after": 0,
+    "closed_before": true,
+    "closed_after": true
+  }
+]
