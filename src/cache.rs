@@ -21,36 +21,47 @@ const MAX_CACHE_ENTRY_BYTES: usize = MAX_VIEWER_HTML_BYTES + 64 * 1024;
 #[derive(Clone, Debug)]
 pub struct ViewerCache {
     root: Option<PathBuf>,
+    session: Arc<Option<tempfile::TempDir>>,
     fallback_meshes: Arc<Mutex<HashSet<String>>>,
 }
 
 impl ViewerCache {
     pub fn from_environment() -> Self {
+        Self::new(cache_root_from_environment())
+    }
+
+    fn new(root: Option<PathBuf>) -> Self {
+        let mut builder = tempfile::Builder::new();
+        builder.prefix("burr-session-");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            builder.permissions(fs::Permissions::from_mode(0o700));
+        }
         Self {
-            root: cache_root_from_environment(),
+            root,
+            session: Arc::new(builder.tempdir().ok()),
             fallback_meshes: Default::default(),
         }
     }
 
     #[cfg(test)]
     pub(crate) fn at(root: PathBuf) -> Self {
-        Self {
-            root: Some(root),
-            fallback_meshes: Default::default(),
-        }
+        Self::new(Some(root))
     }
 
-    fn mesh_root(&self) -> PathBuf {
+    fn mesh_root(&self) -> Option<PathBuf> {
         self.root
-            .clone()
+            .as_ref()
             .map(|root| root.join("meshes-v2"))
-            .unwrap_or_else(Self::session_mesh_root)
+            .or_else(|| self.session_mesh_root())
     }
 
-    fn session_mesh_root() -> PathBuf {
-        std::env::temp_dir()
-            .join(format!("burr-session-{}", std::process::id()))
-            .join("meshes-v2")
+    fn session_mesh_root(&self) -> Option<PathBuf> {
+        self.session
+            .as_ref()
+            .as_ref()
+            .map(|session| session.path().join("meshes-v2"))
     }
 
     pub fn mesh_path(&self, id: &str) -> Option<PathBuf> {
@@ -63,9 +74,9 @@ impl ViewerCache {
         }
         let fallback = self.fallback_meshes.lock().ok()?.contains(id);
         Some(if fallback {
-            Self::session_mesh_root().join(id)
+            self.session_mesh_root()?.join(id)
         } else {
-            self.mesh_root().join(id)
+            self.mesh_root()?.join(id)
         })
     }
 
@@ -74,8 +85,11 @@ impl ViewerCache {
             .duration_since(UNIX_EPOCH)
             .unwrap_or_default()
             .as_nanos();
-        let mut last_error = String::new();
-        for root in [self.mesh_root(), Self::session_mesh_root()] {
+        let mut last_error = "Persistent and temporary storage are unavailable.".to_string();
+        for root in [self.mesh_root(), self.session_mesh_root()]
+            .into_iter()
+            .flatten()
+        {
             let temporary = root.join(format!(".{}.{}.tmp", std::process::id(), nonce));
             let opened = (|| {
                 fs::create_dir_all(&root).map_err(|e| e.to_string())?;
@@ -102,7 +116,10 @@ impl ViewerCache {
     }
 
     pub fn maintain_mesh_cache(&self) {
-        for root in [self.mesh_root(), Self::session_mesh_root()] {
+        for root in [self.mesh_root(), self.session_mesh_root()]
+            .into_iter()
+            .flatten()
+        {
             prune_meshes(&root, MAX_MESH_CACHE_TOTAL_BYTES, MESH_DOWNLOAD_GRACE);
         }
     }
@@ -164,7 +181,7 @@ impl ViewerCache {
                 .fallback_meshes
                 .lock()
                 .map_err(|_| "Local mesh cache became unavailable.".to_string())?;
-            if root != self.mesh_root() {
+            if Some(root) != self.mesh_root() {
                 fallback.insert(id.clone());
             } else {
                 fallback.remove(&id);
@@ -509,6 +526,35 @@ fn secure_file(_path: &Path) -> Result<(), String> {
 mod tests {
     use super::*;
     use tempfile::tempdir;
+
+    #[test]
+    fn fallback_directory_is_unique_shared_and_removed_after_last_clone() {
+        let cache = ViewerCache::new(None);
+        let other = ViewerCache::new(None);
+        let root = cache.session_mesh_root().unwrap();
+        assert_ne!(root, other.session_mesh_root().unwrap());
+        fs::create_dir_all(&root).unwrap();
+        let payload = root.join("a".repeat(64));
+        fs::write(&payload, "mesh").unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            assert_eq!(
+                fs::metadata(root.parent().unwrap())
+                    .unwrap()
+                    .permissions()
+                    .mode()
+                    & 0o777,
+                0o700
+            );
+        }
+        let clone = cache.clone();
+        assert_eq!(clone.mesh_path(&"a".repeat(64)), Some(payload.clone()));
+        drop(cache);
+        assert!(payload.exists());
+        drop(clone);
+        assert!(!root.parent().unwrap().exists());
+    }
 
     #[test]
     fn cache_round_trip_requires_the_exact_key() {
