@@ -420,6 +420,15 @@ mod tests {
     }
 
     #[test]
+    fn curved_mesh_contact_is_not_interference() {
+        // Two valid robot-cover solids: OCCT Common has zero shared volume.
+        let report = report("mesh-contact-pair.step");
+        assert_eq!(report.component_count, 2);
+        assert!(report.findings.is_empty(), "{:?}", report.findings);
+        assert_eq!(report.outcome, CheckOutcome::Pass);
+    }
+
+    #[test]
     fn crossing_assembly_fails_with_component_references() {
         let report = report("intersecting.step");
         assert_eq!(report.outcome, CheckOutcome::Fail);
