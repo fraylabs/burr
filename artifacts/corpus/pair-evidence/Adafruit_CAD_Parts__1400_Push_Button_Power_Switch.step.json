@@ -1,0 +1,1361 @@
+{
+  "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+  "sha256": "60c69cf0b2f1bf5dcb0ef87c7c6b1203a5a94cc60188691d80a1167106554aed",
+  "before": {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "mapping": [
+      {
+        "burr": 0,
+        "occt": 4,
+        "burr_name": "Board",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Board/COMPOUND",
+        "box_error_mm": 7.976771551102431e-07,
+        "alternative_box_error_mm": 1.500918819399603,
+        "surface_sample_error_mm": 7.365475345524672e-07,
+        "source_identity": "board"
+      },
+      {
+        "burr": 1,
+        "occt": 0,
+        "burr_name": "Copper (Bottom)",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Board/Copper (Bottom)",
+        "box_error_mm": 1.2574973600609588e-06,
+        "alternative_box_error_mm": 0.9992319388853683,
+        "surface_sample_error_mm": 6.658545493639679e-07,
+        "source_identity": "copperbottom"
+      },
+      {
+        "burr": 2,
+        "occt": 1,
+        "burr_name": "Copper (Top)",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Board/Copper (Top)",
+        "box_error_mm": 0.00886357565300381,
+        "alternative_box_error_mm": 1.9782447922741606,
+        "surface_sample_error_mm": 8.395126789542252e-07,
+        "source_identity": "coppertop"
+      },
+      {
+        "burr": 3,
+        "occt": 2,
+        "burr_name": "Soldermask (Bottom)",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Board/Soldermask (Bottom)",
+        "box_error_mm": 7.648180621725238e-07,
+        "alternative_box_error_mm": 0.9992316353960351,
+        "surface_sample_error_mm": 1.0536971938520332e-06,
+        "source_identity": "soldermaskbottom"
+      },
+      {
+        "burr": 4,
+        "occt": 3,
+        "burr_name": "Soldermask (Top)",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Board/Soldermask (Top)",
+        "box_error_mm": 8.021115273375943e-07,
+        "alternative_box_error_mm": 1.5009180149671848,
+        "surface_sample_error_mm": 1.0066287123321233e-06,
+        "source_identity": "soldermasktop"
+      },
+      {
+        "burr": 5,
+        "occt": 5,
+        "burr_name": "CHIP-LED0805",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/CHIP-LED0805",
+        "box_error_mm": 4.469838812022687e-07,
+        "alternative_box_error_mm": 7.204379380871234,
+        "surface_sample_error_mm": 3.4700208523480687e-07,
+        "source_identity": "chipled0805"
+      },
+      {
+        "burr": 6,
+        "occt": 6,
+        "burr_name": "B3F-40XX-ROUND-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/B3F-40XX-ROUND-3D",
+        "box_error_mm": 2.6645870128568697e-07,
+        "alternative_box_error_mm": 8.829069978595228,
+        "surface_sample_error_mm": 3.0216465356066963e-07,
+        "source_identity": "b3f40xxround3d"
+      },
+      {
+        "burr": 7,
+        "occt": 7,
+        "burr_name": "C0805-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/C0805-3D",
+        "box_error_mm": 4.6342340483868577e-07,
+        "alternative_box_error_mm": 7.996655973847431,
+        "surface_sample_error_mm": 0.0022960085778031512,
+        "source_identity": "c08053d"
+      },
+      {
+        "burr": 8,
+        "occt": 8,
+        "burr_name": "35746670.f3d ",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/MC14093B-TSSOP14-3D/35746670.f3d ",
+        "box_error_mm": 2.1446417361670878e-07,
+        "alternative_box_error_mm": 8.501172754981146,
+        "surface_sample_error_mm": 1.4229341563928667e-07,
+        "source_identity": "35746670f3d"
+      },
+      {
+        "burr": 9,
+        "occt": 9,
+        "burr_name": "SOT23-WIDE",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/SOT23-WIDE",
+        "box_error_mm": 3.1722810341020465e-07,
+        "alternative_box_error_mm": 8.921338144615685,
+        "surface_sample_error_mm": 2.5401730780477873e-07,
+        "source_identity": "sot23wide"
+      },
+      {
+        "burr": 10,
+        "occt": 10,
+        "burr_name": "SOT23-BEC-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/SOT23-BEC-3D",
+        "box_error_mm": 3.9889175676381637e-07,
+        "alternative_box_error_mm": 5.741904673782277,
+        "surface_sample_error_mm": 2.887657212019351e-07,
+        "source_identity": "sot23bec3d"
+      },
+      {
+        "burr": 11,
+        "occt": 11,
+        "burr_name": "R0805-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/R0805-3D",
+        "box_error_mm": 4.458262892383985e-07,
+        "alternative_box_error_mm": 5.459050367869221,
+        "surface_sample_error_mm": 3.254952439879681e-07,
+        "source_identity": "r08053d"
+      },
+      {
+        "burr": 12,
+        "occt": 12,
+        "burr_name": "R0805-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/R0805-3D",
+        "box_error_mm": 4.885965722759447e-07,
+        "alternative_box_error_mm": 5.741904547440886,
+        "surface_sample_error_mm": 3.6935061483217854e-07,
+        "source_identity": "r08053d"
+      },
+      {
+        "burr": 13,
+        "occt": 13,
+        "burr_name": "R0805-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/R0805-3D",
+        "box_error_mm": 4.7154300894399387e-07,
+        "alternative_box_error_mm": 7.543415167593201,
+        "surface_sample_error_mm": 3.580963207804208e-07,
+        "source_identity": "r08053d"
+      },
+      {
+        "burr": 14,
+        "occt": 14,
+        "burr_name": "R0805-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/R0805-3D",
+        "box_error_mm": 2.6530937689660994e-07,
+        "alternative_box_error_mm": 5.45905053137577,
+        "surface_sample_error_mm": 2.2345419250694164e-07,
+        "source_identity": "r08053d"
+      }
+    ],
+    "exact_pair_count": 11,
+    "confirmed_pair_count": 4,
+    "matched_pairs": [],
+    "extra_pairs": [
+      {
+        "pair": [
+          2,
+          6
+        ],
+        "burr": {
+          "code": "component_interference",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "Soldermask (Bottom)",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:6",
+              "name": "B3F-40XX-ROUND-3D",
+              "occurrence_index": 6
+            }
+          ],
+          "id": "assembly-interference:3:6",
+          "message": "Soldermask (Bottom) overlaps B3F-40XX-ROUND-3D.",
+          "witness": {
+            "kind": "interior_overlap",
+            "point": [
+              -2.0259666442871094,
+              0.05250021858825349,
+              5.064846038818359
+            ]
+          }
+        }
+      },
+      {
+        "pair": [
+          3,
+          6
+        ],
+        "burr": {
+          "code": "component_interference",
+          "components": [
+            {
+              "id": "occurrence:4",
+              "name": "Soldermask (Top)",
+              "occurrence_index": 4
+            },
+            {
+              "id": "occurrence:6",
+              "name": "B3F-40XX-ROUND-3D",
+              "occurrence_index": 6
+            }
+          ],
+          "id": "assembly-interference:4:6",
+          "message": "Soldermask (Top) overlaps B3F-40XX-ROUND-3D.",
+          "witness": {
+            "kind": "interior_overlap",
+            "point": [
+              -2.6715764999389657,
+              1.605000195076166,
+              4.99057459601753
+            ]
+          }
+        }
+      },
+      {
+        "pair": [
+          5,
+          6
+        ],
+        "burr": {
+          "code": "component_interference",
+          "components": [
+            {
+              "id": "occurrence:5",
+              "name": "CHIP-LED0805",
+              "occurrence_index": 5
+            },
+            {
+              "id": "occurrence:6",
+              "name": "B3F-40XX-ROUND-3D",
+              "occurrence_index": 6
+            }
+          ],
+          "id": "assembly-interference:5:6",
+          "message": "CHIP-LED0805 overlaps B3F-40XX-ROUND-3D.",
+          "witness": {
+            "contained_component": "occurrence:5",
+            "kind": "containment",
+            "point": [
+              -0.17320509595876193,
+              -0.2799997518623326,
+              5.7040001276337815
+            ]
+          }
+        }
+      },
+      {
+        "pair": [
+          6,
+          8
+        ],
+        "burr": {
+          "code": "component_interference",
+          "components": [
+            {
+              "id": "occurrence:6",
+              "name": "B3F-40XX-ROUND-3D",
+              "occurrence_index": 6
+            },
+            {
+              "id": "occurrence:8",
+              "name": "35746670.f3d ",
+              "occurrence_index": 8
+            }
+          ],
+          "id": "assembly-interference:6:8",
+          "message": "B3F-40XX-ROUND-3D overlaps 35746670.f3d .",
+          "witness": {
+            "kind": "interior_overlap",
+            "point": [
+              -2.0437500659943146,
+              -0.19999986091821542,
+              3.250000000630308
+            ]
+          }
+        }
+      }
+    ],
+    "missing_pairs": [
+      {
+        "pair": [
+          0,
+          2
+        ],
+        "occt": {
+          "pair": [
+            0,
+            2
+          ],
+          "volume_mm3": 3.0504637803292223,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          0,
+          5
+        ],
+        "occt": {
+          "pair": [
+            0,
+            5
+          ],
+          "volume_mm3": 0.020900885142487266,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          0,
+          7
+        ],
+        "occt": {
+          "pair": [
+            0,
+            7
+          ],
+          "volume_mm3": 0.003859468662172938,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          0,
+          8
+        ],
+        "occt": {
+          "pair": [
+            0,
+            8
+          ],
+          "volume_mm3": 0.035924474319974135,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          0,
+          9
+        ],
+        "occt": {
+          "pair": [
+            0,
+            9
+          ],
+          "volume_mm3": 0.004508884081240355,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          0,
+          10
+        ],
+        "occt": {
+          "pair": [
+            0,
+            10
+          ],
+          "volume_mm3": 0.0014999327601094258,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          0,
+          11
+        ],
+        "occt": {
+          "pair": [
+            0,
+            11
+          ],
+          "volume_mm3": 0.03170300000001802,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          0,
+          12
+        ],
+        "occt": {
+          "pair": [
+            0,
+            12
+          ],
+          "volume_mm3": 0.03170300000001824,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          0,
+          13
+        ],
+        "occt": {
+          "pair": [
+            0,
+            13
+          ],
+          "volume_mm3": 0.0317030000000003,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          0,
+          14
+        ],
+        "occt": {
+          "pair": [
+            0,
+            14
+          ],
+          "volume_mm3": 0.03170300000000006,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          1,
+          3
+        ],
+        "occt": {
+          "pair": [
+            1,
+            3
+          ],
+          "volume_mm3": 1.7755544925535196,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      }
+    ],
+    "unresolved_pairs": []
+  },
+  "after": {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "mapping": [
+      {
+        "burr": 0,
+        "occt": 4,
+        "burr_name": "Board",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Board/COMPOUND",
+        "box_error_mm": 7.976771551102431e-07,
+        "alternative_box_error_mm": 1.500918819399603,
+        "surface_sample_error_mm": 7.365475345524672e-07,
+        "source_identity": "board"
+      },
+      {
+        "burr": 1,
+        "occt": 0,
+        "burr_name": "Copper (Bottom)",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Board/Copper (Bottom)",
+        "box_error_mm": 1.2574973600609588e-06,
+        "alternative_box_error_mm": 0.9992319388853683,
+        "surface_sample_error_mm": 6.658545493639679e-07,
+        "source_identity": "copperbottom"
+      },
+      {
+        "burr": 2,
+        "occt": 1,
+        "burr_name": "Copper (Top)",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Board/Copper (Top)",
+        "box_error_mm": 0.00886357565300381,
+        "alternative_box_error_mm": 1.9782447922741606,
+        "surface_sample_error_mm": 8.395126789542252e-07,
+        "source_identity": "coppertop"
+      },
+      {
+        "burr": 3,
+        "occt": 2,
+        "burr_name": "Soldermask (Bottom)",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Board/Soldermask (Bottom)",
+        "box_error_mm": 7.648180621725238e-07,
+        "alternative_box_error_mm": 0.9992316353960351,
+        "surface_sample_error_mm": 1.0536971938520332e-06,
+        "source_identity": "soldermaskbottom"
+      },
+      {
+        "burr": 4,
+        "occt": 3,
+        "burr_name": "Soldermask (Top)",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Board/Soldermask (Top)",
+        "box_error_mm": 8.021115273375943e-07,
+        "alternative_box_error_mm": 1.5009180149671848,
+        "surface_sample_error_mm": 1.0066287123321233e-06,
+        "source_identity": "soldermasktop"
+      },
+      {
+        "burr": 5,
+        "occt": 5,
+        "burr_name": "CHIP-LED0805",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/CHIP-LED0805",
+        "box_error_mm": 4.469838812022687e-07,
+        "alternative_box_error_mm": 7.204379380871234,
+        "surface_sample_error_mm": 3.4700208523480687e-07,
+        "source_identity": "chipled0805"
+      },
+      {
+        "burr": 6,
+        "occt": 6,
+        "burr_name": "B3F-40XX-ROUND-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/B3F-40XX-ROUND-3D",
+        "box_error_mm": 2.6645870128568697e-07,
+        "alternative_box_error_mm": 8.829069978595228,
+        "surface_sample_error_mm": 3.0216465356066963e-07,
+        "source_identity": "b3f40xxround3d"
+      },
+      {
+        "burr": 7,
+        "occt": 7,
+        "burr_name": "C0805-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/C0805-3D",
+        "box_error_mm": 4.6342340483868577e-07,
+        "alternative_box_error_mm": 7.996655973847431,
+        "surface_sample_error_mm": 0.0022960085778031512,
+        "source_identity": "c08053d"
+      },
+      {
+        "burr": 8,
+        "occt": 8,
+        "burr_name": "35746670.f3d ",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/MC14093B-TSSOP14-3D/35746670.f3d ",
+        "box_error_mm": 2.1446417361670878e-07,
+        "alternative_box_error_mm": 8.501172754981146,
+        "surface_sample_error_mm": 1.4229341563928667e-07,
+        "source_identity": "35746670f3d"
+      },
+      {
+        "burr": 9,
+        "occt": 9,
+        "burr_name": "SOT23-WIDE",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/SOT23-WIDE",
+        "box_error_mm": 3.1722810341020465e-07,
+        "alternative_box_error_mm": 8.921338144615685,
+        "surface_sample_error_mm": 2.5401730780477873e-07,
+        "source_identity": "sot23wide"
+      },
+      {
+        "burr": 10,
+        "occt": 10,
+        "burr_name": "SOT23-BEC-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/SOT23-BEC-3D",
+        "box_error_mm": 3.9889175676381637e-07,
+        "alternative_box_error_mm": 5.741904673782277,
+        "surface_sample_error_mm": 2.887657212019351e-07,
+        "source_identity": "sot23bec3d"
+      },
+      {
+        "burr": 11,
+        "occt": 11,
+        "burr_name": "R0805-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/R0805-3D",
+        "box_error_mm": 4.458262892383985e-07,
+        "alternative_box_error_mm": 5.459050367869221,
+        "surface_sample_error_mm": 3.254952439879681e-07,
+        "source_identity": "r08053d"
+      },
+      {
+        "burr": 12,
+        "occt": 12,
+        "burr_name": "R0805-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/R0805-3D",
+        "box_error_mm": 4.885965722759447e-07,
+        "alternative_box_error_mm": 5.741904547440886,
+        "surface_sample_error_mm": 3.6935061483217854e-07,
+        "source_identity": "r08053d"
+      },
+      {
+        "burr": 13,
+        "occt": 13,
+        "burr_name": "R0805-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/R0805-3D",
+        "box_error_mm": 4.7154300894399387e-07,
+        "alternative_box_error_mm": 7.543415167593201,
+        "surface_sample_error_mm": 3.580963207804208e-07,
+        "source_identity": "r08053d"
+      },
+      {
+        "burr": 14,
+        "occt": 14,
+        "burr_name": "R0805-3D",
+        "occt_name": "1400 Push Button Power Switch v1/Power Switch/Packages/R0805-3D",
+        "box_error_mm": 2.6530937689660994e-07,
+        "alternative_box_error_mm": 5.45905053137577,
+        "surface_sample_error_mm": 2.2345419250694164e-07,
+        "source_identity": "r08053d"
+      }
+    ],
+    "exact_pair_count": 11,
+    "confirmed_pair_count": 10,
+    "matched_pairs": [
+      [
+        0,
+        2
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        0,
+        8
+      ],
+      [
+        0,
+        9
+      ],
+      [
+        0,
+        10
+      ],
+      [
+        0,
+        11
+      ],
+      [
+        0,
+        12
+      ],
+      [
+        0,
+        13
+      ],
+      [
+        0,
+        14
+      ],
+      [
+        1,
+        3
+      ]
+    ],
+    "extra_pairs": [],
+    "missing_pairs": [
+      {
+        "pair": [
+          0,
+          7
+        ],
+        "occt": {
+          "pair": [
+            0,
+            7
+          ],
+          "volume_mm3": 0.003859468662172938,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:1",
+              "name": "Copper (Bottom)",
+              "occurrence_index": 1
+            },
+            {
+              "id": "occurrence:7",
+              "name": "C0805-3D",
+              "occurrence_index": 7
+            }
+          ],
+          "coordinate_error_bound": 1.3683080624105068e-05,
+          "id": "assembly-interference:unresolved:1:7",
+          "message": "Could not resolve Copper (Bottom) against C0805-3D because a tessellated component has an open boundary."
+        }
+      }
+    ],
+    "unresolved_pairs": [
+      {
+        "pair": [
+          0,
+          4
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:0",
+              "name": "Board",
+              "occurrence_index": 0
+            },
+            {
+              "id": "occurrence:1",
+              "name": "Copper (Bottom)",
+              "occurrence_index": 1
+            }
+          ],
+          "coordinate_error_bound": 2.4102210772980487e-05,
+          "id": "assembly-interference:unresolved:0:1",
+          "message": "Board and Copper (Bottom) have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          0,
+          7
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:1",
+              "name": "Copper (Bottom)",
+              "occurrence_index": 1
+            },
+            {
+              "id": "occurrence:7",
+              "name": "C0805-3D",
+              "occurrence_index": 7
+            }
+          ],
+          "coordinate_error_bound": 1.3683080624105068e-05,
+          "id": "assembly-interference:unresolved:1:7",
+          "message": "Could not resolve Copper (Bottom) against C0805-3D because a tessellated component has an open boundary."
+        },
+        "occt_positive": true
+      },
+      {
+        "pair": [
+          1,
+          4
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:0",
+              "name": "Board",
+              "occurrence_index": 0
+            },
+            {
+              "id": "occurrence:2",
+              "name": "Copper (Top)",
+              "occurrence_index": 2
+            }
+          ],
+          "coordinate_error_bound": 2.4102210772980487e-05,
+          "id": "assembly-interference:unresolved:0:2",
+          "message": "Board and Copper (Top) have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          1,
+          6
+        ],
+        "burr": {
+          "code": "below_tessellation_resolution",
+          "components": [
+            {
+              "id": "occurrence:2",
+              "name": "Copper (Top)",
+              "occurrence_index": 2
+            },
+            {
+              "id": "occurrence:6",
+              "name": "B3F-40XX-ROUND-3D",
+              "occurrence_index": 6
+            }
+          ],
+          "coordinate_error_bound": 1.5889840506919723e-05,
+          "id": "assembly-interference:unresolved:2:6",
+          "mesh_witness": {
+            "end": [
+              -3.0000000183106,
+              1.6224996819435444,
+              -6.025825903205681
+            ],
+            "kind": "surface_crossing",
+            "start": [
+              -2.9998105119474605,
+              1.6224996819635429,
+              -6.025368394452496
+            ]
+          },
+          "message": "Copper (Top) and B3F-40XX-ROUND-3D have only a crossing interval below the mesh sampling resolution; no reliable positive volume was proven.",
+          "tessellation_probe_resolution": 0.04464083131468768
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          4
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:0",
+              "name": "Board",
+              "occurrence_index": 0
+            },
+            {
+              "id": "occurrence:3",
+              "name": "Soldermask (Bottom)",
+              "occurrence_index": 3
+            }
+          ],
+          "coordinate_error_bound": 2.4223327272920886e-05,
+          "id": "assembly-interference:unresolved:0:3",
+          "message": "Board and Soldermask (Bottom) have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          5
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "Soldermask (Bottom)",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:5",
+              "name": "CHIP-LED0805",
+              "occurrence_index": 5
+            }
+          ],
+          "coordinate_error_bound": 1.4177036644153867e-05,
+          "id": "assembly-interference:unresolved:3:5",
+          "message": "Soldermask (Bottom) and CHIP-LED0805 have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          8
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "Soldermask (Bottom)",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:8",
+              "name": "35746670.f3d ",
+              "occurrence_index": 8
+            }
+          ],
+          "coordinate_error_bound": 1.3720010669947946e-05,
+          "id": "assembly-interference:unresolved:3:8",
+          "message": "Soldermask (Bottom) and 35746670.f3d  have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          9
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "Soldermask (Bottom)",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:9",
+              "name": "SOT23-WIDE",
+              "occurrence_index": 9
+            }
+          ],
+          "coordinate_error_bound": 1.4115230011356969e-05,
+          "id": "assembly-interference:unresolved:3:9",
+          "message": "Soldermask (Bottom) and SOT23-WIDE have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          10
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "Soldermask (Bottom)",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:10",
+              "name": "SOT23-BEC-3D",
+              "occurrence_index": 10
+            }
+          ],
+          "coordinate_error_bound": 1.4103144892144617e-05,
+          "id": "assembly-interference:unresolved:3:10",
+          "message": "Soldermask (Bottom) and SOT23-BEC-3D have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          11
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "Soldermask (Bottom)",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:11",
+              "name": "R0805-3D",
+              "occurrence_index": 11
+            }
+          ],
+          "coordinate_error_bound": 1.4115255594295658e-05,
+          "id": "assembly-interference:unresolved:3:11",
+          "message": "Soldermask (Bottom) and R0805-3D have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          12
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "Soldermask (Bottom)",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:12",
+              "name": "R0805-3D",
+              "occurrence_index": 12
+            }
+          ],
+          "coordinate_error_bound": 1.4115255594295658e-05,
+          "id": "assembly-interference:unresolved:3:12",
+          "message": "Soldermask (Bottom) and R0805-3D have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          13
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "Soldermask (Bottom)",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:13",
+              "name": "R0805-3D",
+              "occurrence_index": 13
+            }
+          ],
+          "coordinate_error_bound": 1.4115255594295658e-05,
+          "id": "assembly-interference:unresolved:3:13",
+          "message": "Soldermask (Bottom) and R0805-3D have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          14
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "Soldermask (Bottom)",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:14",
+              "name": "R0805-3D",
+              "occurrence_index": 14
+            }
+          ],
+          "coordinate_error_bound": 1.3873022367041185e-05,
+          "id": "assembly-interference:unresolved:3:14",
+          "message": "Soldermask (Bottom) and R0805-3D have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          3,
+          4
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:0",
+              "name": "Board",
+              "occurrence_index": 0
+            },
+            {
+              "id": "occurrence:4",
+              "name": "Soldermask (Top)",
+              "occurrence_index": 4
+            }
+          ],
+          "coordinate_error_bound": 2.4223327272920886e-05,
+          "id": "assembly-interference:unresolved:0:4",
+          "message": "Board and Soldermask (Top) have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          6,
+          7
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:6",
+              "name": "B3F-40XX-ROUND-3D",
+              "occurrence_index": 6
+            },
+            {
+              "id": "occurrence:7",
+              "name": "C0805-3D",
+              "occurrence_index": 7
+            }
+          ],
+          "coordinate_error_bound": 5.591826857984701e-06,
+          "id": "assembly-interference:unresolved:6:7",
+          "message": "Could not resolve B3F-40XX-ROUND-3D against C0805-3D because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      }
+    ]
+  },
+  "after_report": {
+    "candidate_pair_count": 37,
+    "check_id": "assembly-interference",
+    "checked_pair_count": 105,
+    "component_count": 15,
+    "findings": [
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Copper (Bottom)",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:3",
+            "name": "Soldermask (Bottom)",
+            "occurrence_index": 3
+          }
+        ],
+        "id": "assembly-interference:1:3",
+        "message": "Copper (Bottom) overlaps Soldermask (Bottom).",
+        "witness": {
+          "contained_component": "occurrence:1",
+          "kind": "containment",
+          "point": [
+            0.4700002670288086,
+            0.019687654080917355,
+            3.5550003066100606
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Copper (Bottom)",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:5",
+            "name": "CHIP-LED0805",
+            "occurrence_index": 5
+          }
+        ],
+        "id": "assembly-interference:1:5",
+        "message": "Copper (Bottom) overlaps CHIP-LED0805.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -0.6000003814697266,
+            -0.01749975704979785,
+            5.629000428398543
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Copper (Bottom)",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:8",
+            "name": "35746670.f3d ",
+            "occurrence_index": 8
+          }
+        ],
+        "id": "assembly-interference:1:8",
+        "message": "Copper (Bottom) overlaps 35746670.f3d .",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -2.0100002288818346,
+            -0.017500143578690782,
+            -3.2137498824992847
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Copper (Bottom)",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:9",
+            "name": "SOT23-WIDE",
+            "occurrence_index": 9
+          }
+        ],
+        "id": "assembly-interference:1:9",
+        "message": "Copper (Bottom) overlaps SOT23-WIDE.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            4.308999697367351,
+            -0.017500174041865588,
+            -3.9106661448080424
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Copper (Bottom)",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:10",
+            "name": "SOT23-BEC-3D",
+            "occurrence_index": 10
+          }
+        ],
+        "id": "assembly-interference:1:10",
+        "message": "Copper (Bottom) overlaps SOT23-BEC-3D.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -6.2966664632161455,
+            -0.01750015738784992,
+            -3.529666579683531
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Copper (Bottom)",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:11",
+            "name": "R0805-3D",
+            "occurrence_index": 11
+          }
+        ],
+        "id": "assembly-interference:1:11",
+        "message": "Copper (Bottom) overlaps R0805-3D.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -4.986249923706055,
+            -0.01749973864730498,
+            6.0500004322132375
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Copper (Bottom)",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:12",
+            "name": "R0805-3D",
+            "occurrence_index": 12
+          }
+        ],
+        "id": "assembly-interference:1:12",
+        "message": "Copper (Bottom) overlaps R0805-3D.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -5.334000587463379,
+            -0.017500293781938448,
+            -6.6499996154704775
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Copper (Bottom)",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:13",
+            "name": "R0805-3D",
+            "occurrence_index": 13
+          }
+        ],
+        "id": "assembly-interference:1:13",
+        "message": "Copper (Bottom) overlaps R0805-3D.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -0.0937499999999999,
+            -0.017500293781936342,
+            -6.6499996154704775
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Copper (Bottom)",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:14",
+            "name": "R0805-3D",
+            "occurrence_index": 14
+          }
+        ],
+        "id": "assembly-interference:1:14",
+        "message": "Copper (Bottom) overlaps R0805-3D.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -5.633999824523926,
+            -0.017499896172220364,
+            2.446250441749981
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:2",
+            "name": "Copper (Top)",
+            "occurrence_index": 2
+          },
+          {
+            "id": "occurrence:4",
+            "name": "Soldermask (Top)",
+            "occurrence_index": 4
+          }
+        ],
+        "id": "assembly-interference:2:4",
+        "message": "Copper (Top) overlaps Soldermask (Top).",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -9.756893157958984,
+            1.5874997698847657,
+            -4.010556221008303
+          ]
+        }
+      }
+    ],
+    "incomplete_reasons": [
+      {
+        "code": "open_component_mesh",
+        "message": "Could not prove a clean result because these tessellated components do not form closed solids: C0805-3D."
+      },
+      {
+        "code": "below_coordinate_resolution",
+        "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+      },
+      {
+        "code": "below_tessellation_resolution",
+        "message": "Some crossing intervals are below the nominal mesh sampling scale. See the unresolved component pairs."
+      }
+    ],
+    "model_path": "models/Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "model_version": "e98a846e5255e6faef1e35d635feb700280ddc027afdaa626ab7bb786c47dcee",
+    "outcome": "fail",
+    "pair_set_complete": false,
+    "schema_version": "burr.checks.v1",
+    "summary": "10 interfering component pairs detected; 15 component pairs unresolved"
+  }
+}

@@ -1,0 +1,3831 @@
+{
+  "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+  "sha256": "729e55f6794448f7b17a120aaec1aaedaa74518537e9e96a20b2f675b743bedb",
+  "before": {
+    "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "mapping": [
+      {
+        "burr": 0,
+        "occt": 21,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 2.4620992408005185e-05,
+        "alternative_box_error_mm": 2.9051881470937233,
+        "surface_sample_error_mm": 2.0990459858081716e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 1,
+        "occt": 38,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.004915172184281245,
+        "alternative_box_error_mm": 2.488924979571756,
+        "surface_sample_error_mm": 1.8870601917318753e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 2,
+        "occt": 6,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.006160926329875363,
+        "alternative_box_error_mm": 2.490004446910846,
+        "surface_sample_error_mm": 2.033358768078681e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 3,
+        "occt": 1,
+        "burr_name": "MMP.01.00.00.002 Cover flange_00",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/MMP.01.00.00.002 Cover flange_00",
+        "box_error_mm": 0.0051157253555037694,
+        "alternative_box_error_mm": 409.02126871604884,
+        "surface_sample_error_mm": 2.0397439747444135e-05,
+        "source_identity": "mmp010000002coverflange00"
+      },
+      {
+        "burr": 4,
+        "occt": 42,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.5594077830020944e-05,
+        "alternative_box_error_mm": 2.9698657443947365,
+        "surface_sample_error_mm": 2.063681968589199e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 5,
+        "occt": 22,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.9120023990033918e-05,
+        "alternative_box_error_mm": 2.9051881470525607,
+        "surface_sample_error_mm": 1.5652450397856745e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 6,
+        "occt": 46,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 2.4620992336151488e-05,
+        "alternative_box_error_mm": 2.9051881470937233,
+        "surface_sample_error_mm": 1.8450045577451977e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 7,
+        "occt": 7,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.07735273444858e-05,
+        "alternative_box_error_mm": 2.48596359779697,
+        "surface_sample_error_mm": 1.5375046209544737e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 8,
+        "occt": 49,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003953061538902316,
+        "alternative_box_error_mm": 6.183766304114668,
+        "surface_sample_error_mm": 1.3834373909555033e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 9,
+        "occt": 16,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.758955060579822e-05,
+        "alternative_box_error_mm": 2.969865744335657,
+        "surface_sample_error_mm": 1.2433936867579662e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 10,
+        "occt": 3,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957636908485026,
+        "alternative_box_error_mm": 6.18376662723966,
+        "surface_sample_error_mm": 1.7564609845568904e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 11,
+        "occt": 47,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.9120023921607025e-05,
+        "alternative_box_error_mm": 2.9051881470525607,
+        "surface_sample_error_mm": 1.8330577303703637e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 12,
+        "occt": 14,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.006160252246330159,
+        "alternative_box_error_mm": 2.490003564340198,
+        "surface_sample_error_mm": 1.6257744076795923e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 13,
+        "occt": 44,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.0357758858177734e-05,
+        "alternative_box_error_mm": 2.9698657443529406,
+        "surface_sample_error_mm": 1.4907301970490278e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 14,
+        "occt": 25,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957636908460654,
+        "alternative_box_error_mm": 6.183766627240215,
+        "surface_sample_error_mm": 1.7397486114421584e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 15,
+        "occt": 34,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.077352567650277e-05,
+        "alternative_box_error_mm": 2.485963597797505,
+        "surface_sample_error_mm": 1.7723419570714743e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 16,
+        "occt": 23,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.9120014355841236e-05,
+        "alternative_box_error_mm": 2.905188147053312,
+        "surface_sample_error_mm": 1.099695399253218e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 17,
+        "occt": 31,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.004902367258398542,
+        "alternative_box_error_mm": 2.4889249543178398,
+        "surface_sample_error_mm": 2.0333587704174822e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 18,
+        "occt": 28,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957636908485167,
+        "alternative_box_error_mm": 6.1837666272396925,
+        "surface_sample_error_mm": 1.6850718782427397e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 19,
+        "occt": 5,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.5594078750064215e-05,
+        "alternative_box_error_mm": 2.9698657443932897,
+        "surface_sample_error_mm": 1.8658798469135967e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 20,
+        "occt": 36,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.3817413441732396e-05,
+        "alternative_box_error_mm": 2.4859635977486323,
+        "surface_sample_error_mm": 1.051042036673176e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 21,
+        "occt": 30,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.5594078765379106e-05,
+        "alternative_box_error_mm": 2.9698657443932897,
+        "surface_sample_error_mm": 1.8594146781200027e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 22,
+        "occt": 13,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.006161817816802548,
+        "alternative_box_error_mm": 2.4900044491162445,
+        "surface_sample_error_mm": 1.7041154100369213e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 23,
+        "occt": 33,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 9.266868664368425e-06,
+        "alternative_box_error_mm": 2.485963597727674,
+        "surface_sample_error_mm": 6.5455406889575865e-06,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 24,
+        "occt": 24,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003953061538902312,
+        "alternative_box_error_mm": 6.183766304114636,
+        "surface_sample_error_mm": 1.3876531146738058e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 25,
+        "occt": 27,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957606509097379,
+        "alternative_box_error_mm": 6.18376662722027,
+        "surface_sample_error_mm": 1.423557155413689e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 26,
+        "occt": 19,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.0357758858177734e-05,
+        "alternative_box_error_mm": 2.9698657443529406,
+        "surface_sample_error_mm": 1.5025075801122094e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 27,
+        "occt": 40,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.004906263303170118,
+        "alternative_box_error_mm": 2.4889258432790045,
+        "surface_sample_error_mm": 1.5460996272745472e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 28,
+        "occt": 8,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 9.266868664368425e-06,
+        "alternative_box_error_mm": 2.485963597727674,
+        "surface_sample_error_mm": 6.545538036809134e-06,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 29,
+        "occt": 41,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.758955060579822e-05,
+        "alternative_box_error_mm": 2.969865744335657,
+        "surface_sample_error_mm": 1.2433938263737717e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 30,
+        "occt": 26,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957606509147829,
+        "alternative_box_error_mm": 6.183766627220597,
+        "surface_sample_error_mm": 1.3689644133865577e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 31,
+        "occt": 2,
+        "burr_name": "MMP.01.00.00.002 Cover flange_00",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/MMP.01.00.00.002 Cover flange_00",
+        "box_error_mm": 0.005116084906528442,
+        "alternative_box_error_mm": 409.0212664130416,
+        "surface_sample_error_mm": 1.6934350768860912e-05,
+        "source_identity": "mmp010000002coverflange00"
+      },
+      {
+        "burr": 32,
+        "occt": 45,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.4120226564279728e-05,
+        "alternative_box_error_mm": 2.90518562321156,
+        "surface_sample_error_mm": 1.616967229303132e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 33,
+        "occt": 12,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.0061599567865147494,
+        "alternative_box_error_mm": 2.4900053254141032,
+        "surface_sample_error_mm": 1.2466041939132948e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 34,
+        "occt": 51,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957606509147746,
+        "alternative_box_error_mm": 6.183766627220628,
+        "surface_sample_error_mm": 1.4635000275000195e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 35,
+        "occt": 11,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.3817413441732396e-05,
+        "alternative_box_error_mm": 2.4859635977486323,
+        "surface_sample_error_mm": 1.0676806033430189e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 36,
+        "occt": 32,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.0773527363354553e-05,
+        "alternative_box_error_mm": 2.48596359779697,
+        "surface_sample_error_mm": 1.529652183192691e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 37,
+        "occt": 17,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.5594077830020944e-05,
+        "alternative_box_error_mm": 2.9698657443947365,
+        "surface_sample_error_mm": 1.8594145878678913e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 38,
+        "occt": 39,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.004914774237046343,
+        "alternative_box_error_mm": 2.488925860070299,
+        "surface_sample_error_mm": 1.7016918249389846e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 39,
+        "occt": 15,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.006159685285694291,
+        "alternative_box_error_mm": 2.490003562937932,
+        "surface_sample_error_mm": 1.546099626557406e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 40,
+        "occt": 52,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957606509097461,
+        "alternative_box_error_mm": 6.183766627220302,
+        "surface_sample_error_mm": 1.368962516220825e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 41,
+        "occt": 0,
+        "burr_name": "MMP.01.00.00.001 Cover_00",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/MMP.01.00.00.001 Cover_00",
+        "box_error_mm": 0.0017588218024424786,
+        "alternative_box_error_mm": 634.5062576272816,
+        "surface_sample_error_mm": 1.6981454252923683e-05,
+        "source_identity": "mmp010000001cover00"
+      },
+      {
+        "burr": 42,
+        "occt": 29,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 2.4620997176969816e-05,
+        "alternative_box_error_mm": 2.90518814709485,
+        "surface_sample_error_mm": 2.2098589093271662e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 43,
+        "occt": 35,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.3817430260202178e-05,
+        "alternative_box_error_mm": 2.4859635977489893,
+        "surface_sample_error_mm": 1.067681241878536e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 44,
+        "occt": 48,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.912001432143725e-05,
+        "alternative_box_error_mm": 2.905188147053312,
+        "surface_sample_error_mm": 1.782822621887637e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 45,
+        "occt": 20,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.4120226638039762e-05,
+        "alternative_box_error_mm": 2.90518562321156,
+        "surface_sample_error_mm": 6.762493916269224e-06,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 46,
+        "occt": 4,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 2.4620997248823513e-05,
+        "alternative_box_error_mm": 2.90518814709485,
+        "surface_sample_error_mm": 1.7317417404867723e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 47,
+        "occt": 37,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.004910501019222551,
+        "alternative_box_error_mm": 2.488926292278009,
+        "surface_sample_error_mm": 1.2524908048116568e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 48,
+        "occt": 18,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.035777058013737e-05,
+        "alternative_box_error_mm": 2.9698657443538248,
+        "surface_sample_error_mm": 1.4907310599864086e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 49,
+        "occt": 10,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.3817430260202178e-05,
+        "alternative_box_error_mm": 2.4859635977489893,
+        "surface_sample_error_mm": 1.0510432308989114e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 50,
+        "occt": 43,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.035777058013737e-05,
+        "alternative_box_error_mm": 2.9698657443538248,
+        "surface_sample_error_mm": 1.5025080546370034e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 51,
+        "occt": 9,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.077352567650277e-05,
+        "alternative_box_error_mm": 2.485963597797505,
+        "surface_sample_error_mm": 1.529652037193973e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 52,
+        "occt": 50,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957636908460671,
+        "alternative_box_error_mm": 6.183766627240248,
+        "surface_sample_error_mm": 1.764741940428051e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      }
+    ],
+    "exact_pair_count": 22,
+    "confirmed_pair_count": 17,
+    "matched_pairs": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        32
+      ],
+      [
+        1,
+        33
+      ],
+      [
+        1,
+        34
+      ],
+      [
+        1,
+        35
+      ],
+      [
+        1,
+        36
+      ],
+      [
+        2,
+        7
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        2,
+        9
+      ],
+      [
+        2,
+        10
+      ],
+      [
+        2,
+        11
+      ]
+    ],
+    "extra_pairs": [
+      {
+        "pair": [
+          4,
+          6
+        ],
+        "burr": {
+          "code": "component_interference",
+          "components": [
+            {
+              "id": "occurrence:2",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 2
+            },
+            {
+              "id": "occurrence:46",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 46
+            }
+          ],
+          "id": "assembly-interference:2:46",
+          "message": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 overlaps \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C.",
+          "witness": {
+            "contained_component": "occurrence:2",
+            "kind": "containment",
+            "point": [
+              -317.45001220703125,
+              22.285591046982375,
+              -250.52085102864214
+            ]
+          }
+        }
+      },
+      {
+        "pair": [
+          12,
+          20
+        ],
+        "burr": {
+          "code": "component_interference",
+          "components": [
+            {
+              "id": "occurrence:33",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 33
+            },
+            {
+              "id": "occurrence:45",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 45
+            }
+          ],
+          "id": "assembly-interference:33:45",
+          "message": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 overlaps \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C.",
+          "witness": {
+            "contained_component": "occurrence:33",
+            "kind": "containment",
+            "point": [
+              -317.45001220703125,
+              52.28560249107417,
+              -1.5234625545280007
+            ]
+          }
+        }
+      },
+      {
+        "pair": [
+          13,
+          21
+        ],
+        "burr": {
+          "code": "component_interference",
+          "components": [
+            {
+              "id": "occurrence:0",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 0
+            },
+            {
+              "id": "occurrence:22",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 22
+            }
+          ],
+          "id": "assembly-interference:0:22",
+          "message": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C overlaps \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70.",
+          "witness": {
+            "kind": "interior_overlap",
+            "point": [
+              -317.4500060081482,
+              21.887001909618927,
+              246.6858598206309
+            ]
+          }
+        }
+      },
+      {
+        "pair": [
+          14,
+          22
+        ],
+        "burr": {
+          "code": "component_interference",
+          "components": [
+            {
+              "id": "occurrence:5",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 5
+            },
+            {
+              "id": "occurrence:12",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 12
+            }
+          ],
+          "id": "assembly-interference:5:12",
+          "message": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C overlaps \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70.",
+          "witness": {
+            "kind": "interior_overlap",
+            "point": [
+              -317.45000600814825,
+              51.88699809492167,
+              147.68846907356058
+            ]
+          }
+        }
+      },
+      {
+        "pair": [
+          15,
+          23
+        ],
+        "burr": {
+          "code": "component_interference",
+          "components": [
+            {
+              "id": "occurrence:16",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 16
+            },
+            {
+              "id": "occurrence:39",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 39
+            }
+          ],
+          "id": "assembly-interference:16:39",
+          "message": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C overlaps \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70.",
+          "witness": {
+            "kind": "interior_overlap",
+            "point": [
+              -317.4500060081482,
+              51.886982836132596,
+              -152.3115309264394
+            ]
+          }
+        }
+      }
+    ],
+    "missing_pairs": [
+      {
+        "pair": [
+          3,
+          4
+        ],
+        "occt": {
+          "pair": [
+            3,
+            4
+          ],
+          "volume_mm3": 4.762140007038463,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          20,
+          24
+        ],
+        "occt": {
+          "pair": [
+            20,
+            24
+          ],
+          "volume_mm3": 4.762140007038463,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          21,
+          25
+        ],
+        "occt": {
+          "pair": [
+            21,
+            25
+          ],
+          "volume_mm3": 4.762140007038452,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          22,
+          26
+        ],
+        "occt": {
+          "pair": [
+            22,
+            26
+          ],
+          "volume_mm3": 4.762140007038449,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          23,
+          27
+        ],
+        "occt": {
+          "pair": [
+            23,
+            27
+          ],
+          "volume_mm3": 4.762140007038451,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          28,
+          29
+        ],
+        "occt": {
+          "pair": [
+            28,
+            29
+          ],
+          "volume_mm3": 4.762140007038452,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          45,
+          49
+        ],
+        "occt": {
+          "pair": [
+            45,
+            49
+          ],
+          "volume_mm3": 4.762140007038465,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          46,
+          50
+        ],
+        "occt": {
+          "pair": [
+            46,
+            50
+          ],
+          "volume_mm3": 4.762140007038458,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          47,
+          51
+        ],
+        "occt": {
+          "pair": [
+            47,
+            51
+          ],
+          "volume_mm3": 4.762140007038458,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      },
+      {
+        "pair": [
+          48,
+          52
+        ],
+        "occt": {
+          "pair": [
+            48,
+            52
+          ],
+          "volume_mm3": 4.76214000703845,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": null
+      }
+    ],
+    "unresolved_pairs": []
+  },
+  "after": {
+    "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "mapping": [
+      {
+        "burr": 0,
+        "occt": 21,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 2.4620992408005185e-05,
+        "alternative_box_error_mm": 2.9051881470937233,
+        "surface_sample_error_mm": 2.0990459858081716e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 1,
+        "occt": 38,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.004915172184281245,
+        "alternative_box_error_mm": 2.488924979571756,
+        "surface_sample_error_mm": 1.8870601917318753e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 2,
+        "occt": 6,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.006160926329875363,
+        "alternative_box_error_mm": 2.490004446910846,
+        "surface_sample_error_mm": 2.033358768078681e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 3,
+        "occt": 1,
+        "burr_name": "MMP.01.00.00.002 Cover flange_00",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/MMP.01.00.00.002 Cover flange_00",
+        "box_error_mm": 0.0051157253555037694,
+        "alternative_box_error_mm": 409.02126871604884,
+        "surface_sample_error_mm": 2.0397439747444135e-05,
+        "source_identity": "mmp010000002coverflange00"
+      },
+      {
+        "burr": 4,
+        "occt": 42,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.5594077830020944e-05,
+        "alternative_box_error_mm": 2.9698657443947365,
+        "surface_sample_error_mm": 2.063681968589199e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 5,
+        "occt": 22,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.9120023990033918e-05,
+        "alternative_box_error_mm": 2.9051881470525607,
+        "surface_sample_error_mm": 1.5652450397856745e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 6,
+        "occt": 46,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 2.4620992336151488e-05,
+        "alternative_box_error_mm": 2.9051881470937233,
+        "surface_sample_error_mm": 1.8450045577451977e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 7,
+        "occt": 7,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.07735273444858e-05,
+        "alternative_box_error_mm": 2.48596359779697,
+        "surface_sample_error_mm": 1.5375046209544737e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 8,
+        "occt": 49,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003953061538902316,
+        "alternative_box_error_mm": 6.183766304114668,
+        "surface_sample_error_mm": 1.3834373909555033e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 9,
+        "occt": 16,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.758955060579822e-05,
+        "alternative_box_error_mm": 2.969865744335657,
+        "surface_sample_error_mm": 1.2433936867579662e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 10,
+        "occt": 3,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957636908485026,
+        "alternative_box_error_mm": 6.18376662723966,
+        "surface_sample_error_mm": 1.7564609845568904e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 11,
+        "occt": 47,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.9120023921607025e-05,
+        "alternative_box_error_mm": 2.9051881470525607,
+        "surface_sample_error_mm": 1.8330577303703637e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 12,
+        "occt": 14,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.006160252246330159,
+        "alternative_box_error_mm": 2.490003564340198,
+        "surface_sample_error_mm": 1.6257744076795923e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 13,
+        "occt": 44,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.0357758858177734e-05,
+        "alternative_box_error_mm": 2.9698657443529406,
+        "surface_sample_error_mm": 1.4907301970490278e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 14,
+        "occt": 25,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957636908460654,
+        "alternative_box_error_mm": 6.183766627240215,
+        "surface_sample_error_mm": 1.7397486114421584e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 15,
+        "occt": 34,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.077352567650277e-05,
+        "alternative_box_error_mm": 2.485963597797505,
+        "surface_sample_error_mm": 1.7723419570714743e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 16,
+        "occt": 23,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.9120014355841236e-05,
+        "alternative_box_error_mm": 2.905188147053312,
+        "surface_sample_error_mm": 1.099695399253218e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 17,
+        "occt": 31,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.004902367258398542,
+        "alternative_box_error_mm": 2.4889249543178398,
+        "surface_sample_error_mm": 2.0333587704174822e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 18,
+        "occt": 28,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957636908485167,
+        "alternative_box_error_mm": 6.1837666272396925,
+        "surface_sample_error_mm": 1.6850718782427397e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 19,
+        "occt": 5,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.5594078750064215e-05,
+        "alternative_box_error_mm": 2.9698657443932897,
+        "surface_sample_error_mm": 1.8658798469135967e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 20,
+        "occt": 36,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.3817413441732396e-05,
+        "alternative_box_error_mm": 2.4859635977486323,
+        "surface_sample_error_mm": 1.051042036673176e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 21,
+        "occt": 30,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.5594078765379106e-05,
+        "alternative_box_error_mm": 2.9698657443932897,
+        "surface_sample_error_mm": 1.8594146781200027e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 22,
+        "occt": 13,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.006161817816802548,
+        "alternative_box_error_mm": 2.4900044491162445,
+        "surface_sample_error_mm": 1.7041154100369213e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 23,
+        "occt": 33,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 9.266868664368425e-06,
+        "alternative_box_error_mm": 2.485963597727674,
+        "surface_sample_error_mm": 6.5455406889575865e-06,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 24,
+        "occt": 24,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003953061538902312,
+        "alternative_box_error_mm": 6.183766304114636,
+        "surface_sample_error_mm": 1.3876531146738058e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 25,
+        "occt": 27,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957606509097379,
+        "alternative_box_error_mm": 6.18376662722027,
+        "surface_sample_error_mm": 1.423557155413689e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 26,
+        "occt": 19,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.0357758858177734e-05,
+        "alternative_box_error_mm": 2.9698657443529406,
+        "surface_sample_error_mm": 1.5025075801122094e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 27,
+        "occt": 40,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.004906263303170118,
+        "alternative_box_error_mm": 2.4889258432790045,
+        "surface_sample_error_mm": 1.5460996272745472e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 28,
+        "occt": 8,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 9.266868664368425e-06,
+        "alternative_box_error_mm": 2.485963597727674,
+        "surface_sample_error_mm": 6.545538036809134e-06,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 29,
+        "occt": 41,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.758955060579822e-05,
+        "alternative_box_error_mm": 2.969865744335657,
+        "surface_sample_error_mm": 1.2433938263737717e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 30,
+        "occt": 26,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957606509147829,
+        "alternative_box_error_mm": 6.183766627220597,
+        "surface_sample_error_mm": 1.3689644133865577e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 31,
+        "occt": 2,
+        "burr_name": "MMP.01.00.00.002 Cover flange_00",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/MMP.01.00.00.002 Cover flange_00",
+        "box_error_mm": 0.005116084906528442,
+        "alternative_box_error_mm": 409.0212664130416,
+        "surface_sample_error_mm": 1.6934350768860912e-05,
+        "source_identity": "mmp010000002coverflange00"
+      },
+      {
+        "burr": 32,
+        "occt": 45,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.4120226564279728e-05,
+        "alternative_box_error_mm": 2.90518562321156,
+        "surface_sample_error_mm": 1.616967229303132e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 33,
+        "occt": 12,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.0061599567865147494,
+        "alternative_box_error_mm": 2.4900053254141032,
+        "surface_sample_error_mm": 1.2466041939132948e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 34,
+        "occt": 51,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957606509147746,
+        "alternative_box_error_mm": 6.183766627220628,
+        "surface_sample_error_mm": 1.4635000275000195e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 35,
+        "occt": 11,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.3817413441732396e-05,
+        "alternative_box_error_mm": 2.4859635977486323,
+        "surface_sample_error_mm": 1.0676806033430189e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 36,
+        "occt": 32,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.0773527363354553e-05,
+        "alternative_box_error_mm": 2.48596359779697,
+        "surface_sample_error_mm": 1.529652183192691e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 37,
+        "occt": 17,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.5594077830020944e-05,
+        "alternative_box_error_mm": 2.9698657443947365,
+        "surface_sample_error_mm": 1.8594145878678913e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 38,
+        "occt": 39,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.004914774237046343,
+        "alternative_box_error_mm": 2.488925860070299,
+        "surface_sample_error_mm": 1.7016918249389846e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 39,
+        "occt": 15,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.006159685285694291,
+        "alternative_box_error_mm": 2.490003562937932,
+        "surface_sample_error_mm": 1.546099626557406e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 40,
+        "occt": 52,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957606509097461,
+        "alternative_box_error_mm": 6.183766627220302,
+        "surface_sample_error_mm": 1.368962516220825e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      },
+      {
+        "burr": 41,
+        "occt": 0,
+        "burr_name": "MMP.01.00.00.001 Cover_00",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/MMP.01.00.00.001 Cover_00",
+        "box_error_mm": 0.0017588218024424786,
+        "alternative_box_error_mm": 634.5062576272816,
+        "surface_sample_error_mm": 1.6981454252923683e-05,
+        "source_identity": "mmp010000001cover00"
+      },
+      {
+        "burr": 42,
+        "occt": 29,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 2.4620997176969816e-05,
+        "alternative_box_error_mm": 2.90518814709485,
+        "surface_sample_error_mm": 2.2098589093271662e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 43,
+        "occt": 35,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.3817430260202178e-05,
+        "alternative_box_error_mm": 2.4859635977489893,
+        "surface_sample_error_mm": 1.067681241878536e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 44,
+        "occt": 48,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.912001432143725e-05,
+        "alternative_box_error_mm": 2.905188147053312,
+        "surface_sample_error_mm": 1.782822621887637e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 45,
+        "occt": 20,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 1.4120226638039762e-05,
+        "alternative_box_error_mm": 2.90518562321156,
+        "surface_sample_error_mm": 6.762493916269224e-06,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 46,
+        "occt": 4,
+        "burr_name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0120\uaae0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+        "box_error_mm": 2.4620997248823513e-05,
+        "alternative_box_error_mm": 2.90518814709485,
+        "surface_sample_error_mm": 1.7317417404867723e-05,
+        "source_identity": "din934hexagonnutiso4032m3dc"
+      },
+      {
+        "burr": 47,
+        "occt": 37,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 7980 (\ud803\udc73\u7a6d\ue87f)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+        "box_error_mm": 0.004910501019222551,
+        "alternative_box_error_mm": 2.488926292278009,
+        "surface_sample_error_mm": 1.2524908048116568e-05,
+        "source_identity": "din79803640270"
+      },
+      {
+        "burr": 48,
+        "occt": 18,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.035777058013737e-05,
+        "alternative_box_error_mm": 2.9698657443538248,
+        "surface_sample_error_mm": 1.4907310599864086e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 49,
+        "occt": 10,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 1.3817430260202178e-05,
+        "alternative_box_error_mm": 2.4859635977489893,
+        "surface_sample_error_mm": 1.0510432308989114e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 50,
+        "occt": 43,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.035777058013737e-05,
+        "alternative_box_error_mm": 2.9698657443538248,
+        "surface_sample_error_mm": 1.5025080546370034e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 51,
+        "occt": 9,
+        "burr_name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u0660\ua8a0 DIN 125_Washer DIN 125 - A 3.2",
+        "box_error_mm": 2.077352567650277e-05,
+        "alternative_box_error_mm": 2.485963597797505,
+        "surface_sample_error_mm": 1.529652037193973e-05,
+        "source_identity": "din125washerdin125a32"
+      },
+      {
+        "burr": 52,
+        "occt": 50,
+        "burr_name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "occt_name": "MMP.01.00.00.000 Cover assembly/\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+        "box_error_mm": 0.003957636908460671,
+        "alternative_box_error_mm": 6.183766627240248,
+        "surface_sample_error_mm": 1.764741940428051e-05,
+        "source_identity": "din7985iso7045m3x8z8c"
+      }
+    ],
+    "exact_pair_count": 22,
+    "confirmed_pair_count": 12,
+    "matched_pairs": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        32
+      ],
+      [
+        1,
+        33
+      ],
+      [
+        1,
+        34
+      ],
+      [
+        1,
+        35
+      ],
+      [
+        1,
+        36
+      ],
+      [
+        2,
+        7
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        2,
+        9
+      ],
+      [
+        2,
+        10
+      ],
+      [
+        2,
+        11
+      ]
+    ],
+    "extra_pairs": [],
+    "missing_pairs": [
+      {
+        "pair": [
+          3,
+          4
+        ],
+        "occt": {
+          "pair": [
+            3,
+            4
+          ],
+          "volume_mm3": 4.762140007038463,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:10",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 10
+            },
+            {
+              "id": "occurrence:46",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 46
+            }
+          ],
+          "coordinate_error_bound": 0.00015715126652973206,
+          "id": "assembly-interference:unresolved:10:46",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C because a tessellated component has an open boundary."
+        }
+      },
+      {
+        "pair": [
+          20,
+          24
+        ],
+        "occt": {
+          "pair": [
+            20,
+            24
+          ],
+          "volume_mm3": 4.762140007038463,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:24",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 24
+            },
+            {
+              "id": "occurrence:45",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 45
+            }
+          ],
+          "coordinate_error_bound": 0.00015715126652973206,
+          "id": "assembly-interference:unresolved:24:45",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C because a tessellated component has an open boundary."
+        }
+      },
+      {
+        "pair": [
+          21,
+          25
+        ],
+        "occt": {
+          "pair": [
+            21,
+            25
+          ],
+          "volume_mm3": 4.762140007038452,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:0",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 0
+            },
+            {
+              "id": "occurrence:14",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 14
+            }
+          ],
+          "coordinate_error_bound": 0.00015715126652973206,
+          "id": "assembly-interference:unresolved:0:14",
+          "message": "Could not resolve \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        }
+      },
+      {
+        "pair": [
+          22,
+          26
+        ],
+        "occt": {
+          "pair": [
+            22,
+            26
+          ],
+          "volume_mm3": 4.762140007038449,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:5",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 5
+            },
+            {
+              "id": "occurrence:30",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 30
+            }
+          ],
+          "coordinate_error_bound": 0.00015715126652973206,
+          "id": "assembly-interference:unresolved:5:30",
+          "message": "Could not resolve \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        }
+      },
+      {
+        "pair": [
+          23,
+          27
+        ],
+        "occt": {
+          "pair": [
+            23,
+            27
+          ],
+          "volume_mm3": 4.762140007038451,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:16",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 16
+            },
+            {
+              "id": "occurrence:25",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 25
+            }
+          ],
+          "coordinate_error_bound": 0.00015715126652973206,
+          "id": "assembly-interference:unresolved:16:25",
+          "message": "Could not resolve \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        }
+      },
+      {
+        "pair": [
+          28,
+          29
+        ],
+        "occt": {
+          "pair": [
+            28,
+            29
+          ],
+          "volume_mm3": 4.762140007038452,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:18",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 18
+            },
+            {
+              "id": "occurrence:42",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 42
+            }
+          ],
+          "coordinate_error_bound": 0.00015657906339507983,
+          "id": "assembly-interference:unresolved:18:42",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C because a tessellated component has an open boundary."
+        }
+      },
+      {
+        "pair": [
+          45,
+          49
+        ],
+        "occt": {
+          "pair": [
+            45,
+            49
+          ],
+          "volume_mm3": 4.762140007038465,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:8",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 8
+            },
+            {
+              "id": "occurrence:32",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 32
+            }
+          ],
+          "coordinate_error_bound": 0.00015657906339507983,
+          "id": "assembly-interference:unresolved:8:32",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C because a tessellated component has an open boundary."
+        }
+      },
+      {
+        "pair": [
+          46,
+          50
+        ],
+        "occt": {
+          "pair": [
+            46,
+            50
+          ],
+          "volume_mm3": 4.762140007038458,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:6",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 6
+            },
+            {
+              "id": "occurrence:52",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 52
+            }
+          ],
+          "coordinate_error_bound": 0.00015657906339507983,
+          "id": "assembly-interference:unresolved:6:52",
+          "message": "Could not resolve \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        }
+      },
+      {
+        "pair": [
+          47,
+          51
+        ],
+        "occt": {
+          "pair": [
+            47,
+            51
+          ],
+          "volume_mm3": 4.762140007038458,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:11",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 11
+            },
+            {
+              "id": "occurrence:34",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 34
+            }
+          ],
+          "coordinate_error_bound": 0.00015657906339507983,
+          "id": "assembly-interference:unresolved:11:34",
+          "message": "Could not resolve \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        }
+      },
+      {
+        "pair": [
+          48,
+          52
+        ],
+        "occt": {
+          "pair": [
+            48,
+            52
+          ],
+          "volume_mm3": 4.76214000703845,
+          "threshold_mm3": 1e-06
+        },
+        "unresolved": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:40",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 40
+            },
+            {
+              "id": "occurrence:44",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 44
+            }
+          ],
+          "coordinate_error_bound": 0.00015657906339507983,
+          "id": "assembly-interference:unresolved:40:44",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C because a tessellated component has an open boundary."
+        }
+      }
+    ],
+    "unresolved_pairs": [
+      {
+        "pair": [
+          0,
+          3
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:10",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 10
+            },
+            {
+              "id": "occurrence:41",
+              "name": "MMP.01.00.00.001 Cover_00",
+              "occurrence_index": 41
+            }
+          ],
+          "coordinate_error_bound": 0.00024006665010086202,
+          "id": "assembly-interference:unresolved:10:41",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.001 Cover_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          0,
+          24
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:24",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 24
+            },
+            {
+              "id": "occurrence:41",
+              "name": "MMP.01.00.00.001 Cover_00",
+              "occurrence_index": 41
+            }
+          ],
+          "coordinate_error_bound": 0.00024006665010086202,
+          "id": "assembly-interference:unresolved:24:41",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.001 Cover_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          0,
+          25
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:14",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 14
+            },
+            {
+              "id": "occurrence:41",
+              "name": "MMP.01.00.00.001 Cover_00",
+              "occurrence_index": 41
+            }
+          ],
+          "coordinate_error_bound": 0.00024006665010086202,
+          "id": "assembly-interference:unresolved:14:41",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.001 Cover_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          0,
+          26
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:30",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 30
+            },
+            {
+              "id": "occurrence:41",
+              "name": "MMP.01.00.00.001 Cover_00",
+              "occurrence_index": 41
+            }
+          ],
+          "coordinate_error_bound": 0.00024006665010086202,
+          "id": "assembly-interference:unresolved:30:41",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.001 Cover_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          0,
+          27
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:25",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 25
+            },
+            {
+              "id": "occurrence:41",
+              "name": "MMP.01.00.00.001 Cover_00",
+              "occurrence_index": 41
+            }
+          ],
+          "coordinate_error_bound": 0.00024006665010086202,
+          "id": "assembly-interference:unresolved:25:41",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.001 Cover_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          0,
+          28
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:18",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 18
+            },
+            {
+              "id": "occurrence:41",
+              "name": "MMP.01.00.00.001 Cover_00",
+              "occurrence_index": 41
+            }
+          ],
+          "coordinate_error_bound": 0.00024006665010086202,
+          "id": "assembly-interference:unresolved:18:41",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.001 Cover_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          0,
+          49
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:8",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 8
+            },
+            {
+              "id": "occurrence:41",
+              "name": "MMP.01.00.00.001 Cover_00",
+              "occurrence_index": 41
+            }
+          ],
+          "coordinate_error_bound": 0.00024006665010086202,
+          "id": "assembly-interference:unresolved:8:41",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.001 Cover_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          0,
+          50
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:41",
+              "name": "MMP.01.00.00.001 Cover_00",
+              "occurrence_index": 41
+            },
+            {
+              "id": "occurrence:52",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 52
+            }
+          ],
+          "coordinate_error_bound": 0.00024006665010086202,
+          "id": "assembly-interference:unresolved:41:52",
+          "message": "Could not resolve MMP.01.00.00.001 Cover_00 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          0,
+          51
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:34",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 34
+            },
+            {
+              "id": "occurrence:41",
+              "name": "MMP.01.00.00.001 Cover_00",
+              "occurrence_index": 41
+            }
+          ],
+          "coordinate_error_bound": 0.00024006665010086202,
+          "id": "assembly-interference:unresolved:34:41",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.001 Cover_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          0,
+          52
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:40",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 40
+            },
+            {
+              "id": "occurrence:41",
+              "name": "MMP.01.00.00.001 Cover_00",
+              "occurrence_index": 41
+            }
+          ],
+          "coordinate_error_bound": 0.00024006665010086202,
+          "id": "assembly-interference:unresolved:40:41",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.001 Cover_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          1,
+          28
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "MMP.01.00.00.002 Cover flange_00",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:18",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 18
+            }
+          ],
+          "coordinate_error_bound": 0.0002632333736334035,
+          "id": "assembly-interference:unresolved:3:18",
+          "message": "Could not resolve MMP.01.00.00.002 Cover flange_00 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          1,
+          49
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "MMP.01.00.00.002 Cover flange_00",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:8",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 8
+            }
+          ],
+          "coordinate_error_bound": 0.0002632333736334035,
+          "id": "assembly-interference:unresolved:3:8",
+          "message": "Could not resolve MMP.01.00.00.002 Cover flange_00 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          1,
+          50
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "MMP.01.00.00.002 Cover flange_00",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:52",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 52
+            }
+          ],
+          "coordinate_error_bound": 0.0002632333736334035,
+          "id": "assembly-interference:unresolved:3:52",
+          "message": "Could not resolve MMP.01.00.00.002 Cover flange_00 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          1,
+          51
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "MMP.01.00.00.002 Cover flange_00",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:34",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 34
+            }
+          ],
+          "coordinate_error_bound": 0.0002632333736334035,
+          "id": "assembly-interference:unresolved:3:34",
+          "message": "Could not resolve MMP.01.00.00.002 Cover flange_00 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          1,
+          52
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "MMP.01.00.00.002 Cover flange_00",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:40",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 40
+            }
+          ],
+          "coordinate_error_bound": 0.0002632333736334035,
+          "id": "assembly-interference:unresolved:3:40",
+          "message": "Could not resolve MMP.01.00.00.002 Cover flange_00 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          3
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:10",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 10
+            },
+            {
+              "id": "occurrence:31",
+              "name": "MMP.01.00.00.002 Cover flange_00",
+              "occurrence_index": 31
+            }
+          ],
+          "coordinate_error_bound": 0.0002632333736334035,
+          "id": "assembly-interference:unresolved:10:31",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.002 Cover flange_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          24
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:24",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 24
+            },
+            {
+              "id": "occurrence:31",
+              "name": "MMP.01.00.00.002 Cover flange_00",
+              "occurrence_index": 31
+            }
+          ],
+          "coordinate_error_bound": 0.0002632333736334035,
+          "id": "assembly-interference:unresolved:24:31",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.002 Cover flange_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          25
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:14",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 14
+            },
+            {
+              "id": "occurrence:31",
+              "name": "MMP.01.00.00.002 Cover flange_00",
+              "occurrence_index": 31
+            }
+          ],
+          "coordinate_error_bound": 0.0002632333736334035,
+          "id": "assembly-interference:unresolved:14:31",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.002 Cover flange_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          26
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:30",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 30
+            },
+            {
+              "id": "occurrence:31",
+              "name": "MMP.01.00.00.002 Cover flange_00",
+              "occurrence_index": 31
+            }
+          ],
+          "coordinate_error_bound": 0.0002632333736334035,
+          "id": "assembly-interference:unresolved:30:31",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.002 Cover flange_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          27
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:25",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 25
+            },
+            {
+              "id": "occurrence:31",
+              "name": "MMP.01.00.00.002 Cover flange_00",
+              "occurrence_index": 31
+            }
+          ],
+          "coordinate_error_bound": 0.0002632333736334035,
+          "id": "assembly-interference:unresolved:25:31",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against MMP.01.00.00.002 Cover flange_00 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          3,
+          4
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:10",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 10
+            },
+            {
+              "id": "occurrence:46",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 46
+            }
+          ],
+          "coordinate_error_bound": 0.00015715126652973206,
+          "id": "assembly-interference:unresolved:10:46",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C because a tessellated component has an open boundary."
+        },
+        "occt_positive": true
+      },
+      {
+        "pair": [
+          3,
+          5
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:10",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 10
+            },
+            {
+              "id": "occurrence:19",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 19
+            }
+          ],
+          "coordinate_error_bound": 0.00015596328336561153,
+          "id": "assembly-interference:unresolved:10:19",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          3,
+          6
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:2",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 2
+            },
+            {
+              "id": "occurrence:10",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 10
+            }
+          ],
+          "coordinate_error_bound": 0.00015617737305842,
+          "id": "assembly-interference:unresolved:2:10",
+          "message": "Could not resolve \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          3,
+          7
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:7",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 7
+            },
+            {
+              "id": "occurrence:10",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 10
+            }
+          ],
+          "coordinate_error_bound": 0.00015646396383691634,
+          "id": "assembly-interference:unresolved:7:10",
+          "message": "Could not resolve \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          4,
+          6
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:2",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 2
+            },
+            {
+              "id": "occurrence:46",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 46
+            }
+          ],
+          "coordinate_error_bound": 0.00015480412938372512,
+          "id": "assembly-interference:unresolved:2:46",
+          "mesh_witness": {
+            "contained_component": "occurrence:2",
+            "kind": "containment",
+            "point": [
+              -317.45001220703125,
+              22.285591046982375,
+              -250.52085102864214
+            ]
+          },
+          "message": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 and \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          8,
+          24
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:24",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 24
+            },
+            {
+              "id": "occurrence:28",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 28
+            }
+          ],
+          "coordinate_error_bound": 0.00015646396383691634,
+          "id": "assembly-interference:unresolved:24:28",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          9,
+          25
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:14",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 14
+            },
+            {
+              "id": "occurrence:51",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 51
+            }
+          ],
+          "coordinate_error_bound": 0.00015646396383691634,
+          "id": "assembly-interference:unresolved:14:51",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          10,
+          26
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:30",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 30
+            },
+            {
+              "id": "occurrence:49",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 49
+            }
+          ],
+          "coordinate_error_bound": 0.00015646396383691634,
+          "id": "assembly-interference:unresolved:30:49",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          11,
+          27
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:25",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 25
+            },
+            {
+              "id": "occurrence:35",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 35
+            }
+          ],
+          "coordinate_error_bound": 0.00015646396383691634,
+          "id": "assembly-interference:unresolved:25:35",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          12,
+          20
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:33",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 33
+            },
+            {
+              "id": "occurrence:45",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 45
+            }
+          ],
+          "coordinate_error_bound": 0.00015480412938372512,
+          "id": "assembly-interference:unresolved:33:45",
+          "mesh_witness": {
+            "contained_component": "occurrence:33",
+            "kind": "containment",
+            "point": [
+              -317.45001220703125,
+              52.28560249107417,
+              -1.5234625545280007
+            ]
+          },
+          "message": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 and \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          12,
+          24
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:24",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 24
+            },
+            {
+              "id": "occurrence:33",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 33
+            }
+          ],
+          "coordinate_error_bound": 0.00015617737305842,
+          "id": "assembly-interference:unresolved:24:33",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          13,
+          21
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:0",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 0
+            },
+            {
+              "id": "occurrence:22",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 22
+            }
+          ],
+          "coordinate_error_bound": 0.00015480412938372512,
+          "id": "assembly-interference:unresolved:0:22",
+          "mesh_witness": {
+            "kind": "interior_overlap",
+            "point": [
+              -317.4500060081482,
+              21.887001909618927,
+              246.6858598206309
+            ]
+          },
+          "message": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C and \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          13,
+          25
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:14",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 14
+            },
+            {
+              "id": "occurrence:22",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 22
+            }
+          ],
+          "coordinate_error_bound": 0.00015617737305842,
+          "id": "assembly-interference:unresolved:14:22",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          14,
+          22
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:5",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 5
+            },
+            {
+              "id": "occurrence:12",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 12
+            }
+          ],
+          "coordinate_error_bound": 0.00015480412938372512,
+          "id": "assembly-interference:unresolved:5:12",
+          "mesh_witness": {
+            "kind": "interior_overlap",
+            "point": [
+              -317.45000600814825,
+              51.88699809492167,
+              147.68846907356058
+            ]
+          },
+          "message": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C and \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          14,
+          26
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:12",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 12
+            },
+            {
+              "id": "occurrence:30",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 30
+            }
+          ],
+          "coordinate_error_bound": 0.00015617737305842,
+          "id": "assembly-interference:unresolved:12:30",
+          "message": "Could not resolve \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          15,
+          23
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:16",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 16
+            },
+            {
+              "id": "occurrence:39",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 39
+            }
+          ],
+          "coordinate_error_bound": 0.00015480412938372512,
+          "id": "assembly-interference:unresolved:16:39",
+          "mesh_witness": {
+            "kind": "interior_overlap",
+            "point": [
+              -317.4500060081482,
+              51.886982836132596,
+              -152.3115309264394
+            ]
+          },
+          "message": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C and \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          15,
+          27
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:25",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 25
+            },
+            {
+              "id": "occurrence:39",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 39
+            }
+          ],
+          "coordinate_error_bound": 0.00015617737305842,
+          "id": "assembly-interference:unresolved:25:39",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          16,
+          24
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:9",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 9
+            },
+            {
+              "id": "occurrence:24",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 24
+            }
+          ],
+          "coordinate_error_bound": 0.00015596328336561153,
+          "id": "assembly-interference:unresolved:9:24",
+          "message": "Could not resolve \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          17,
+          25
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:14",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 14
+            },
+            {
+              "id": "occurrence:37",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 37
+            }
+          ],
+          "coordinate_error_bound": 0.00015596328336561153,
+          "id": "assembly-interference:unresolved:14:37",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          18,
+          26
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:30",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 30
+            },
+            {
+              "id": "occurrence:48",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 48
+            }
+          ],
+          "coordinate_error_bound": 0.00015596328336561153,
+          "id": "assembly-interference:unresolved:30:48",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          19,
+          27
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:25",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 25
+            },
+            {
+              "id": "occurrence:26",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 26
+            }
+          ],
+          "coordinate_error_bound": 0.00015596328336561153,
+          "id": "assembly-interference:unresolved:25:26",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          20,
+          24
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:24",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 24
+            },
+            {
+              "id": "occurrence:45",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 45
+            }
+          ],
+          "coordinate_error_bound": 0.00015715126652973206,
+          "id": "assembly-interference:unresolved:24:45",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C because a tessellated component has an open boundary."
+        },
+        "occt_positive": true
+      },
+      {
+        "pair": [
+          21,
+          25
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:0",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 0
+            },
+            {
+              "id": "occurrence:14",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 14
+            }
+          ],
+          "coordinate_error_bound": 0.00015715126652973206,
+          "id": "assembly-interference:unresolved:0:14",
+          "message": "Could not resolve \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": true
+      },
+      {
+        "pair": [
+          22,
+          26
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:5",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 5
+            },
+            {
+              "id": "occurrence:30",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 30
+            }
+          ],
+          "coordinate_error_bound": 0.00015715126652973206,
+          "id": "assembly-interference:unresolved:5:30",
+          "message": "Could not resolve \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": true
+      },
+      {
+        "pair": [
+          23,
+          27
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:16",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 16
+            },
+            {
+              "id": "occurrence:25",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 25
+            }
+          ],
+          "coordinate_error_bound": 0.00015715126652973206,
+          "id": "assembly-interference:unresolved:16:25",
+          "message": "Could not resolve \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": true
+      },
+      {
+        "pair": [
+          28,
+          29
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:18",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 18
+            },
+            {
+              "id": "occurrence:42",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 42
+            }
+          ],
+          "coordinate_error_bound": 0.00015657906339507983,
+          "id": "assembly-interference:unresolved:18:42",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C because a tessellated component has an open boundary."
+        },
+        "occt_positive": true
+      },
+      {
+        "pair": [
+          28,
+          30
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:18",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 18
+            },
+            {
+              "id": "occurrence:21",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 21
+            }
+          ],
+          "coordinate_error_bound": 0.00015596328336561153,
+          "id": "assembly-interference:unresolved:18:21",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          28,
+          31
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:17",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 17
+            },
+            {
+              "id": "occurrence:18",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 18
+            }
+          ],
+          "coordinate_error_bound": 0.00015617737305842,
+          "id": "assembly-interference:unresolved:17:18",
+          "message": "Could not resolve \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          28,
+          32
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:18",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 18
+            },
+            {
+              "id": "occurrence:36",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 36
+            }
+          ],
+          "coordinate_error_bound": 0.00015646396383691634,
+          "id": "assembly-interference:unresolved:18:36",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          33,
+          49
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:8",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 8
+            },
+            {
+              "id": "occurrence:23",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 23
+            }
+          ],
+          "coordinate_error_bound": 0.00015646396383691634,
+          "id": "assembly-interference:unresolved:8:23",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          34,
+          50
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:15",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 15
+            },
+            {
+              "id": "occurrence:52",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 52
+            }
+          ],
+          "coordinate_error_bound": 0.00015646396383691634,
+          "id": "assembly-interference:unresolved:15:52",
+          "message": "Could not resolve \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          35,
+          51
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:34",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 34
+            },
+            {
+              "id": "occurrence:43",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 43
+            }
+          ],
+          "coordinate_error_bound": 0.00015646396383691634,
+          "id": "assembly-interference:unresolved:34:43",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          36,
+          52
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:20",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 20
+            },
+            {
+              "id": "occurrence:40",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 40
+            }
+          ],
+          "coordinate_error_bound": 0.00015646396383691634,
+          "id": "assembly-interference:unresolved:20:40",
+          "message": "Could not resolve \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          37,
+          49
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:8",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 8
+            },
+            {
+              "id": "occurrence:47",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 47
+            }
+          ],
+          "coordinate_error_bound": 0.00015617737305842,
+          "id": "assembly-interference:unresolved:8:47",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          38,
+          50
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:1",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 1
+            },
+            {
+              "id": "occurrence:52",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 52
+            }
+          ],
+          "coordinate_error_bound": 0.00015617737305842,
+          "id": "assembly-interference:unresolved:1:52",
+          "message": "Could not resolve \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          39,
+          51
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:34",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 34
+            },
+            {
+              "id": "occurrence:38",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 38
+            }
+          ],
+          "coordinate_error_bound": 0.00015617737305842,
+          "id": "assembly-interference:unresolved:34:38",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          40,
+          52
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:27",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70",
+              "occurrence_index": 27
+            },
+            {
+              "id": "occurrence:40",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 40
+            }
+          ],
+          "coordinate_error_bound": 0.00015617737305842,
+          "id": "assembly-interference:unresolved:27:40",
+          "message": "Could not resolve \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 7980 (\u00ef\u00f0\u00f3\u00e6\u00e8\u00ed\u00ed\u00e0\u00ff)_\u0098\u00a0\u00a9\u00a1\u00a0 3 \u0083\u008e\u0091\u0092 6402-70 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          41,
+          49
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:8",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 8
+            },
+            {
+              "id": "occurrence:29",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 29
+            }
+          ],
+          "coordinate_error_bound": 0.00015596328336561153,
+          "id": "assembly-interference:unresolved:8:29",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          42,
+          50
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:4",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 4
+            },
+            {
+              "id": "occurrence:52",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 52
+            }
+          ],
+          "coordinate_error_bound": 0.00015596328336561153,
+          "id": "assembly-interference:unresolved:4:52",
+          "message": "Could not resolve \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          43,
+          51
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:34",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 34
+            },
+            {
+              "id": "occurrence:50",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 50
+            }
+          ],
+          "coordinate_error_bound": 0.00015596328336561153,
+          "id": "assembly-interference:unresolved:34:50",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          44,
+          52
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:13",
+              "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+              "occurrence_index": 13
+            },
+            {
+              "id": "occurrence:40",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 40
+            }
+          ],
+          "coordinate_error_bound": 0.00015596328336561153,
+          "id": "assembly-interference:unresolved:13:40",
+          "message": "Could not resolve \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          45,
+          49
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:8",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 8
+            },
+            {
+              "id": "occurrence:32",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 32
+            }
+          ],
+          "coordinate_error_bound": 0.00015657906339507983,
+          "id": "assembly-interference:unresolved:8:32",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C because a tessellated component has an open boundary."
+        },
+        "occt_positive": true
+      },
+      {
+        "pair": [
+          46,
+          50
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:6",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 6
+            },
+            {
+              "id": "occurrence:52",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 52
+            }
+          ],
+          "coordinate_error_bound": 0.00015657906339507983,
+          "id": "assembly-interference:unresolved:6:52",
+          "message": "Could not resolve \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": true
+      },
+      {
+        "pair": [
+          47,
+          51
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:11",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 11
+            },
+            {
+              "id": "occurrence:34",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 34
+            }
+          ],
+          "coordinate_error_bound": 0.00015657906339507983,
+          "id": "assembly-interference:unresolved:11:34",
+          "message": "Could not resolve \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C against \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C because a tessellated component has an open boundary."
+        },
+        "occt_positive": true
+      },
+      {
+        "pair": [
+          48,
+          52
+        ],
+        "burr": {
+          "code": "open_component_mesh",
+          "components": [
+            {
+              "id": "occurrence:40",
+              "name": "\u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C",
+              "occurrence_index": 40
+            },
+            {
+              "id": "occurrence:44",
+              "name": "\u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C",
+              "occurrence_index": 44
+            }
+          ],
+          "coordinate_error_bound": 0.00015657906339507983,
+          "id": "assembly-interference:unresolved:40:44",
+          "message": "Could not resolve \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C against \u00c3\u00e0\u00e9\u00ea\u00e0 DIN 934_Hexagon Nut ISO - 4032 - M3 - D - C because a tessellated component has an open boundary."
+        },
+        "occt_positive": true
+      }
+    ]
+  },
+  "after_report": {
+    "candidate_pair_count": 107,
+    "check_id": "assembly-interference",
+    "checked_pair_count": 1378,
+    "component_count": 53,
+    "findings": [
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:3",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 3
+          },
+          {
+            "id": "occurrence:15",
+            "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+            "occurrence_index": 15
+          }
+        ],
+        "id": "assembly-interference:3:15",
+        "message": "MMP.01.00.00.002 Cover flange_00 overlaps \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            316.19097900390614,
+            21.988511562166877,
+            250.8973989411959
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:3",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 3
+          },
+          {
+            "id": "occurrence:20",
+            "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+            "occurrence_index": 20
+          }
+        ],
+        "id": "assembly-interference:3:20",
+        "message": "MMP.01.00.00.002 Cover flange_00 overlaps \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2.",
+        "witness": {
+          "end": [
+            316.1524606299374,
+            54.64600466829722,
+            -147.74815833024394
+          ],
+          "kind": "surface_crossing",
+          "start": [
+            316.1499938964844,
+            54.29418677662095,
+            -148.50157406016595
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:3",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 3
+          },
+          {
+            "id": "occurrence:23",
+            "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+            "occurrence_index": 23
+          }
+        ],
+        "id": "assembly-interference:3:23",
+        "message": "MMP.01.00.00.002 Cover flange_00 overlaps \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2.",
+        "witness": {
+          "end": [
+            316.15782473881876,
+            55.409144002785524,
+            0.6901177105818886
+          ],
+          "kind": "surface_crossing",
+          "start": [
+            316.1499938964844,
+            54.29181419879311,
+            0.8537224483302132
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:3",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 3
+          },
+          {
+            "id": "occurrence:36",
+            "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+            "occurrence_index": 36
+          }
+        ],
+        "id": "assembly-interference:3:36",
+        "message": "MMP.01.00.00.002 Cover flange_00 overlaps \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            316.1936340332031,
+            23.888517939831342,
+            -248.99739179127104
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:3",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 3
+          },
+          {
+            "id": "occurrence:41",
+            "name": "MMP.01.00.00.001 Cover_00",
+            "occurrence_index": 41
+          }
+        ],
+        "id": "assembly-interference:3:41",
+        "message": "MMP.01.00.00.002 Cover flange_00 overlaps MMP.01.00.00.001 Cover_00.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            315.2655639648437,
+            1.2788542747988831,
+            265.08404535425626
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:3",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 3
+          },
+          {
+            "id": "occurrence:43",
+            "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+            "occurrence_index": 43
+          }
+        ],
+        "id": "assembly-interference:3:43",
+        "message": "MMP.01.00.00.002 Cover flange_00 overlaps \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2.",
+        "witness": {
+          "end": [
+            316.15378529128367,
+            54.83448161115602,
+            152.0062335251376
+          ],
+          "kind": "surface_crossing",
+          "start": [
+            316.1499938964844,
+            54.29368622055396,
+            150.8588772595551
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:7",
+            "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+            "occurrence_index": 7
+          },
+          {
+            "id": "occurrence:31",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 31
+          }
+        ],
+        "id": "assembly-interference:7:31",
+        "message": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 overlaps MMP.01.00.00.002 Cover flange_00.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -316.1499938964844,
+            25.031077308453803,
+            -250.74739087956337
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:28",
+            "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+            "occurrence_index": 28
+          },
+          {
+            "id": "occurrence:31",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 31
+          }
+        ],
+        "id": "assembly-interference:28:31",
+        "message": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2 overlaps MMP.01.00.00.002 Cover flange_00.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -316.1499938964844,
+            55.03108875254559,
+            -1.7500024054488263
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:31",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 31
+          },
+          {
+            "id": "occurrence:35",
+            "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+            "occurrence_index": 35
+          }
+        ],
+        "id": "assembly-interference:31:35",
+        "message": "MMP.01.00.00.002 Cover flange_00 overlaps \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2.",
+        "witness": {
+          "end": [
+            -316.1537852762546,
+            54.83446617862809,
+            -152.0062337707827
+          ],
+          "kind": "surface_crossing",
+          "start": [
+            -316.1499938964844,
+            54.29367303204329,
+            -150.8588820060421
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:31",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 31
+          },
+          {
+            "id": "occurrence:41",
+            "name": "MMP.01.00.00.001 Cover_00",
+            "occurrence_index": 41
+          }
+        ],
+        "id": "assembly-interference:31:41",
+        "message": "MMP.01.00.00.002 Cover flange_00 overlaps MMP.01.00.00.001 Cover_00.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -315.26556396484375,
+            1.2788311004151738,
+            -265.0840454660562
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:31",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 31
+          },
+          {
+            "id": "occurrence:49",
+            "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+            "occurrence_index": 49
+          }
+        ],
+        "id": "assembly-interference:31:49",
+        "message": "MMP.01.00.00.002 Cover flange_00 overlaps \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2.",
+        "witness": {
+          "end": [
+            -316.1524606263754,
+            54.646017076803986,
+            147.74815464091716
+          ],
+          "kind": "surface_crossing",
+          "start": [
+            -316.1499938964844,
+            54.294199759032125,
+            148.50156931363423
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:31",
+            "name": "MMP.01.00.00.002 Cover flange_00",
+            "occurrence_index": 31
+          },
+          {
+            "id": "occurrence:51",
+            "name": "\u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2",
+            "occurrence_index": 51
+          }
+        ],
+        "id": "assembly-interference:31:51",
+        "message": "MMP.01.00.00.002 Cover flange_00 overlaps \u00d8\u00e0\u00e9\u00e1\u00e0 DIN 125_Washer DIN 125 - A 3.2.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -316.1936340332031,
+            23.888539707874166,
+            248.99738970286955
+          ]
+        }
+      }
+    ],
+    "incomplete_reasons": [
+      {
+        "code": "open_component_mesh",
+        "message": "Could not prove a clean result because these tessellated components do not form closed solids: \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C, \u00c2\u00e8\u00ed\u00f2 DIN 7985 (\u00f6\u00e8\u00eb.)_ISO 7045 - M3 x 8 - Z --- 8C."
+      },
+      {
+        "code": "below_coordinate_resolution",
+        "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+      }
+    ],
+    "model_path": "models/openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "model_version": "5380dd7080bb7a9fb50c01feb3878fb3824478ff5ad01fbd8ef199222bd1764a",
+    "outcome": "fail",
+    "pair_set_complete": false,
+    "schema_version": "burr.checks.v1",
+    "summary": "12 interfering component pairs detected; 65 component pairs unresolved"
+  }
+}

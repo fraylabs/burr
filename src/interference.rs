@@ -28,6 +28,10 @@ pub struct CheckReport {
     pub checked_pair_count: usize,
     pub candidate_pair_count: usize,
     pub findings: Vec<InterferenceFinding>,
+    /// False even when the overall verdict is Fail if some pairs are unresolved.
+    pub pair_set_complete: bool,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub unresolved_pairs: Vec<UnresolvedPair>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub incomplete_reasons: Vec<IncompleteReason>,
 }
@@ -45,6 +49,19 @@ pub struct InterferenceFinding {
     pub message: String,
     pub components: [ComponentRef; 2],
     pub witness: InterferenceWitness,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct UnresolvedPair {
+    pub id: String,
+    pub code: &'static str,
+    pub message: String,
+    pub components: [ComponentRef; 2],
+    pub coordinate_error_bound: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tessellation_probe_resolution: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mesh_witness: Option<InterferenceWitness>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -78,6 +95,7 @@ struct Component {
     inverse: DMat4,
     scale: f64,
     bounds: Bounds,
+    coordinate_error: f64,
 }
 
 impl CheckReport {
@@ -93,6 +111,8 @@ impl CheckReport {
             checked_pair_count: 0,
             candidate_pair_count: 0,
             findings: Vec::new(),
+            pair_set_complete: false,
+            unresolved_pairs: Vec::new(),
             incomplete_reasons: vec![IncompleteReason {
                 code: "unsupported_model",
                 message: message.into(),
@@ -144,6 +164,8 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             checked_pair_count: 0,
             candidate_pair_count: 0,
             findings: Vec::new(),
+            pair_set_complete: false,
+            unresolved_pairs: Vec::new(),
             incomplete_reasons: import_reasons,
         };
     }
@@ -224,6 +246,21 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
                 inverse,
                 scale,
                 bounds: transformed_bounds(mesh.bounds, transform),
+                // Both definition coordinates and occurrence placement are f32.
+                // Casting the matrix to f64 cannot recover lost placement bits.
+                // Include cancellation between large local coordinates and
+                // translations, not only the final world-coordinate magnitude.
+                coordinate_error: mesh.epsilon * scale
+                    + 2.0
+                        * f64::from(f32::EPSILON)
+                        * (mesh
+                            .bounds
+                            .min
+                            .abs()
+                            .max(mesh.bounds.max.abs())
+                            .max_element()
+                            * scale
+                            + transform.w_axis.truncate().abs().max_element()),
             })
         })();
         match prepared {
@@ -266,6 +303,7 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
         component_meshes.push(mesh);
     }
     let mut findings = Vec::new();
+    let mut unresolved_pairs = Vec::new();
     // Sweep the axis with the widest spread. checked_pair_count includes
     // pairs rejected by the broad phase, preserving the report's meaning.
     let checked_pair_count = components.len() * (components.len() - 1) / 2;
@@ -276,7 +314,34 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
         let right = &components[right_index];
         let left_mesh = component_meshes[left_index];
         let right_mesh = component_meshes[right_index];
-        if let Some(witness) = intersection_witness(left, left_mesh, right, right_mesh) {
+        let tolerance = left.coordinate_error + right.coordinate_error;
+        // Edge intervals narrower than the mesher's nominal sampling scale
+        // cannot establish reliable surface crossing near curved boundaries.
+        // Vertex/interior witnesses keep the coordinate-accuracy path, and the
+        // search continues past short intervals to find a stronger witness.
+        let probe_resolution = (left_mesh.bounds.diagonal() * left.scale
+            + right_mesh.bounds.diagonal() * right.scale)
+            * look::step::meshing_policy::MeshingPolicy::DEFAULT.relative_linear_deflection;
+        if !left_mesh.closed || !right_mesh.closed {
+            unresolved_pairs.push(UnresolvedPair {
+                id: format!("{CHECK_ID}:unresolved:{left_index}:{right_index}"),
+                code: "open_component_mesh",
+                message: format!("Could not resolve {} against {} because a tessellated component has an open boundary.",left.reference.name,right.reference.name),
+                components: [left.reference.clone(),right.reference.clone()],
+                coordinate_error_bound: tolerance,
+                tessellation_probe_resolution: None,
+                mesh_witness: None,
+            });
+            continue;
+        }
+        if let Some(witness) = intersection_witness(
+            left,
+            left_mesh,
+            right,
+            right_mesh,
+            tolerance,
+            probe_resolution,
+        ) {
             findings.push(InterferenceFinding {
                 id: format!("{CHECK_ID}:{left_index}:{right_index}"),
                 code: "component_interference",
@@ -284,6 +349,29 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
                 components: [left.reference.clone(), right.reference.clone()],
                 witness,
             });
+        } else {
+            let local_accuracy = left_mesh.epsilon * left.scale + right_mesh.epsilon * right.scale;
+            let mesh_witness =
+                intersection_witness(left, left_mesh, right, right_mesh, local_accuracy, 0.0);
+            let overlap =
+                left.bounds.max.min(right.bounds.max) - left.bounds.min.max(right.bounds.min);
+            if mesh_witness.is_some() || overlap.min_element() <= tolerance {
+                let below_sampling = mesh_witness.as_ref().is_some_and(|witness| {
+                    matches!(witness, InterferenceWitness::SurfaceCrossing { start, end }
+                        if DVec3::from_array(*start).distance(DVec3::from_array(*end)) <= probe_resolution)
+                });
+                unresolved_pairs.push(UnresolvedPair {
+                id: format!("{CHECK_ID}:unresolved:{left_index}:{right_index}"),
+                    code: if below_sampling { "below_tessellation_resolution" } else { "below_coordinate_resolution" },
+                    message: if below_sampling {
+                        format!("{} and {} have only a crossing interval below the mesh sampling resolution; no reliable positive volume was proven.",left.reference.name,right.reference.name)
+                    } else { format!("{} and {} have a possible overlap below the coordinate and placement resolution; no positive volume was proven.",left.reference.name,right.reference.name) },
+                    components: [left.reference.clone(),right.reference.clone()],
+                    coordinate_error_bound: tolerance,
+                tessellation_probe_resolution: below_sampling.then_some(probe_resolution),
+                    mesh_witness,
+                });
+            }
         }
     }
     findings.sort_by_key(|finding| {
@@ -293,7 +381,13 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
         )
     });
 
-    let incomplete_reasons = if open_components.is_empty() {
+    unresolved_pairs.sort_by_key(|pair| {
+        (
+            pair.components[0].occurrence_index,
+            pair.components[1].occurrence_index,
+        )
+    });
+    let mut incomplete_reasons = if open_components.is_empty() {
         Vec::new()
     } else {
         vec![IncompleteReason {
@@ -304,6 +398,25 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             ),
         }]
     };
+    if unresolved_pairs
+        .iter()
+        .any(|pair| pair.code == "below_coordinate_resolution")
+    {
+        incomplete_reasons.push(IncompleteReason {
+            code: "below_coordinate_resolution",
+            message: "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs.".into(),
+        });
+    }
+    if unresolved_pairs
+        .iter()
+        .any(|pair| pair.code == "below_tessellation_resolution")
+    {
+        incomplete_reasons.push(IncompleteReason {
+            code: "below_tessellation_resolution",
+            message: "Some crossing intervals are below the nominal mesh sampling scale. See the unresolved component pairs.".into(),
+        });
+    }
+    let pair_set_complete = incomplete_reasons.is_empty() && unresolved_pairs.is_empty();
     let outcome = if !findings.is_empty() {
         CheckOutcome::Fail
     } else if incomplete_reasons.is_empty() {
@@ -311,7 +424,7 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
     } else {
         CheckOutcome::Incomplete
     };
-    let summary = match outcome {
+    let mut summary = match outcome {
         CheckOutcome::Pass => {
             format!("No assembly interference detected across {checked_pair_count} pairs")
         }
@@ -323,6 +436,12 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
         CheckOutcome::Incomplete => "Interference check not completed".to_string(),
     };
 
+    if !unresolved_pairs.is_empty() {
+        summary.push_str(&format!(
+            "; {} component pairs unresolved",
+            unresolved_pairs.len()
+        ));
+    }
     CheckReport {
         schema_version: REPORT_SCHEMA_VERSION,
         model_path: model_path.to_string(),
@@ -334,6 +453,8 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
         checked_pair_count,
         candidate_pair_count,
         findings,
+        pair_set_complete,
+        unresolved_pairs,
         incomplete_reasons,
     }
 }
@@ -356,6 +477,8 @@ fn incomplete(
         checked_pair_count: 0,
         candidate_pair_count: 0,
         findings: Vec::new(),
+        pair_set_complete: false,
+        unresolved_pairs: Vec::new(),
         incomplete_reasons: vec![IncompleteReason { code, message }],
     }
 }
@@ -409,6 +532,8 @@ fn intersection_witness(
     left_mesh: &Mesh,
     right: &Component,
     right_mesh: &Mesh,
+    tolerance: f64,
+    minimum_crossing_length: f64,
 ) -> Option<InterferenceWitness> {
     if left.geometry_index == right.geometry_index
         && left_mesh.closed
@@ -423,14 +548,29 @@ fn intersection_witness(
     }
     // A strictly interior surface point proves positive overlap volume (a
     // neighborhood on the solid side also lies inside the other component).
-    // Use the mesh's coordinate/weld accuracy here: a global chord-deflection
-    // threshold would erase shallow real overlaps on small assembly parts.
-    let tolerance = left_mesh.epsilon * left.scale + right_mesh.epsilon * right.scale;
+    // The caller includes both local coordinate and occurrence-placement
+    // accuracy. Sub-resolution witnesses are retained as unresolved pairs.
     if !left.bounds.overlaps(right.bounds, tolerance) {
         return None;
     }
-    penetrating_surface(left, left_mesh, right, right_mesh, tolerance)
-        .or_else(|| penetrating_surface(right, right_mesh, left, left_mesh, tolerance))
+    penetrating_surface(
+        left,
+        left_mesh,
+        right,
+        right_mesh,
+        tolerance,
+        minimum_crossing_length,
+    )
+    .or_else(|| {
+        penetrating_surface(
+            right,
+            right_mesh,
+            left,
+            left_mesh,
+            tolerance,
+            minimum_crossing_length,
+        )
+    })
 }
 
 fn penetrating_surface(
@@ -439,6 +579,7 @@ fn penetrating_surface(
     target: &Component,
     target_mesh: &Mesh,
     tolerance: f64,
+    minimum_crossing_length: f64,
 ) -> Option<InterferenceWitness> {
     if !source_mesh.closed || !target_mesh.closed {
         return None;
@@ -486,7 +627,9 @@ fn penetrating_surface(
             cuts.insert(0, 0.0);
             cuts.push(1.0);
             for interval in cuts.windows(2) {
-                if (interval[1] - interval[0]) * direction.length() <= 2.0 * local_tolerance {
+                if (interval[1] - interval[0]) * direction.length()
+                    <= (2.0 * local_tolerance).max(minimum_crossing_length / target.scale)
+                {
                     continue;
                 }
                 let point = a + direction * ((interval[0] + interval[1]) * 0.5);
@@ -902,6 +1045,129 @@ mod tests {
         let report = analyze_scene("double-sided-face.step", "fixture", &scene);
         assert_eq!(report.outcome, CheckOutcome::Incomplete);
         assert!(report.findings.is_empty());
+    }
+
+    #[test]
+    fn narrow_crossings_below_mesh_sampling_are_kept_as_unresolved() {
+        let mut scene = compile_scene(
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        let definition = scene.instances[0].geometry;
+        scene.instances[1].geometry = definition;
+        let geometry = &mut scene.geometries[definition];
+        let template = geometry.vertices[0];
+        // Deliberately use only box corners: a tessellator's face-centre
+        // vertex could provide a stronger, genuine interior witness.
+        geometry.vertices = [
+            [-25., -0.0005, -5.],
+            [25., -0.0005, -5.],
+            [25., 0.0005, -5.],
+            [-25., 0.0005, -5.],
+            [-25., -0.0005, 5.],
+            [25., -0.0005, 5.],
+            [25., 0.0005, 5.],
+            [-25., 0.0005, 5.],
+        ]
+        .into_iter()
+        .map(|position| {
+            let mut vertex = template;
+            vertex.position = position;
+            vertex
+        })
+        .collect();
+        geometry.indices = vec![
+            0, 2, 1, 0, 3, 2, 4, 5, 6, 4, 6, 7, 0, 1, 5, 0, 5, 4, 1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7,
+            6, 3, 0, 4, 3, 4, 7,
+        ];
+        scene.instances[0].transform = glam::Mat4::IDENTITY;
+        scene.instances[1].transform = glam::Mat4::from_rotation_z(std::f32::consts::FRAC_PI_2);
+        let report = analyze_scene("thin-crossing.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert!(report.findings.is_empty());
+        assert_eq!(report.unresolved_pairs.len(), 1);
+        assert_eq!(
+            report.unresolved_pairs[0].code,
+            "below_tessellation_resolution"
+        );
+    }
+
+    #[test]
+    fn overlap_below_placement_precision_is_reported_as_unresolved() {
+        let mut scene = compile_scene(
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        scene.instances[1].geometry = scene.instances[0].geometry;
+        scene.instances[0].transform =
+            glam::Mat4::from_translation(glam::Vec3::new(10000., 0., 0.));
+        scene.instances[1].transform =
+            glam::Mat4::from_translation(glam::Vec3::new(10009.999, 0., 0.));
+        let report = analyze_scene("sub-ulp-overlap.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert!(report.findings.is_empty());
+    }
+
+    #[test]
+    fn a_real_mesh_hole_stays_unresolved_with_component_references() {
+        let mut scene = compile_scene(
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        let definition = scene.instances[0].geometry;
+        for instance in &mut scene.instances {
+            instance.geometry = definition;
+            instance.transform = glam::Mat4::IDENTITY;
+        }
+        scene.geometries[definition].indices.drain(..3);
+        let report = analyze_scene("hole.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert!(report.findings.is_empty());
+        assert!(!report.pair_set_complete);
+        assert_eq!(report.unresolved_pairs.len(), 1);
+        assert_eq!(report.unresolved_pairs[0].code, "open_component_mesh");
+        assert_eq!(report.unresolved_pairs[0].components[0].occurrence_index, 0);
+        assert_eq!(report.unresolved_pairs[0].components[1].occurrence_index, 1);
+    }
+
+    #[test]
+    fn a_t_junction_on_a_closed_solid_does_not_hide_a_pair() {
+        let mut scene = compile_scene(
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        let definition = scene.instances[0].geometry;
+        for instance in &mut scene.instances {
+            instance.geometry = definition;
+            instance.transform = glam::Mat4::IDENTITY;
+        }
+        let geometry = &mut scene.geometries[definition];
+        let [a, b, c] = [
+            geometry.indices[0],
+            geometry.indices[1],
+            geometry.indices[2],
+        ];
+        let mut midpoint = geometry.vertices[a as usize];
+        for axis in 0..3 {
+            midpoint.position[axis] = (geometry.vertices[a as usize].position[axis]
+                + geometry.vertices[b as usize].position[axis])
+                * 0.5;
+        }
+        let m = geometry.vertices.len() as u32;
+        geometry.vertices.push(midpoint);
+        geometry.indices[..3].copy_from_slice(&[a, m, c]);
+        geometry.indices.extend([m, b, c]);
+        let report = analyze_scene("t-junction.step", "fixture", &scene);
+        assert_eq!(report.findings.len(), 1);
+        assert!(report.incomplete_reasons.is_empty());
     }
 
     #[test]

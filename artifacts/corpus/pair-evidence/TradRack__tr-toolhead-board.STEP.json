@@ -1,0 +1,380 @@
+{
+  "model": "TradRack__tr-toolhead-board.STEP",
+  "sha256": "fe502c59d239a848198aa791e3e8bdbe17dd044d5410eaa38ea941e29da0c7aa",
+  "before": {
+    "model": "TradRack__tr-toolhead-board.STEP",
+    "mapping": [
+      {
+        "burr": 0,
+        "occt": 1,
+        "burr_name": "Solid #18208",
+        "occt_name": "solid:1",
+        "box_error_mm": 9.215831022247362e-06,
+        "alternative_box_error_mm": 9.483148631175231,
+        "surface_sample_error_mm": 1.0003044183013587e-05,
+        "source_identity": null
+      },
+      {
+        "burr": 1,
+        "occt": 5,
+        "burr_name": "Solid #18295",
+        "occt_name": "solid:5",
+        "box_error_mm": 9.632629449735192e-06,
+        "alternative_box_error_mm": 39.39490481192133,
+        "surface_sample_error_mm": 6.470513820194203e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 2,
+        "occt": 0,
+        "burr_name": "Solid #19261",
+        "occt_name": "solid:0",
+        "box_error_mm": 7.977217181246887e-06,
+        "alternative_box_error_mm": 9.59091005287074,
+        "surface_sample_error_mm": 9.145259225837173e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 3,
+        "occt": 3,
+        "burr_name": "Solid #19356",
+        "occt_name": "solid:3",
+        "box_error_mm": 1.207078459587056e-05,
+        "alternative_box_error_mm": 15.055617385582492,
+        "surface_sample_error_mm": 9.119871881235881e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 4,
+        "occt": 4,
+        "burr_name": "Solid #36693",
+        "occt_name": "solid:4",
+        "box_error_mm": 9.024111014846725e-06,
+        "alternative_box_error_mm": 16.412202988563966,
+        "surface_sample_error_mm": 5.877940156453703e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 5,
+        "occt": 2,
+        "burr_name": "Solid #37348",
+        "occt_name": "solid:2",
+        "box_error_mm": 8.339328241749581e-06,
+        "alternative_box_error_mm": 9.483150774592643,
+        "surface_sample_error_mm": 9.145259225837173e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 6,
+        "occt": 6,
+        "burr_name": "Solid #38033",
+        "occt_name": "solid:6",
+        "box_error_mm": 8.253954840899013e-06,
+        "alternative_box_error_mm": 16.412204551800922,
+        "surface_sample_error_mm": 5.725422470546269e-06,
+        "source_identity": null
+      }
+    ],
+    "exact_pair_count": 6,
+    "confirmed_pair_count": 6,
+    "matched_pairs": [
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        5,
+        6
+      ]
+    ],
+    "extra_pairs": [],
+    "missing_pairs": [],
+    "unresolved_pairs": []
+  },
+  "after": {
+    "model": "TradRack__tr-toolhead-board.STEP",
+    "mapping": [
+      {
+        "burr": 0,
+        "occt": 1,
+        "burr_name": "Solid #18208",
+        "occt_name": "solid:1",
+        "box_error_mm": 9.215831022247362e-06,
+        "alternative_box_error_mm": 9.483148631175231,
+        "surface_sample_error_mm": 1.0003044183013587e-05,
+        "source_identity": null
+      },
+      {
+        "burr": 1,
+        "occt": 5,
+        "burr_name": "Solid #18295",
+        "occt_name": "solid:5",
+        "box_error_mm": 9.632629449735192e-06,
+        "alternative_box_error_mm": 39.39490481192133,
+        "surface_sample_error_mm": 6.470513820194203e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 2,
+        "occt": 0,
+        "burr_name": "Solid #19261",
+        "occt_name": "solid:0",
+        "box_error_mm": 7.977217181246887e-06,
+        "alternative_box_error_mm": 9.59091005287074,
+        "surface_sample_error_mm": 9.145259225837173e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 3,
+        "occt": 3,
+        "burr_name": "Solid #19356",
+        "occt_name": "solid:3",
+        "box_error_mm": 1.207078459587056e-05,
+        "alternative_box_error_mm": 15.055617385582492,
+        "surface_sample_error_mm": 9.119871881235881e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 4,
+        "occt": 4,
+        "burr_name": "Solid #36693",
+        "occt_name": "solid:4",
+        "box_error_mm": 9.024111014846725e-06,
+        "alternative_box_error_mm": 16.412202988563966,
+        "surface_sample_error_mm": 5.877940156453703e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 5,
+        "occt": 2,
+        "burr_name": "Solid #37348",
+        "occt_name": "solid:2",
+        "box_error_mm": 8.339328241749581e-06,
+        "alternative_box_error_mm": 9.483150774592643,
+        "surface_sample_error_mm": 9.145259225837173e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 6,
+        "occt": 6,
+        "burr_name": "Solid #38033",
+        "occt_name": "solid:6",
+        "box_error_mm": 8.253954840899013e-06,
+        "alternative_box_error_mm": 16.412204551800922,
+        "surface_sample_error_mm": 5.725422470546269e-06,
+        "source_identity": null
+      }
+    ],
+    "exact_pair_count": 6,
+    "confirmed_pair_count": 6,
+    "matched_pairs": [
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        5,
+        6
+      ]
+    ],
+    "extra_pairs": [],
+    "missing_pairs": [],
+    "unresolved_pairs": []
+  },
+  "after_report": {
+    "candidate_pair_count": 6,
+    "check_id": "assembly-interference",
+    "checked_pair_count": 21,
+    "component_count": 7,
+    "findings": [
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:0",
+            "name": "Solid #18208",
+            "occurrence_index": 0
+          },
+          {
+            "id": "occurrence:1",
+            "name": "Solid #18295",
+            "occurrence_index": 1
+          }
+        ],
+        "id": "assembly-interference:0:1",
+        "message": "Solid #18208 overlaps Solid #18295.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            153.15725708007812,
+            0.6375055576356827,
+            127.41660306051288
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Solid #18295",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:2",
+            "name": "Solid #19261",
+            "occurrence_index": 2
+          }
+        ],
+        "id": "assembly-interference:1:2",
+        "message": "Solid #18295 overlaps Solid #19261.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            139.75241088867188,
+            5.58891812353602e-06,
+            127.85954284667967
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Solid #18295",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:3",
+            "name": "Solid #19356",
+            "occurrence_index": 3
+          }
+        ],
+        "id": "assembly-interference:1:3",
+        "message": "Solid #18295 overlaps Solid #19356.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            132.51585388183594,
+            5.6234431569815524e-06,
+            128.64938354492185
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Solid #18295",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:4",
+            "name": "Solid #36693",
+            "occurrence_index": 4
+          }
+        ],
+        "id": "assembly-interference:1:4",
+        "message": "Solid #18295 overlaps Solid #36693.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            111.55558776855469,
+            1.6000053133393726,
+            121.00959770838207
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Solid #18295",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:5",
+            "name": "Solid #37348",
+            "occurrence_index": 5
+          }
+        ],
+        "id": "assembly-interference:1:5",
+        "message": "Solid #18295 overlaps Solid #37348.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            146.53421020507812,
+            5.58891812353602e-06,
+            127.85954284667967
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:1",
+            "name": "Solid #18295",
+            "occurrence_index": 1
+          },
+          {
+            "id": "occurrence:6",
+            "name": "Solid #38033",
+            "occurrence_index": 6
+          }
+        ],
+        "id": "assembly-interference:1:6",
+        "message": "Solid #18295 overlaps Solid #38033.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            122.31387329101562,
+            1.6000048347171458,
+            110.05999748865551
+          ]
+        }
+      }
+    ],
+    "model_path": "models/TradRack__tr-toolhead-board.STEP",
+    "model_version": "16620188b0a7df2ce93bdb95def56779d54b42169e767c22d3bd07d005df361d",
+    "outcome": "fail",
+    "pair_set_complete": true,
+    "schema_version": "burr.checks.v1",
+    "summary": "6 interfering component pairs detected"
+  }
+}

@@ -1,0 +1,623 @@
+{
+  "model": "text-to-cad-assembly__pick_place_arm.step",
+  "sha256": "c31fd1adb88029a18a22028ecab3e776011126db2f1fe80624b77860719009d3",
+  "before": {
+    "model": "text-to-cad-assembly__pick_place_arm.step",
+    "mapping": [
+      {
+        "burr": 0,
+        "occt": 0,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/SOLID",
+        "box_error_mm": 1.3486991523486091e-06,
+        "alternative_box_error_mm": 182.93168130945193,
+        "surface_sample_error_mm": 1.0728836059570312e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 1,
+        "occt": 1,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/SOLID",
+        "box_error_mm": 0.06473731997438706,
+        "alternative_box_error_mm": 141.2673014703838,
+        "surface_sample_error_mm": 6.67572021484375e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 2,
+        "occt": 2,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 1.0789593218788873e-05,
+        "alternative_box_error_mm": 24.698178070459296,
+        "surface_sample_error_mm": 7.62939453125e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 3,
+        "occt": 3,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 1.0873560191146259e-05,
+        "alternative_box_error_mm": 24.69817822491191,
+        "surface_sample_error_mm": 8.225440979003906e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 4,
+        "occt": 4,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/SOLID",
+        "box_error_mm": 1.2157009872419321e-05,
+        "alternative_box_error_mm": 19.798989873227065,
+        "surface_sample_error_mm": 9.059906005859375e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 5,
+        "occt": 5,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/SOLID",
+        "box_error_mm": 1.2157009872419321e-05,
+        "alternative_box_error_mm": 19.798989873227065,
+        "surface_sample_error_mm": 9.059906005859375e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 6,
+        "occt": 6,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 5.170128501076578e-06,
+        "alternative_box_error_mm": 34.87492203724539,
+        "surface_sample_error_mm": 5.432644116141841e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 7,
+        "occt": 7,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 1.3486991523486091e-06,
+        "alternative_box_error_mm": 12.106660849076704,
+        "surface_sample_error_mm": 9.5367431640625e-07,
+        "source_identity": null
+      },
+      {
+        "burr": 8,
+        "occt": 8,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 2.263967832459448e-06,
+        "alternative_box_error_mm": 12.10665995801044,
+        "surface_sample_error_mm": 1.5298274952497782e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 9,
+        "occt": 9,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 2.7271365235586853e-06,
+        "alternative_box_error_mm": 12.10666053961424,
+        "surface_sample_error_mm": 1.923159089613757e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 10,
+        "occt": 10,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 3.0577711489419342e-06,
+        "alternative_box_error_mm": 12.106660241504622,
+        "surface_sample_error_mm": 2.0405555150092014e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 11,
+        "occt": 11,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 3.5666091190581467e-06,
+        "alternative_box_error_mm": 12.106660037346497,
+        "surface_sample_error_mm": 2.5187587788642363e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 12,
+        "occt": 12,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 5.025116300541178e-06,
+        "alternative_box_error_mm": 12.106659788988042,
+        "surface_sample_error_mm": 2.861582090075833e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 13,
+        "occt": 13,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 6.680202447835834e-06,
+        "alternative_box_error_mm": 12.106657031290728,
+        "surface_sample_error_mm": 4.72323970950294e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 14,
+        "occt": 14,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 4.726046205016743e-06,
+        "alternative_box_error_mm": 12.106661049556484,
+        "surface_sample_error_mm": 3.3408534181249965e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 15,
+        "occt": 15,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/SOLID",
+        "box_error_mm": 1.2560739669470201e-15,
+        "alternative_box_error_mm": 108.71062505569546,
+        "surface_sample_error_mm": 3.011463642019666e-07,
+        "source_identity": null
+      },
+      {
+        "burr": 16,
+        "occt": 16,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 1.0662402997414063e-06,
+        "alternative_box_error_mm": 108.71062504253656,
+        "surface_sample_error_mm": 1.8816386777878367e-06,
+        "source_identity": null
+      }
+    ],
+    "exact_pair_count": 3,
+    "confirmed_pair_count": 3,
+    "matched_pairs": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        7
+      ],
+      [
+        0,
+        15
+      ]
+    ],
+    "extra_pairs": [],
+    "missing_pairs": [],
+    "unresolved_pairs": []
+  },
+  "after": {
+    "model": "text-to-cad-assembly__pick_place_arm.step",
+    "mapping": [
+      {
+        "burr": 0,
+        "occt": 0,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/SOLID",
+        "box_error_mm": 1.3486991523486091e-06,
+        "alternative_box_error_mm": 182.93168130945193,
+        "surface_sample_error_mm": 1.0728836059570312e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 1,
+        "occt": 1,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/SOLID",
+        "box_error_mm": 0.06473731997438706,
+        "alternative_box_error_mm": 141.2673014703838,
+        "surface_sample_error_mm": 6.67572021484375e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 2,
+        "occt": 2,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 1.0789593218788873e-05,
+        "alternative_box_error_mm": 24.698178070459296,
+        "surface_sample_error_mm": 7.62939453125e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 3,
+        "occt": 3,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 1.0873560191146259e-05,
+        "alternative_box_error_mm": 24.69817822491191,
+        "surface_sample_error_mm": 8.225440979003906e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 4,
+        "occt": 4,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/SOLID",
+        "box_error_mm": 1.2157009872419321e-05,
+        "alternative_box_error_mm": 19.798989873227065,
+        "surface_sample_error_mm": 9.059906005859375e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 5,
+        "occt": 5,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/SOLID",
+        "box_error_mm": 1.2157009872419321e-05,
+        "alternative_box_error_mm": 19.798989873227065,
+        "surface_sample_error_mm": 9.059906005859375e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 6,
+        "occt": 6,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 5.170128501076578e-06,
+        "alternative_box_error_mm": 34.87492203724539,
+        "surface_sample_error_mm": 5.432644116141841e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 7,
+        "occt": 7,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 1.3486991523486091e-06,
+        "alternative_box_error_mm": 12.106660849076704,
+        "surface_sample_error_mm": 9.5367431640625e-07,
+        "source_identity": null
+      },
+      {
+        "burr": 8,
+        "occt": 8,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 2.263967832459448e-06,
+        "alternative_box_error_mm": 12.10665995801044,
+        "surface_sample_error_mm": 1.5298274952497782e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 9,
+        "occt": 9,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 2.7271365235586853e-06,
+        "alternative_box_error_mm": 12.10666053961424,
+        "surface_sample_error_mm": 1.923159089613757e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 10,
+        "occt": 10,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 3.0577711489419342e-06,
+        "alternative_box_error_mm": 12.106660241504622,
+        "surface_sample_error_mm": 2.0405555150092014e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 11,
+        "occt": 11,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 3.5666091190581467e-06,
+        "alternative_box_error_mm": 12.106660037346497,
+        "surface_sample_error_mm": 2.5187587788642363e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 12,
+        "occt": 12,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 5.025116300541178e-06,
+        "alternative_box_error_mm": 12.106659788988042,
+        "surface_sample_error_mm": 2.861582090075833e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 13,
+        "occt": 13,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 6.680202447835834e-06,
+        "alternative_box_error_mm": 12.106657031290728,
+        "surface_sample_error_mm": 4.72323970950294e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 14,
+        "occt": 14,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 4.726046205016743e-06,
+        "alternative_box_error_mm": 12.106661049556484,
+        "surface_sample_error_mm": 3.3408534181249965e-06,
+        "source_identity": null
+      },
+      {
+        "burr": 15,
+        "occt": 15,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/SOLID",
+        "box_error_mm": 1.2560739669470201e-15,
+        "alternative_box_error_mm": 108.71062505569546,
+        "surface_sample_error_mm": 3.011463642019666e-07,
+        "source_identity": null
+      },
+      {
+        "burr": 16,
+        "occt": 16,
+        "burr_name": "SOLID",
+        "occt_name": "ASSEMBLY/ASSEMBLY/SOLID",
+        "box_error_mm": 1.0662402997414063e-06,
+        "alternative_box_error_mm": 108.71062504253656,
+        "surface_sample_error_mm": 1.8816386777878367e-06,
+        "source_identity": null
+      }
+    ],
+    "exact_pair_count": 3,
+    "confirmed_pair_count": 3,
+    "matched_pairs": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        7
+      ],
+      [
+        0,
+        15
+      ]
+    ],
+    "extra_pairs": [],
+    "missing_pairs": [],
+    "unresolved_pairs": [
+      {
+        "pair": [
+          0,
+          16
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:0",
+              "name": "SOLID",
+              "occurrence_index": 0
+            },
+            {
+              "id": "occurrence:16",
+              "name": "SOLID",
+              "occurrence_index": 16
+            }
+          ],
+          "coordinate_error_bound": 8.201599121093755e-05,
+          "id": "assembly-interference:unresolved:0:16",
+          "message": "SOLID and SOLID have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          1,
+          2
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:1",
+              "name": "SOLID",
+              "occurrence_index": 1
+            },
+            {
+              "id": "occurrence:2",
+              "name": "SOLID",
+              "occurrence_index": 2
+            }
+          ],
+          "coordinate_error_bound": 0.00010728836059570317,
+          "id": "assembly-interference:unresolved:1:2",
+          "message": "SOLID and SOLID have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          2,
+          3
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:2",
+              "name": "SOLID",
+              "occurrence_index": 2
+            },
+            {
+              "id": "occurrence:3",
+              "name": "SOLID",
+              "occurrence_index": 3
+            }
+          ],
+          "coordinate_error_bound": 0.00010456643165552621,
+          "id": "assembly-interference:unresolved:2:3",
+          "message": "SOLID and SOLID have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          3,
+          4
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "SOLID",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:4",
+              "name": "SOLID",
+              "occurrence_index": 4
+            }
+          ],
+          "coordinate_error_bound": 0.0001044472223659754,
+          "id": "assembly-interference:unresolved:3:4",
+          "message": "SOLID and SOLID have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      },
+      {
+        "pair": [
+          3,
+          5
+        ],
+        "burr": {
+          "code": "below_coordinate_resolution",
+          "components": [
+            {
+              "id": "occurrence:3",
+              "name": "SOLID",
+              "occurrence_index": 3
+            },
+            {
+              "id": "occurrence:5",
+              "name": "SOLID",
+              "occurrence_index": 5
+            }
+          ],
+          "coordinate_error_bound": 0.0001044472223659754,
+          "id": "assembly-interference:unresolved:3:5",
+          "message": "SOLID and SOLID have a possible overlap below the coordinate and placement resolution; no positive volume was proven."
+        },
+        "occt_positive": false
+      }
+    ]
+  },
+  "after_report": {
+    "candidate_pair_count": 8,
+    "check_id": "assembly-interference",
+    "checked_pair_count": 136,
+    "component_count": 17,
+    "findings": [
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:0",
+            "name": "SOLID",
+            "occurrence_index": 0
+          },
+          {
+            "id": "occurrence:1",
+            "name": "SOLID",
+            "occurrence_index": 1
+          }
+        ],
+        "id": "assembly-interference:0:1",
+        "message": "SOLID overlaps SOLID.",
+        "witness": {
+          "end": [
+            15.0,
+            -25.000000327835423,
+            -7.4999989072152955
+          ],
+          "kind": "surface_crossing",
+          "start": [
+            14.583333333333318,
+            -25.00000034969112,
+            -7.999998907215314
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:0",
+            "name": "SOLID",
+            "occurrence_index": 0
+          },
+          {
+            "id": "occurrence:7",
+            "name": "SOLID",
+            "occurrence_index": 7
+          }
+        ],
+        "id": "assembly-interference:0:7",
+        "message": "SOLID overlaps SOLID.",
+        "witness": {
+          "kind": "interior_overlap",
+          "point": [
+            -15.000000000000004,
+            24.999999999999996,
+            -1.0927847071684482e-06
+          ]
+        }
+      },
+      {
+        "code": "component_interference",
+        "components": [
+          {
+            "id": "occurrence:0",
+            "name": "SOLID",
+            "occurrence_index": 0
+          },
+          {
+            "id": "occurrence:15",
+            "name": "SOLID",
+            "occurrence_index": 15
+          }
+        ],
+        "id": "assembly-interference:0:15",
+        "message": "SOLID overlaps SOLID.",
+        "witness": {
+          "end": [
+            130.0,
+            1.4175634059291204,
+            5.809867510479266
+          ],
+          "kind": "surface_crossing",
+          "start": [
+            130.0,
+            -5.701243318406277,
+            -1.3089385915103093
+          ]
+        }
+      }
+    ],
+    "incomplete_reasons": [
+      {
+        "code": "below_coordinate_resolution",
+        "message": "Some possible overlaps are smaller than the coordinate and placement resolution. See the unresolved component pairs."
+      }
+    ],
+    "model_path": "models/text-to-cad-assembly__pick_place_arm.step",
+    "model_version": "2f9cd4b1b7577c5507af5c5f90c2d49d5d3f57ead594ceafc5e035bb9500a8a8",
+    "outcome": "fail",
+    "pair_set_complete": false,
+    "schema_version": "burr.checks.v1",
+    "summary": "3 interfering component pairs detected; 5 component pairs unresolved"
+  }
+}
