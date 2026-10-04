@@ -35,3 +35,7 @@ rmdir /tmp/burr-build.lock
 ```
 
 The harness verifies source hashes, refuses incomplete OCCT scans for pair comparisons, and stops on a new false pair, lost confirmed pair or wrong conclusive verdict. Its compact summary is intended for version control; its detailed outputs are local evidence.
+
+The [Switchwire source-bound investigation](switchwire-loops.md) records why
+all 42 disconnected/open source loops remain refused, with a reproducible OCCT
+inspection script and a compact entity/error summary.
