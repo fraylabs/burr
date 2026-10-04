@@ -77,6 +77,9 @@ pub struct ContactPair {
     pub separating_normal: [f64; 3],
     pub signed_gap: f64,
     pub arithmetic_error_bound: f64,
+    pub source_tolerance: f64,
+    pub maximum_overlap_depth: f64,
+    pub maximum_common_volume: f64,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -226,6 +229,23 @@ pub fn analyze_scene_from_source(
                 .unwrap_or_else(|| source::fallback_name(instance.node_name.as_deref(), model_path))
         })
         .collect::<Vec<_>>();
+    let mut name_counts = std::collections::HashMap::new();
+    for name in &definition_names {
+        *name_counts.entry(name.as_str()).or_insert(0usize) += 1;
+    }
+    let mut siblings = std::collections::HashMap::new();
+    let names = definition_names
+        .iter()
+        .map(|name| {
+            let sibling = siblings.entry(name.as_str()).or_insert(0usize);
+            *sibling += 1;
+            if name_counts[name.as_str()] > 1 {
+                format!("{name} #{sibling}")
+            } else {
+                name.clone()
+            }
+        })
+        .collect::<Vec<_>>();
     let mut meshes: Vec<Option<Mesh>> = (0..scene.geometries.len()).map(|_| None).collect();
     let mut components = Vec::with_capacity(scene.instances.len());
     for (index, instance) in scene.instances.iter().enumerate() {
@@ -278,20 +298,7 @@ pub fn analyze_scene_from_source(
                 return Err("has a non-uniform scale or shear".into());
             }
             let definition_name = definition_names[index].clone();
-            let name = if definition_names
-                .iter()
-                .filter(|other| **other == definition_name)
-                .count()
-                > 1
-            {
-                let sibling = definition_names[..=index]
-                    .iter()
-                    .filter(|other| **other == definition_name)
-                    .count();
-                format!("{definition_name} #{sibling}")
-            } else {
-                definition_name.clone()
-            };
+            let name = names[index].clone();
             Ok(Component {
                 reference: ComponentRef {
                     id: format!("occurrence:{index}"),
@@ -397,11 +404,13 @@ pub fn analyze_scene_from_source(
         // Keep the interference narrow phase and unresolved policy unchanged
         // for every previously checked positive-bounds pair.
         if !left.bounds.overlaps(right.bounds, 0.0) {
-            if let Some(pair) = source
-                .as_ref()
-                .and_then(|source| contact_pair(source, left, right, left_index, right_index))
-            {
-                contact_pairs.push(pair);
+            if left_mesh.closed && right_mesh.closed {
+                if let Some(pair) = source
+                    .as_ref()
+                    .and_then(|source| contact_pair(source, left, right, left_index, right_index))
+                {
+                    contact_pairs.push(pair);
+                }
             }
             continue;
         }
@@ -617,11 +626,14 @@ fn contact_pair(
     Some(ContactPair {
         id: format!("{CHECK_ID}:contact:{left_index}:{right_index}"),
         code: "planar_contact",
-        message: format!("{} and {} have coincident analytic supports within source arithmetic precision. A source separating plane proves no positive interior overlap beyond that precision.", left.reference.name, right.reference.name),
+        message: format!("{} and {} contact within the STEP source tolerance. Analytic support bounds any shared interior to a depth of {:.3e} and a volume of at most {:.3e} in source units; no interference above that precision is possible.", left.reference.name, right.reference.name, proof.maximum_overlap_depth, proof.maximum_common_volume),
         components: [left.reference.clone(), right.reference.clone()],
         separating_normal: proof.normal.to_array(),
         signed_gap: proof.gap,
         arithmetic_error_bound: proof.error,
+        source_tolerance: proof.source_tolerance,
+        maximum_overlap_depth: proof.maximum_overlap_depth,
+        maximum_common_volume: proof.maximum_common_volume,
     })
 }
 

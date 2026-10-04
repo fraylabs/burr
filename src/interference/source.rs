@@ -22,6 +22,7 @@ pub struct SourceEvidence {
 pub struct SourceOccurrence {
     pub name: String,
     world: DMat4,
+    placement_depth: usize,
     boundary: Option<Arc<AnalyticBoundary>>,
 }
 
@@ -29,8 +30,10 @@ pub struct SourceOccurrence {
 struct AnalyticBoundary {
     points: Vec<DVec3>,
     ellipses: Vec<[DVec3; 3]>,
+    ellipsoids: Vec<[DVec3; 4]>,
     cylinders: Vec<CylinderSupport>,
     normals: Vec<DVec3>,
+    source_tolerance: Option<f64>,
 }
 
 struct CylinderSupport {
@@ -44,6 +47,9 @@ pub struct ContactProof {
     pub normal: DVec3,
     pub gap: f64,
     pub error: f64,
+    pub source_tolerance: f64,
+    pub maximum_overlap_depth: f64,
+    pub maximum_common_volume: f64,
 }
 
 pub fn fallback_name(name: Option<&str>, path: &str) -> String {
@@ -102,25 +108,25 @@ impl SourceEvidence {
         let mut definitions = HashMap::new();
         for node in mapped.all_nodes() {
             let mut shells = Vec::new();
+            let mut complete_boundary = true;
             for shape in node.shape() {
                 match shape {
                     ProductShape::Solid(solid, ids) => {
-                        if !complete(&table, &solid.boundaries, ids) {
-                            return None;
-                        }
+                        complete_boundary &= complete(&table, &solid.boundaries, ids);
                         shells.extend(solid.boundaries.iter());
                     }
                     ProductShape::Shells(source_shells, ids) => {
-                        if !complete(&table, source_shells, ids) {
-                            return None;
-                        }
+                        complete_boundary &= complete(&table, source_shells, ids);
                         shells.extend(source_shells.iter());
                     }
                     ProductShape::Matrix(_) => {}
                 }
             }
             if !shells.is_empty() || node.is_terminal() {
-                let boundary = AnalyticBoundary::from_shells(&shells).map(Arc::new);
+                let boundary = complete_boundary
+                    .then(|| AnalyticBoundary::from_shells(&shells))
+                    .flatten()
+                    .map(Arc::new);
                 definitions.insert(node.index(), (definitions.len(), boundary));
             }
         }
@@ -175,6 +181,7 @@ impl SourceEvidence {
                 occurrences.push(SourceOccurrence {
                     name,
                     world,
+                    placement_depth: path_in_graph.edges().len(),
                     boundary: boundary.clone(),
                 });
             }
@@ -200,18 +207,61 @@ impl SourceEvidence {
                 let (amin, amax) = ab.support(a.world, normal)?;
                 let (bmin, bmax) = bb.support(b.world, normal)?;
                 let gap = (bmin - amax).max(amin - bmax);
-                let magnitude = amin
-                    .abs()
-                    .max(amax.abs())
-                    .max(bmin.abs())
-                    .max(bmax.abs())
-                    .max(1.0);
-                // Arithmetic precision only: never the float32 mesh/placement
-                // tolerance or nominal tessellation scale. A genuinely shallow
-                // source overlap above this bound stays unresolved.
-                let error = magnitude * f64::EPSILON * 256.0;
-                if gap.abs() <= error {
-                    return Some(ContactProof { normal, gap, error });
+                let error = ab.arithmetic_error(a.world, normal, a.placement_depth)
+                    + bb.arithmetic_error(b.world, normal, b.placement_depth);
+                let source_tolerance = match (ab.source_tolerance, bb.source_tolerance) {
+                    (Some(at), Some(bt)) => (at
+                        * a.world.transpose().transform_vector3(normal).length())
+                    .min(bt * b.world.transpose().transform_vector3(normal).length()),
+                    _ => 0.0,
+                };
+                let maximum_overlap_depth = (-gap + error).max(0.0);
+                if !error.is_finite()
+                    || !source_tolerance.is_finite()
+                    || gap > error
+                    || maximum_overlap_depth > source_tolerance.max(error)
+                {
+                    continue;
+                }
+                // The intersection lies in a slab of this certified depth.
+                // Slice along the dominant normal axis: each fiber has length
+                // at most depth / |n_axis|. Analytic support in the other two
+                // axes bounds the projected overlap area. This independent
+                // volume upper bound prevents a large, shallow true overlap
+                // from becoming contact merely because STEP admits its depth.
+                let axis = if normal.x.abs() >= normal.y.abs() && normal.x.abs() >= normal.z.abs() {
+                    0
+                } else if normal.y.abs() >= normal.z.abs() {
+                    1
+                } else {
+                    2
+                };
+                let mut area = 1.0;
+                for index in 0..3 {
+                    if index == axis {
+                        continue;
+                    }
+                    let mut direction = DVec3::ZERO;
+                    direction[index] = 1.0;
+                    let (amin, amax) = ab.support(a.world, direction)?;
+                    let (bmin, bmax) = bb.support(b.world, direction)?;
+                    let axis_error = ab.arithmetic_error(a.world, direction, a.placement_depth)
+                        + bb.arithmetic_error(b.world, direction, b.placement_depth);
+                    area *= (amax.min(bmax) - amin.max(bmin) + axis_error).max(0.0);
+                }
+                let maximum_common_volume = maximum_overlap_depth * area / normal[axis].abs();
+                // The corpus exact gate's absolute positive-volume floor,
+                // in source coordinate units cubed. This bounds contact only;
+                // it never relaxes the existing interference witness policy.
+                if maximum_common_volume <= 1e-6 {
+                    return Some(ContactProof {
+                        normal,
+                        gap,
+                        error,
+                        source_tolerance,
+                        maximum_overlap_depth,
+                        maximum_common_volume,
+                    });
                 }
             }
         }
@@ -231,7 +281,24 @@ fn complete(table: &Table, shells: &[Shell], ids: &[u64]) -> bool {
 
 impl AnalyticBoundary {
     fn from_shells(shells: &[&Shell]) -> Option<Self> {
-        let mut out = Self::default();
+        let source_tolerance = shells
+            .iter()
+            .map(|shell| shell.source_geometric_uncertainty)
+            .collect::<Option<Vec<_>>>()
+            .and_then(|values| {
+                if values.is_empty()
+                    || values
+                        .iter()
+                        .any(|value| !value.is_finite() || *value <= 0.0)
+                {
+                    return None;
+                }
+                values.into_iter().reduce(f64::min)
+            });
+        let mut out = Self {
+            source_tolerance,
+            ..Self::default()
+        };
         for shell in shells {
             if shell.faces.is_empty() || shell.edges.is_empty() {
                 return None;
@@ -248,12 +315,34 @@ impl AnalyticBoundary {
                     Surface::ElementarySurface(ElementarySurface::Plane(plane)) => {
                         out.normals.push(vector(plane.normal()))
                     }
+                    Surface::ElementarySurface(ElementarySurface::Sphere(sphere)) => {
+                        let m = matrix(sphere.transform());
+                        let center = m.transform_point3(point(sphere.entity().0.center()));
+                        let radius = sphere.entity().0.radius();
+                        if !radius.is_finite() || radius <= 0.0 {
+                            return None;
+                        }
+                        // The complete analytic sphere (an ellipsoid after an
+                        // affine placement) contains every source trim.
+                        out.ellipsoids.push([
+                            center,
+                            m.x_axis.truncate() * radius,
+                            m.y_axis.truncate() * radius,
+                            m.z_axis.truncate() * radius,
+                        ]);
+                    }
                     Surface::ElementarySurface(ElementarySurface::CylindricalSurface(cylinder)) => {
-                        let p0 = point(cylinder.subs(0.0, 0.0));
-                        let p90 = point(cylinder.subs(0.0, std::f64::consts::FRAC_PI_2));
-                        let p180 = point(cylinder.subs(0.0, std::f64::consts::PI));
+                        // STEP's cylinder processor reverses surface orientation
+                        // by swapping u/v. Read the underlying revolution so
+                        // the axial and angular parameters cannot be confused.
+                        let placement = matrix(cylinder.transform());
+                        let sample =
+                            |u, v| placement.transform_point3(point(cylinder.entity().subs(u, v)));
+                        let p0 = sample(0.0, 0.0);
+                        let p90 = sample(0.0, std::f64::consts::FRAC_PI_2);
+                        let p180 = sample(0.0, std::f64::consts::PI);
                         let center = (p0 + p180) * 0.5;
-                        let axis = (point(cylinder.subs(1.0, 0.0)) - p0).normalize();
+                        let axis = (sample(1.0, 0.0) - p0).normalize();
                         if !axis.is_finite() {
                             return None;
                         }
@@ -278,6 +367,27 @@ impl AnalyticBoundary {
                 }
             }
         }
+        if !out.points.iter().all(|point| point.is_finite())
+            || !out
+                .ellipses
+                .iter()
+                .flatten()
+                .all(|vector| vector.is_finite())
+            || !out
+                .ellipsoids
+                .iter()
+                .flatten()
+                .all(|vector| vector.is_finite())
+            || !out.cylinders.iter().all(|cylinder| {
+                cylinder.center.is_finite()
+                    && cylinder.radial.iter().all(|vector| vector.is_finite())
+                    && cylinder.axis.is_finite()
+                    && cylinder.axial_range.0.is_finite()
+                    && cylinder.axial_range.1.is_finite()
+            })
+        {
+            return None;
+        }
         Some(out)
     }
 
@@ -300,6 +410,43 @@ impl AnalyticBoundary {
         Some(())
     }
 
+    fn arithmetic_error(&self, world: DMat4, direction: DVec3, placement_depth: usize) -> f64 {
+        // Bound arithmetic using operand magnitudes, not just the final
+        // coordinates: large local coordinates can cancel a large placement.
+        // Account for the full source placement chain as well as carrier and
+        // support evaluation. A high arithmetic bound refuses contact.
+        let mut local = self
+            .points
+            .iter()
+            .map(|point| point.abs().max_element())
+            .fold(0.0, f64::max);
+        for &[center, u, v] in &self.ellipses {
+            local = local.max(center.abs().max_element() + u.length() + v.length());
+        }
+        for &[center, u, v, w] in &self.ellipsoids {
+            local = local.max(center.abs().max_element() + u.length() + v.length() + w.length());
+        }
+        for cylinder in &self.cylinders {
+            local = local.max(
+                cylinder.center.abs().max_element()
+                    + cylinder.radial[0].length()
+                    + cylinder.radial[1].length()
+                    + cylinder
+                        .axial_range
+                        .0
+                        .abs()
+                        .max(cylinder.axial_range.1.abs()),
+            );
+        }
+        let operands = world.x_axis.truncate().abs() * local
+            + world.y_axis.truncate().abs() * local
+            + world.z_axis.truncate().abs() * local
+            + world.w_axis.truncate().abs();
+        direction.abs().dot(operands).max(1.0)
+            * f64::EPSILON
+            * (256.0 + 64.0 * placement_depth as f64)
+    }
+
     fn support(&self, world: DMat4, normal: DVec3) -> Option<(f64, f64)> {
         let direction = world.transpose().transform_vector3(normal);
         let translation = normal.dot(world.w_axis.truncate());
@@ -313,6 +460,15 @@ impl AnalyticBoundary {
         for &[center, u, v] in &self.ellipses {
             let d = direction.dot(center) + translation;
             let radius = direction.dot(u).hypot(direction.dot(v));
+            min = min.min(d - radius);
+            max = max.max(d + radius);
+        }
+        for &[center, u, v, w] in &self.ellipsoids {
+            let d = direction.dot(center) + translation;
+            let radius = direction
+                .dot(u)
+                .hypot(direction.dot(v))
+                .hypot(direction.dot(w));
             min = min.min(d - radius);
             max = max.max(d + radius);
         }
@@ -361,7 +517,29 @@ mod tests {
     }
 
     #[test]
-    fn source_contact_proof_does_not_admit_positive_overlap() {
+    fn cylinder_support_keeps_axial_and_angular_parameters_distinct() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/interference/curved-contact.step");
+        let scene = compile_scene(&path, UpAxis::Z, &mut Timings::default()).unwrap();
+        let evidence = SourceEvidence::read(&path, &scene).unwrap();
+        let cylinders = evidence
+            .occurrences
+            .iter()
+            .filter_map(|occurrence| occurrence.boundary.as_ref())
+            .flat_map(|boundary| boundary.cylinders.iter())
+            .collect::<Vec<_>>();
+        assert!(!cylinders.is_empty());
+        for cylinder in cylinders {
+            assert!(cylinder.radial[0].length() > 0.0);
+            assert!((cylinder.radial[0].length() - cylinder.radial[1].length()).abs() < 1e-10);
+            assert!(cylinder.radial[0].dot(cylinder.axis).abs() < 1e-10);
+            assert!(cylinder.radial[1].dot(cylinder.axis).abs() < 1e-10);
+            assert!(cylinder.radial[0].dot(cylinder.radial[1]).abs() < 1e-10);
+        }
+    }
+
+    #[test]
+    fn source_support_refuses_overlap_above_precision_or_volume_floor() {
         let path =
             Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/interference/touching.step");
         let scene = compile_scene(&path, UpAxis::Z, &mut Timings::default()).unwrap();
@@ -377,6 +555,10 @@ mod tests {
         // Moving by much less than float32 placement error still invalidates
         // the source separation proof. No mesh threshold is widened.
         source.occurrences[1].world.w_axis.x -= 1e-7;
+        assert!(source.contact(0, 1).is_none());
+        // Even inside the declared length tolerance, the broad common area
+        // makes this 2e-8-deep overlap larger than the exact volume floor.
+        source.occurrences[1].world.w_axis.x += 8e-8;
         assert!(source.contact(0, 1).is_none());
     }
 }

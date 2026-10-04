@@ -1002,7 +1002,7 @@
         checkReport: null,
         focusedFinding: null,
         focusedComponents: null,
-        expandedCheckGroups: new Set(),
+        expandedCheckGroups: new Set(["Unresolved"]),
         snapshotReset: null,
         activeMotion: null,
         motionProgress: 0,
@@ -1161,7 +1161,7 @@
           state.checkRequest += 1;
           state.checkReport = null;
           state.focusedFinding = null;
-        state.focusedComponents = null;
+          state.focusedComponents = null;
           state.activeMotion = null;
           state.motionReady = false;
           clearActiveLoad();
@@ -1272,6 +1272,8 @@
       }
 
       function selectFile(file, refreshed = false) {
+        state.expandedCheckGroups.clear();
+        state.expandedCheckGroups.add("Unresolved");
         state.selectedPath = file.path;
         state.selectedVersion = file.version;
         state.checkRequest += 1;
@@ -1486,12 +1488,6 @@
 
       function renderChecks(report) {
         renderCheckMessage(capitalize(report.outcome), report.summary, report.outcome);
-        for (const reason of report.incomplete_reasons || []) {
-          const message = document.createElement("p");
-          message.className = "check-reason";
-          message.textContent = reason.message;
-          checksContent.append(message);
-        }
 
         const list = document.createElement("div");
         list.className = "finding-list";
@@ -1499,7 +1495,7 @@
           open_component_mesh: "Open mesh",
           below_tessellation_resolution: "Below mesh sampling resolution",
           below_coordinate_resolution: "Below coordinate resolution",
-          planar_contact: "Contact · Separating plane proven",
+          planar_contact: "Contact · Within STEP tolerance",
         })[code] || code;
         const appendPair = (parent, finding, unresolved = false) => {
           const button = document.createElement("button");
@@ -1545,6 +1541,7 @@
           for (const [key, group] of groups) {
             const details = document.createElement("details");
             details.className = "check-group";
+            details.dataset.group = key;
             details.open = state.expandedCheckGroups.has(key);
             details.addEventListener("toggle", () => {
               if (details.open) state.expandedCheckGroups.add(key);
@@ -1578,6 +1575,13 @@
         };
         appendGroups(report.unresolved_pairs || [], "Unresolved", true);
         appendGroups(report.contact_pairs || [], "Contacts", false);
+
+        for (const reason of report.incomplete_reasons || []) {
+          const message = document.createElement("p");
+          message.className = "check-reason";
+          message.textContent = reason.message;
+          checksContent.append(message);
+        }
 
         if (state.focusedFinding) {
           const clear = document.createElement("button");

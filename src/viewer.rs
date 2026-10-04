@@ -1708,13 +1708,20 @@ angle_degrees = 90.0
     }
 
     #[test]
-    fn viewer_focus_is_sorted_and_rejects_invalid_pairs() {
+    fn viewer_focus_sorts_groups_and_rejects_invalid_selections() {
         assert_eq!(
             FocusPair::from_query(Some("5,2")).unwrap(),
             Some(FocusPair {
                 indexes: vec![2, 5],
             })
         );
+        assert_eq!(
+            FocusPair::from_query(Some("5,2,9,1")).unwrap(),
+            Some(FocusPair {
+                indexes: vec![1, 2, 5, 9]
+            })
+        );
+        assert!(FocusPair::from_query(Some("2")).is_err());
         assert!(FocusPair::from_query(Some("2,2")).is_err());
         assert!(FocusPair::from_query(Some("two,5")).is_err());
     }

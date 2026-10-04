@@ -184,6 +184,8 @@ try {
   const touching = model(initialTree, "models/assemblies/touching.step")
   const touchingReport = await getJson(`/api/checks?path=${encodeURIComponent(touching.path)}`)
   expectEqual(touchingReport.outcome, "pass", "face-touching assembly outcome")
+  expectEqual(touchingReport.contact_pairs.length, 1, "source-proven touching contact")
+  expectEqual((touchingReport.unresolved_pairs || []).length, 0, "contact is resolved separately")
 
   const intersecting = model(initialTree, "models/assemblies/intersecting.step")
   const intersectingReport = await getJson(
