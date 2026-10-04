@@ -121,15 +121,17 @@ lines += ['', '## Measurement limits', '',
     '- Corpus models and raw repro geometry remain external measurement inputs under their original licences. [sources.csv](sources.csv) records URLs, licences, repository revisions and SHA-256 values. Burr receives no GPL/CC CAD fixture in this change. The nullable Look regression is synthetic; the two source-derived face snippets in Look have separate source notices/licences.',
     '', '## Reproduce', '', '```sh',
     '# Put the original corpus at CORPUS, using sources.csv and the original reducers.',
+    '# Use a Python interpreter with psutil installed (python3 -m pip install psutil).',
+    'BURR_PYTHON="${BURR_PYTHON:-python3}"',
     'mkdir -p examples',
     'cp artifacts/corpus/scripts/corpus-bench.rs examples/corpus-bench.rs',
     'until mkdir /tmp/burr-build.lock 2>/dev/null; do sleep 15; done',
     'CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=/tmp/burr-target cargo build --release --locked --bin burr --example corpus-bench',
     'rmdir /tmp/burr-build.lock',
     'until mkdir /tmp/burr-build.lock 2>/dev/null; do sleep 15; done',
-    'CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=/tmp/burr-target /tmp/burr-occt-venv/bin/python artifacts/corpus/scripts/run_integrated.py --corpus "$CORPUS" --manifest artifacts/corpus/baseline-0.35.json --output artifacts/corpus/logs-0.36 --binary /tmp/burr-target/release/examples/corpus-bench',
+    'CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=/tmp/burr-target "$BURR_PYTHON" artifacts/corpus/scripts/run_integrated.py --corpus "$CORPUS" --manifest artifacts/corpus/baseline-0.35.json --output artifacts/corpus/logs-0.36 --binary /tmp/burr-target/release/examples/corpus-bench',
     'rmdir /tmp/burr-build.lock', '```', '',
-    'The runner uses the recorded baseline JSON as its 21-model manifest and appends all six `.step` repros. It skips completed runs; choose an empty output directory for a new measurement. Raw integrated reports, metrics and diagnostic JSONL files are retained under `logs-0.36/`. Aggregate before/after rows are in [results-0.36.json](results-0.36.json).', '']
+    'The runner uses the recorded baseline JSON as its 21-model manifest and requires all six inputs from `repros-manifest.json`, rejecting missing or unlisted repros. It skips completed runs only when the source/binary hashes match and the result file is readable; choose an empty output directory for a new measurement. Raw integrated reports, metrics and diagnostic JSONL files are retained under `logs-0.36/`. Aggregate before/after rows are in [results-0.36.json](results-0.36.json).', '']
 args.output.write_text('\n'.join(lines))
 args.output.with_suffix('.json').write_text(json.dumps(dict(burr_head=args.burr_head, look_head=args.look_head, counts=dict(counts), verdicts=dict(verdicts), models=rows, repros=repros), indent=2) + '\n')
 print(dict(counts), dict(verdicts))

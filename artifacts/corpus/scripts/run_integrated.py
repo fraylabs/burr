@@ -14,24 +14,34 @@ binary_sha = hashlib.sha256(args.binary.read_bytes()).hexdigest()
 rows = json.loads((args.manifest or args.corpus / "results.json").read_text())
 files = [(args.corpus / row["file"], row["sha256"]) for row in rows]
 repro_manifest = (args.manifest.parent / "repros-manifest.json") if args.manifest else args.corpus / "repros" / "manifest.json"
-repro_hashes = {row["file"]: row["sha256"] for row in json.loads(repro_manifest.read_text())} if repro_manifest.exists() else {}
-files += [(p, repro_hashes.get(p.name)) for p in sorted((args.corpus / "repros").glob("*.step"))]
+repro_hashes = {row["file"]: row["sha256"] for row in json.loads(repro_manifest.read_text())}
+actual_repros = {p.name for p in (args.corpus / "repros").glob("*.step")}
+if actual_repros != set(repro_hashes):
+    raise RuntimeError(f"Repro manifest mismatch: missing {sorted(set(repro_hashes) - actual_repros)}, unlisted {sorted(actual_repros - set(repro_hashes))}")
+files += [(args.corpus / "repros" / name, sha) for name, sha in sorted(repro_hashes.items())]
 for file, expected_sha in files:
     sha = hashlib.sha256(file.read_bytes()).hexdigest()
-    if expected_sha and sha != expected_sha:
+    if sha != expected_sha:
         raise RuntimeError(f"Corpus SHA-256 mismatch: {file.name}")
     prefix = args.output / file.name
     metrics = pathlib.Path(str(prefix) + ".burr.metrics.json")
+    out = pathlib.Path(str(prefix) + ".burr.json")
     if metrics.exists():
         existing = json.loads(metrics.read_text())
         if existing.get("sha256") != sha or existing.get("binary_sha256") != binary_sha:
             raise RuntimeError(f"Recorded run has different source or binary: {file.name}")
-        continue
+        try:
+            recorded_result = out.read_text()
+            if existing.get("returncode") == 0:
+                json.loads(recorded_result)
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            pass  # Recover a missing/unreadable result using the same inputs.
+        else:
+            continue
     print("START", file.name, flush=True)
     begin = time.monotonic()
     peak = 0
     cap = None
-    out = pathlib.Path(str(prefix) + ".burr.json")
     err = pathlib.Path(str(prefix) + ".burr.stderr")
     with out.open("w") as stdout, err.open("w") as stderr:
         env = os.environ.copy()

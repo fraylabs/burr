@@ -1,6 +1,6 @@
 # Burr 0.36 real-assembly integration
 
-Measured all 21 original multipart STEP models and the six original repros; report updated 2026-10-04T13:27:52+00:00.
+Measured all 21 original multipart STEP models and the six original repros; report updated 2026-10-04T13:48:29+00:00.
 
 7 of 21 models now agree with the conclusive OCCT assembly verdict, compared with 4 before. Classifications: {'incomplete': 14, 'correct': 7}. Burr verdicts: {'incomplete': 14, 'fail': 6, 'pass': 1}.
 
@@ -88,14 +88,16 @@ A correct overall fail still does not certify its pair list. The cover reports 1
 
 ```sh
 # Put the original corpus at CORPUS, using sources.csv and the original reducers.
+# Use a Python interpreter with psutil installed (python3 -m pip install psutil).
+BURR_PYTHON="${BURR_PYTHON:-python3}"
 mkdir -p examples
 cp artifacts/corpus/scripts/corpus-bench.rs examples/corpus-bench.rs
 until mkdir /tmp/burr-build.lock 2>/dev/null; do sleep 15; done
 CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=/tmp/burr-target cargo build --release --locked --bin burr --example corpus-bench
 rmdir /tmp/burr-build.lock
 until mkdir /tmp/burr-build.lock 2>/dev/null; do sleep 15; done
-CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=/tmp/burr-target /tmp/burr-occt-venv/bin/python artifacts/corpus/scripts/run_integrated.py --corpus "$CORPUS" --manifest artifacts/corpus/baseline-0.35.json --output artifacts/corpus/logs-0.36 --binary /tmp/burr-target/release/examples/corpus-bench
+CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=/tmp/burr-target "$BURR_PYTHON" artifacts/corpus/scripts/run_integrated.py --corpus "$CORPUS" --manifest artifacts/corpus/baseline-0.35.json --output artifacts/corpus/logs-0.36 --binary /tmp/burr-target/release/examples/corpus-bench
 rmdir /tmp/burr-build.lock
 ```
 
-The runner uses the recorded baseline JSON as its 21-model manifest and appends all six `.step` repros. It skips completed runs; choose an empty output directory for a new measurement. Raw integrated reports, metrics and diagnostic JSONL files are retained under `logs-0.36/`. Aggregate before/after rows are in [results-0.36.json](results-0.36.json).
+The runner uses the recorded baseline JSON as its 21-model manifest and requires all six inputs from `repros-manifest.json`, rejecting missing or unlisted repros. It skips completed runs only when the source/binary hashes match and the result file is readable; choose an empty output directory for a new measurement. Raw integrated reports, metrics and diagnostic JSONL files are retained under `logs-0.36/`. Aggregate before/after rows are in [results-0.36.json](results-0.36.json).
