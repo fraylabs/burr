@@ -231,7 +231,7 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
         vec![IncompleteReason {
             code: "open_component_mesh",
             message: format!(
-                "Could not prove a clean result because these tessellated components are not closed: {}.",
+                "Could not prove a clean result because these tessellated components do not form closed solids: {}.",
                 open_components.join(", ")
             ),
         }]
@@ -643,6 +643,37 @@ mod tests {
         vertices[0].position[0] = f32::from_bits(vertices[0].position[0].to_bits() + 1);
         let report = analyze_scene("offset-rounding.step", "fixture", &scene);
         assert_eq!(report.outcome, CheckOutcome::Pass);
+    }
+
+    #[test]
+    fn coincident_double_sided_face_is_not_solid_interference() {
+        let mut scene = compile_scene(
+            &fixture("separated.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        let definition = scene.instances[0].geometry;
+        for instance in &mut scene.instances {
+            instance.geometry = definition;
+            instance.transform = glam::Mat4::IDENTITY;
+        }
+        let geometry = &mut scene.geometries[definition];
+        geometry.vertices.truncate(3);
+        for (vertex, position) in
+            geometry
+                .vertices
+                .iter_mut()
+                .zip([[0.0, 0.0, 0.0], [1.0, 0.0, 1.0], [0.0, 1.0, 1.0]])
+        {
+            vertex.position = position;
+        }
+        geometry.indices = vec![0, 1, 2, 0, 2, 1];
+        // Every edge has two incident faces and all three AABB extents are
+        // positive, but this doubled sloping face encloses no volume.
+        let report = analyze_scene("double-sided-face.step", "fixture", &scene);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert!(report.findings.is_empty());
     }
 
     #[test]

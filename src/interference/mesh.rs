@@ -165,7 +165,19 @@ impl Mesh {
                 *edges.entry([a.min(b), a.max(b)]).or_default() += 1;
             }
         }
-        let closed = !triangles.is_empty() && edges.values().all(|&count| count == 2);
+        // A closed edge graph can be a doubled sheet with no solid interior.
+        // Center the tetrahedra to avoid cancellation from an origin offset.
+        let origin = (bounds.min + bounds.max) * 0.5;
+        let six_volume: f64 = triangles
+            .iter()
+            .map(|t| {
+                (points[t[0] as usize] - origin)
+                    .dot((points[t[1] as usize] - origin).cross(points[t[2] as usize] - origin))
+            })
+            .sum();
+        let closed = !triangles.is_empty()
+            && edges.values().all(|&count| count == 2)
+            && six_volume.abs() > bounds.diagonal().powi(3) * 6e-12;
         drop(edges);
         drop(cells);
         drop(remap);
