@@ -152,6 +152,8 @@ def main():
                    before_triangles=a['triangles'], after_triangles=b['triangles'],
                    incomplete_reasons=b['reasons'],
                    structure_errors=b['structure_errors'])
+        if current is not None:
+            row['current_main'] = current
         diagnostics = args.after / (name + '.diagnostics.jsonl')
         if diagnostics.exists() and not row['after_measurement_capped']:
             row['face_refusal_reasons'] = dict(Counter(
@@ -247,6 +249,8 @@ def main():
                    measured_binary_sha256=read(next(args.after.glob('*.burr.metrics.json')))['binary_sha256'],
                    baseline_binary_sha256=read(next(args.before.glob('*.burr.metrics.json')))['binary_sha256'],
                    scene_binary_sha256=hashlib.sha256(args.scene_binary.read_bytes()).hexdigest())
+    if args.current_main:
+        summary['current_main_binary_sha256'] = read(next(args.current_main.glob('*.burr.metrics.json')))['binary_sha256']
     if summary['protected_true'] < 64 or summary['protected_false']:
         raise RuntimeError('Protected pair gate failed')
     (args.output / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
