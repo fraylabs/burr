@@ -2,6 +2,11 @@ name: Check
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: Published version to install smoke (leave empty for normal checks)
+        required: false
+        type: string
   pull_request:
   push:
     branches:
@@ -16,10 +21,11 @@ concurrency:
 
 jobs:
   binaries:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.version == ''
     uses: ./.github/workflows/build-binaries.yml
 
   check:
+    if: github.event_name != 'workflow_dispatch' || inputs.version == ''
     name: Burr
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -44,3 +50,9 @@ jobs:
 
       - name: Confirm checks did not modify tracked files
         run: git diff --exit-code
+
+  install_smoke:
+    if: github.event_name == 'workflow_dispatch' && inputs.version != ''
+    uses: ./.github/workflows/install-smoke.yml
+    with:
+      version: ${{ inputs.version }}
