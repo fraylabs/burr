@@ -3,7 +3,11 @@
 use glam::{DMat4, DVec3, DVec4};
 use look::scene::CompiledScene;
 use ruststep::ast::{DataSection, EntityInstance, Name, Parameter};
-use std::{collections::HashMap, path::Path, sync::Arc};
+use std::{
+    collections::HashMap,
+    path::Path,
+    sync::{Arc, OnceLock},
+};
 use truck_assembly::assy::EdgeEntity;
 use truck_stepio::r#in::{
     convert::{AssembleEntity, ProductEntity, ProductShape},
@@ -37,6 +41,8 @@ struct AnalyticBoundary {
     normals: Vec<DVec3>,
     source_tolerance: Option<f64>,
     operand_magnitude: f64,
+    // Initialized after construction; the shared boundary is immutable.
+    local_magnitude: OnceLock<f64>,
 }
 
 struct CylinderSupport {
@@ -236,10 +242,9 @@ impl SourceEvidence {
         let ab = a.boundary.as_ref()?;
         let bb = b.boundary.as_ref()?;
         for (occurrence, boundary) in [(a, ab), (b, bb)] {
+            let inverse_transpose = occurrence.world.inverse().transpose();
             for &local_normal in &boundary.normals {
-                let inverse = occurrence.world.inverse();
-                let normal = inverse
-                    .transpose()
+                let normal = inverse_transpose
                     .transform_vector3(local_normal)
                     .normalize();
                 if !normal.is_finite() {
@@ -486,7 +491,9 @@ impl AnalyticBoundary {
                         {
                             return None;
                         }
-                        out.normals.push(normal);
+                        if !out.normals.contains(&normal) && !out.normals.contains(&-normal) {
+                            out.normals.push(normal);
+                        }
                     }
                     Surface::ElementarySurface(ElementarySurface::Sphere(sphere)) => {
                         let m = matrix(sphere.transform());
@@ -565,6 +572,11 @@ impl AnalyticBoundary {
         {
             return None;
         }
+        let local = out.compute_local_magnitude();
+        if !local.is_finite() {
+            return None;
+        }
+        out.local_magnitude.set(local).ok()?;
         Some(out)
     }
 
@@ -587,12 +599,7 @@ impl AnalyticBoundary {
         Some(())
     }
 
-    fn arithmetic_error(&self, world: DMat4, direction: DVec3, placement_depth: usize) -> f64 {
-        // Bound arithmetic using operand magnitudes, not just the final
-        // coordinates: large local coordinates can cancel a large placement.
-        // `world` is the product of absolute source placement matrices.
-        // Intermediate placement cancellation cannot shrink this operand bound.
-        // Account for that chain as well as carrier/support evaluation.
+    fn compute_local_magnitude(&self) -> f64 {
         let mut local = self
             .points
             .iter()
@@ -616,6 +623,18 @@ impl AnalyticBoundary {
                         .max(cylinder.axial_range.1.abs()),
             );
         }
+        local
+    }
+
+    fn arithmetic_error(&self, world: DMat4, direction: DVec3, placement_depth: usize) -> f64 {
+        // Bound arithmetic using operand magnitudes, not just the final
+        // coordinates: large local coordinates can cancel a large placement.
+        // `world` is the product of absolute source placement matrices.
+        // Intermediate placement cancellation cannot shrink this operand bound.
+        // Account for that chain as well as carrier/support evaluation.
+        let local = *self
+            .local_magnitude
+            .get_or_init(|| self.compute_local_magnitude());
         let operands = world.x_axis.truncate().abs() * local
             + world.y_axis.truncate().abs() * local
             + world.z_axis.truncate().abs() * local

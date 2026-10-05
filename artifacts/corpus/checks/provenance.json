@@ -23,7 +23,7 @@
     "command": "npm run check",
     "tests_passed": 88,
     "viewer_passed": true,
-    "log": "/Users/brianlim/coding/fray/artifacts/burr-checks/npm-final.log"
+    "log": "npm-final.log"
   },
   "reference_scope_tests_passed": 8,
   "final_source_tree": "58fc54ca3f8a04232515a3444485263d407180de",
@@ -31,9 +31,8 @@
     {
       "label": "after-control-unit",
       "model": "text-to-cad-assembly__automation_control_unit.step",
-      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-final",
+      "binary": "burr-final",
       "binary_sha256": "e45e2f6cedba3977a4ba69ebf96b4ab9e0d07ef82a4260319784f9e07d3e28f2",
-      "personally_inspected": true,
       "counts": {
         "real": 12,
         "contact": 2,
@@ -45,29 +44,31 @@
       "pair_highlight": null,
       "screenshots": [
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-control-unit/workbench-solid.png",
+          "path": "evidence/after-control-unit/workbench-solid.png",
           "sha256": "d25a5d49bffbb2404574367bdf23306df7194783f1ee7a2939ec5e9e149b44f3"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-control-unit/workbench-x-ray.png",
+          "path": "evidence/after-control-unit/workbench-x-ray.png",
           "sha256": "886ad816562fbe88cb41f7dba39ee46a834c4da7c25b85881afad34c7e12cfe8"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-control-unit/workbench-finding-solid.png",
+          "path": "evidence/after-control-unit/workbench-finding-solid.png",
           "sha256": "4aa547060644fa4141df401023cf114c3f7ac1a3623d786ee46ec9c361aec29a"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-control-unit/workbench-finding-x-ray.png",
+          "path": "evidence/after-control-unit/workbench-finding-x-ray.png",
           "sha256": "91394ab37bee8f56ad8a08dcff936a6d5bf373f60c120c514e626a3781e7bf62"
         }
+      ],
+      "inspected_screenshots": [
+        "evidence/after-control-unit/workbench-solid.png"
       ]
     },
     {
       "label": "after-faze4",
       "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
-      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-final",
+      "binary": "burr-final",
       "binary_sha256": "e45e2f6cedba3977a4ba69ebf96b4ab9e0d07ef82a4260319784f9e07d3e28f2",
-      "personally_inspected": true,
       "counts": {
         "real": 9,
         "contact": 93,
@@ -79,29 +80,32 @@
       "pair_highlight": "0,5",
       "screenshots": [
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4/workbench-solid.png",
+          "path": "evidence/after-faze4/workbench-solid.png",
           "sha256": "f7697255d2f09ebbe961533f322f7541e000f7d19c73ea7752961075ad2bd16e"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4/workbench-x-ray.png",
+          "path": "evidence/after-faze4/workbench-x-ray.png",
           "sha256": "bc96a94868192e0596c81aa9fc574ea80c8dbbacfe8242af4bfe77c85cbda626"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4/workbench-group-highlight.png",
+          "path": "evidence/after-faze4/workbench-group-highlight.png",
           "sha256": "f1668cabf5afda0e0a836896f441144886e8e0b7e68e5c0fa7ecd311b4797f7f"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4/workbench-group-pair.png",
+          "path": "evidence/after-faze4/workbench-group-pair.png",
           "sha256": "7f0bc3f30a8451a36a7778288bbffa1e5823f6dee49bd3cb4139a8ee22efc5ce"
         }
+      ],
+      "inspected_screenshots": [
+        "evidence/after-faze4/workbench-solid.png",
+        "evidence/after-faze4/workbench-group-highlight.png"
       ]
     },
     {
       "label": "after-faze4-contacts",
       "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
-      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-final",
+      "binary": "burr-final",
       "binary_sha256": "e45e2f6cedba3977a4ba69ebf96b4ab9e0d07ef82a4260319784f9e07d3e28f2",
-      "personally_inspected": true,
       "counts": {
         "real": 9,
         "contact": 93,
@@ -113,29 +117,31 @@
       "pair_highlight": "0,64",
       "screenshots": [
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4-contacts/workbench-solid.png",
+          "path": "evidence/after-faze4-contacts/workbench-solid.png",
           "sha256": "f7697255d2f09ebbe961533f322f7541e000f7d19c73ea7752961075ad2bd16e"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4-contacts/workbench-x-ray.png",
+          "path": "evidence/after-faze4-contacts/workbench-x-ray.png",
           "sha256": "bc96a94868192e0596c81aa9fc574ea80c8dbbacfe8242af4bfe77c85cbda626"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4-contacts/workbench-group-highlight.png",
+          "path": "evidence/after-faze4-contacts/workbench-group-highlight.png",
           "sha256": "ecaff9dc9bb11f16a7a8e3c8210f3310a1527501c299daf929c9b7db0b3fca7e"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4-contacts/workbench-group-pair.png",
+          "path": "evidence/after-faze4-contacts/workbench-group-pair.png",
           "sha256": "0d7a111953488819d1a2544874dc9635cb27d73407e247195594dd50d8133f1e"
         }
+      ],
+      "inspected_screenshots": [
+        "evidence/after-faze4-contacts/workbench-group-highlight.png"
       ]
     },
     {
       "label": "after-robot-cover",
       "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
-      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-final",
+      "binary": "burr-final",
       "binary_sha256": "e45e2f6cedba3977a4ba69ebf96b4ab9e0d07ef82a4260319784f9e07d3e28f2",
-      "personally_inspected": true,
       "counts": {
         "real": 16,
         "contact": 0,
@@ -147,29 +153,31 @@
       "pair_highlight": null,
       "screenshots": [
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-robot-cover/workbench-solid.png",
+          "path": "evidence/after-robot-cover/workbench-solid.png",
           "sha256": "3581f4628a13c0c455fe64ca07f663e0e756359a1ea9d441cdfca13f7a282f82"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-robot-cover/workbench-x-ray.png",
+          "path": "evidence/after-robot-cover/workbench-x-ray.png",
           "sha256": "5ac7218358adb25a7dbe7f3892a3c4f1baf42f9de13d541d228cc523ba697154"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-robot-cover/workbench-finding-solid.png",
+          "path": "evidence/after-robot-cover/workbench-finding-solid.png",
           "sha256": "316625642e2919c646aa9ceeb243fd450349447187d1a1c9034614ff9e5295eb"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-robot-cover/workbench-finding-x-ray.png",
+          "path": "evidence/after-robot-cover/workbench-finding-x-ray.png",
           "sha256": "aa5247382dde45fb4c977a17fc028083be366de6f33df258e480f0f58734e575"
         }
+      ],
+      "inspected_screenshots": [
+        "evidence/after-robot-cover/workbench-solid.png"
       ]
     },
     {
       "label": "before-control-unit",
       "model": "text-to-cad-assembly__automation_control_unit.step",
-      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-before039",
+      "binary": "burr-before039",
       "binary_sha256": "be6e8805930bcff02b10dd6397b59376384af3fecdbf04079573d33e9c8d2ec7",
-      "personally_inspected": true,
       "counts": {
         "real": 12,
         "contact": 0,
@@ -181,29 +189,31 @@
       "pair_highlight": null,
       "screenshots": [
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-control-unit/workbench-solid.png",
+          "path": "evidence/before-control-unit/workbench-solid.png",
           "sha256": "dd8a4b70b4f4f3fb91339caf1a5cdb9f8bcc7bcffacd22ad849b17389e69c241"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-control-unit/workbench-x-ray.png",
+          "path": "evidence/before-control-unit/workbench-x-ray.png",
           "sha256": "77c69f2a8b3080c610a5e1099910f253453e76e18aa90a6fd68a00275927cea3"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-control-unit/workbench-finding-solid.png",
+          "path": "evidence/before-control-unit/workbench-finding-solid.png",
           "sha256": "7aee09aa31aa54fa6c2af64c77970952538808fd6e809ba3577d365136ab5fba"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-control-unit/workbench-finding-x-ray.png",
+          "path": "evidence/before-control-unit/workbench-finding-x-ray.png",
           "sha256": "033a0ca72e9f06099ebb6540a2d4148510025c447e226be24b4e1e15c52d246f"
         }
+      ],
+      "inspected_screenshots": [
+        "evidence/before-control-unit/workbench-solid.png"
       ]
     },
     {
       "label": "before-faze4",
       "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
-      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-before039",
+      "binary": "burr-before039",
       "binary_sha256": "be6e8805930bcff02b10dd6397b59376384af3fecdbf04079573d33e9c8d2ec7",
-      "personally_inspected": true,
       "counts": {
         "real": 9,
         "contact": 0,
@@ -215,21 +225,23 @@
       "pair_highlight": null,
       "screenshots": [
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-faze4/workbench-solid.png",
+          "path": "evidence/before-faze4/workbench-solid.png",
           "sha256": "c7b74f1004bdf7f66471d55d7491e44f75f2b7ea36448e176e16a92d4e9719a5"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-faze4/workbench-x-ray.png",
+          "path": "evidence/before-faze4/workbench-x-ray.png",
           "sha256": "000cf425e5837f35e82ff7f3c592ae4c00604c335a162524732b9d3dd00e5a8d"
         }
+      ],
+      "inspected_screenshots": [
+        "evidence/before-faze4/workbench-solid.png"
       ]
     },
     {
       "label": "before-robot-cover",
       "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
-      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-before039",
+      "binary": "burr-before039",
       "binary_sha256": "be6e8805930bcff02b10dd6397b59376384af3fecdbf04079573d33e9c8d2ec7",
-      "personally_inspected": true,
       "counts": {
         "real": 16,
         "contact": 0,
@@ -241,22 +253,26 @@
       "pair_highlight": null,
       "screenshots": [
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-robot-cover/workbench-solid.png",
+          "path": "evidence/before-robot-cover/workbench-solid.png",
           "sha256": "edd55f112aeec6c02a90346bab797360561918e7fd6fcb33d13e69ca6a7f8fac"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-robot-cover/workbench-x-ray.png",
+          "path": "evidence/before-robot-cover/workbench-x-ray.png",
           "sha256": "c8f49b4f5e0bef17189b0c42cc13db63716588a38213426f7adeb65e31451319"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-robot-cover/workbench-finding-solid.png",
+          "path": "evidence/before-robot-cover/workbench-finding-solid.png",
           "sha256": "adc72402600803c2e6aa442c7ea310d9ab499624474d98a57a172301db28f17a"
         },
         {
-          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-robot-cover/workbench-finding-x-ray.png",
+          "path": "evidence/before-robot-cover/workbench-finding-x-ray.png",
           "sha256": "f789e8e2ced151df66c099de60616018fe32c958d5c2307e7ca092d42dfe91fc"
         }
+      ],
+      "inspected_screenshots": [
+        "evidence/before-robot-cover/workbench-solid.png"
       ]
     }
-  ]
+  ],
+  "path_base": "local burr-checks evidence directory; artifacts retained outside the repository"
 }

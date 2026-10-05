@@ -509,6 +509,12 @@ pub fn analyze_scene_from_source(
             pair.components[1].occurrence_index,
         )
     });
+    contact_pairs.sort_by_key(|pair| {
+        (
+            pair.components[0].occurrence_index,
+            pair.components[1].occurrence_index,
+        )
+    });
     let mut incomplete_reasons = if open_components.is_empty() {
         Vec::new()
     } else {
@@ -939,7 +945,7 @@ mod tests {
         let path = fixture(name);
         let mut timings = Timings::default();
         let scene = compile_scene(&path, UpAxis::Z, &mut timings).unwrap();
-        analyze_scene(name, "fixture", &scene)
+        analyze_scene_from_source(name, "fixture", &scene, &path)
     }
 
     #[test]
