@@ -26,6 +26,10 @@ def identity(name):
 
 def validate_reference_scope(reference, found, reported_pairs_only):
     scope = reference.get('pair_check_scope', 'all_pairs')
+    if scope == 'mapping_only':
+        if not reported_pairs_only:
+            raise ValueError('Occurrence-mapping reference requires reported-pairs-only mode')
+        return scope
     if scope == 'reported_pairs':
         if not reported_pairs_only:
             raise ValueError('Pair-limited OCCT reference requires --reported-pairs-only')
@@ -48,11 +52,17 @@ def source_bounds(shape, index, name):
     return [b.xmin, b.zmin, -b.ymax, b.xmax, b.zmax, -b.ymin]
 
 
-def compare(model, scene_path, burr_path, occt_path, reference_complete=False, reported_pairs_only=False):
+def compare(model, scene_path, burr_path, occt_path, reference_complete=False, reported_pairs_only=False, occurrence_indexes=None):
     scene = json.loads(scene_path.read_text(encoding="utf-8"))['parts']
     report = json.loads(burr_path.read_text(encoding="utf-8"))['report']
-    reported_occurrences = {c['occurrence_index'] for finding in report['findings']
+    reported_occurrences = {c['occurrence_index'] for finding in report['findings'] + report.get('contact_pairs', [])
                             for c in finding['components']}
+    if occurrence_indexes is not None:
+        if not reported_pairs_only:
+            raise ValueError('Explicit occurrence subset requires reported-pairs-only mode')
+        reported_occurrences.update(occurrence_indexes)
+    if any(index < 0 or index >= len(scene) for index in reported_occurrences):
+        raise ValueError('Reported occurrence is outside the scene')
     exact = components(model)
     if len(exact) == 1 and len(cq.Shape.cast(exact[0][1]).Solids()) > 1:
         exact = [('solid:' + str(i), s.wrapped)
@@ -94,7 +104,8 @@ def compare(model, scene_path, burr_path, occt_path, reference_complete=False, r
                              box_error_mm=distance, alternative_box_error_mm=alternative if len(exact) > 1 else None,
                              surface_sample_error_mm=sample_error, source_identity=left_id or right_id))
     reference = json.loads(occt_path.read_text(encoding="utf-8"))
-    if not reference.get('pair_check_complete', reference_complete):
+    partial_scope = reference.get('pair_check_scope') in ('reported_pairs', 'mapping_only')
+    if not reference.get('pair_check_complete', reference_complete) and not (reported_pairs_only and partial_scope):
         raise ValueError('OCCT reference did not finish its pair scan')
     if reference['names'] != [n for n, _ in exact]:
         raise ValueError('OCCT occurrence identity changed from the recorded reference')
@@ -102,12 +113,16 @@ def compare(model, scene_path, burr_path, occt_path, reference_complete=False, r
     def pair(f):
         return tuple(sorted(mapping[c['occurrence_index']] for c in f['components']))
     found = {pair(f): f for f in report['findings']}
-    scope = validate_reference_scope(reference, found.keys(), reported_pairs_only)
+    contacts = {pair(f): f for f in report.get('contact_pairs', [])}
+    scope = validate_reference_scope(reference, found.keys() | contacts.keys(), reported_pairs_only)
     unresolved = {pair(f): f for f in report.get('unresolved_pairs', [])
                   if all(c['occurrence_index'] in mapping for c in f['components'])}
     return dict(model=model.name, comparison_mode='reported_pairs_only' if reported_pairs_only else 'all_occurrences',
                 reference_scope=scope,
                 occurrence_mapping_complete=len(mapping) == len(scene), mapping=evidence, exact_pair_count=len(positives),
+                contact_pair_count=len(contacts),
+                occt_positive_contacts=[dict(pair=p, burr=contacts[p], occt=positives[p])
+                                        for p in sorted(contacts.keys() & positives.keys())],
                 confirmed_pair_count=len(found), matched_pairs=sorted(found.keys() & positives.keys()),
                 extra_pairs=[dict(pair=p, burr=found[p]) for p in sorted(found.keys() - positives.keys())],
                 missing_pairs=[dict(pair=p, occt=positives[p], unresolved=unresolved.get(p))
@@ -129,7 +144,10 @@ def main():
     result = compare(args.model, args.scene, args.burr, args.occt, args.reference_complete, args.reported_pairs_only)
     args.output.write_text(json.dumps(result, indent=2) + '\n', encoding="utf-8")
     print(args.model.name, 'matched', len(result['matched_pairs']), 'extra', len(result['extra_pairs']),
-          'missing', len(result['missing_pairs']), 'unresolved', len(result['unresolved_pairs']))
+          'missing', len(result['missing_pairs']), 'unresolved', len(result['unresolved_pairs']),
+          'contacts', result['contact_pair_count'], 'positive contacts', len(result['occt_positive_contacts']))
+    if result['occt_positive_contacts']:
+        raise SystemExit('A true OCCT interference was classified as contact')
 
 
 if __name__ == '__main__':

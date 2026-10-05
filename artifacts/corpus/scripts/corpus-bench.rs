@@ -14,7 +14,7 @@ fn main() {
                 serde_json::json!({"load_s":load,"stages_ms":timings,"parts":scene.instances.len(),"geometries":scene.geometries.len(),"step_import":scene.statistics.step_import,"structure_errors":scene.assembly_structure_errors,"triangles":scene.geometries.iter().map(|g|g.indices.len()/3).sum::<usize>()})
             );
             let check = Instant::now();
-            let report = interference::analyze_scene(&file, &scene.source_hash, &scene);
+            let report = interference::analyze_scene_from_source(&file, &scene.source_hash, &scene, Path::new(&file));
             println!(
                 "{}",
                 serde_json::json!({"load_s":load,"stages_ms":timings,"check_s":check.elapsed().as_secs_f64(),"parts":scene.instances.len(),"geometries":scene.geometries.len(),"step_import":scene.statistics.step_import,"structure_errors":scene.assembly_structure_errors,"triangles":scene.geometries.iter().map(|g|g.indices.len()/3).sum::<usize>(),"report":report})

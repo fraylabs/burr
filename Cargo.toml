@@ -12,9 +12,13 @@ blake3 = "1.8"
 glam = "0.30"
 look = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
 percent-encoding = "2.3.2"
+ruststep = "0.4"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tiny_http = "0.12.0"
+truck-assembly = "0.1"
+truck-topology = "0.6"
+truck-stepio = "0.3"
 toml = "0.9"
 
 tempfile = "3.12"

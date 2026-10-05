@@ -1,0 +1,1447 @@
+{
+  "baseline_commit": "62e7a2d0d089081427ada03ad51ef3a139255dd8",
+  "candidate_code_commit": "af063e2d8cff3e1a969911723fa2cbc8d78a7b9f",
+  "look_revision": "6b1021cd0d7e4f19a7d94f67ae92987db853d223",
+  "zero_false_gate": {
+    "confirmed_true": 97,
+    "confirmed_false": 0,
+    "occt_positive_contacts": 0,
+    "protected_ten_true": 64,
+    "bowden_true": 9,
+    "integrated_importer_true": 24,
+    "bowden_scope": "pair limited; full candidate completeness unknown"
+  },
+  "contact_verifications": [
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        1
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        2
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        3
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        4
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        6
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        8
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        9
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        10
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        11
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        12
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        13
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        14
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        15
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        16
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        17
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        18
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        19
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        20
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        21
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        22
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        23
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        24
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        25
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        26
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        27
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        28
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        29
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        30
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        31
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        32
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        33
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        34
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        35
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        36
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        37
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        38
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        39
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        40
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        41
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        42
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        43
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        44
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        45
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        46
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        47
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        48
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        49
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        50
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        51
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        52
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        53
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        54
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        55
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        56
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        57
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        58
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        59
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        60
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        61
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        62
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        63
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        64
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        65
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        66
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        67
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        68
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        69
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        70
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        71
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        72
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        73
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        74
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        75
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        76
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        77
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        78
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        103
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        106
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        109
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        112
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        115
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        118
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        121
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        123
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        126
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        128
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        129
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        130
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        131
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        132
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        133
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        134
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "pair": [
+        0,
+        135
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "pair": [
+        0,
+        1
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 0.000105375
+    },
+    {
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "pair": [
+        12,
+        13
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1.9600000000000002e-05
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "pair": [
+        0,
+        16
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 1e-06
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "pair": [
+        1,
+        2
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 4.800000000000001e-06
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "pair": [
+        2,
+        3
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 4.800000000000001e-06
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "pair": [
+        3,
+        4
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 2.3509999999999996e-06
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "pair": [
+        3,
+        5
+      ],
+      "volume_mm3": 0.0,
+      "threshold_mm3": 2.3509999999999996e-06
+    }
+  ],
+  "extra_models": [
+    {
+      "model": "FreeCAD-library__Yellow_gearmotor_L.step",
+      "outcome": "fail",
+      "true": 4,
+      "false": 0,
+      "missing": 0
+    },
+    {
+      "model": "01-gearmotor-contact.step",
+      "outcome": "incomplete",
+      "true": 0,
+      "false": 0,
+      "missing": 0
+    },
+    {
+      "model": "08-hinge-base-rivets.step",
+      "outcome": "incomplete",
+      "true": 0,
+      "false": 0,
+      "missing": 0
+    },
+    {
+      "model": "09-jig-open-components.step",
+      "outcome": "incomplete",
+      "true": 0,
+      "false": 0,
+      "missing": 0
+    },
+    {
+      "model": "10-gearmotor-coordinate.step",
+      "outcome": "incomplete",
+      "true": 0,
+      "false": 0,
+      "missing": 0
+    }
+  ],
+  "full_check": {
+    "tests_passed": 90,
+    "strict_clippy_passed": true,
+    "viewer_proof_passed": true
+  },
+  "browser": {
+    "chromeVersion": "154.0.8037.95",
+    "state": {
+      "focused": "group:below_coordinate_resolution:0:2",
+      "mode": "x-ray",
+      "sections": [
+        {
+          "label": "Unresolved \u00b7 33 pairs",
+          "open": true
+        },
+        {
+          "label": "Contacts / separated \u00b7 93 pairs",
+          "open": false
+        }
+      ],
+      "groups": [
+        {
+          "label": "Board \u00d7 LTV-817S \u2014 9 pairs \u00b7 Below coordinate resolution",
+          "open": true
+        },
+        {
+          "label": "Board \u00d7 sot-23-3 \u2014 24 pairs \u00b7 Below coordinate resolution",
+          "open": false
+        },
+        {
+          "label": "Board \u00d7 0603_resistor \u2014 84 pairs \u00b7 Contact or separated \u00b7 Within STEP precision",
+          "open": false
+        },
+        {
+          "label": "Board \u00d7 LED_0603_Base_YELLOW \u2014 9 pairs \u00b7 Contact or separated \u00b7 Within STEP precision",
+          "open": false
+        }
+      ]
+    },
+    "render": {
+      "occurrences": 136,
+      "definitions": 6,
+      "renderer": "WebKit WebGL",
+      "webglError": 0
+    },
+    "modes": {
+      "solid": {
+        "samples": [
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          }
+        ],
+        "orange": 150014,
+        "cyan": 3005,
+        "error": 0
+      },
+      "x-ray": {
+        "samples": [
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          }
+        ],
+        "orange": 150014,
+        "cyan": 3005,
+        "error": 0
+      }
+    },
+    "errors": [],
+    "screenshot": "faze4-unresolved-group-xray.png",
+    "screenshot_sha256": "0acd090bce116366b1f7ee32c20c6826e872f083345ed9a8eba1af2bc95590c2",
+    "inspected": true
+  },
+  "binary_sha256": {
+    "checks-burr": "147c62e511f82174d4b366cd4de4815d8817bc17c30c253ee501d8a0cb8ec81c",
+    "checks-bench": "bb6b010f003b7dc2dbdc24f8778baca23304816b5f567beadf925d0a0794621c",
+    "checks-scene": "43d82e6a57ae60ffac035b8f1d6e744b18cf015c9be4f3d11ed418b8d4d0becb",
+    "checks-import": "7cefd5557cbd5cc9186f61d580367ae2957faa3eeab31849ddcdb6c64e2db8bb"
+  },
+  "paired_imports": [
+    {
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "runs": [
+        {
+          "iteration": 0,
+          "version": "baseline",
+          "load_s": 14.383087,
+          "parts": 1691,
+          "triangles": 6909362
+        },
+        {
+          "iteration": 0,
+          "version": "checks",
+          "load_s": 14.914861375,
+          "parts": 1691,
+          "triangles": 6909043
+        },
+        {
+          "iteration": 0,
+          "version": "checks",
+          "load_s": 14.053661417,
+          "parts": 1691,
+          "triangles": 6909043
+        },
+        {
+          "iteration": 0,
+          "version": "baseline",
+          "load_s": 14.929041625,
+          "parts": 1691,
+          "triangles": 6909362
+        },
+        {
+          "iteration": 1,
+          "version": "checks",
+          "load_s": 14.415327208,
+          "parts": 1691,
+          "triangles": 6909043
+        },
+        {
+          "iteration": 1,
+          "version": "baseline",
+          "load_s": 14.181599791,
+          "parts": 1691,
+          "triangles": 6909362
+        },
+        {
+          "iteration": 1,
+          "version": "baseline",
+          "load_s": 15.063909959,
+          "parts": 1691,
+          "triangles": 6909362
+        },
+        {
+          "iteration": 1,
+          "version": "checks",
+          "load_s": 15.236718625,
+          "parts": 1691,
+          "triangles": 6909043
+        },
+        {
+          "iteration": 2,
+          "version": "baseline",
+          "load_s": 13.716156833,
+          "parts": 1691,
+          "triangles": 6909362
+        },
+        {
+          "iteration": 2,
+          "version": "checks",
+          "load_s": 14.360130166,
+          "parts": 1691,
+          "triangles": 6909043
+        },
+        {
+          "iteration": 2,
+          "version": "checks",
+          "load_s": 14.874066625,
+          "parts": 1691,
+          "triangles": 6909043
+        },
+        {
+          "iteration": 2,
+          "version": "baseline",
+          "load_s": 14.308319542,
+          "parts": 1691,
+          "triangles": 6909362
+        }
+      ],
+      "medians": {
+        "baseline": 14.345703271,
+        "checks": 14.6446969165
+      },
+      "outside_every_block": false,
+      "passed": true
+    },
+    {
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "runs": [
+        {
+          "iteration": 0,
+          "version": "baseline",
+          "load_s": 39.336971958,
+          "parts": 1428,
+          "triangles": 12230198
+        },
+        {
+          "iteration": 0,
+          "version": "checks",
+          "load_s": 41.28154625,
+          "parts": 1428,
+          "triangles": 12222021
+        },
+        {
+          "iteration": 0,
+          "version": "checks",
+          "load_s": 49.893915125,
+          "parts": 1428,
+          "triangles": 12222021
+        },
+        {
+          "iteration": 0,
+          "version": "baseline",
+          "load_s": 40.556839708,
+          "parts": 1428,
+          "triangles": 12230198
+        },
+        {
+          "iteration": 1,
+          "version": "checks",
+          "load_s": 40.833847458,
+          "parts": 1428,
+          "triangles": 12222021
+        },
+        {
+          "iteration": 1,
+          "version": "baseline",
+          "load_s": 36.312065208,
+          "parts": 1428,
+          "triangles": 12230198
+        },
+        {
+          "iteration": 1,
+          "version": "baseline",
+          "load_s": 38.694940125,
+          "parts": 1428,
+          "triangles": 12230198
+        },
+        {
+          "iteration": 1,
+          "version": "checks",
+          "load_s": 39.856407208,
+          "parts": 1428,
+          "triangles": 12222021
+        },
+        {
+          "iteration": 2,
+          "version": "baseline",
+          "load_s": 40.431911792,
+          "parts": 1428,
+          "triangles": 12230198
+        },
+        {
+          "iteration": 2,
+          "version": "checks",
+          "load_s": 40.467048209,
+          "parts": 1428,
+          "triangles": 12222021
+        },
+        {
+          "iteration": 2,
+          "version": "checks",
+          "load_s": 34.496559125,
+          "parts": 1428,
+          "triangles": 12222021
+        },
+        {
+          "iteration": 2,
+          "version": "baseline",
+          "load_s": 37.841389875,
+          "parts": 1428,
+          "triangles": 12230198
+        }
+      ],
+      "medians": {
+        "baseline": 39.015956041500004,
+        "checks": 40.650447833499996
+      },
+      "outside_every_block": false,
+      "passed": true
+    },
+    {
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "runs": [
+        {
+          "iteration": 0,
+          "version": "baseline",
+          "load_s": 7.536861417,
+          "parts": 712,
+          "triangles": 4278599
+        },
+        {
+          "iteration": 0,
+          "version": "checks",
+          "load_s": 7.113548291,
+          "parts": 712,
+          "triangles": 4273003
+        },
+        {
+          "iteration": 0,
+          "version": "checks",
+          "load_s": 6.986890292,
+          "parts": 712,
+          "triangles": 4273003
+        },
+        {
+          "iteration": 0,
+          "version": "baseline",
+          "load_s": 6.946278125,
+          "parts": 712,
+          "triangles": 4278599
+        },
+        {
+          "iteration": 1,
+          "version": "checks",
+          "load_s": 7.064352541,
+          "parts": 712,
+          "triangles": 4273003
+        },
+        {
+          "iteration": 1,
+          "version": "baseline",
+          "load_s": 6.985031667,
+          "parts": 712,
+          "triangles": 4278599
+        },
+        {
+          "iteration": 1,
+          "version": "baseline",
+          "load_s": 6.935629417,
+          "parts": 712,
+          "triangles": 4278599
+        },
+        {
+          "iteration": 1,
+          "version": "checks",
+          "load_s": 7.179447792,
+          "parts": 712,
+          "triangles": 4273003
+        },
+        {
+          "iteration": 2,
+          "version": "baseline",
+          "load_s": 7.6236115,
+          "parts": 712,
+          "triangles": 4278599
+        },
+        {
+          "iteration": 2,
+          "version": "checks",
+          "load_s": 7.2326105,
+          "parts": 712,
+          "triangles": 4273003
+        },
+        {
+          "iteration": 2,
+          "version": "checks",
+          "load_s": 7.436119583,
+          "parts": 712,
+          "triangles": 4273003
+        },
+        {
+          "iteration": 2,
+          "version": "baseline",
+          "load_s": 7.490503,
+          "parts": 712,
+          "triangles": 4278599
+        }
+      ],
+      "medians": {
+        "baseline": 7.237767333500001,
+        "checks": 7.1464980415
+      },
+      "outside_every_block": false,
+      "passed": true
+    }
+  ],
+  "timing_rule": "Fail if candidate median > 110% of baseline or candidate samples are wholly above baseline on every balanced block; six runs per binary.",
+  "viewer_followup": {
+    "reason": "Translucent context must blend without writing depth in both Solid and X-ray; selected occurrences are drawn afterward opaquely with depth testing.",
+    "source_sha256": {
+      "src/binary_viewer.rs": "c4ce344ff2c6a6b753c4ac13f34d037c1c0bc8bfd1107a7ebed9b486e905d0a7",
+      "src/viewer.rs": "841f90840a43a02ec11b8fc5ee138d1dfbd16df08f3b8b486bc4d9a471316c73"
+    },
+    "binary_sha256": "86a36eab4f901a69d5d964413fc9519b65e1ef6aa87dd30505d98052acbbf095",
+    "full_check": {
+      "tests_passed": 90,
+      "strict_clippy_passed": true,
+      "viewer_proof_passed": true
+    },
+    "geometry_and_import_code_unchanged": true
+  }
+}

@@ -433,6 +433,13 @@
         margin-top: 7px;
       }
 
+      .check-section > summary, .check-group > summary {
+        cursor: pointer;
+        padding: 12px 0;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .check-group { padding-left: 10px; }
       .finding-list {
         display: grid;
         gap: 7px;
@@ -458,6 +465,9 @@
         background: var(--danger);
       }
 
+      .finding[data-kind="contact"]::before { background: var(--text-muted); }
+      .finding[data-kind="unresolved"]::before { background: var(--text-secondary); }
+
       .finding:hover,
       .finding[aria-current="true"] {
         border-color: var(--border-strong);
@@ -478,6 +488,9 @@
       }
 
       .finding strong {
+        white-space: normal;
+        overflow-wrap: anywhere;
+        line-height: 1.4;
         color: var(--text);
         font-size: 10px;
       }
@@ -988,6 +1001,8 @@
         checkRequest: 0,
         checkReport: null,
         focusedFinding: null,
+        focusedComponents: null,
+        expandedCheckGroups: new Set(["Unresolved"]),
         snapshotReset: null,
         activeMotion: null,
         motionProgress: 0,
@@ -1146,6 +1161,7 @@
           state.checkRequest += 1;
           state.checkReport = null;
           state.focusedFinding = null;
+          state.focusedComponents = null;
           state.activeMotion = null;
           state.motionReady = false;
           clearActiveLoad();
@@ -1256,11 +1272,14 @@
       }
 
       function selectFile(file, refreshed = false) {
+        state.expandedCheckGroups.clear();
+        state.expandedCheckGroups.add("Unresolved");
         state.selectedPath = file.path;
         state.selectedVersion = file.version;
         state.checkRequest += 1;
         state.checkReport = null;
         state.focusedFinding = null;
+        state.focusedComponents = null;
         setCheckIndicator(null);
         renderCheckMessage("Waiting", "Checks begin after the model is visible.", null);
         selectMotion(file.path);
@@ -1436,6 +1455,7 @@
         state.checkRequest += 1;
         state.checkReport = null;
         state.focusedFinding = null;
+        state.focusedComponents = null;
         setCheckIndicator(null);
         if (!available) {
           renderMotionCheckBoundary();
@@ -1468,44 +1488,115 @@
 
       function renderChecks(report) {
         renderCheckMessage(capitalize(report.outcome), report.summary, report.outcome);
+
+        const list = document.createElement("div");
+        list.className = "finding-list";
+        const reasonLabel = (code) => ({
+          open_component_mesh: "Open mesh",
+          below_tessellation_resolution: "Below mesh sampling resolution",
+          below_coordinate_resolution: "Below coordinate resolution",
+          source_non_interference: "Contact or separated · Within STEP precision",
+        })[code] || code;
+        const appendPair = (parent, finding, unresolved = false) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "finding";
+          button.dataset.kind = unresolved ? "unresolved" : finding.code === "source_non_interference" ? "contact" : "interference";
+          button.setAttribute("aria-current", String(finding.id === state.focusedFinding));
+          button.title = finding.message;
+          const content = document.createElement("div");
+          const title = document.createElement("strong");
+          title.textContent = `${finding.components[0].name} × ${finding.components[1].name}`;
+          const kind = document.createElement("span");
+          kind.textContent = unresolved ? `Unresolved · ${reasonLabel(finding.code)}`
+            : finding.code === "source_non_interference" ? reasonLabel(finding.code)
+            : witnessLabel(finding.witness?.kind);
+          content.append(title, kind);
+          button.append(content);
+          button.addEventListener("click", () => focusFinding(finding));
+          parent.append(button);
+        };
+        for (const finding of report.findings || []) appendPair(list, finding);
+        checksContent.append(list);
+
+        const appendGroups = (pairs, label, unresolved) => {
+          if (!pairs.length) return;
+          const section = document.createElement("details");
+          section.className = "check-section";
+          section.open = state.expandedCheckGroups.has(label);
+          section.addEventListener("toggle", () => {
+            if (section.open) state.expandedCheckGroups.add(label);
+            else state.expandedCheckGroups.delete(label);
+          });
+          const heading = document.createElement("summary");
+          heading.textContent = `${label} · ${pairs.length} pairs`;
+          section.append(heading);
+          if (unresolved) {
+            for (const reason of report.incomplete_reasons || []) {
+              if (reason.code !== "below_coordinate_resolution") continue;
+              const note = document.createElement("p");
+              note.className = "check-reason";
+              note.textContent = reason.message;
+              section.append(note);
+            }
+          }
+          const groups = new Map();
+          for (const pair of pairs) {
+            const components = [...pair.components].sort((a, b) => a.definition_id - b.definition_id);
+            const key = `${pair.code}:${components.map(c => c.definition_id).join(":")}`;
+            if (!groups.has(key)) groups.set(key, {components, pairs: [], code: pair.code});
+            groups.get(key).pairs.push(pair);
+          }
+          for (const [key, group] of groups) {
+            const details = document.createElement("details");
+            details.className = "check-group";
+            details.dataset.group = key;
+            details.open = state.expandedCheckGroups.has(key);
+            details.addEventListener("toggle", () => {
+              if (details.open) state.expandedCheckGroups.add(key);
+              else state.expandedCheckGroups.delete(key);
+            });
+            const summary = document.createElement("summary");
+            const name = c => c.definition_name || c.name;
+            summary.textContent = `${name(group.components[0])} × ${name(group.components[1])} — ${group.pairs.length} pairs · ${reasonLabel(group.code)}`;
+            details.append(summary);
+            const highlight = document.createElement("button");
+            highlight.type = "button";
+            highlight.className = "clear-highlight";
+            highlight.dataset.kind = unresolved ? "unresolved" : "contact";
+            highlight.textContent = "Highlight all occurrences";
+            const selection = {
+              id: `group:${key}`,
+              components: [...new Map(group.pairs.flatMap(pair => pair.components).map(c => [c.occurrence_index, c])).values()],
+            };
+            highlight.addEventListener("click", () => focusFinding(selection));
+            summary.addEventListener("click", event => {
+              event.preventDefault();
+              if (details.open) state.expandedCheckGroups.delete(key);
+              else state.expandedCheckGroups.add(key);
+              focusFinding(selection);
+            });
+            details.append(highlight);
+            for (const pair of group.pairs) appendPair(details, pair, unresolved);
+            section.append(details);
+          }
+          checksContent.append(section);
+          if (!unresolved) {
+            const note = document.createElement("p");
+            note.className = "check-reason";
+            note.textContent = "Contact or separation; no shared volume above STEP precision. Touching itself is not proven.";
+            checksContent.append(note);
+          }
+        };
+        appendGroups(report.unresolved_pairs || [], "Unresolved", true);
+        appendGroups(report.contact_pairs || [], "Contacts / separated", false);
+
         for (const reason of report.incomplete_reasons || []) {
+          if (reason.code === "below_coordinate_resolution" && report.unresolved_pairs?.length) continue;
           const message = document.createElement("p");
           message.className = "check-reason";
           message.textContent = reason.message;
           checksContent.append(message);
-        }
-
-        const pairs = [...(report.findings || []), ...(report.unresolved_pairs || [])];
-        if (pairs.length) {
-          const list = document.createElement("div");
-          list.className = "finding-list";
-          for (const finding of pairs) {
-            const button = document.createElement("button");
-            button.type = "button";
-            button.className = "finding";
-            button.setAttribute(
-              "aria-current",
-              String(finding.id === state.focusedFinding),
-            );
-            button.title = finding.message;
-
-            const content = document.createElement("div");
-            const title = document.createElement("strong");
-            title.textContent = `${finding.components[0].name} × ${finding.components[1].name}`;
-            const kind = document.createElement("span");
-            kind.textContent = finding.code === "open_component_mesh"
-              ? "Unresolved · Open mesh"
-              : finding.code === "below_tessellation_resolution"
-                ? "Unresolved · Below mesh sampling resolution"
-              : finding.code === "below_coordinate_resolution"
-                ? "Unresolved · Below coordinate resolution"
-                : witnessLabel(finding.witness?.kind);
-            content.append(title, kind);
-            button.append(content);
-            button.addEventListener("click", () => focusFinding(finding));
-            list.append(button);
-          }
-          checksContent.append(list);
         }
 
         if (state.focusedFinding) {
@@ -1552,6 +1643,7 @@
         const file = state.files.find((candidate) => candidate.path === state.selectedPath);
         if (!file) return;
         state.focusedFinding = finding.id;
+        state.focusedComponents = finding.components.map(component => component.occurrence_index);
         renderChecks(state.checkReport);
         const focus = finding.components.map((component) => component.occurrence_index);
         openViewer(file, false, focus);
@@ -1561,6 +1653,7 @@
         const file = state.files.find((candidate) => candidate.path === state.selectedPath);
         if (!file) return;
         state.focusedFinding = null;
+        state.focusedComponents = null;
         renderChecks(state.checkReport);
         openViewer(file);
       }
@@ -1590,12 +1683,7 @@
         if (reloadViewer && state.selectedPath) {
           const selected = state.files.find((file) => file.path === state.selectedPath);
           if (selected) {
-            const finding = [...(state.checkReport?.findings || []), ...(state.checkReport?.unresolved_pairs || [])].find(
-              (candidate) => candidate.id === state.focusedFinding,
-            );
-            const focus = finding
-              ? finding.components.map((component) => component.occurrence_index)
-              : null;
+            const focus = state.focusedComponents;
             openViewer(selected, true, focus);
           }
         }

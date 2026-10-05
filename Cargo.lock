@@ -212,11 +212,15 @@ dependencies = [
  "glam",
  "look",
  "percent-encoding",
+ "ruststep",
  "serde",
  "serde_json",
  "tempfile",
  "tiny_http",
  "toml",
+ "truck-assembly",
+ "truck-stepio",
+ "truck-topology",
 ]
 
 [[package]]
