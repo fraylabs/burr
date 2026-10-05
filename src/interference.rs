@@ -791,6 +791,14 @@ mod tests {
     }
 
     #[test]
+    fn gearmotor_contact_never_reports_interference() {
+        let result = report("gearmotor-contact.step");
+        assert_eq!(result.component_count, 2);
+        assert!(result.findings.is_empty(), "{result:#?}");
+        assert_ne!(result.outcome, CheckOutcome::Fail);
+    }
+
+    #[test]
     fn structure_and_face_losses_are_reported_before_mesh_preparation() {
         let mut scene = compile_scene(
             &fixture("separated.step"),
