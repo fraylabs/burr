@@ -1,0 +1,16 @@
+{
+  "baseline_burr_revision": "535b7d7ded86eb6cca5cb44b05a169c395940012",
+  "baseline_look_revision": "6b1021cd0d7e4f19a7d94f67ae92987db853d223",
+  "candidate_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_source_diff_sha256": "9d67ad97e879386c7b91d883b8464e274b48cd2c2e1cdf062499d85239bf4ecf",
+  "source_face": 1740108,
+  "outside_boundary_bounds_mm": 0.0,
+  "outside_source_face_bounds_mm": 0.0,
+  "canonical_unique_boundary_samples": 114,
+  "canonical_raw_boundary_samples": 122,
+  "realized_boundary_edges": 114,
+  "nonmanifold_face_edges": 0,
+  "boundary_coordinates_identical_to_published_6b": true,
+  "retained_in_realized_triangles": 114,
+  "maximum_boundary_match_error_mm": 0.0
+}

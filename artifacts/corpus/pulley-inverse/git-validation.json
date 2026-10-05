@@ -1,0 +1,13 @@
+{
+  "burr_base": "535b7d7ded86eb6cca5cb44b05a169c395940012",
+  "published_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "source_diff_sha256": "9d67ad97e879386c7b91d883b8464e274b48cd2c2e1cdf062499d85239bf4ecf",
+  "manifest_refs": 11,
+  "locked_look_packages": 13,
+  "full_npm_check": "pass",
+  "release_build": "pass",
+  "binary_sha256": "eaf98e08983507eaa087fb9ed95635f961eb8df14089320d2b97ed3569453262",
+  "compilation_source": "Published Git dependency; no path dependency or private hook",
+  "candidate_package_version": "0.40.1",
+  "metadata_change": "Package version only after the validated geometry build; same exact published Look source."
+}

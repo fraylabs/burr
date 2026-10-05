@@ -1,0 +1,25 @@
+{
+  "baseline_burr_revision": "535b7d7ded86eb6cca5cb44b05a169c395940012",
+  "baseline_look_revision": "6b1021cd0d7e4f19a7d94f67ae92987db853d223",
+  "candidate_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_source_diff_sha256": "9d67ad97e879386c7b91d883b8464e274b48cd2c2e1cdf062499d85239bf4ecf",
+  "model": "Voron-2__Voron_2.4r2_Assembly.step",
+  "geometries": [
+    {
+      "geometry_name": "XY Cable Chain Bridge - 3 Hole",
+      "closed": true,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "source_triangles": 21340,
+      "prepared_triangles": 21340
+    },
+    {
+      "geometry_name": "XY Cable Chain Bridge - 2 Hole",
+      "closed": true,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "source_triangles": 21132,
+      "prepared_triangles": 21132
+    }
+  ]
+}
