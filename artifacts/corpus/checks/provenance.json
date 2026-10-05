@@ -1,0 +1,262 @@
+{
+  "before_commit": "b0bde98",
+  "after_commit": "e5a06551832da9c3459c613dbd229bcec37a9a51",
+  "look_revision": "58c39f4ba9ebabd28832e5c55193f85d9cc5286d",
+  "burr_version": "0.39.0",
+  "before_binaries": {
+    "burr-before039": "be6e8805930bcff02b10dd6397b59376384af3fecdbf04079573d33e9c8d2ec7",
+    "bench-before039": "6d25db063a4e22728902d27e4c85f5338d69378dda58db8f0d6877e8ba4f705e",
+    "scene-before039": "36e56903fa186fd1a275e9151ad014334889e640f93debd23d284aabf3ff22e6"
+  },
+  "after_binaries": {
+    "burr-after039": "4b5da27cd38b7764f8bae3179dcd54efbadb6d9d487464ffe4ddab9be29074da",
+    "bench-after039": "32ec2d71b29004cca9027cbabb7e47767ff05c5a1e69e2945bae08dbd4bf4497",
+    "scene-after039": "3dd06c11228110db91d19cb6bff9ace156a78fab567853a5d486183fbed281da"
+  },
+  "final_code_commit": "02a97473558ad6c287d6e027896cd3b0b265ff26",
+  "final_binaries": {
+    "burr-final": "e45e2f6cedba3977a4ba69ebf96b4ab9e0d07ef82a4260319784f9e07d3e28f2",
+    "bench-final": "e40853a41e90f9b5dc7f17cb77b908ef0d1c2d55820175ce30b3938016a83c0b",
+    "scene-final": "3dd06c11228110db91d19cb6bff9ace156a78fab567853a5d486183fbed281da"
+  },
+  "full_check": {
+    "command": "npm run check",
+    "tests_passed": 88,
+    "viewer_passed": true,
+    "log": "/Users/brianlim/coding/fray/artifacts/burr-checks/npm-final.log"
+  },
+  "reference_scope_tests_passed": 8,
+  "final_source_tree": "58fc54ca3f8a04232515a3444485263d407180de",
+  "browser_runs": [
+    {
+      "label": "after-control-unit",
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-final",
+      "binary_sha256": "e45e2f6cedba3977a4ba69ebf96b4ab9e0d07ef82a4260319784f9e07d3e28f2",
+      "personally_inspected": true,
+      "counts": {
+        "real": 12,
+        "contact": 2,
+        "unresolved": 0
+      },
+      "contacts_initially_collapsed": true,
+      "group_pair_count": null,
+      "group_highlight": null,
+      "pair_highlight": null,
+      "screenshots": [
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-control-unit/workbench-solid.png",
+          "sha256": "d25a5d49bffbb2404574367bdf23306df7194783f1ee7a2939ec5e9e149b44f3"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-control-unit/workbench-x-ray.png",
+          "sha256": "886ad816562fbe88cb41f7dba39ee46a834c4da7c25b85881afad34c7e12cfe8"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-control-unit/workbench-finding-solid.png",
+          "sha256": "4aa547060644fa4141df401023cf114c3f7ac1a3623d786ee46ec9c361aec29a"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-control-unit/workbench-finding-x-ray.png",
+          "sha256": "91394ab37bee8f56ad8a08dcff936a6d5bf373f60c120c514e626a3781e7bf62"
+        }
+      ]
+    },
+    {
+      "label": "after-faze4",
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-final",
+      "binary_sha256": "e45e2f6cedba3977a4ba69ebf96b4ab9e0d07ef82a4260319784f9e07d3e28f2",
+      "personally_inspected": true,
+      "counts": {
+        "real": 9,
+        "contact": 93,
+        "unresolved": 33
+      },
+      "contacts_initially_collapsed": true,
+      "group_pair_count": 9,
+      "group_highlight": "0,5,102,105,108,111,114,119,124,127",
+      "pair_highlight": "0,5",
+      "screenshots": [
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4/workbench-solid.png",
+          "sha256": "f7697255d2f09ebbe961533f322f7541e000f7d19c73ea7752961075ad2bd16e"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4/workbench-x-ray.png",
+          "sha256": "bc96a94868192e0596c81aa9fc574ea80c8dbbacfe8242af4bfe77c85cbda626"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4/workbench-group-highlight.png",
+          "sha256": "f1668cabf5afda0e0a836896f441144886e8e0b7e68e5c0fa7ecd311b4797f7f"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4/workbench-group-pair.png",
+          "sha256": "7f0bc3f30a8451a36a7778288bbffa1e5823f6dee49bd3cb4139a8ee22efc5ce"
+        }
+      ]
+    },
+    {
+      "label": "after-faze4-contacts",
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-final",
+      "binary_sha256": "e45e2f6cedba3977a4ba69ebf96b4ab9e0d07ef82a4260319784f9e07d3e28f2",
+      "personally_inspected": true,
+      "counts": {
+        "real": 9,
+        "contact": 93,
+        "unresolved": 33
+      },
+      "contacts_initially_collapsed": true,
+      "group_pair_count": 84,
+      "group_highlight": "0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,121,128,129,130,131,132,133,134,135",
+      "pair_highlight": "0,64",
+      "screenshots": [
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4-contacts/workbench-solid.png",
+          "sha256": "f7697255d2f09ebbe961533f322f7541e000f7d19c73ea7752961075ad2bd16e"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4-contacts/workbench-x-ray.png",
+          "sha256": "bc96a94868192e0596c81aa9fc574ea80c8dbbacfe8242af4bfe77c85cbda626"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4-contacts/workbench-group-highlight.png",
+          "sha256": "ecaff9dc9bb11f16a7a8e3c8210f3310a1527501c299daf929c9b7db0b3fca7e"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-faze4-contacts/workbench-group-pair.png",
+          "sha256": "0d7a111953488819d1a2544874dc9635cb27d73407e247195594dd50d8133f1e"
+        }
+      ]
+    },
+    {
+      "label": "after-robot-cover",
+      "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-final",
+      "binary_sha256": "e45e2f6cedba3977a4ba69ebf96b4ab9e0d07ef82a4260319784f9e07d3e28f2",
+      "personally_inspected": true,
+      "counts": {
+        "real": 16,
+        "contact": 0,
+        "unresolved": 25
+      },
+      "contacts_initially_collapsed": null,
+      "group_pair_count": null,
+      "group_highlight": null,
+      "pair_highlight": null,
+      "screenshots": [
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-robot-cover/workbench-solid.png",
+          "sha256": "3581f4628a13c0c455fe64ca07f663e0e756359a1ea9d441cdfca13f7a282f82"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-robot-cover/workbench-x-ray.png",
+          "sha256": "5ac7218358adb25a7dbe7f3892a3c4f1baf42f9de13d541d228cc523ba697154"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-robot-cover/workbench-finding-solid.png",
+          "sha256": "316625642e2919c646aa9ceeb243fd450349447187d1a1c9034614ff9e5295eb"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/after-robot-cover/workbench-finding-x-ray.png",
+          "sha256": "aa5247382dde45fb4c977a17fc028083be366de6f33df258e480f0f58734e575"
+        }
+      ]
+    },
+    {
+      "label": "before-control-unit",
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-before039",
+      "binary_sha256": "be6e8805930bcff02b10dd6397b59376384af3fecdbf04079573d33e9c8d2ec7",
+      "personally_inspected": true,
+      "counts": {
+        "real": 12,
+        "contact": 0,
+        "unresolved": 2
+      },
+      "contacts_initially_collapsed": null,
+      "group_pair_count": null,
+      "group_highlight": null,
+      "pair_highlight": null,
+      "screenshots": [
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-control-unit/workbench-solid.png",
+          "sha256": "dd8a4b70b4f4f3fb91339caf1a5cdb9f8bcc7bcffacd22ad849b17389e69c241"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-control-unit/workbench-x-ray.png",
+          "sha256": "77c69f2a8b3080c610a5e1099910f253453e76e18aa90a6fd68a00275927cea3"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-control-unit/workbench-finding-solid.png",
+          "sha256": "7aee09aa31aa54fa6c2af64c77970952538808fd6e809ba3577d365136ab5fba"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-control-unit/workbench-finding-x-ray.png",
+          "sha256": "033a0ca72e9f06099ebb6540a2d4148510025c447e226be24b4e1e15c52d246f"
+        }
+      ]
+    },
+    {
+      "label": "before-faze4",
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-before039",
+      "binary_sha256": "be6e8805930bcff02b10dd6397b59376384af3fecdbf04079573d33e9c8d2ec7",
+      "personally_inspected": true,
+      "counts": {
+        "real": 9,
+        "contact": 0,
+        "unresolved": 126
+      },
+      "contacts_initially_collapsed": null,
+      "group_pair_count": null,
+      "group_highlight": null,
+      "pair_highlight": null,
+      "screenshots": [
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-faze4/workbench-solid.png",
+          "sha256": "c7b74f1004bdf7f66471d55d7491e44f75f2b7ea36448e176e16a92d4e9719a5"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-faze4/workbench-x-ray.png",
+          "sha256": "000cf425e5837f35e82ff7f3c592ae4c00604c335a162524732b9d3dd00e5a8d"
+        }
+      ]
+    },
+    {
+      "label": "before-robot-cover",
+      "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+      "binary": "/Users/brianlim/coding/fray/artifacts/burr-checks/burr-before039",
+      "binary_sha256": "be6e8805930bcff02b10dd6397b59376384af3fecdbf04079573d33e9c8d2ec7",
+      "personally_inspected": true,
+      "counts": {
+        "real": 16,
+        "contact": 0,
+        "unresolved": 25
+      },
+      "contacts_initially_collapsed": null,
+      "group_pair_count": null,
+      "group_highlight": null,
+      "pair_highlight": null,
+      "screenshots": [
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-robot-cover/workbench-solid.png",
+          "sha256": "edd55f112aeec6c02a90346bab797360561918e7fd6fcb33d13e69ca6a7f8fac"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-robot-cover/workbench-x-ray.png",
+          "sha256": "c8f49b4f5e0bef17189b0c42cc13db63716588a38213426f7adeb65e31451319"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-robot-cover/workbench-finding-solid.png",
+          "sha256": "adc72402600803c2e6aa442c7ea310d9ab499624474d98a57a172301db28f17a"
+        },
+        {
+          "path": "/Users/brianlim/coding/fray/artifacts/burr-checks/evidence/before-robot-cover/workbench-finding-x-ray.png",
+          "sha256": "f789e8e2ced151df66c099de60616018fe32c958d5c2307e7ca092d42dfe91fc"
+        }
+      ]
+    }
+  ]
+}
