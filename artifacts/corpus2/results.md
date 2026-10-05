@@ -1,10 +1,10 @@
 # Held-out Burr 0.39.0 results
 
-**Reference correction: a valid, empty OCCT Common is not sufficient to prove non-overlap.** Independent checks on three pulley M5 screw/t-nut pairs demonstrate real overlap even though direct Common returns exactly zero and a valid empty shape. The six earlier alleged false pairs (gearmotor plus five Biped pairs) are therefore **Common-zero disagreements awaiting independent source revalidation**, not a certified false-pair count. They all remain unresolved in released 0.40.0.
+**Reference correction: a valid, empty OCCT Common is not sufficient to prove non-overlap.** Independent checks on three pulley M5 screw/t-nut pairs demonstrate real overlap even though direct Common returns exactly zero and a valid empty shape. The six earlier alleged false pairs (gearmotor plus five Biped pairs) are therefore **Common-zero disagreements: three bounded negatives and three disputed source checks**, not a certified false-pair count. They all remain unresolved in released 0.40.0.
 
 **Current checkpoint: 25 of 27 source models measured; 0 fully verified correct, 25 incomplete/unverified.** No false-pair count is certified from Common zero alone. Two measurements, eight baseline pair comparisons and four Chrome inspections remain pending. The interrupted Positron reference remains excluded. Derived repros are excluded from the denominator.
 
-**Measured gearmotor repro verdict disagreement: Burr 0.39.0 `fail`, OCCT Common reference `pass`.** The 134,040-byte two-part source-preserving repro and strict occurrence matching remain reproducible evidence. Whether this is a true Burr false fail requires the new independent source check. The original assembly also has four positive Common pairs.
+**Measured gearmotor repro verdict disagreement: Burr 0.39.0 `fail`, OCCT Common reference `pass`.** The 134,040-byte two-part source-preserving repro and strict occurrence matching remain reproducible evidence. The independent source recheck is disputed at boundary points, so a true Burr false fail remains unproved. The original assembly also has four positive Common pairs.
 
 ## Gearmotor: zero Common and opposite reduced verdict
 
@@ -58,6 +58,27 @@ The largest bounds error across these selected pairs is 0.066930 mm, below the u
 
 A long near-tangential surface-crossing witness and the new trim-error/sampling refusal are consistent with the curved-contact failure class; the precise checker mechanism is not instrumented. The gearmotor remains first because its two-part whole-model verdict disagreement against the Common reference is reproduced. Its ground-truth interpretation is now provisional.
 
+## Six historical Common-zero source rechecks
+
+All six historical disagreements completed strict source matching, valid Common, source seed-cube classification and independent source-mesh winding under per-pair 150-second caps. The original Burr witness points and surface-crossing endpoints were converted back into STEP coordinates and included as extra seeds. No sampled point was classified IN both source solids; no shared-interior certificate was found. No timeout or matching refusal occurred.
+
+Biped [74,87], [77,85] and [118,121] have bounded negative evidence. The gearmotor and Biped [67,73]/[67,74] remain disputed: winding gives shared-inside values at source ON/ON points, or at an IN/OUT point on [67,73]. Numerical boundary disagreement is not a shared-interior certificate. None of these finite searches establishes exhaustive non-overlap, so the earlier definitive false-pair count remains suspended.
+
+The method and full receipts are local under `baseline-disagreement-crosschecks/`.
+
+Bounded source rechecks: 3 contact_or_separated_bounded, 3 disputed.
+
+Each pair uses strict occurrence matching, valid source solids, OCCT Common, source point classification in bounded seed cubes, and independent solid-angle winding of fine source meshes. An overlap certificate also requires more than 0.000001 mm clearance to both source boundaries. Negative sampling is bounded; it does not establish exhaustive separation. Boundary disagreements, invalid sources, mapping refusals and timeouts remain disputed.
+
+| Model | Burr pair | Status | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Interior certificates | Limitation |
+|---|---|---|---:|---:|---:|---:|---|
+| FreeCAD-library__Yellow_gearmotor_L.step | 0/3 | disputed | 0.0 | 0 | 4 | 0 |  |
+| open_robot_actuator_hardware__biped_6dof_v1.STEP | 67/73 | disputed | 0.0 | 0 | 15 | 0 |  |
+| open_robot_actuator_hardware__biped_6dof_v1.STEP | 67/74 | disputed | 0.0 | 0 | 6 | 0 |  |
+| open_robot_actuator_hardware__biped_6dof_v1.STEP | 74/87 | contact_or_separated_bounded | 0.0 | 0 | 0 | 0 |  |
+| open_robot_actuator_hardware__biped_6dof_v1.STEP | 77/85 | contact_or_separated_bounded | 0.0 | 0 | 0 | 0 |  |
+| open_robot_actuator_hardware__biped_6dof_v1.STEP | 118/121 | contact_or_separated_bounded | 0.0 | 0 | 0 | 0 |  |
+
 ## Independent source cross-check: Common failure on pulley fasteners
 
 The mesh worker's fallback candidate reports Burr [8,17], [9,19], [13,20], strictly mapped to OCCT [17,20], [18,21], [19,22]. These are candidate checks, not the released 0.40.0 dataset. **All three pairs overlap. Direct OCCT Common is wrong on all three.** Fresh source import validates each solid. Exact source classification at tolerance 1e-9 mm places all 27 points in a 0.004-mm cube inside both solids. A separate solid-angle winding algorithm on source tessellations (0.0005-mm tolerance; nut 90,480 triangles, screw 3,192) gives winding number 1 in both at the seed and opposite cube corners; outside controls give approximately zero. The seeds have positive clearance to every face of both source solids, so these are interior neighborhoods, not boundary contact.
@@ -78,13 +99,13 @@ This finding invalidates the assumption that valid zero Common alone certifies c
 
 All **22 reported contact-or-separated pairs have completed the capped source recheck**. No shared-interior certificate was found. **Five have bounded negative evidence; seventeen remain disputed**. The five bounded negatives are four Adirondack pairs and OpenArmJIG [2,5]. Thirteen mapped pairs have winding values near one at source ON/ON boundary points, with no sampled point classified IN both source solids. Four folding-table pairs refuse the unchanged strict occurrence matcher: bounds errors 0.184734/0.184756 mm exceed its 0.1-mm limit. No timeout occurred.
 
-All eighteen mapped pairs have valid source solids and a valid, completed Common with exactly zero volume. This does not independently certify exhaustive separation. Each mapped pair was additionally checked using 27-point seed cubes, source classification at 1e-9 mm, fine source-mesh solid-angle winding and outside controls. A positive overlap certificate requires both source IN/IN, both winding inside and positive distance to both source boundaries. Bounded negative sampling is explicitly weaker than a proof over the whole geometry. The desk's complete pair-set claim therefore remains independently unverified.
+All eighteen mapped pairs have valid source solids and a valid, completed Common with exactly zero volume. This does not independently certify exhaustive separation. Each mapped pair was additionally checked using 27-point seed cubes, source classification at 1e-9 mm, fine source-mesh solid-angle winding and outside controls. A positive overlap certificate requires both source IN/IN, both winding inside and more than 0.000001 mm clearance to both source boundaries. Bounded negative sampling is explicitly weaker than a proof over the whole geometry. The desk's complete pair-set claim therefore remains independently unverified.
 
 The local receipts are under `rerun-0400/contact-crosschecks/`. Every row retains its method and matching evidence; disputed rows are not counted as safe.
 
 Bounded source rechecks: 5 contact_or_separated_bounded, 17 disputed.
 
-Each pair uses strict occurrence matching, valid source solids, OCCT Common, source point classification in bounded seed cubes, and independent solid-angle winding of fine source meshes. An overlap certificate also requires positive distance to both source boundaries. Negative sampling is bounded; it does not establish exhaustive separation. Boundary disagreements, invalid sources, mapping refusals and timeouts remain disputed.
+Each pair uses strict occurrence matching, valid source solids, OCCT Common, source point classification in bounded seed cubes, and independent solid-angle winding of fine source meshes. An overlap certificate also requires more than 0.000001 mm clearance to both source boundaries. Negative sampling is bounded; it does not establish exhaustive separation. Boundary disagreements, invalid sources, mapping refusals and timeouts remain disputed.
 
 | Model | Burr pair | Status | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Interior certificates | Limitation |
 |---|---|---|---:|---:|---:|---:|---|
@@ -296,13 +317,13 @@ The first 25 rows with recorded timings have completed both measurement jobs. `p
 | jubilee__bondtech_groovemount_extruder.STEP | incomplete | 60 / 60 | 0 / — | fail (partial) | fail (partial) | — | 1.946 | 131.933 | 533.234 | 13.175 | 22.987 | 707.531 |
 | jubilee__ooze_wiper_assembly.STEP | incomplete | 6 / 6 | 0 / — | fail | fail | refused | 0.067 | 0.234 | 32.969 | 3.474 | 4.504 | 465.297 |
 | jubilee__camera_calibration_tool_jan_31_2020.STEP | incomplete | 15 / 15 | 0 / — | incomplete (partial) | fail | 0 / 0 / 2 (partial mapping) | 0.331 | 0.348 | 115.641 | 6.923 | 120.910 | 604.250 |
-| open_robot_actuator_hardware__biped_6dof_v1.STEP | incomplete | 345 / 345 | 0 / — | fail (partial) | fail (partial) | —; 5 Common-zero disagreements (independent source revalidation pending) | 1.682 | 36.356 | 777.547 | 48.774 | 50.090 | 689.438 |
+| open_robot_actuator_hardware__biped_6dof_v1.STEP | incomplete | 345 / 345 | 0 / — | fail (partial) | fail (partial) | —; 5 Common-zero disagreements (3 bounded negatives; 2 disputed source checks) | 1.682 | 36.356 | 777.547 | 48.774 | 50.090 | 689.438 |
 | kicadStepUpMod__demo.step | incomplete | 13 / 13 | 1 / 401 | incomplete (partial) | fail | 0 / 0 / 2 | 0.161 | 0.060 | 58.766 | 3.467 | 4.152 | 475.875 |
 | FreeCAD-library__Adirondack Chair.step | incomplete | 36 / 36 | 0 / — | fail (partial) | fail | 38 / 0 / 4 | 0.070 | 0.171 | 25.141 | 2.426 | 3.343 | 456.844 |
 | FreeCAD-library__wooden folding chair.step | incomplete | 20 / 20 | 0 / — | fail (partial) | fail | refused | 0.063 | 0.116 | 25.953 | 2.303 | 2.684 | 454.219 |
 | FreeCAD-library__Wooden Folding Table.step | incomplete | 14 / 14 | 0 / — | incomplete (partial) | fail | 0 / 0 / 4 (partial mapping) | 0.062 | 0.056 | 22.203 | 2.254 | 2.564 | 453.734 |
 | FreeCAD-library__Double glass doors with handles and transom.step | incomplete | 1 / 3 | 0 / — | incomplete (partial) | pass | refused | 0.066 | 0.057 | 22.781 | 2.215 | 2.476 | 451.844 |
-| FreeCAD-library__Yellow_gearmotor_L.step | incomplete | 6 / 6 | 0 / — | fail (partial) | fail | 4 / 1 / 0 (independent source revalidation pending) | 0.068 | 0.282 | 30.484 | 2.230 | 2.683 | 458.000 |
+| FreeCAD-library__Yellow_gearmotor_L.step | incomplete | 6 / 6 | 0 / — | fail (partial) | fail | 4 / 1 / 0 (independent source recheck disputed) | 0.068 | 0.282 | 30.484 | 2.230 | 2.683 | 458.000 |
 | FreeCAD-library__ComputerDesk (100 x 50 x 75 cm WDH).step | incomplete | 9 / 9 | 0 / — | fail (partial) | fail | 4 / 0 / 0 | 0.066 | 0.060 | 20.734 | 5.729 | 6.049 | 454.719 |
 | openarm_hardware__OpenArm_2.0.STEP | incomplete | 564 / 564 | 12 / 7520 | incomplete (partial) | fail (partial) | — | 2.349 | 0.060 | 869.094 | 31.983 | 32.434 | 804.938 |
 | openarm_hardware__OpenArmJIG.STEP | incomplete | 8 / 8 | 0 / — | incomplete (partial) | pass | 0 / 0 / 0 | 0.125 | 0.164 | 69.656 | 2.263 | 2.583 | 459.719 |
@@ -345,3 +366,11 @@ All four remaining captures and inspections require release-priority clearance. 
 ## Sample limits
 
 The 27 public downloads are a convenience sample selected by provenance, domain and multipart source structure before testing. They have no old-corpus hash, URL or repository overlap. Several share projects, so they are not 27 independent exporter implementations. Exporters represented are SolidWorks, Creo, FreeCAD and Autodesk Translation Framework; the full requested exporter spread has not been achieved. A declared STEP assembly-graph census finds at most 1,236 expanded leaf occurrences (Positron); the sample does not meet the requested 2,000+-component coverage. Declared leaves may include wire or empty definitions, so final geometry component counts still come from OCCT. No accuracy generalization to all public assemblies is justified.
+
+## Original corpus contact audit — in progress
+
+The reviewed Checks candidate's external reference has 100 Common-zero contact receipts across the original corpus: Faze4 (93), automation control unit (2), and pick/place arm (5). Burr also records analytic support and precision/volume bounds; the external OCCT corroboration used Common alone. These historical claims are now being rechecked with the same capped independent methods. They are not a fresh released 0.40.0 measurement and do not enter the held-out denominator.
+
+All three source hashes match both the original source manifest and the contact receipts. Original reports and scenes are preserved locally. Only scene display labels for the control unit and pick/place arm were replaced by their own report's canonical definition names; bounds, transforms and surface samples remain unchanged. Current receipts and explicit provenance stay under `original-corpus-contact-rechecks/`. Any shared-interior certificate is reviewed against the pair's declared precision and volume bound and reported immediately.
+
+Early Faze4 receipts expose a distinction between literal zero and permitted source-scale shared interior: Board/resistor samples are classified IN both with winding near one despite empty Common. Pair [0,8] has source-boundary clearances 1.7484555e-8/1.7397133e-8 mm, consistent with the report's declared maximum shared depth (~3.498e-8 mm), below its 1e-7-mm source tolerance. This does not establish a violation of the reported precision/volume bound. Such sub-certificate interior candidates remain disputed and retain their exact margins; the robust certificate requires more than 1e-6-mm clearance.

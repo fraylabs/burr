@@ -122,13 +122,18 @@ for shape in shapes:
 record['winding']=dict(tolerance_mm=0.0005,components=winding)
 record['winding_both_in_indices']=[i for i in range(len(points)) if all(abs(w['values'][i]-1)<1e-5 for w in winding)]
 certificates=[]
+candidates=[]
 for i,p in enumerate(points):
     if p['states']!=['IN','IN'] or i not in record['winding_both_in_indices']:continue
     vertex=cq.Vertex.makeVertex(*p['point'])
     distances=[vertex.distance(s) for s in boundaries]
+    candidate=dict(point=p['point'],boundary_distances_mm=distances,winding=[w['values'][i] for w in winding],interior_ball_radius_mm=.8*min(distances))
+    candidates.append(candidate)
     if min(distances)>1e-6:
-        certificates.append(dict(point=p['point'],boundary_distances_mm=distances,winding=[w['values'][i] for w in winding],interior_ball_radius_mm=.8*min(distances)))
+        certificates.append(candidate)
         break
+record['interior_candidates']=candidates
+record['minimum_certificate_margin_mm']=1e-6
 record['interior_overlap_certificates']=certificates
 common_zero=record['common'].get('done') and record['common'].get('valid') and record['common'].get('volume_mm3')==0
 controls=all(abs(w['outside_control'])<1e-5 for w in winding)
