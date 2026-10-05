@@ -7,6 +7,7 @@ historical pairs plus every current finding/contact; full completeness is unknow
 import argparse
 import hashlib
 import json
+import math
 import pathlib
 import subprocess
 
@@ -88,6 +89,8 @@ def main():
                         raise RuntimeError(f'Unverified Bowden common: {i}:{j}')
                     volume = abs(cq.Shape.cast(common.Shape()).Volume())
                     floor = max(1e-6, min(abs(shapes[i].Volume()), abs(shapes[j].Volume())) * 1e-9)
+                    if not math.isfinite(volume) or not math.isfinite(floor):
+                        raise RuntimeError(f'Nonfinite Bowden volume: {i}:{j}')
                     entry = dict(pair=[i, j], volume_mm3=volume, threshold_mm3=floor, positive=volume > floor)
                     details.append(entry)
                     if entry['positive']:
@@ -120,6 +123,8 @@ def main():
                     raise RuntimeError(f'Unverified exact contact: {name}: {i}:{j}')
                 volume = abs(cq.Shape.cast(common.Shape()).Volume())
                 floor = max(1e-6, min(abs(shapes[i].Volume()), abs(shapes[j].Volume())) * 1e-9)
+                if not math.isfinite(volume) or not math.isfinite(floor):
+                    raise RuntimeError(f'Nonfinite exact contact volume: {name}: {i}:{j}')
                 if volume > floor:
                     raise RuntimeError(f'OCCT-positive pair became contact: {name}: {i}:{j}: {volume}')
                 verified_contacts.append(dict(pair=[i, j], volume_mm3=volume, threshold_mm3=floor))
