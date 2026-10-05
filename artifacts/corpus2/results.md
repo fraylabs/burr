@@ -25,7 +25,7 @@ The original model is [Yellow_gearmotor_L.step, pinned public download](https://
 | [1,5] Plastic–White | interference | 17.499999999999954 | true pair |
 | [2,3] Axis–Yellow | interference | 15.707963267948962 | true pair |
 
-Burr also leaves Metal–Plastic [0,1] unresolved under `below_coordinate_resolution`; its original pair set is incomplete. OCCT's complete scan reports no positive for that pair. This does not invalidate the four matched positives or the independently proved extra pair.
+Burr also leaves Metal–Plastic [0,1] unresolved under `below_coordinate_resolution`; its original pair set is incomplete. OCCT's complete scan reports no positive for that pair. The four matched positive Common results remain recorded separately from the Common-zero disagreement awaiting independent source revalidation.
 
 The successful reduction is `artifacts/corpus2/repros/01-gearmotor-contact.step`, **134,040 bytes, two components**, SHA-256 `bfaa2748bba69f73d7bf222eff82fb797277a649979fbaf57bbf7b52f1a77ca6`. It preserves source STEP IDs, geometry and ancestor placements without CAD re-export. Burr reports one Metal–Yellow pair [0,1], `fail`, and a complete pair set. OCCT reports `pass`, zero positives and a complete pair scan with both solids valid. Strict comparison finds one extra Burr pair and no missing positive. This is a **fail/pass disagreement on the reduction**. Its former false-fail interpretation is provisional until independent source revalidation. The original assembly has a Common-zero interference disagreement; its overall `fail` remains supported by its other overlaps.
 
@@ -74,6 +74,43 @@ The bounded check finished in 61.23 seconds under a 150-second hard timeout. The
 
 This finding invalidates the assumption that valid zero Common alone certifies contact or separation, particularly on detailed fasteners. Every proposed contact proof must survive a cross-check capable of detecting this failure; the six earlier zero-volume disagreements must be independently revalidated before restoring a false-positive headline. No existing measurements or comparison receipts are discarded.
 
+## Released 0.40.0 contact source rechecks
+
+All **22 reported contact-or-separated pairs have completed the capped source recheck**. No shared-interior certificate was found. **Five have bounded negative evidence; seventeen remain disputed**. The five bounded negatives are four Adirondack pairs and OpenArmJIG [2,5]. Thirteen mapped pairs have winding values near one at source ON/ON boundary points, with no sampled point classified IN both source solids. Four folding-table pairs refuse the unchanged strict occurrence matcher: bounds errors 0.184734/0.184756 mm exceed its 0.1-mm limit. No timeout occurred.
+
+All eighteen mapped pairs have valid source solids and a valid, completed Common with exactly zero volume. This does not independently certify exhaustive separation. Each mapped pair was additionally checked using 27-point seed cubes, source classification at 1e-9 mm, fine source-mesh solid-angle winding and outside controls. A positive overlap certificate requires both source IN/IN, both winding inside and positive distance to both source boundaries. Bounded negative sampling is explicitly weaker than a proof over the whole geometry. The desk's complete pair-set claim therefore remains independently unverified.
+
+The local receipts are under `rerun-0400/contact-crosschecks/`. Every row retains its method and matching evidence; disputed rows are not counted as safe.
+
+Bounded source rechecks: 5 contact_or_separated_bounded, 17 disputed.
+
+Each pair uses strict occurrence matching, valid source solids, OCCT Common, source point classification in bounded seed cubes, and independent solid-angle winding of fine source meshes. An overlap certificate also requires positive distance to both source boundaries. Negative sampling is bounded; it does not establish exhaustive separation. Boundary disagreements, invalid sources, mapping refusals and timeouts remain disputed.
+
+| Model | Burr pair | Status | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Interior certificates | Limitation |
+|---|---|---|---:|---:|---:|---:|---|
+| FreeCAD-library__Adirondack Chair.step | 4/6 | disputed | 0.0 | 0 | 3 | 0 |  |
+| FreeCAD-library__Adirondack Chair.step | 4/9 | contact_or_separated_bounded | 0.0 | 0 | 0 | 0 |  |
+| FreeCAD-library__Adirondack Chair.step | 4/22 | contact_or_separated_bounded | 0.0 | 0 | 0 | 0 |  |
+| FreeCAD-library__Adirondack Chair.step | 4/23 | contact_or_separated_bounded | 0.0 | 0 | 0 | 0 |  |
+| FreeCAD-library__Adirondack Chair.step | 4/24 | contact_or_separated_bounded | 0.0 | 0 | 0 | 0 |  |
+| FreeCAD-library__Adirondack Chair.step | 5/7 | disputed | 0.0 | 0 | 11 | 0 |  |
+| FreeCAD-library__Adirondack Chair.step | 5/8 | disputed | 0.0 | 0 | 5 | 0 |  |
+| FreeCAD-library__Adirondack Chair.step | 5/22 | disputed | 0.0 | 0 | 6 | 0 |  |
+| FreeCAD-library__Adirondack Chair.step | 5/23 | disputed | 0.0 | 0 | 7 | 0 |  |
+| FreeCAD-library__Adirondack Chair.step | 5/24 | disputed | 0.0 | 0 | 6 | 0 |  |
+| FreeCAD-library__Adirondack Chair.step | 6/9 | disputed | 0.0 | 0 | 5 | 0 |  |
+| FreeCAD-library__Adirondack Chair.step | 7/8 | disputed | 0.0 | 0 | 4 | 0 |  |
+| FreeCAD-library__ComputerDesk (100 x 50 x 75 cm WDH).step | 0/1 | disputed | 0.0 | 0 | 11 | 0 |  |
+| FreeCAD-library__ComputerDesk (100 x 50 x 75 cm WDH).step | 0/2 | disputed | 0.0 | 0 | 3 | 0 |  |
+| FreeCAD-library__ComputerDesk (100 x 50 x 75 cm WDH).step | 1/4 | disputed | 0.0 | 0 | 3 | 0 |  |
+| FreeCAD-library__ComputerDesk (100 x 50 x 75 cm WDH).step | 1/5 | disputed | 0.0 | 0 | 12 | 0 |  |
+| FreeCAD-library__Wooden Folding Table.step | 0/2 | disputed | — | 0 | 0 | 0 | Ambiguous placement for occurrence 0: 0.18473414499615076, 36.807239182404416 |
+| FreeCAD-library__Wooden Folding Table.step | 0/3 | disputed | — | 0 | 0 | 0 | Ambiguous placement for occurrence 0: 0.18473414499615076, 36.807239182404416 |
+| FreeCAD-library__Wooden Folding Table.step | 1/2 | disputed | — | 0 | 0 | 0 | Ambiguous placement for occurrence 1: 0.184755730916784, 36.80725960415718 |
+| FreeCAD-library__Wooden Folding Table.step | 1/3 | disputed | — | 0 | 0 | 0 | Ambiguous placement for occurrence 1: 0.184755730916784, 36.80725960415718 |
+| openarm_hardware__OpenArmJIG.STEP | 2/3 | disputed | 0.0 | 0 | 12 | 0 |  |
+| openarm_hardware__OpenArmJIG.STEP | 2/5 | contact_or_separated_bounded | 0.0 | 0 | 0 | 0 |  |
+
 ## Released 0.40.0 rerun — in progress
 
 The original 0.39.0 baseline above remains unchanged. A separately installed, checksum-verified 0.40.0 release is rerunning the original 25 models after the gearmotor fix, spike fix and contact proofs. Per-model interference comparison, exact-zero validation of every reported contact-or-separated pair, and unresolved reasons will be reported separately. No follow-up accuracy or contact-safety claim is made before those checks complete.
@@ -82,7 +119,7 @@ An early import regression is already measured: Jubilee's left double-pulley cor
 
 ### Per-model 0.40.0 checkpoint
 
-Release runs: 25/25 completed (8 `fail`, 16 `incomplete`, 1 `pass`). Verification columns remain provisional. “Complete” is Burr's pair-set claim, not yet certification of agreement; every reported contact remains subject to the independent exact-zero check. Empty contact sets require no CAD calculation. The table's zero counts never turn a pending comparison into agreement.
+Release runs: 25/25 completed (8 `fail`, 16 `incomplete`, 1 `pass`). Verification columns remain provisional. “Complete” is Burr's pair-set claim, not yet certification of agreement; every reported contact remains subject to independent source verification. Empty contact sets require no CAD calculation. The table's zero counts never turn a pending comparison into agreement.
 
 | Model | 0.39.0 coordinate limit | 0.40.0 verdict | Pair set complete | Interferences matched / extra / missing | Contact Common zeros / reported (source proof separate) | Unresolved pairs and reasons |
 |---|---|---|---|---|---|---|
@@ -151,7 +188,7 @@ The desk is the only one of the 11 former coordinate-limit models now reporting 
 
 ## Classification and reference limits
 
-The 25 completed measurement jobs yield raw Burr outcomes **11 `fail`, 13 `incomplete`, 1 `pass`**. Of the 17 comparison records, eight have full occurrence mapping and a full reference scan, five certify a subset, and four refuse comparison. Eight more comparisons are pending. These records match **57 reported positive pairs** to OCCT and contain **one confirmed extra pair**. The separate removed-pair audit also records five Biped Common-zero disagreements despite its incomplete full comparison. Together there are six Common-zero disagreements across two models; their former false-positive classification is suspended. These are counts within verified scopes, not a precision or recall estimate for unverified pairs.
+The 25 completed measurement jobs yield raw Burr outcomes **11 `fail`, 13 `incomplete`, 1 `pass`**. Of the 17 comparison records, eight have full occurrence mapping and a full reference scan, five certify a subset, and four refuse comparison. Eight more comparisons are pending. These records match **57 reported positive pairs** to OCCT and contain **one extra pair against the Common reference**. The separate removed-pair audit also records five Biped Common-zero disagreements despite its incomplete full comparison. Together there are six Common-zero disagreements across two models; their former false-positive classification is suspended. These are counts within verified scopes, not a precision or recall estimate for unverified pairs.
 
 Across the 25 references, 17 completed a full pair scan, six used the existing positive-witness shortcut, and two timed out. Five references contain invalid source components. The webcam's sole raw Burr `pass` remains unresolved against an invalid reference; it is not a confirmed false pass. Bed and cell reference timeouts are not Burr timeouts. Source counts are component occurrences, with compounds potentially containing several solids.
 

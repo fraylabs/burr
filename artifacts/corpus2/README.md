@@ -33,7 +33,7 @@ The viewer HTTP duration includes parsing, tessellation, material preparation an
 
 `occt_reference.py` reuses the existing corpus reference's XCAF occurrence traversal, OCCT Common-volume criterion and tolerances. Files above 10 MB or 150 components use its existing positive-witness shortcut; that scan cannot certify pair recall. Common zero is a disputed negative reference on fasteners; use independent source classification and winding checks before certifying separation. `compare_release.py` calls the existing `artifacts/corpus/scripts/compare_pairs.py`: 0.1-mm bounds, 0.2-mm alternative-placement margin, identity agreement when present and 0.1-mm surface-sample distance. If a reference scan is partial, reported pairs are checked separately, after the same strict occurrence validation, with valid source solids and valid OCCT Common. Subset comparisons certify only those reported pairs.
 
-## False-pair repro
+## Verdict-disagreement repro
 
 The gearmotor reduction preserves original STEP entities and placement chains rather than changing the CAD with a new export:
 
@@ -77,3 +77,9 @@ Copy the existing reference JSON/metrics into the version evidence folder before
 `verify_contacts.py` selects every contact occurrence through the existing strict identity, placement and surface matcher. It requires valid source shapes and valid, completed OCCT Common for each reported contact-or-separated pair. **Exactly zero volume** is recorded explicitly; any nonzero result is preserved, even below the ordinary interference reference threshold. Mapping refusals, invalid shapes and resource caps leave the relevant pairs unverified. Partial contact results survive a 600-second/9-GiB cap.
 
 `summarize_versions.py` reports the 11 baseline coordinate-limit models separately: removal of that reason, pair-set completeness and independent pair verification are distinct results. Import-time face loss can suppress checking entirely; that is not a contact-proof success.
+
+## Bounded independent source rechecks
+
+`recheck_source_pair.py` binds one reported pair to its source occurrences through the unchanged strict matcher. It then records source validity, Common, bounded source-point classification and an independent solid-angle winding calculation on fine source meshes. An overlap certificate requires a point classified inside both source solids, winding inside both meshes, and positive distance from both source boundaries. Boundary disagreements, matching refusals, invalid sources and hard timeouts remain disputed. A bounded negative records that these methods found no shared interior in the sampled seed cubes; it does not establish exhaustive separation.
+
+`run_source_rechecks.py` accepts a JSON job list of `[model_filename, [Burr_index, Burr_index]]`, takes the shared lock for each capped pair, writes its ownership receipt, and leaves a 20-second gap. It stops on an overlap certificate for immediate review. `summarize_source_rechecks.py` generates the per-pair method table and preserves pending and disputed rows.
