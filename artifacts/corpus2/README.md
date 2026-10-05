@@ -6,13 +6,13 @@ This corpus preserves a public **0.39.0 release baseline** and adds a separate *
 
 The selection covers robots, printer/tool assemblies, a populated KiCad/FreeCAD board, laptop enclosures and hardware, furniture, and a gearmotor. Exporters include SolidWorks, Creo, FreeCAD and Autodesk Translation Framework. **This is a convenience sample, not a random sample of all CAD.** Several files share the Jubilee, Framework, FreeCAD-library and OpenArm projects. No source was downloaded behind a login. CAD files and detailed local evidence are not committed.
 
-Baseline checkpoint: **at least 6 confirmed false pairs across two held-out models, all now unresolved in 0.40.0**. Of the 25 measured models, 0 are fully verified correct, 23 remain incomplete/unverified and 2 have confirmed false pairs. The two remaining measurements and pending comparisons/renders are explicit.
+**Reference reliability correction:** independent source checks prove three pulley screw/nut overlaps despite valid empty OCCT Common results. The previous six-pair false-positive headline is suspended: those six are now Common-zero disagreements requiring independent revalidation. Current checkpoint: 25 measured models, 0 fully verified correct, 25 incomplete/unverified; two measurements and the pending comparisons/renders remain explicit. See the source cross-check and retained receipts in results.md.
 
 See [results.md](results.md) for the measured headline, false pairs, ranked limitations, model table and Chrome inspection. A model classified `timeout` reached a Burr-stage guard; a reference-only timeout remains an unresolved reference and does not mean Burr timed out. Any reference timeout, ambiguous occurrence matching or incomplete pair scan is explicitly unresolved; agreement on an overall `fail` does not certify every pair.
 
 ## Reproduce
 
-The original baseline used `/tmp/burr-corpus2`. After the sandbox changed, the work folder moved under `~/coding/fray/.fray/tmp/` and the original temporary folders were retired. The reused OCCT environment is now `~/coding/fray/.fray/burr/occt-venv`. Use one heavy run at a time; release work has priority. The scripts now acquire `~/coding/fray/.fray/burr/build.lock` around each model command and release it afterwards, including ordinary failures. They never run CAD measurements concurrently. The reproducible runner leaves a 20-second gap after each job to give other workers polling the shared lock an opportunity to acquire it.
+The original baseline used `/tmp/burr-corpus2`. After the sandbox changed, the work folder moved under `~/coding/fray/.fray/tmp/` and the original temporary folders were retired. The reused OCCT environment is now `~/coding/fray/.fray/burr/occt-venv`. Use one heavy run at a time; release work has priority. The scripts now acquire `~/coding/fray/.fray/burr/build.lock` around each model command and release it afterwards, including ordinary failures. After acquisition, each shared lock contains an owner record identifying the thread, acquisition time and command. Release removes the owned directory and record. They never run CAD measurements concurrently. The reproducible runner leaves a 20-second gap after each job to give other workers polling the shared lock an opportunity to acquire it.
 
 ```sh
 CORPUS_WORK="$HOME/coding/fray/.fray/tmp/<your-thread-id>"
@@ -31,7 +31,7 @@ The existing environment contains CadQuery 2.8.0, cadquery-ocp 7.9.3.1.1, NumPy 
 
 The viewer HTTP duration includes parsing, tessellation, material preparation and viewer generation. Sampled load-stage transitions supply an upper bound on import time where captured; very fast imports can finish between samples. OCCT import time includes STEP loading, occurrence expansion, source validity checks and the bounding-box census; it is not a parser-only timing. Server RSS covers import, checking and mesh serving. Check time is measured separately after import. Lost-face counts are Burr's declared STEP face entities, not expanded per-occurrence face totals; OCCT face totals include repeated occurrences and must not be subtracted from Burr's declaration count. Both Burr and OCCT stages have a 600-second limit and a 9-GiB memory cap. The reproducible comparison runner applies the same caps and records unresolved comparison refusals on exhaustion.
 
-`occt_reference.py` reuses the existing corpus reference's XCAF occurrence traversal, OCCT Common-volume criterion and tolerances. Files above 10 MB or 150 components use its existing positive-witness shortcut; that scan cannot certify pair recall. `compare_release.py` calls the existing `artifacts/corpus/scripts/compare_pairs.py`: 0.1-mm bounds, 0.2-mm alternative-placement margin, identity agreement when present and 0.1-mm surface-sample distance. If a reference scan is partial, reported pairs are checked separately, after the same strict occurrence validation, with valid source solids and valid OCCT Common. Subset comparisons certify only those reported pairs.
+`occt_reference.py` reuses the existing corpus reference's XCAF occurrence traversal, OCCT Common-volume criterion and tolerances. Files above 10 MB or 150 components use its existing positive-witness shortcut; that scan cannot certify pair recall. Common zero is a disputed negative reference on fasteners; use independent source classification and winding checks before certifying separation. `compare_release.py` calls the existing `artifacts/corpus/scripts/compare_pairs.py`: 0.1-mm bounds, 0.2-mm alternative-placement margin, identity agreement when present and 0.1-mm surface-sample distance. If a reference scan is partial, reported pairs are checked separately, after the same strict occurrence validation, with valid source solids and valid OCCT Common. Subset comparisons certify only those reported pairs.
 
 ## False-pair repro
 
@@ -40,8 +40,9 @@ The gearmotor reduction preserves original STEP entities and placement chains ra
 ```sh
 python3 artifacts/corpus2/scripts/reduce_pair.py artifacts/corpus2/models/FreeCAD-library__Yellow_gearmotor_L.step artifacts/corpus2/repros/01-gearmotor-contact.step --keep-name Metal --keep-name Yellow
 until mkdir "$HOME/coding/fray/.fray/burr/build.lock" 2>/dev/null; do sleep 15; done
+echo "${CORPUS_AGENT_ID:-corpus2} $(date) gearmotor release measurement" > "$HOME/coding/fray/.fray/burr/build.lock/owner"
 "$OCCT_PYTHON" artifacts/corpus2/scripts/measure_release.py --binary "$CORPUS_WORK/bin0390/burr" --work-dir "$CORPUS_WORK" --model artifacts/corpus2/repros/01-gearmotor-contact.step --output artifacts/corpus2/repro-logs
-rmdir "$HOME/coding/fray/.fray/burr/build.lock"
+rm -r "$HOME/coding/fray/.fray/burr/build.lock"
 ```
 
 The source is attributed to its author in `sources.csv`, under CC BY 3.0. Retain that provenance when reproducing or sharing a derived CAD file. No CAD file is added by this PR.

@@ -33,7 +33,7 @@ def run(root, binary, phase, timeout, evidence, lock, limit):
             if mode not in ('comparison','contacts'):
                 args += ['--output',str(evidence),'--timeout',str(timeout)]
             print('START',mode,model.name,flush=True)
-            wrapper="corpus_lock=$1; shift; until mkdir \"$corpus_lock\" 2>/dev/null; do sleep 15; done; trap 'rmdir \"$corpus_lock\"' EXIT; \"$@\""
+            wrapper="corpus_lock=$1; shift; until mkdir \"$corpus_lock\" 2>/dev/null; do sleep 15; done; printf '%s %s %s\\n' \"${CORPUS_AGENT_ID:-dd9facaa-87e0-817c-92a1-1a1cb63b87dd}\" \"$(date)\" \"$*\" > \"$corpus_lock/owner\"; trap 'rm -r \"$corpus_lock\"' EXIT; \"$@\""
             result=subprocess.run(['zsh','-c',wrapper,'corpus2-job',str(lock),*args])
             print('END',mode,model.name,result.returncode,flush=True)
             if result.returncode:

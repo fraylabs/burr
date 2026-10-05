@@ -36,8 +36,10 @@ for row in rows:
             pairs += " (partial mapping)"
         if comparison.get("reference_scope") != "all_pairs":
             pairs += " (reported only)"
-    if row.get("independent_false_pairs") and not comparison.get("extra_pairs"):
-        pairs += f'; {len(row["independent_false_pairs"])} independently proved extra pair(s)'
+    if row.get("independent_common_zero_pairs") and not comparison.get("extra_pairs"):
+        pairs += f'; {len(row["independent_common_zero_pairs"])} Common-zero disagreements'
+    if row.get("reference_disputed"):
+        pairs += ' (independent source revalidation pending)'
     verdict = burr.get("outcome", "—")
     if burr and not burr.get("pair_set_complete"):
         verdict += " (partial)"
