@@ -1,0 +1,89 @@
+{
+  "baseline_release": "0.39.1",
+  "baseline_look": "01dbeac7c63e523019c64e0174cc2729ef991220",
+  "candidate_look": "6b1021cd0d7e4f19a7d94f67ae92987db853d223",
+  "method": "Import-only release corpus binaries, shared lock, sequential baseline/candidate/candidate/baseline per model. Medians of two runs each; timing variability is shown in the individual runs.",
+  "models": [
+    {
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "runs": [
+        {
+          "kind": "baseline",
+          "load_s": 12.508281917,
+          "lost_faces": 6
+        },
+        {
+          "kind": "candidate",
+          "load_s": 12.348863167,
+          "lost_faces": 6
+        },
+        {
+          "kind": "candidate",
+          "load_s": 12.761144999999999,
+          "lost_faces": 6
+        },
+        {
+          "kind": "baseline",
+          "load_s": 12.794263625,
+          "lost_faces": 6
+        }
+      ],
+      "baseline_median_s": 12.651272770999999,
+      "candidate_median_s": 12.555004083499998
+    },
+    {
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "runs": [
+        {
+          "kind": "baseline",
+          "load_s": 40.132127375,
+          "lost_faces": 4
+        },
+        {
+          "kind": "candidate",
+          "load_s": 39.982751208,
+          "lost_faces": 4
+        },
+        {
+          "kind": "candidate",
+          "load_s": 38.328751917,
+          "lost_faces": 4
+        },
+        {
+          "kind": "baseline",
+          "load_s": 41.028105583,
+          "lost_faces": 4
+        }
+      ],
+      "baseline_median_s": 40.580116479,
+      "candidate_median_s": 39.1557515625
+    },
+    {
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "runs": [
+        {
+          "kind": "baseline",
+          "load_s": 7.585478333,
+          "lost_faces": 46
+        },
+        {
+          "kind": "candidate",
+          "load_s": 7.117224375,
+          "lost_faces": 46
+        },
+        {
+          "kind": "candidate",
+          "load_s": 7.110867959,
+          "lost_faces": 46
+        },
+        {
+          "kind": "baseline",
+          "load_s": 7.163096167,
+          "lost_faces": 46
+        }
+      ],
+      "baseline_median_s": 7.37428725,
+      "candidate_median_s": 7.114046167
+    }
+  ]
+}

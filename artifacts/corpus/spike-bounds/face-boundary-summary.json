@@ -1,0 +1,15 @@
+{
+  "source_face": 1740108,
+  "source_surface": 24572,
+  "source_face_valid_in_occt": true,
+  "outside_source_face_bounds_mm": 0.0,
+  "triangles": 134,
+  "positions": 125,
+  "before_boundary_edges": 114,
+  "after_boundary_edges": 114,
+  "before_nonmanifold_face_edges": 0,
+  "after_nonmanifold_face_edges": 0,
+  "boundary_coordinate_sets_identical": true,
+  "baseline_look": "01dbeac7c63e523019c64e0174cc2729ef991220",
+  "candidate_look": "6b1021cd0d7e4f19a7d94f67ae92987db853d223"
+}

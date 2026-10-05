@@ -1,0 +1,55 @@
+{
+  "candidate_look": "6b1021cd0d7e4f19a7d94f67ae92987db853d223",
+  "captures": [
+    {
+      "stage": "released",
+      "errors": [],
+      "report": {
+        "schema_version": "burr.checks.v1",
+        "model_path": "Voron-2__Voron_2.4r2_Assembly.step",
+        "model_version": "241522213-1791161353-390557443",
+        "check_id": "assembly-interference",
+        "outcome": "incomplete",
+        "summary": "Interference check incomplete: 4 of 100800 STEP faces were lost during import",
+        "component_count": 1428,
+        "checked_pair_count": 0,
+        "candidate_pair_count": 0,
+        "findings": [],
+        "pair_set_complete": false,
+        "incomplete_reasons": [
+          {
+            "code": "step_faces_lost",
+            "message": "4 of 100800 STEP faces were lost during import"
+          }
+        ]
+      },
+      "solid_image_sha256": "8d2acf4d79dc8a5ae795adc9d36f00d48b50e896ccc5486db2b1c60650e8beff",
+      "inspected": true
+    },
+    {
+      "stage": "candidate",
+      "errors": [],
+      "report": {
+        "schema_version": "burr.checks.v1",
+        "model_path": "Voron-2__Voron_2.4r2_Assembly.step",
+        "model_version": "241522213-1791161353-390557443",
+        "check_id": "assembly-interference",
+        "outcome": "incomplete",
+        "summary": "Interference check incomplete: 4 of 100800 STEP faces were lost during import",
+        "component_count": 1428,
+        "checked_pair_count": 0,
+        "candidate_pair_count": 0,
+        "findings": [],
+        "pair_set_complete": false,
+        "incomplete_reasons": [
+          {
+            "code": "step_faces_lost",
+            "message": "4 of 100800 STEP faces were lost during import"
+          }
+        ]
+      },
+      "solid_image_sha256": "22779a0bbbbc263b143504ab70cdb32b535ed33653adaf2b48e6cd88380e7042",
+      "inspected": true
+    }
+  ]
+}
