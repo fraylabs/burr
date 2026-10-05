@@ -3,6 +3,8 @@
 Uses the existing strict occurrence identity, placement and surface matcher.
 No volume threshold turns a nonzero contact into a zero. Refusals and partial
 results remain unverified. Run under the shared CAD lock with a resource cap.
+An empty valid Common is an observational receipt, not a source non-overlap
+certificate: the pulley cross-check demonstrates this Boolean can miss overlap.
 """
 import argparse
 import json
@@ -16,6 +18,7 @@ def verify(model, evidence, scripts):
     report = json.loads(pathlib.Path(str(prefix) + '.burr.json').read_text())['report']
     contacts = report.get('contact_pairs', [])
     result = dict(model=model.name, reported_count=len(contacts), complete=False,
+                  common_scan_complete=False, source_non_overlap_certified=False,
                   checked=[], nonzero_pairs=[], refused_pairs=[])
 
     def save():
@@ -24,6 +27,8 @@ def verify(model, evidence, scripts):
     save()
     if not contacts:
         result['complete'] = True
+        result['common_scan_complete'] = True
+        result['source_non_overlap_certified'] = True # Empty set requires no pair proof.
         save()
         return
     try:
@@ -99,7 +104,11 @@ def verify(model, evidence, scripts):
                 result['refused_pairs'].append(entry)
             save()
             print(model.name, 'contact', entry.get('occt_pair', burr_pair), entry.get('common_volume_mm3', entry.get('refused')), flush=True)
-        result['complete'] = not result['refused_pairs'] and len(result['checked']) == len(contacts)
+        result['common_scan_complete'] = not result['refused_pairs'] and len(result['checked']) == len(contacts)
+        result['independent_source_revalidation_pending'] = True
+        # Preserve the complete Common receipts without promoting zero volume to
+        # a non-overlap certificate. Additional source proofs are required.
+        result['complete'] = False
     except Exception as error:
         result['refused'] = str(error)
     save()

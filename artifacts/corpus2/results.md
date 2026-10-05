@@ -84,7 +84,7 @@ An early import regression is already measured: Jubilee's left double-pulley cor
 
 Release runs: 25/25 completed (8 `fail`, 16 `incomplete`, 1 `pass`). Verification columns remain provisional. “Complete” is Burr's pair-set claim, not yet certification of agreement; every reported contact remains subject to the independent exact-zero check. Empty contact sets require no CAD calculation. The table's zero counts never turn a pending comparison into agreement.
 
-| Model | 0.39.0 coordinate limit | 0.40.0 verdict | Pair set complete | Interferences matched / extra / missing | Contact-or-separated checked zero / reported | Unresolved pairs and reasons |
+| Model | 0.39.0 coordinate limit | 0.40.0 verdict | Pair set complete | Interferences matched / extra / missing | Contact Common zeros / reported (source proof separate) | Unresolved pairs and reasons |
 |---|---|---|---|---|---|---|
 | Framework-Laptop-13__Framework Laptop 13 CAD.stp | no | incomplete | False | refused | 0 / 0 | 0 (step_faces_lost) |
 | Framework-Laptop-13__13_5_hinge_R_assy.stp | yes | incomplete | False | pending | 0 / 0 | 6 (open_component_mesh: 2, below_tessellation_resolution: 4) |

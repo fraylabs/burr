@@ -40,7 +40,7 @@ def summarize(root, evidence, limit):
                    contacts_checked_exact_zero=sum(x.get('exactly_zero') is True for r in rows for x in r['contact_verification'].get('checked', [])),
                    nonzero_contact_pairs=sum(len(r['contact_verification'].get('nonzero_pairs', [])) for r in rows))
     (evidence.parent / 'version-summary.json').write_text(json.dumps(dict(summary=summary, models=rows), indent=2) + '\n')
-    lines = ['| Model | 0.39.0 coordinate limit | 0.40.0 verdict | Pair set complete | Interferences matched / extra / missing | Contact-or-separated checked zero / reported | Unresolved pairs and reasons |',
+    lines = ['| Model | 0.39.0 coordinate limit | 0.40.0 verdict | Pair set complete | Interferences matched / extra / missing | Contact Common zeros / reported (source proof separate) | Unresolved pairs and reasons |',
              '|---|---|---|---|---|---|---|']
     for r in rows:
         c = r['comparison']; v = r['contact_verification']
