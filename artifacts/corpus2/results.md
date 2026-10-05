@@ -377,115 +377,117 @@ Early Faze4 receipts expose a distinction between literal zero and permitted sou
 
 <!-- original-source-rechecks-start -->
 
-Snapshot of the running audit; pending rows have no completed independent source check.
+Snapshot of the running audit; pending rows have no completed independent source check. The owner-requested normal tie-breaker was added after the earlier receipts; those earlier disputed rows and the 13 + 3 previous disputes require the completed tie-breaker recheck. Raw preliminary receipts will be retained. Contact within tolerance is a bounded witness result, not literal zero or exhaustive separation.
 
-Bounded source rechecks: 19 disputed, 81 pending.
+Bounded source rechecks: 2 contact_within_tolerance_bounded, 36 disputed, 62 pending.
 
 Each pair uses strict occurrence matching, valid source solids, OCCT Common, source point classification in bounded seed cubes, and independent solid-angle winding of fine source meshes. An overlap certificate also requires positive distance to both source boundaries. Negative sampling is bounded; it does not establish exhaustive separation. Boundary disagreements, invalid sources, mapping refusals and timeouts remain disputed.
 
 The maximum sampled clearance is the largest sampled distance to the nearer of the two source boundaries among points classified IN by both source solids and inside by both winding checks. It is local evidence, not a measured total overlap depth or volume. The declared depth and volume bounds come from the tested Burr report; a sampled clearance below them does not verify those global bounds. A dash means no candidate clearance was recorded, not zero clearance.
 
-| Model | Burr pair | Status | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Interior certificates | Max sampled clearance mm | Declared max depth mm | Declared max volume mm³ | Limitation |
-|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/1 | disputed | 0.0 | 2 | 7 | 0 | — | 3.498388000744728e-08 | 4.477937240843201e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/2 | disputed | 0.0 | 2 | 5 | 0 | — | 3.4983880007447185e-08 | 4.4779377302161485e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/3 | disputed | 0.0 | 2 | 4 | 0 | — | 3.498388000744731e-08 | 4.4779368849872485e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/4 | disputed | 0.0 | 2 | 7 | 0 | — | 3.498388000744728e-08 | 4.4779372408313886e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/6 | disputed | 0.0 | 12 | 18 | 0 | — | 1.7499324656011864e-08 | 2.659897839216933e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/8 | disputed | 0.0 | 2 | 7 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.4779372407087713e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/9 | disputed | 0.0 | 2 | 10 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.4779367513953614e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/10 | disputed | 0.0 | 2 | 7 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240711754e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/11 | disputed | 0.0 | 2 | 10 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751401041e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/12 | disputed | 0.0 | 2 | 7 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240714617e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/13 | disputed | 0.0 | 2 | 10 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.4779367514068155e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/14 | disputed | 0.0 | 2 | 6 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240717243e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/15 | disputed | 0.0 | 2 | 10 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751412853e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/16 | disputed | 0.0 | 2 | 7 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.4779372407202255e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/17 | disputed | 0.0 | 2 | 10 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751419105e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/18 | disputed | 0.0 | 2 | 7 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240723328e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/19 | disputed | 0.0 | 2 | 10 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.4779367514255475e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/20 | disputed | 0.0 | 2 | 6 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240726549e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/21 | disputed | 0.0 | 2 | 10 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751431275e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/22 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/23 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/24 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/25 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/26 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/27 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/28 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/29 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/30 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/31 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/32 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/33 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/34 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/35 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/36 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/37 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/38 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/39 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/40 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/41 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/42 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/43 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/44 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/45 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/46 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/47 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/48 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/49 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/50 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/51 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/52 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/53 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/54 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/55 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/56 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/57 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/58 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/59 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/60 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/61 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/62 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/63 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/64 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/65 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/66 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/67 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/68 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/69 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/70 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/71 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/72 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/73 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/74 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/75 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/76 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/77 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/78 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/103 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/106 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/109 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/112 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/115 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/118 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/121 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/123 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/126 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/128 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/129 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/130 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/131 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/132 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/133 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/134 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/135 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__automation_control_unit.step | 0/1 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__automation_control_unit.step | 12/13 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__pick_place_arm.step | 0/16 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__pick_place_arm.step | 1/2 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__pick_place_arm.step | 2/3 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__pick_place_arm.step | 3/4 | pending | — | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__pick_place_arm.step | 3/5 | pending | — | 0 | 0 | 0 | — | — | — |  |
+Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary normal-probe receipts. Method 5 probes both face-normal signs and adjacent-face bisectors at 1e-6, 1e-4, 1e-3 and 1e-2 mm, verifies which steps enter the originating source solid, and checks those points against the other solid and winding. It records boundary distances for every source IN/IN point, including winding disagreements. Shared interior within 1e-6 mm of either boundary is treated as tolerance contact at the sampled witness; only deeper shared interior corroborated by winding yields an overlap certificate. These remain bounded local checks; earlier disputed rows without the completed tie-breaker need rechecking.
+
+| Model | Burr pair | Status | Method | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Verified inward steps | Interior certificates | Max sampled clearance mm | Declared max depth mm | Declared max volume mm³ | Limitation |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/1 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | — | 3.498388000744728e-08 | 4.477937240843201e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/2 | disputed | 1 | 0.0 | 2 | 5 | 0 | 0 | — | 3.4983880007447185e-08 | 4.4779377302161485e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/3 | disputed | 1 | 0.0 | 2 | 4 | 0 | 0 | — | 3.498388000744731e-08 | 4.4779368849872485e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/4 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | — | 3.498388000744728e-08 | 4.4779372408313886e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/6 | disputed | 1 | 0.0 | 12 | 18 | 0 | 0 | — | 1.7499324656011864e-08 | 2.659897839216933e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/8 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.4779372407087713e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/9 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.4779367513953614e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/10 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240711754e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/11 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751401041e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/12 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240714617e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/13 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.4779367514068155e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/14 | disputed | 1 | 0.0 | 2 | 6 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240717243e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/15 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751412853e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/16 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.4779372407202255e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/17 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751419105e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/18 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240723328e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/19 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.4779367514255475e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/20 | disputed | 1 | 0.0 | 2 | 6 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240726549e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/21 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751431275e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/22 | disputed | 1 | 0.0 | 2 | 6 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240729413e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/23 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.7397132556246827e-08 | 3.498388000744732e-08 | 4.477936751437798e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/24 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240732674e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/25 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.7397132556246827e-08 | 3.498388000744732e-08 | 4.477936751444194e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/26 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.4779372407358956e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/27 | disputed | 1 | 0.0 | 2 | 5 | 0 | 0 | 1.7397132553652203e-08 | 3.498388000744678e-08 | 4.4779387088197585e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/28 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240739595e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/29 | disputed | 1 | 0.0 | 2 | 5 | 0 | 0 | 1.7397132553652203e-08 | 3.498388000744678e-08 | 4.47793870882644e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/30 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240742935e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/31 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.7397132556247138e-08 | 3.498388000744732e-08 | 4.4779367513722135e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/32 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.4779372406996836e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/33 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751378418e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/34 | disputed | 2 | 0.0 | 10 | 18 | 44 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240702805e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/35 | disputed | 2 | 0.0 | 10 | 26 | 44 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.4779367513839066e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/36 | disputed | 2 | 0.0 | 10 | 18 | 40 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240705788e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/37 | disputed | 3 | 0.0 | 10 | 26 | 40 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751355151e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/38 | disputed | 3 | 0.0 | 10 | 19 | 40 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240691211e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/39 | contact_within_tolerance_bounded | 4 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.47793675136064e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/40 | contact_within_tolerance_bounded | 4 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240693956e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/41 | pending | — | 0.0 | 10 | 0 | 64 | 0 | — | 3.498388000744732e-08 | 4.477936751366415e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/42 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/43 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/44 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/45 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/46 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/47 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/48 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/49 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/50 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/51 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/52 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/53 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/54 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/55 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/56 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/57 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/58 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/59 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/60 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/61 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/62 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/63 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/64 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/65 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/66 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/67 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/68 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/69 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/70 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/71 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/72 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/73 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/74 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/75 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/76 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/77 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/78 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/103 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/106 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/109 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/112 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/115 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/118 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/121 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/123 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/126 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/128 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/129 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/130 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/131 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/132 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/133 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/134 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/135 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| text-to-cad-assembly__automation_control_unit.step | 0/1 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| text-to-cad-assembly__automation_control_unit.step | 12/13 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| text-to-cad-assembly__pick_place_arm.step | 0/16 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| text-to-cad-assembly__pick_place_arm.step | 1/2 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| text-to-cad-assembly__pick_place_arm.step | 2/3 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| text-to-cad-assembly__pick_place_arm.step | 3/4 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| text-to-cad-assembly__pick_place_arm.step | 3/5 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
 
 <!-- original-source-rechecks-end -->

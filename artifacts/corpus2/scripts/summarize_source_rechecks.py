@@ -23,13 +23,16 @@ for model, pair in jobs:
     winding_inside = len(data.get("winding_both_in_indices", []))
     certificates = data.get("interior_overlap_certificates", [])
     candidates = data.get("interior_candidates", [])
-    clearances = [min(candidate["boundary_distances_mm"]) for candidate in candidates]
+    clearances = [min(candidate["boundary_distances_mm"]) for candidate in candidates if candidate.get("winding_confirms_inside", True)]
     clearance = max(clearances) if clearances else "—"
     reported = data.get("reported_pair", {})
+    method_version = data.get("method_version", 1) if data.get("phase") == "finished" else "—"
+    normal = data.get("normal_probe", {})
+    inward = sum(p.get("inward_verified", False) for p in normal.get("points", []))
     depth_bound = reported.get("maximum_overlap_depth", "—")
     volume_bound = reported.get("maximum_common_volume", "—")
     detail = data.get("refused") or data.get("error") or ""
-    rows.append(f"| {model} | {pair[0]}/{pair[1]} | {status} | {volume} | {exact_inside} | {winding_inside} | {len(certificates)} | {clearance} | {depth_bound} | {volume_bound} | {detail} |")
+    rows.append(f"| {model} | {pair[0]}/{pair[1]} | {status} | {method_version} | {volume} | {exact_inside} | {winding_inside} | {inward} | {len(certificates)} | {clearance} | {depth_bound} | {volume_bound} | {detail} |")
 lines = [
     "Bounded source rechecks: " + ", ".join(f"{number} {status}" for status, number in sorted(counts.items())) + ".",
     "",
@@ -37,8 +40,10 @@ lines = [
     "",
     "The maximum sampled clearance is the largest sampled distance to the nearer of the two source boundaries among points classified IN by both source solids and inside by both winding checks. It is local evidence, not a measured total overlap depth or volume. The declared depth and volume bounds come from the tested Burr report; a sampled clearance below them does not verify those global bounds. A dash means no candidate clearance was recorded, not zero clearance.",
     "",
-    "| Model | Burr pair | Status | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Interior certificates | Max sampled clearance mm | Declared max depth mm | Declared max volume mm³ | Limitation |",
-    "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
+    "Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary normal-probe receipts. Method 5 probes both face-normal signs and adjacent-face bisectors at 1e-6, 1e-4, 1e-3 and 1e-2 mm, verifies which steps enter the originating source solid, and checks those points against the other solid and winding. It records boundary distances for every source IN/IN point, including winding disagreements. Shared interior within 1e-6 mm of either boundary is treated as tolerance contact at the sampled witness; only deeper shared interior corroborated by winding yields an overlap certificate. These remain bounded local checks; earlier disputed rows without the completed tie-breaker need rechecking.",
+    "",
+    "| Model | Burr pair | Status | Method | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Verified inward steps | Interior certificates | Max sampled clearance mm | Declared max depth mm | Declared max volume mm³ | Limitation |",
+    "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     *rows,
     "",
 ]

@@ -37,7 +37,7 @@ from occt_components import components
 pair=sorted(args.pair)
 report=json.loads((logs/(args.model.name+'.burr.json')).read_text())['report']
 contact=next(x for x in report[args.list] if sorted(c['occurrence_index'] for c in x['components'])==pair)
-record=dict(model=args.model.name,burr_pair=pair,reported_pair=contact,reported_list=args.list,status='disputed',method='strict source mapping + Common + bounded source classification + independent solid-angle winding',phase='loading')
+record=dict(model=args.model.name,burr_pair=pair,reported_pair=contact,reported_list=args.list,status='disputed',method='strict source mapping + Common + bounded source classification + inward-normal probes + independent solid-angle winding',method_version=5,phase='loading')
 def save():args.output.write_text(json.dumps(record,indent=2))
 save()
 source=components(args.model)
@@ -89,19 +89,70 @@ seeds=list({tuple(round(v,11) for v in p):p for p in seeds}.values())
 record['seed_points']=seeds
 classifiers=[[BRepClass3d_SolidClassifier(s.wrapped) for s in component.Solids()] for component in shapes]
 boundaries=[cq.Compound.makeCompound(s.Faces()) for s in shapes]
+def classify(p):
+    states=[]
+    for component in classifiers:
+        ss=[]
+        for classifier in component:
+            classifier.Perform(gp_Pnt(*p),1e-9);ss.append(str(classifier.State()))
+        states.append('IN' if any(s.endswith('TopAbs_IN') for s in ss) else 'ON' if any(s.endswith('TopAbs_ON') for s in ss) else 'OUT' if all(s.endswith('TopAbs_OUT') for s in ss) else 'UNKNOWN')
+    return states
 points=[]
 for seed in seeds:
     for offset in itertools.product([-0.002,0,0.002],repeat=3):
-        p=[a+b for a,b in zip(seed,offset)];states=[]
-        for component in classifiers:
-            ss=[]
-            for classifier in component:
-                classifier.Perform(gp_Pnt(*p),1e-9);ss.append(str(classifier.State()))
-            states.append('IN' if any(s.endswith('TopAbs_IN') for s in ss) else 'ON' if any(s.endswith('TopAbs_ON') for s in ss) else 'OUT' if all(s.endswith('TopAbs_OUT') for s in ss) else 'UNKNOWN')
-        points.append(dict(point=p,states=states))
+        p=[a+b for a,b in zip(seed,offset)]
+        points.append(dict(point=p,states=classify(p),kind='seed_cube'))
 record['classification']=dict(tolerance_mm=1e-9,point_count=len(points),both_in=[p for p in points if p['states']==['IN','IN']],points=points)
 save()
 print('CLASSIFICATION',args.model.name,pair,len(points),len(record['classification']['both_in']),flush=True)
+
+# Probe both normal signs and retain only steps classified inside the originating
+# component. This checks orientation rather than trusting a face's normal sign.
+# Projection must remain on the trimmed face. These are local witness probes,
+# not an exhaustive test of the solids' entire intersection.
+normal_witnesses=list(seeds)
+normal_witnesses.extend(p['point'] for p in points if 'ON' in p['states'])
+normal_witnesses=list({tuple(round(v,11) for v in p):p for p in normal_witnesses}.values())[:8]
+normal_rows=[];normal_errors=[];normal_skipped=[];normal_indices=[]
+for witness_index,seed in enumerate(normal_witnesses):
+    vertex=cq.Vertex.makeVertex(*seed)
+    if any(vertex.distance(boundary)>0.002 for boundary in boundaries):
+        normal_skipped.append(dict(witness=witness_index,reason='Not near both source boundaries; not a boundary ambiguity'));continue
+    normal_indices.append(witness_index)
+    for component_index,shape in enumerate(shapes):
+        try:
+            face=min(shape.Faces(),key=lambda f:vertex.distance(f))
+            if vertex.distance(face)>0.002:
+                normal_errors.append(dict(witness=witness_index,component=component_index,reason='Witness farther than 0.002 mm from boundary'));continue
+            u,v=face.paramAt(cq.Vector(*seed));normal,foot=face.normalAt(u,v)
+            if cq.Vertex.makeVertex(*foot.toTuple()).distance(face)>1e-6:
+                normal_errors.append(dict(witness=witness_index,component=component_index,reason='Normal projection outside trimmed face'));continue
+            directions=[normal]
+            # At an edge/corner, one face normal may remain on another face.
+            # Try the adjacent-face bisector as well, always verifying IN rather
+            # than assuming orientation or that a bisector enters the solid.
+            foot_vertex=cq.Vertex.makeVertex(*foot.toTuple());adjacent=[]
+            for nearby in shape.Faces():
+                if foot_vertex.distance(nearby)<=1e-6:
+                    try:adjacent.append(nearby.normalAt(foot))
+                    except Exception:pass
+            unique={tuple(round(v,8) for v in n.toTuple()):n for n in adjacent}
+            if unique:
+                combined=sum(unique.values(),cq.Vector())
+                if combined.Length>1e-12:directions.append(combined.normalized())
+            directions=list({tuple(round(v,8) for v in n.toTuple()):n for n in directions}.values())
+            for direction_index,direction in enumerate(directions):
+                for sign in (-1,1):
+                    for depth in (1e-6,1e-4,1e-3,1e-2):
+                        p=list((foot+direction*(sign*depth)).toTuple());states=classify(p)
+                        row=dict(point=p,states=states,kind='normal_probe',witness=witness_index,originating_component=component_index,step_mm=depth,normal_sign=sign,direction_index=direction_index,direction=list(direction.toTuple()),inward_verified=states[component_index]=='IN')
+                        normal_rows.append(row);points.append(row)
+        except Exception as error:
+            normal_errors.append(dict(witness=witness_index,component=component_index,reason=str(error)))
+record['normal_probe']=dict(witness_limit=8,witness_points=normal_witnesses,probed_witness_indices=normal_indices,skipped_witnesses=normal_skipped,depths_mm=[1e-6,1e-4,1e-3,1e-2],direction_rule='Nearest face normal and adjacent-face bisector',points=normal_rows,errors=normal_errors,scope='Local face-normal probes; both signs tested, inward direction verified by source classification')
+record['classification'].update(point_count=len(points),both_in=[p for p in points if p['states']==['IN','IN']],points=points)
+save()
+print('NORMAL_PROBES',args.model.name,pair,len(normal_rows),len(normal_errors),flush=True)
 
 # Check every sampled point by a separate solid-angle method. Near-surface
 # winding values are preserved as ambiguous, not rounded into an inside result.
@@ -124,15 +175,16 @@ record['winding_both_in_indices']=[i for i in range(len(points)) if all(abs(w['v
 certificates=[]
 candidates=[]
 for i,p in enumerate(points):
-    if p['states']!=['IN','IN'] or i not in record['winding_both_in_indices']:continue
+    if p['states']!=['IN','IN']:continue
     vertex=cq.Vertex.makeVertex(*p['point'])
     distances=[vertex.distance(s) for s in boundaries]
-    candidate=dict(point=p['point'],boundary_distances_mm=distances,winding=[w['values'][i] for w in winding],interior_ball_radius_mm=.8*min(distances))
+    candidate=dict(point=p['point'],boundary_distances_mm=distances,winding=[w['values'][i] for w in winding],winding_confirms_inside=i in record['winding_both_in_indices'],interior_ball_radius_mm=.8*min(distances))
     candidates.append(candidate)
-    if min(distances)>1e-6:
+    if candidate['winding_confirms_inside'] and min(distances)>1e-6:
         certificates.append(candidate)
         break
 record['interior_candidates']=candidates
+record['source_inside_distances_complete']=len(candidates)==len(record['classification']['both_in'])
 record['minimum_certificate_margin_mm']=1e-6
 record['interior_overlap_certificates']=certificates
 common_zero=record['common'].get('done') and record['common'].get('valid') and record['common'].get('volume_mm3')==0
@@ -142,6 +194,17 @@ if certificates:
 elif common_zero and controls and not record['classification']['both_in'] and not record['winding_both_in_indices']:
     record['status']='contact_or_separated_bounded'
     record['negative_scope']='valid zero Common; no shared interior found by bounded source seed cubes or independent winding (not exhaustive sampling)'
+elif common_zero and controls and normal_rows and not normal_errors and all(
+        any(p['inward_verified'] and p['originating_component']==component and p['witness']==witness for p in normal_rows)
+        for witness in normal_indices for component in range(2)):
+    # Preserve every shared-interior sample. A thin source-tolerance film is not
+    # a robust overlap, but unknown/deeper classifications cannot be discarded.
+    inward=[p for p in normal_rows if p['inward_verified']]
+    dual_inside=record['classification']['both_in']
+    measured={tuple(c['point']):min(c['boundary_distances_mm']) for c in candidates}
+    if all(p['states'][1-p['originating_component']] in ('ON','OUT') or measured.get(tuple(p['point']),math.inf)<=1e-6 for p in inward) and all(tuple(p['point']) in measured for p in dual_inside) and all(min(c['boundary_distances_mm'])<=1e-6 for c in candidates):
+        record['status']='contact_within_tolerance_bounded'
+        record['negative_scope']='At bounded witnesses, verified inward steps are ON/OUT in the other source solid or share only source-tolerance interior with at most 1e-6 mm nearer-boundary clearance. Not exhaustive separation or a global depth/volume proof.'
 else:
     record['status']='disputed'
 record['phase']='finished';save()
