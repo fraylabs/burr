@@ -1,0 +1,230 @@
+{
+  "baseline_release": "0.39.1",
+  "baseline_look": "01dbeac7c63e523019c64e0174cc2729ef991220",
+  "candidate_look": "6b1021cd0d7e4f19a7d94f67ae92987db853d223",
+  "model_count": 21,
+  "true_pairs": 97,
+  "false_pairs": 0,
+  "protected_true_pairs": 64,
+  "bowden_true_pairs": 9,
+  "bowden_reference_scope": "Only 18 previously reported pairs; full pair completeness is unknown.",
+  "models": [
+    {
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "outcome": "incomplete",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 0,
+      "unresolved": 0,
+      "load_s": 43.649243583,
+      "lost_faces": 4
+    },
+    {
+      "model": "openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+      "outcome": "incomplete",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 0,
+      "unresolved": 0,
+      "load_s": 1.092241917,
+      "lost_faces": 5
+    },
+    {
+      "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+      "outcome": "fail",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 16,
+      "unresolved": 25,
+      "load_s": 0.037369083,
+      "lost_faces": 0,
+      "true": 16,
+      "false": 0
+    },
+    {
+      "model": "openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+      "outcome": "fail",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 16,
+      "unresolved": 26,
+      "load_s": 0.08216675,
+      "lost_faces": 0,
+      "true": 16,
+      "false": 0
+    },
+    {
+      "model": "openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+      "outcome": "incomplete",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 0,
+      "unresolved": 0,
+      "load_s": 0.347675875,
+      "lost_faces": 5
+    },
+    {
+      "model": "openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+      "outcome": "fail",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 8,
+      "unresolved": 8,
+      "load_s": 0.084169375,
+      "lost_faces": 0,
+      "true": 8,
+      "false": 0
+    },
+    {
+      "model": "Voron-0__MiniSB_Bowden.step",
+      "outcome": "fail",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 9,
+      "unresolved": 76,
+      "load_s": 1.3289744589999999,
+      "lost_faces": 0,
+      "true": 9,
+      "false": 0,
+      "formerly_false_unresolved": 9,
+      "scope": "Only the 18 confirmed Burr findings, not a complete scan of all candidate or unresolved pairs. Unique placement, identity and surface samples validated for every referenced occurrence."
+    },
+    {
+      "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+      "outcome": "fail",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 7,
+      "unresolved": 7,
+      "load_s": 0.145366584,
+      "lost_faces": 0,
+      "true": 7,
+      "false": 0
+    },
+    {
+      "model": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+      "outcome": "pass",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 0,
+      "unresolved": 0,
+      "load_s": 0.045186125,
+      "lost_faces": 0,
+      "true": 0,
+      "false": 0
+    },
+    {
+      "model": "Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+      "outcome": "incomplete",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 0,
+      "unresolved": 13,
+      "load_s": 1.100351959,
+      "lost_faces": 0
+    },
+    {
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "outcome": "incomplete",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 0,
+      "unresolved": 0,
+      "load_s": 13.584847791,
+      "lost_faces": 6
+    },
+    {
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "outcome": "incomplete",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 0,
+      "unresolved": 0,
+      "load_s": 7.754337709,
+      "lost_faces": 46
+    },
+    {
+      "model": "TradRack__tr-lower-carabiner-distribution-board.STEP",
+      "outcome": "incomplete",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 0,
+      "unresolved": 0,
+      "load_s": 0.13721225,
+      "lost_faces": 2
+    },
+    {
+      "model": "TradRack__tr-toolhead-board.STEP",
+      "outcome": "fail",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 6,
+      "unresolved": 0,
+      "load_s": 0.104769542,
+      "lost_faces": 0,
+      "true": 6,
+      "false": 0
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "outcome": "fail",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 9,
+      "unresolved": 126,
+      "load_s": 0.0878615,
+      "lost_faces": 0,
+      "true": 9,
+      "false": 0
+    },
+    {
+      "model": "apollo-3d-enclosure__flat__assembly.step",
+      "outcome": "pass",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 0,
+      "unresolved": 0,
+      "load_s": 0.4691965,
+      "lost_faces": 0,
+      "true": 0,
+      "false": 0
+    },
+    {
+      "model": "apollo-3d-enclosure__corner__assembly.step",
+      "outcome": "pass",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 0,
+      "unresolved": 0,
+      "load_s": 0.296404625,
+      "lost_faces": 0,
+      "true": 0,
+      "false": 0
+    },
+    {
+      "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+      "outcome": "fail",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 11,
+      "unresolved": 13,
+      "load_s": 0.306813583,
+      "lost_faces": 0,
+      "true": 11,
+      "false": 0
+    },
+    {
+      "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+      "outcome": "incomplete",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 0,
+      "unresolved": 7,
+      "load_s": 0.449753,
+      "lost_faces": 0
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "outcome": "fail",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 3,
+      "unresolved": 5,
+      "load_s": 0.022477917,
+      "lost_faces": 0,
+      "true": 3,
+      "false": 0
+    },
+    {
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "outcome": "fail",
+      "verdict_and_pair_lists_identical_to_combined": true,
+      "confirmed": 12,
+      "unresolved": 2,
+      "load_s": 0.053723,
+      "lost_faces": 0,
+      "true": 12,
+      "false": 0
+    }
+  ]
+}
