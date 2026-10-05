@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.39.1 - 2026-10-05
+
+- Close periodic NURBS seams whose period is only known from the source
+  surface: the Meanwell power supply in the Voron 2.4 assembly is now a closed,
+  manifold mesh again (the known limitation from 0.38.3 is fixed).
+- No interference result changes: all 21 corpus models keep identical
+  verdicts and pair lists (97 real pairs, 0 false), and every previously
+  closed mesh stays closed.
+
 ## 0.39.0 - 2026-10-05
 
 - Read STEP assemblies whose shapes use `MANIFOLD_SURFACE_SHAPE_REPRESENTATION`:

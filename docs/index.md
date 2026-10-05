@@ -19,7 +19,7 @@ curl -fsSL https://raw.githubusercontent.com/fraylabs/burr/main/install.sh | sh
 x86-64 builds need a CPU with AVX and FMA. To build from source instead:
 
 ```bash
-cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.39.0 --locked
+cargo install --git https://github.com/fraylabs/burr.git --tag burr-v0.39.1 --locked
 ```
 
 On x86-64, source installs need `RUSTFLAGS="-Ctarget-feature=+avx,+fma"`.
