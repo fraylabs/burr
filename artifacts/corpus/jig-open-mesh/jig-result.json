@@ -1,0 +1,23 @@
+{
+  "baseline_version": "0.40.1",
+  "baseline_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "baseline_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_tested_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "candidate_look_revision": "387f94f030a286124057dd14036e85cbc0eecb47",
+  "candidate_source_diff_sha256": "fa1d9bf9ebac1dc7b87896d405ba84a55859643bf56512800933670351701790",
+  "source": "OpenArm JIG, Enactic, CERN-OHL-S-2.0",
+  "source_sha256": "c7e7ddd664ccfdc9820c3aa80be5360d7d51f6845866545848e3d7d7917bb16f",
+  "parts": 2,
+  "geometries": 1,
+  "declared_definition_faces": 36,
+  "declared_occurrence_faces": 72,
+  "lost_faces": 0,
+  "outcome": "pass",
+  "pair_set_complete": true,
+  "checked_pairs": 1,
+  "findings": 0,
+  "baseline_boundary_edges": 22,
+  "candidate_boundary_edges": 0,
+  "candidate_nonmanifold_edges": 0,
+  "reference_validation": "Strict source occurrence mapping, valid source solids and bounded source seed-cube/winding review completed; not exhaustive separation."
+}

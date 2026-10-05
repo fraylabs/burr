@@ -1,0 +1,19 @@
+{
+  "baseline_version": "0.40.1",
+  "baseline_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "baseline_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_tested_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "candidate_look_revision": "387f94f030a286124057dd14036e85cbc0eecb47",
+  "candidate_source_diff_sha256": "fa1d9bf9ebac1dc7b87896d405ba84a55859643bf56512800933670351701790",
+  "burr_base": "d85770180fb534097ec48f4af785953abc96782f",
+  "published_look_revision": "387f94f030a286124057dd14036e85cbc0eecb47",
+  "source_diff_sha256": "fa1d9bf9ebac1dc7b87896d405ba84a55859643bf56512800933670351701790",
+  "manifest_refs": 11,
+  "locked_look_packages": 13,
+  "full_npm_check": "pass",
+  "release_build": "pass",
+  "binary_sha256": "8c71d4113692fcafb90e2857b61f761f74d53a62c7349deecb7d6de9981044a2",
+  "compilation_source": "Published Git dependency; no path dependency or private hook",
+  "candidate_package_version": "0.40.2",
+  "metadata_change": "Package version only after the validated geometry build; same exact published Look source."
+}

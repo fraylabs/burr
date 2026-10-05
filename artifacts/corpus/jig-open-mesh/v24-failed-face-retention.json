@@ -1,0 +1,43 @@
+{
+  "baseline_version": "0.40.1",
+  "baseline_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "baseline_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_tested_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "candidate_look_revision": "387f94f030a286124057dd14036e85cbc0eecb47",
+  "candidate_source_diff_sha256": "fa1d9bf9ebac1dc7b87896d405ba84a55859643bf56512800933670351701790",
+  "model": "Voron-2__Voron_2.4r2_Assembly.step",
+  "baseline_failed_faces_receipt_sha256": "36a9f9665a8bf0dc2c242535737174ffc83ddf52aa55bb9681a7049dad0b52f5",
+  "candidate_failed_source_faces": [
+    {
+      "source_face_id": 1814162,
+      "disposition": "RejectedIntrinsic",
+      "terminal_reason": "RejectedDegenerate",
+      "failure_stage": "ValidityClassification",
+      "derived_bucket": "IntrinsicDegenerate"
+    },
+    {
+      "source_face_id": 1814164,
+      "disposition": "Failed",
+      "terminal_reason": "NoOddParityRegion",
+      "failure_stage": "MaterialSelection",
+      "derived_bucket": "NoMaterialRegion"
+    },
+    {
+      "source_face_id": 1831656,
+      "disposition": "Failed",
+      "terminal_reason": "ConstraintInsertionIncomplete",
+      "failure_stage": "ConstraintInsertion",
+      "derived_bucket": "VertexInsertionFailure"
+    },
+    {
+      "source_face_id": 1831657,
+      "disposition": "Failed",
+      "terminal_reason": "ConstraintInsertionIncomplete",
+      "failure_stage": "ConstraintInsertion",
+      "derived_bucket": "VertexInsertionFailure"
+    }
+  ],
+  "failed_source_faces_and_terminal_signatures_identical": true,
+  "new_failed_source_faces": [],
+  "candidate_diagnostic_sha256": "63a031902965e59a23cd97ce6cc644e7678e0343de2924c1bb718e56d71279e9"
+}

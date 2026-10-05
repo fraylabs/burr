@@ -1,0 +1,995 @@
+{
+  "baseline_version": "0.40.1",
+  "baseline_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "baseline_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_tested_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "candidate_look_revision": "387f94f030a286124057dd14036e85cbc0eecb47",
+  "candidate_source_diff_sha256": "fa1d9bf9ebac1dc7b87896d405ba84a55859643bf56512800933670351701790",
+  "models_checked": 25,
+  "scope": "Fresh 0.40.1 comparison covers attributed Failed, RejectedIntrinsic and conversion_refusal events and unattributed-event counts. Historical 0.39.0/0.40.0 comparisons cover recorded lost/declared counts only.",
+  "models": [
+    {
+      "model": "ExpansionCards__ExpansionCard_SelfTapping.stp",
+      "source_sha256": "4d44d4fb5606a535271b522be98c48eeee4d1d05a6db9670a6ef7ca95606c3f2",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 251,
+      "parts": 4,
+      "geometries": 3,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "5dfe01b4d6d04b728e080a40cdb996776b2cde33aec1b1f462146bf80624e372",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "8c58b2c438a183be38c5a804c8bb8175a25b7c9bf3aee472ee2d0e32380f2136",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "Framework-Laptop-13__13_5_hinge_R_assy.stp",
+      "source_sha256": "be1fbe624389687ff992bed8693baedf2a7b29c0bcde167a7c2642678ae426fe",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 269,
+      "parts": 6,
+      "geometries": 5,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "3b72b6d710814a8ddb616c9ef3e80cacacac811643defd1776b680d94545fc52",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "4fed4590fc87652f9bb40ee1dff52583459b4205777b1dbaddd4ea0504088856",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "Framework-Laptop-13__FWKNAQ9_G01_20210911.stp",
+      "source_sha256": "1c8ae3b3026c64a1473c2c2662f0746a3734c47cd318c80a08695ccbb065f1c9",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 6,
+      "candidate_lost_faces": 6,
+      "declared_faces": 5752,
+      "parts": 21,
+      "geometries": 14,
+      "baseline_unrealized_source_faces": [
+        194229,
+        194847,
+        195809,
+        195821,
+        225044,
+        225662
+      ],
+      "candidate_unrealized_source_faces": [
+        194229,
+        194847,
+        195809,
+        195821,
+        225044,
+        225662
+      ],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": "8504e29505509881b85810a91c9015fe722aa83a529c5b690850e92d2596a0a6",
+        "candidate": "30fd17dd07d945bf3cf456abf9cc50591dee85ce619282db47eb845c39c05f53"
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 6,
+          "declared_faces_if_recorded": 5752,
+          "metrics_sha256": "ca626764636a270f800c940ba1bef8d47cf6101d2b0b557a0193247f469ef7b7",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 6,
+          "declared_faces_if_recorded": 5752,
+          "metrics_sha256": "0dc636854bd323df8c03e4418a3d6db3122dbec4c114d0aad6fd5bf2132437fc",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "Framework-Laptop-13__FW_13_camera_module.stp",
+      "source_sha256": "c8be514e8f313a9d89a9c66d7ab9ffd854e7cd7c7ce1b82f22bd9d8616ea4d8c",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 713,
+      "parts": 3,
+      "geometries": 3,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "370b54d4c418ef4ab91feec7814e9908c7403e789687c8b98a620bc4c9545bd5",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "4aaa128a9925fe4195424b95e610c73e49b8de5250c15414bd41601f273b9c7c",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "Framework-Laptop-13__Framework Laptop 13 CAD.stp",
+      "source_sha256": "19778e9a7c8f229451922b42717647c7cf9f4a7ef05a09a36c368d4480127f31",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 1,
+      "candidate_lost_faces": 1,
+      "declared_faces": 6652,
+      "parts": 107,
+      "geometries": 107,
+      "baseline_unrealized_source_faces": [
+        128324
+      ],
+      "candidate_unrealized_source_faces": [
+        128324
+      ],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": "93876fdb728bb58b3494e5334732c7122685c265d1afdf5deec32ec4adcdf366",
+        "candidate": "93876fdb728bb58b3494e5334732c7122685c265d1afdf5deec32ec4adcdf366"
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 1,
+          "declared_faces_if_recorded": 6652,
+          "metrics_sha256": "73d4df28185b632df8ae4a23dd337ea01495e452e3b11d4a5022416dda779db9",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 1,
+          "declared_faces_if_recorded": 6652,
+          "metrics_sha256": "4d4e8b03b4187832503718a71f1bef8aa26bb2a9be345c2328e3d153671fc10a",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "Framework-Laptop-13__printable_case_full.stp",
+      "source_sha256": "5b2a62f7a61d026548a2581c44e2f52adf5792c2d7d00796d73b4ee5aadbb1c8",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 1641,
+      "parts": 15,
+      "geometries": 6,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "0f7ada6d2dced124f3162c3018ec5a197d5cfb7d8a679fb8e652b946bfcf19a6",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "2a072884626f409f35f7e0c57e40fb045fe54a0c143fb1f0658a405de3af9fa9",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "FreeCAD-library__Adirondack Chair.step",
+      "source_sha256": "fb630b8001b2a622e80e564baa35706f7aa5138de90d28e83e50fb39de5de8c2",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 113,
+      "parts": 36,
+      "geometries": 12,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "f8becc1e7472f4efc438508ca5dc01952a036b02fd84e2719ae4c2eddb53861f",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "b9a31d9b72de6c208d1fdaffc86510e7ec7a4928a8e904040687f5429e28b077",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "FreeCAD-library__ComputerDesk (100 x 50 x 75 cm WDH).step",
+      "source_sha256": "9c8d7c728ea579b686234e41b37e89078a2df8fcf52fd014e8b754179298bda8",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 60,
+      "parts": 9,
+      "geometries": 9,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "816c37fb80d13beca536ae48e4b0dbaf0a3d1c4aa6cd58e03d292ff755ebffad",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "e145ec75a59221db9493a0b46054b5b4fa3b91ba48c4e9aa76680b8e90b05e1c",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "FreeCAD-library__Double glass doors with handles and transom.step",
+      "source_sha256": "fc6bee047fb7e4c401a5cd2ff7c5a077687948b21f3e319c397df39464d641e6",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 112,
+      "parts": 1,
+      "geometries": 1,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "da09258e69b9a2b3d65760e583e1ae63f6747e1c8eb0483c2b0493ab494be58c",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "0b9db19bb0a09d30c3781582a87aff1a50c325726dc9f63bc58e8f754eb1f014",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "FreeCAD-library__Wooden Folding Table.step",
+      "source_sha256": "24f2acbdf7778dc58db39f5bffd0f0086b00b01e3292efe87ecd0150ea975f54",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 60,
+      "parts": 14,
+      "geometries": 7,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "06d5e75d52cba503e81b122c48641ffa013236dee19b96d1e8d692dce6f8396b",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "ab5d81f91e465d854a6560a12c635328c3d78aa3656b5ab29c9e0acfb5cfb636",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "FreeCAD-library__Yellow_gearmotor_L.step",
+      "source_sha256": "fe7343ace714992975bc9c34d6944295a9d80f0cf627771c5ce108a13d54360c",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 97,
+      "parts": 6,
+      "geometries": 6,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "0ee2c7b5985c834e54719509d7d0ff2088098f8b33c9e7b4dcb33e1d9d3371bd",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "6c4177a2eb458c82e026f3dd22206b96560537e701c21da2e09a7f00035a1dfe",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "FreeCAD-library__wooden folding chair.step",
+      "source_sha256": "15008f61ca1c054265ed097e76f666e05e25b60ff934ece30aa6e6e8b43ce181",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 79,
+      "parts": 20,
+      "geometries": 7,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "a5d0eb25c065296f91c25996a62596161b92c94147a1e26f1a888093cadda41f",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "cfa9bc37537e2141c2c2877662d50258d11f3bbd219674b6fb147874968c1302",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "jubilee__6x_well_plate_bed_assembly.STEP",
+      "source_sha256": "8e7c9171850a0441e032a09adf7f4e22755874970e4a3bb7c3a4c41c4bef2d42",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 1,
+      "candidate_lost_faces": 1,
+      "declared_faces": 1198,
+      "parts": 98,
+      "geometries": 17,
+      "baseline_unrealized_source_faces": [
+        1003
+      ],
+      "candidate_unrealized_source_faces": [
+        1003
+      ],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": "19bb2886742a2b7979267d19be2d70d22c76bfc16fe0d878ee5f139f38390867",
+        "candidate": "19bb2886742a2b7979267d19be2d70d22c76bfc16fe0d878ee5f139f38390867"
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 1,
+          "declared_faces_if_recorded": 1198,
+          "metrics_sha256": "65556b91b46b4d86613d03a2e37095a727b73192c004235b0963088b78440634",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 1,
+          "declared_faces_if_recorded": 1198,
+          "metrics_sha256": "61d88fa3d6d58520a69536ad15948c2e30c63f0d9c48a004aa5732224ceae938",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "jubilee__bondtech_groovemount_extruder.STEP",
+      "source_sha256": "c14c748eb54dcc20979a753bf697b2fcff7a0a8e04042ffd7d48d4c0055e5646",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 4240,
+      "parts": 60,
+      "geometries": 28,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "a81f61ce59d00c6233c84a84479d8ad5b071d7216def7d72b54bf5c055c2cd23",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "a1216b8f7994597f11cde335db81e0081407f651aa86e0aa2e0058f590a5c0d0",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "jubilee__camera_calibration_tool_jan_31_2020.STEP",
+      "source_sha256": "f67456ea7079952cab81c90445bbd8acb4d192e69ae82cd20979abccb1c96965",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 517,
+      "parts": 15,
+      "geometries": 8,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "bccd5beb76899ffc0d6868e5d0d8038bc8506c9f36d42964e2904b7967e745dc",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "de6deddfd00a261e6e658eb878f24aaaef9850ee857ca6aa96deea39b0aa2d80",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "jubilee__jubilee.STEP",
+      "source_sha256": "533417712183775a544802ae29a6f94d50ef0839bc2f24f68bce7a048798afea",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 9453,
+      "parts": 755,
+      "geometries": 127,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 2,
+          "declared_faces_if_recorded": 9453,
+          "metrics_sha256": "0b758205644086186d400268e197aba5837c25de13e300c2192deb2fa8c3b861",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 3,
+          "declared_faces_if_recorded": 9453,
+          "metrics_sha256": "9d3a19b8522324bf9735657875d77b742f6adc64020d2d4040cda4e2fef7c33f",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "jubilee__left_double_pulley_corner_bracket_assembly.STEP",
+      "source_sha256": "43e3dacb1b9e7cb3873f925080147608debb7888b8e8c0f9b9f8dc9414d5af7f",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 510,
+      "parts": 23,
+      "geometries": 12,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "fbb4a4170a2f73eaa02dd99462d043e9c3671a58ae0087c36f3b4ecbbbeae94f",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 1,
+          "declared_faces_if_recorded": 510,
+          "metrics_sha256": "a30909daad45da525fcc72c300fb574c4d4204b6dd7ed8a6320cf8d8c1847008",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "jubilee__ooze_wiper_assembly.STEP",
+      "source_sha256": "ae282d97667148603e238ec15a5c8fdb6fe2cdbb3af5e271ce18fb6d02cce0bf",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 165,
+      "parts": 6,
+      "geometries": 4,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "18e4196768c65d4529855451d7107776b1143a03de75566e071b58415e94bcca",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "4a06729b0f226cdb65a101a49241ec5e4ca842f7c177a78d62974b1c3c09a691",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "jubilee__passive_pen_tool_assembly.STEP",
+      "source_sha256": "4d233cae83ac8bc298b40655399c1ba8e8922da895ad6e586439d6b9dd4abfde",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 843,
+      "parts": 39,
+      "geometries": 13,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "2e3ab84a72aea566600597d69f284b30ad85a1b72b40e173020ec04907cadbd9",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "32fba545a4dad6d7991ba1f976c1622ffc2ecc91c19f98e06b44aa4653f55c42",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "jubilee__tool_template_assembly.STEP",
+      "source_sha256": "eb3cbe4bfafaf683a9089010515bf6f288e9b4ae86f9df35ee813ad893b92739",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 441,
+      "parts": 14,
+      "geometries": 5,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "f1d5444e2c9bcb456c20e83e7e965ecd0476fe373263c2b0ba4df7f107c3dd16",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "7f4186b2417b8aacc1404a91f0158b44d39b527c1260b9c714aeecf8237a244a",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "kicadStepUpMod__demo.step",
+      "source_sha256": "61967820ddd9388f5e411fd7bf27f30e0f152500c24d3df8edbc8c507a66cd5b",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 1,
+      "candidate_lost_faces": 1,
+      "declared_faces": 401,
+      "parts": 13,
+      "geometries": 13,
+      "baseline_unrealized_source_faces": [
+        8490
+      ],
+      "candidate_unrealized_source_faces": [
+        8490
+      ],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": "e265e626cb379e851367b6b814b848bc1d20f5b175a90f768cf347ebcc2ff2fe",
+        "candidate": "e265e626cb379e851367b6b814b848bc1d20f5b175a90f768cf347ebcc2ff2fe"
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 1,
+          "declared_faces_if_recorded": 401,
+          "metrics_sha256": "7c712ab05eff0fd1287cb197118111d672f2ab9029538f81b669b65705ba2b57",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 1,
+          "declared_faces_if_recorded": 401,
+          "metrics_sha256": "8a475706aa79e8123c310e3db06af1a99dc38453b81ccb18d50c9071adeb1cbe",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "open_robot_actuator_hardware__biped_6dof_v1.STEP",
+      "source_sha256": "b5018637f72dce223c2b4dccebe5d01c362c455ec6c7bd1ff14ffcce854643fa",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 7236,
+      "parts": 345,
+      "geometries": 56,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "2d9ce9cadd06281d6958e2ae226480bcb0e7a1a401936e3aa8551b0dbc22830b",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "8c31d4ffb8360465d15c2a1df6746f04ce384eb22ec7f4f75f4a1afab3a72cb7",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "openarm_hardware__OpenArmJIG.STEP",
+      "source_sha256": "13a19057c70ee72460786fa243b75d0e0600d859624f2963350befeda5f91276",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 0,
+      "candidate_lost_faces": 0,
+      "declared_faces": 344,
+      "parts": 8,
+      "geometries": 6,
+      "baseline_unrealized_source_faces": [],
+      "candidate_unrealized_source_faces": [],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": null,
+        "candidate": null
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "61840b1b5fc018efdf339cd758c5b8cef046f81f396df62e6308fec4c04f2ff9",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 0,
+          "declared_faces_if_recorded": null,
+          "metrics_sha256": "7019af5c9e083fa3ff5180ba8a5711b6e937eb93f5ab760022eec8c28827d697",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "openarm_hardware__OpenArm_2.0.STEP",
+      "source_sha256": "0f97a5fb308d5b09353aa67bbd32d7c08e55dc5629bcbe20c12f71c82ef13c94",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 12,
+      "candidate_lost_faces": 12,
+      "declared_faces": 7520,
+      "parts": 564,
+      "geometries": 89,
+      "baseline_unrealized_source_faces": [
+        15808,
+        23809,
+        40398,
+        68065,
+        101642,
+        230231,
+        245833,
+        256669,
+        279639,
+        301685,
+        437070,
+        461184
+      ],
+      "candidate_unrealized_source_faces": [
+        15808,
+        23809,
+        40398,
+        68065,
+        101642,
+        230231,
+        245833,
+        256669,
+        279639,
+        301685,
+        437070,
+        461184
+      ],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": "02d278a8df11ef81a1f19f286c6f37c1252c776d5a464bbc3c7cc12ea2aeffeb",
+        "candidate": "de8098b608f68d748eb328b802a28d99eca81d2e4474b49fdb2103a556ea687a"
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 12,
+          "declared_faces_if_recorded": 7520,
+          "metrics_sha256": "19b7b8254fd4dd66e75f6fdd67ad728b542c9e85bdb30a179b62373268be8a41",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 12,
+          "declared_faces_if_recorded": 7520,
+          "metrics_sha256": "f88c5a73dc870d8f933315ae78d2fbb195d19acb5c7b4e642baa8375e2068de5",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "model": "openarm_hardware__OpenArm_Cell+OpenArm_2.0.STEP",
+      "source_sha256": "cd0ee9b9d029cb23d2e48f80662bac18092f60c4b62a61b4eeef6155567f4b21",
+      "baseline_version": "0.40.1",
+      "baseline_lost_faces": 2,
+      "candidate_lost_faces": 2,
+      "declared_faces": 69931,
+      "parts": 538,
+      "geometries": 88,
+      "baseline_unrealized_source_faces": [
+        75741,
+        2216155
+      ],
+      "candidate_unrealized_source_faces": [
+        75741,
+        2216155
+      ],
+      "new_unrealized_source_faces": [],
+      "baseline_unattributed_unrealized_events": 0,
+      "candidate_unattributed_unrealized_events": 0,
+      "diagnostics_sha256": {
+        "baseline": "a3ed56ef9af7114ecc332571df6b27f56992c0957fed2cd436e7b7c2258ecfe1",
+        "candidate": "a3ed56ef9af7114ecc332571df6b27f56992c0957fed2cd436e7b7c2258ecfe1"
+      },
+      "unrealized_scope": "Failed, RejectedIntrinsic and conversion_refusal events with available source attribution",
+      "historical_count_retention": [
+        {
+          "version": "0.39.0",
+          "lost_faces": 2,
+          "declared_faces_if_recorded": 69931,
+          "metrics_sha256": "fa050e2b23f3e5c76eced2b946eff43ebbcf214fc4c02cbeda1ae6d931377ac8",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        },
+        {
+          "version": "0.40.0",
+          "lost_faces": 2,
+          "declared_faces_if_recorded": 69931,
+          "metrics_sha256": "facf4b6a89dbbb1f3730373ab0b4f48f8422aa31fea3398b8ddb1e23dbf908fe",
+          "diagnostic_attribution": "historical diagnostics may omit conversion refusals; complete current comparison uses fresh 0.40.1 below"
+        }
+      ],
+      "passed": true
+    }
+  ]
+}

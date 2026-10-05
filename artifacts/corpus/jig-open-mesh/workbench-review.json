@@ -1,0 +1,73 @@
+{
+  "baseline_version": "0.40.1",
+  "baseline_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "baseline_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_tested_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "candidate_look_revision": "387f94f030a286124057dd14036e85cbc0eecb47",
+  "candidate_source_diff_sha256": "fa1d9bf9ebac1dc7b87896d405ba84a55859643bf56512800933670351701790",
+  "reviewer": "Burr Owner",
+  "scope": "Independent review of real production-candidate workbench renders and checks. Seven screenshots are retained; check results are Owner observations, not additional screenshots.",
+  "candidate_burr_binary_sha256": "30f5a23f823b2dc9b5ed6ba8eba63a7ffb1af77fbc2ff135ff8696ac9e92e182",
+  "models": [
+    {
+      "model": "jig",
+      "approved": true,
+      "owner_observations": "Solid and X-ray clean; Checks Pass, no assembly interference detected across one pair.",
+      "checks_reviewed_by_owner": true,
+      "screenshots": [
+        {
+          "mode": "solid",
+          "sha256": "79560cd881f3d34c82cac076f98d39ba2b066b4b0e8e88a3fda90be6afebcfba"
+        },
+        {
+          "mode": "xray",
+          "sha256": "23680542cdc58c7422e27d4bc583fbaa7439a7cabc6b46377aab4160b70e6de4"
+        }
+      ]
+    },
+    {
+      "model": "lower",
+      "approved": true,
+      "owner_observations": "Solid and X-ray clean; Checks Fail with exactly five Interior overlap findings, occurrences 1 through 5 versus 6, nothing unresolved.",
+      "checks_reviewed_by_owner": true,
+      "screenshots": [
+        {
+          "mode": "solid",
+          "sha256": "15d2f36144b3159ea3966758260e0f848034f5be9b1a99be9c8e9a7cc5eeb27d"
+        },
+        {
+          "mode": "xray",
+          "sha256": "d70614a074134e927d082df15979c8c303bb4a4e004f5c13e890d69d77e87843"
+        }
+      ]
+    },
+    {
+      "model": "voron2",
+      "approved": true,
+      "owner_observations": "Solid and X-ray clean with no spikes; same four known lost faces only.",
+      "checks_reviewed_by_owner": false,
+      "screenshots": [
+        {
+          "mode": "solid",
+          "sha256": "b3faada59a32f062eefe8aeafc565ed0c8c5c1c42561c2744e819ecf02a18152"
+        },
+        {
+          "mode": "xray",
+          "sha256": "846b5f8c654b1c65cea6c640e4da800a2828753e3022adb75a2e3fbfde071c6d"
+        }
+      ]
+    },
+    {
+      "model": "pulley",
+      "approved": true,
+      "owner_observations": "No lost faces; Checks identical to 0.40.1: bracket and M4 interference, 25 unresolved including M5/t-nut Open mesh, 12 contact-or-separated.",
+      "checks_reviewed_by_owner": true,
+      "screenshots": [
+        {
+          "mode": "workbench-render",
+          "sha256": "5691f380c3eaa76e5bcfcbd9e5d69a447351876087b109dec86d102922613780"
+        }
+      ]
+    }
+  ]
+}

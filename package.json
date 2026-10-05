@@ -1,6 +1,6 @@
 {
   "name": "@fraylabs/burr",
-  "version": "0.40.1",
+  "version": "0.40.2",
   "private": true,
   "description": "Fast local browser and assembly interference checker for CAD models.",
   "type": "module",

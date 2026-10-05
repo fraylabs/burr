@@ -206,7 +206,7 @@ checksum = "72f5acc6cb2ba439de613abc23857ec3d78374d8ed5ac84e9d11336e87da8649"
 
 [[package]]
 name = "burr"
-version = "0.40.1"
+version = "0.40.2"
 dependencies = [
  "blake3",
  "glam",
@@ -985,7 +985,7 @@ checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
 [[package]]
 name = "look"
 version = "0.1.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "anyhow",
  "blake3",
@@ -1947,7 +1947,7 @@ checksum = "7d56353a2a665ad0f41a421187180aab746c8c325620617ad883a99a1cbe66d2"
 [[package]]
 name = "truck-assembly"
 version = "0.1.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "rayon",
  "truck-base",
@@ -1956,7 +1956,7 @@ dependencies = [
 [[package]]
 name = "truck-base"
 version = "0.5.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "cgmath",
  "matext4cgmath",
@@ -1967,7 +1967,7 @@ dependencies = [
 [[package]]
 name = "truck-certified"
 version = "0.1.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "cgmath",
  "robust",
@@ -1983,7 +1983,7 @@ dependencies = [
 [[package]]
 name = "truck-derivers"
 version = "0.1.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",
@@ -1994,7 +1994,7 @@ dependencies = [
 [[package]]
 name = "truck-evidence"
 version = "0.1.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "inari",
  "truck-base",
@@ -2005,7 +2005,7 @@ dependencies = [
 [[package]]
 name = "truck-geometry"
 version = "0.5.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "serde",
  "thiserror 2.0.20",
@@ -2016,7 +2016,7 @@ dependencies = [
 [[package]]
 name = "truck-geotrait"
 version = "0.4.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "getrandom",
  "rand",
@@ -2028,7 +2028,7 @@ dependencies = [
 [[package]]
 name = "truck-meshalgo"
 version = "0.4.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "array-macro",
  "derive_more 2.1.1",
@@ -2051,7 +2051,7 @@ dependencies = [
 [[package]]
 name = "truck-modeling"
 version = "0.6.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "derive_more 2.1.1",
  "itertools 0.15.0",
@@ -2069,7 +2069,7 @@ dependencies = [
 [[package]]
 name = "truck-polymesh"
 version = "0.6.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "array-macro",
  "bytemuck",
@@ -2084,7 +2084,7 @@ dependencies = [
 [[package]]
 name = "truck-stepio"
 version = "0.3.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "chrono",
  "derive_more 2.1.1",
@@ -2103,7 +2103,7 @@ dependencies = [
 [[package]]
 name = "truck-topology"
 version = "0.6.0"
-source = "git+https://github.com/fraylabs/look.git?rev=8b0ec8ef70944a895caa8149f14ae1552b0912a0#8b0ec8ef70944a895caa8149f14ae1552b0912a0"
+source = "git+https://github.com/fraylabs/look.git?rev=387f94f030a286124057dd14036e85cbc0eecb47#387f94f030a286124057dd14036e85cbc0eecb47"
 dependencies = [
  "inari",
  "parking_lot",
