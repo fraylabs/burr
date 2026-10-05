@@ -1,0 +1,2007 @@
+{
+  "contacts_checked": 100,
+  "occt_positive_contacts": 0,
+  "maximum_common_volume_mm3": 0.0,
+  "pairs": [
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        1
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #1"
+      ],
+      "occt_pair": [
+        0,
+        1
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240843201e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        2
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #2"
+      ],
+      "occt_pair": [
+        0,
+        2
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779377302161485e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        3
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #3"
+      ],
+      "occt_pair": [
+        0,
+        3
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779368849872485e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        4
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #4"
+      ],
+      "occt_pair": [
+        0,
+        4
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372408313886e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        6
+      ],
+      "names": [
+        "Board",
+        "LED_0603_Base_YELLOW #1"
+      ],
+      "occt_pair": [
+        0,
+        6
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 2.659897839216933e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        8
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #5"
+      ],
+      "occt_pair": [
+        0,
+        8
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372407087713e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        9
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #6"
+      ],
+      "occt_pair": [
+        0,
+        9
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779367513953614e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        10
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #7"
+      ],
+      "occt_pair": [
+        0,
+        10
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240711754e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        11
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #8"
+      ],
+      "occt_pair": [
+        0,
+        11
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477936751401041e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        12
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #9"
+      ],
+      "occt_pair": [
+        0,
+        12
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240714617e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        13
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #10"
+      ],
+      "occt_pair": [
+        0,
+        13
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779367514068155e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        14
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #11"
+      ],
+      "occt_pair": [
+        0,
+        14
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240717243e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        15
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #12"
+      ],
+      "occt_pair": [
+        0,
+        15
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477936751412853e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        16
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #13"
+      ],
+      "occt_pair": [
+        0,
+        16
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372407202255e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        17
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #14"
+      ],
+      "occt_pair": [
+        0,
+        17
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477936751419105e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        18
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #15"
+      ],
+      "occt_pair": [
+        0,
+        18
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240723328e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        19
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #16"
+      ],
+      "occt_pair": [
+        0,
+        19
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779367514255475e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        20
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #17"
+      ],
+      "occt_pair": [
+        0,
+        20
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240726549e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        21
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #18"
+      ],
+      "occt_pair": [
+        0,
+        21
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477936751431275e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        22
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #19"
+      ],
+      "occt_pair": [
+        0,
+        22
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240729413e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        23
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #20"
+      ],
+      "occt_pair": [
+        0,
+        23
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477936751437798e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        24
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #21"
+      ],
+      "occt_pair": [
+        0,
+        24
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240732674e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        25
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #22"
+      ],
+      "occt_pair": [
+        0,
+        25
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477936751444194e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        26
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #23"
+      ],
+      "occt_pair": [
+        0,
+        26
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372407358956e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        27
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #24"
+      ],
+      "occt_pair": [
+        0,
+        27
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779387088197585e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        28
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #25"
+      ],
+      "occt_pair": [
+        0,
+        28
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240739595e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        29
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #26"
+      ],
+      "occt_pair": [
+        0,
+        29
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.47793870882644e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        30
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #27"
+      ],
+      "occt_pair": [
+        0,
+        30
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240742935e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        31
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #28"
+      ],
+      "occt_pair": [
+        0,
+        31
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779367513722135e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        32
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #29"
+      ],
+      "occt_pair": [
+        0,
+        32
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372406996836e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        33
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #30"
+      ],
+      "occt_pair": [
+        0,
+        33
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477936751378418e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        34
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #31"
+      ],
+      "occt_pair": [
+        0,
+        34
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240702805e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        35
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #32"
+      ],
+      "occt_pair": [
+        0,
+        35
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779367513839066e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        36
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #33"
+      ],
+      "occt_pair": [
+        0,
+        36
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240705788e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        37
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #34"
+      ],
+      "occt_pair": [
+        0,
+        37
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477936751355151e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        38
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #35"
+      ],
+      "occt_pair": [
+        0,
+        38
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240691211e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        39
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #36"
+      ],
+      "occt_pair": [
+        0,
+        39
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.47793675136064e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        40
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #37"
+      ],
+      "occt_pair": [
+        0,
+        40
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240693956e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        41
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #38"
+      ],
+      "occt_pair": [
+        0,
+        41
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477936751366415e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        42
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #39"
+      ],
+      "occt_pair": [
+        0,
+        42
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372406968196e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        43
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #40"
+      ],
+      "occt_pair": [
+        0,
+        43
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372406846594e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        44
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #41"
+      ],
+      "occt_pair": [
+        0,
+        44
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477937730028136e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        45
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #42"
+      ],
+      "occt_pair": [
+        0,
+        45
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240678813e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        46
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #43"
+      ],
+      "occt_pair": [
+        0,
+        46
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477937730025282e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        47
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #44"
+      ],
+      "occt_pair": [
+        0,
+        47
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372406723694e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        48
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #45"
+      ],
+      "occt_pair": [
+        0,
+        48
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477937730022061e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        49
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #46"
+      ],
+      "occt_pair": [
+        0,
+        49
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240710789e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        50
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #47"
+      ],
+      "occt_pair": [
+        0,
+        50
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.47793773004139e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        51
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #48"
+      ],
+      "occt_pair": [
+        0,
+        51
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240704657e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        52
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #49"
+      ],
+      "occt_pair": [
+        0,
+        52
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779377300383596e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        53
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #50"
+      ],
+      "occt_pair": [
+        0,
+        53
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240698858e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        54
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #51"
+      ],
+      "occt_pair": [
+        0,
+        54
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477937730035185e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        55
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #52"
+      ],
+      "occt_pair": [
+        0,
+        55
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240754629e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        56
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #53"
+      ],
+      "occt_pair": [
+        0,
+        56
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.47793773017224e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        57
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #54"
+      ],
+      "occt_pair": [
+        0,
+        57
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477936884898736e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        58
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #55"
+      ],
+      "occt_pair": [
+        0,
+        58
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240742816e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        59
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #56"
+      ],
+      "occt_pair": [
+        0,
+        59
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240764842e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        60
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #57"
+      ],
+      "occt_pair": [
+        0,
+        60
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779377301774894e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        61
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #58"
+      ],
+      "occt_pair": [
+        0,
+        61
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779368849093545e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        62
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #59"
+      ],
+      "occt_pair": [
+        0,
+        62
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240753507e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        63
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #60"
+      ],
+      "occt_pair": [
+        0,
+        63
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240775747e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        64
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #61"
+      ],
+      "occt_pair": [
+        0,
+        64
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779377301833366e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        65
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #62"
+      ],
+      "occt_pair": [
+        0,
+        65
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779368849198346e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        66
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #63"
+      ],
+      "occt_pair": [
+        0,
+        66
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240764293e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        67
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #64"
+      ],
+      "occt_pair": [
+        0,
+        67
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240786844e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        68
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #65"
+      ],
+      "occt_pair": [
+        0,
+        68
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779377301883004e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        69
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #66"
+      ],
+      "occt_pair": [
+        0,
+        69
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779368849310035e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        70
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #67"
+      ],
+      "occt_pair": [
+        0,
+        70
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240775389e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        71
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #68"
+      ],
+      "occt_pair": [
+        0,
+        71
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240798147e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        72
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #69"
+      ],
+      "occt_pair": [
+        0,
+        72
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477937730194028e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        73
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #70"
+      ],
+      "occt_pair": [
+        0,
+        73
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477936884942386e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        74
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #71"
+      ],
+      "occt_pair": [
+        0,
+        74
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372407866454e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        75
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #72"
+      ],
+      "occt_pair": [
+        0,
+        75
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372408093625e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        76
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #73"
+      ],
+      "occt_pair": [
+        0,
+        76
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477937730199086e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        77
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #74"
+      ],
+      "occt_pair": [
+        0,
+        77
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477936884953124e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        78
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #75"
+      ],
+      "occt_pair": [
+        0,
+        78
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240797503e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        103
+      ],
+      "names": [
+        "Board",
+        "LED_0603_Base_YELLOW #2"
+      ],
+      "occt_pair": [
+        0,
+        103
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 2.6598978391976208e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        106
+      ],
+      "names": [
+        "Board",
+        "LED_0603_Base_YELLOW #3"
+      ],
+      "occt_pair": [
+        0,
+        106
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 2.6598978392005897e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        109
+      ],
+      "names": [
+        "Board",
+        "LED_0603_Base_YELLOW #4"
+      ],
+      "occt_pair": [
+        0,
+        109
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 2.6598978392029696e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        112
+      ],
+      "names": [
+        "Board",
+        "LED_0603_Base_YELLOW #5"
+      ],
+      "occt_pair": [
+        0,
+        112
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 2.6598978392058542e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        115
+      ],
+      "names": [
+        "Board",
+        "LED_0603_Base_YELLOW #6"
+      ],
+      "occt_pair": [
+        0,
+        115
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 2.6598978392085174e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        118
+      ],
+      "names": [
+        "Board",
+        "LED_0603_Base_YELLOW #7"
+      ],
+      "occt_pair": [
+        0,
+        118
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 2.6598978391950542e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        121
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #76"
+      ],
+      "occt_pair": [
+        0,
+        121
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.477936751389396e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        123
+      ],
+      "names": [
+        "Board",
+        "LED_0603_Base_YELLOW #8"
+      ],
+      "occt_pair": [
+        0,
+        123
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 2.6598978392142474e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        126
+      ],
+      "names": [
+        "Board",
+        "LED_0603_Base_YELLOW #9"
+      ],
+      "occt_pair": [
+        0,
+        126
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 2.659897839211323e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        128
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #77"
+      ],
+      "occt_pair": [
+        0,
+        128
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240820411e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        129
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #78"
+      ],
+      "occt_pair": [
+        0,
+        129
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779368849762714e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        130
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #79"
+      ],
+      "occt_pair": [
+        0,
+        130
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779377302106594e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        131
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #80"
+      ],
+      "occt_pair": [
+        0,
+        131
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.477937240832343e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        132
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #81"
+      ],
+      "occt_pair": [
+        0,
+        132
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372408087186e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        133
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #82"
+      ],
+      "occt_pair": [
+        0,
+        133
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779368849645784e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        134
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #83"
+      ],
+      "occt_pair": [
+        0,
+        134
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 4.4779377302048857e-08
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "source_sha256": "a14a22f19eb2bbc7c07ef8610c02ff2f2e5abf0825ea173e48b29520208c9809",
+      "burr_pair": [
+        0,
+        135
+      ],
+      "names": [
+        "Board",
+        "0603_resistor #84"
+      ],
+      "occt_pair": [
+        0,
+        135
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 9.999999999999998e-08,
+      "source_maximum_common_volume_mm3": 4.4779372408206505e-08
+    },
+    {
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "source_sha256": "cf8fc68d8f32a1bdf3e68cddeaf0b67c040b47946cabc67021b94b9b8229757f",
+      "burr_pair": [
+        0,
+        1
+      ],
+      "names": [
+        "MountingPlate",
+        "DINRail"
+      ],
+      "occt_pair": [
+        0,
+        1
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 0.000105375,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 2.6634694450010247e-07
+    },
+    {
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "source_sha256": "cf8fc68d8f32a1bdf3e68cddeaf0b67c040b47946cabc67021b94b9b8229757f",
+      "burr_pair": [
+        12,
+        13
+      ],
+      "names": [
+        "AirPump #1",
+        "AirPump #2"
+      ],
+      "occt_pair": [
+        12,
+        13
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1.9600000000000002e-05,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 6.197602431271057e-08
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "source_sha256": "c31fd1adb88029a18a22028ecab3e776011126db2f1fe80624b77860719009d3",
+      "burr_pair": [
+        0,
+        16
+      ],
+      "names": [
+        "ASSEMBLY #1",
+        "ASSEMBLY #17"
+      ],
+      "occt_pair": [
+        0,
+        16
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 1e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 1.1623342288912187e-09
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "source_sha256": "c31fd1adb88029a18a22028ecab3e776011126db2f1fe80624b77860719009d3",
+      "burr_pair": [
+        1,
+        2
+      ],
+      "names": [
+        "ASSEMBLY #2",
+        "ASSEMBLY #3"
+      ],
+      "occt_pair": [
+        1,
+        2
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 4.800000000000001e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 1.7646470951208592e-08
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "source_sha256": "c31fd1adb88029a18a22028ecab3e776011126db2f1fe80624b77860719009d3",
+      "burr_pair": [
+        2,
+        3
+      ],
+      "names": [
+        "ASSEMBLY #3",
+        "ASSEMBLY #4"
+      ],
+      "occt_pair": [
+        2,
+        3
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 4.800000000000001e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 1.731223164827385e-08
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "source_sha256": "c31fd1adb88029a18a22028ecab3e776011126db2f1fe80624b77860719009d3",
+      "burr_pair": [
+        3,
+        4
+      ],
+      "names": [
+        "ASSEMBLY #4",
+        "ASSEMBLY #5"
+      ],
+      "occt_pair": [
+        3,
+        4
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 2.3509999999999996e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 3.316472430022811e-09
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "source_sha256": "c31fd1adb88029a18a22028ecab3e776011126db2f1fe80624b77860719009d3",
+      "burr_pair": [
+        3,
+        5
+      ],
+      "names": [
+        "ASSEMBLY #4",
+        "ASSEMBLY #6"
+      ],
+      "occt_pair": [
+        3,
+        5
+      ],
+      "common_volume_mm3": 0.0,
+      "occt_positive_floor_mm3": 2.3509999999999996e-06,
+      "source_tolerance_mm": 1e-07,
+      "source_maximum_common_volume_mm3": 3.316472430022811e-09
+    }
+  ]
+}
