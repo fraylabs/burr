@@ -109,9 +109,15 @@ if __name__=='__main__':
                 break
             except FileExistsError:
                 time.sleep(15)
+        queue_owner=queue/'owner'
+        queue_owner_text=f"{os.environ.get('CORPUS_AGENT_ID','dd9facaa-87e0-817c-92a1-1a1cb63b87dd')} pid={os.getpid()} {datetime.datetime.now().isoformat()} {args.phase} {evidence}\n"
+        queue_owner.write_text(queue_owner_text)
         try:
             completed=run(args.root,args.binary,args.phase,args.timeout,evidence,args.lock,args.limit,stop_file)
         finally:
+            if queue_owner.read_text()!=queue_owner_text:
+                raise RuntimeError('Comparison queue owner changed; refusing cleanup')
+            queue_owner.unlink()
             queue.rmdir()
     else:
         completed=run(args.root,args.binary,args.phase,args.timeout,evidence,args.lock,args.limit,stop_file)
