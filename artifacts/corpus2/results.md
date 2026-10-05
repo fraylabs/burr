@@ -2,7 +2,7 @@
 
 **Reference correction: a valid, empty OCCT Common is not sufficient to prove non-overlap.** Independent checks on three pulley M5 screw/t-nut pairs demonstrate real overlap even though direct Common returns exactly zero and a valid empty shape. The six earlier alleged false pairs (gearmotor plus five Biped pairs) are therefore **Common-zero disagreements: three bounded contact-or-separated results and three bounded tolerance contacts**, not a certified false-pair count. They all remain unresolved in released 0.40.0.
 
-**Current checkpoint: 25 of 27 source models measured; 0 fully verified correct, 25 incomplete/unverified.** No false-pair count is certified from Common zero alone. Two measurements, eight baseline pair comparisons and four Chrome inspections remain pending. The interrupted Positron reference remains excluded. Derived repros are excluded from the denominator.
+**Final measurement report: all 27 source models have terminal measurement receipts in both frozen releases; all remain incomplete/unverified for model accuracy.** Both strict comparison phases are terminal, with refusals preserved. The Biped audit is capped with 23 removed pairs still pending; compact reproduction wrappers are terminal; the five largest assemblies have actual overview inspections, with visual limits recorded. Derived repros are excluded from the denominator; no false-pair count is certified from Common zero alone.
 
 **Measured gearmotor repro verdict disagreement: Burr 0.39.0 `fail`, OCCT Common reference `pass`.** The 134,040-byte two-part source-preserving repro and strict occurrence matching remain reproducible evidence. The original pair’s method-5 source recheck finds bounded tolerance contact. Finite sampling does not certify a false fail, and the reduced pair has not received this independent replay. The original assembly also has four positive Common pairs.
 
@@ -54,7 +54,7 @@ The [SolidWorks biped source](https://raw.githubusercontent.com/open-dynamic-rob
 | [77, 85] | transmission_pulley_at3_t10_center / transmission_timing_belt_at3_201_6 | [127, 139] | **0 exactly** | unresolved below tessellation resolution |
 | [118, 121] | transmission_pulley_at3_t30_output / transmission_timing_belt_at3_201_6 | [72, 91] | **0 exactly** | unresolved below tessellation resolution |
 
-The largest bounds error across these selected pairs is 0.066930 mm, below the unchanged 0.1-mm matching limit; surface errors are below 0.000009 mm. The codewheel pair's reported tessellation probe is 0.0540497 mm. These are baseline interference/Common disagreements removed conservatively into unresolved status by 0.40.0. Independent non-overlap proof is pending. The Biped audit reached its 600-second reference guard after five checked pairs and one strict matching refusal; 25 removed Biped pairs remain pending. This is an audit timeout, not a Burr timeout. The full biped remains the confirmed disagreement repro. A source-preserving encoder mount/codewheel reduction, 13-biped-encoder-contact.step (350,080 bytes), is prepared and **not yet validated**. No wrong reduced verdict is claimed for it.
+The largest bounds error across these selected pairs is 0.066930 mm, below the unchanged 0.1-mm matching limit; surface errors are below 0.000009 mm. The codewheel pair's reported tessellation probe is 0.0540497 mm. These are baseline interference/Common disagreements removed conservatively into unresolved status by 0.40.0. Independent non-overlap proof is pending. The archived first pass checked five Biped pairs and refused one. The separately preserved cached-source retry reached its 600-second reference cap after six valid empty Common results and two strict placement refusals, leaving 23 removed pairs pending. The added Common-zero pair is [121,130]; [130,131] is refused at 0.170074 mm against the unchanged 0.1-mm limit. This is an audit timeout, not a Burr timeout. The full biped remains the confirmed disagreement repro. A source-preserving encoder mount/codewheel reduction, 13-biped-encoder-contact.step (350,080 bytes), has terminal frozen-release receipts: twelve valid source occurrences, six Common-zero reported pairs in 0.39.0, and an incomplete tessellation-refusal result in 0.40.0. This reproduces a qualified Common-reference disagreement, not a certified false fail.
 
 A long near-tangential surface-crossing witness and the new trim-error/sampling refusal are consistent with the curved-contact failure class; the precise checker mechanism is not instrumented. The gearmotor remains first because its two-part whole-model verdict disagreement against the Common reference is reproduced. Its ground-truth interpretation is now provisional.
 
@@ -70,7 +70,7 @@ Each pair uses strict occurrence matching, valid source solids, OCCT Common, sou
 
 The maximum sampled clearance is the largest sampled distance to the nearer of the two source boundaries among points classified IN by both source solids and inside by both winding checks. It is local evidence, not a measured total overlap depth or volume. The declared depth and volume bounds come from the tested Burr report; a sampled clearance below them does not verify those global bounds. A dash means no candidate clearance was recorded, not zero clearance.
 
-Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary normal-probe receipts. Method 5 probes both face-normal signs and adjacent-face bisectors at 1e-6, 1e-4, 1e-3 and 1e-2 mm, verifies which steps enter the originating source solid, and checks those points against the other solid and winding. It records boundary distances for every source IN/IN point, including winding disagreements. Shared interior within 1e-6 mm of either boundary is treated as tolerance contact at the sampled witness; only deeper shared interior corroborated by winding yields an overlap certificate. These remain bounded local checks; earlier disputed rows without the completed tie-breaker need rechecking.
+Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary normal-probe receipts. Method 5 probes both face-normal signs and adjacent-face bisectors at 1e-6, 1e-4, 1e-3 and 1e-2 mm, verifies which steps enter the originating source solid, and checks those points against the other solid and winding. It records boundary distances for every source IN/IN point, including winding disagreements. Shared interior within 1e-6 mm of either boundary is treated as tolerance contact at the sampled witness; only deeper shared interior corroborated by winding yields an overlap certificate. These remain bounded local checks. Earlier preliminary disputes are retained; the selected mapped disputes have completed method-5 replays. Strict matching refusals remain unresolved.
 
 | Model | Burr pair | Status | Method | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Verified inward steps | Interior certificates | Max sampled clearance mm | Declared max depth mm | Declared max volume mm³ | Limitation |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
@@ -111,7 +111,7 @@ Each pair uses strict occurrence matching, valid source solids, OCCT Common, sou
 
 The maximum sampled clearance is the largest sampled distance to the nearer of the two source boundaries among points classified IN by both source solids and inside by both winding checks. It is local evidence, not a measured total overlap depth or volume. The declared depth and volume bounds come from the tested Burr report; a sampled clearance below them does not verify those global bounds. A dash means no candidate clearance was recorded, not zero clearance.
 
-Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary normal-probe receipts. Method 5 probes both face-normal signs and adjacent-face bisectors at 1e-6, 1e-4, 1e-3 and 1e-2 mm, verifies which steps enter the originating source solid, and checks those points against the other solid and winding. It records boundary distances for every source IN/IN point, including winding disagreements. Shared interior within 1e-6 mm of either boundary is treated as tolerance contact at the sampled witness; only deeper shared interior corroborated by winding yields an overlap certificate. These remain bounded local checks; earlier disputed rows without the completed tie-breaker need rechecking.
+Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary normal-probe receipts. Method 5 probes both face-normal signs and adjacent-face bisectors at 1e-6, 1e-4, 1e-3 and 1e-2 mm, verifies which steps enter the originating source solid, and checks those points against the other solid and winding. It records boundary distances for every source IN/IN point, including winding disagreements. Shared interior within 1e-6 mm of either boundary is treated as tolerance contact at the sampled witness; only deeper shared interior corroborated by winding yields an overlap certificate. These remain bounded local checks. Earlier preliminary disputes are retained; the selected mapped disputes have completed method-5 replays. Strict matching refusals remain unresolved.
 
 | Model | Burr pair | Status | Method | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Verified inward steps | Interior certificates | Max sampled clearance mm | Declared max depth mm | Declared max volume mm³ | Limitation |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
@@ -138,43 +138,46 @@ Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary n
 | openarm_hardware__OpenArmJIG.STEP | 2/3 | contact_within_tolerance_bounded | 5 | 0.0 | 0 | 12 | 40 | 0 | — | 1.268463023507138e-10 | 1.522155628233238e-07 |  |
 | openarm_hardware__OpenArmJIG.STEP | 2/5 | contact_or_separated_bounded | 1 | 0.0 | 0 | 0 | 0 | 0 | — | — | — |  |
 
-## Released 0.40.0 rerun — in progress
+## Released 0.40.0 measurement and comparison receipts
 
-The original 0.39.0 baseline above remains unchanged. A separately installed, checksum-verified 0.40.0 release is rerunning the original 25 models after the gearmotor fix, spike fix and contact proofs. Per-model interference comparison, exact-zero validation of every reported contact-or-separated pair, and unresolved reasons will be reported separately. No follow-up accuracy or contact-safety claim is made before those checks complete.
+The frozen 0.39.0 baseline and separately installed, checksum-verified 0.40.0 release have terminal measurement receipts for all 27 pinned models. Both strict comparison phases and contact wrappers are terminal. Matching refusals, partial reference scope and independent source qualifications remain explicit; completion of these wrappers does not certify model accuracy.
 
 An early import regression is already measured: Jubilee's left double-pulley corner-bracket assembly loses source face 22181 (`ContradictoryDualParity`, source/synthetic `DuplicateTraversal`), returning `incomplete` with 1/510 faces lost and zero checked pairs. 0.39.0 imported it without face loss and reported a supported `fail` with unresolved pairs. The existing OCCT source reference validates all 23 components. Removal of its coordinate-limit reason is not a gain because the new import stops checking earlier. The exact cause of the new refusal is not established.
 
 ### Per-model 0.40.0 checkpoint
 
-Release runs: 25/25 completed (8 `fail`, 16 `incomplete`, 1 `pass`). Verification columns remain provisional. “Complete” is Burr's pair-set claim, not yet certification of agreement; every reported contact remains subject to independent source verification. Empty contact sets require no CAD calculation. The table's zero counts never turn a pending comparison into agreement.
+Release runs: 27/27 have terminal receipts (9 `fail`, 17 `incomplete`, 1 `pass`). Positron has a saved `incomplete` product report followed by a separate empty-occurrence bounds-extraction error in the measurement harness; its scene is absent and comparison is refused. “Complete” below is Burr’s pair-set claim. The contact column records Common calculations only; the independent source table above retains 13 bounded tolerance contacts, five bounded contact-or-separated results and four strict matching refusals.
 
 | Model | 0.39.0 coordinate limit | 0.40.0 verdict | Pair set complete | Interferences matched / extra / missing | Contact Common zeros / reported (source proof separate) | Unresolved pairs and reasons |
 |---|---|---|---|---|---|---|
 | Framework-Laptop-13__Framework Laptop 13 CAD.stp | no | incomplete | False | refused | 0 / 0 | 0 (step_faces_lost) |
-| Framework-Laptop-13__13_5_hinge_R_assy.stp | yes | incomplete | False | pending | 0 / 0 | 6 (open_component_mesh: 2, below_tessellation_resolution: 4) |
+| Framework-Laptop-13__13_5_hinge_R_assy.stp | yes | incomplete | False | 0 / 0 / 0 | 0 / 0 | 6 (open_component_mesh: 2, below_tessellation_resolution: 4) |
 | Framework-Laptop-13__FWKNAQ9_G01_20210911.stp | no | incomplete | False | refused | 0 / 0 | 0 (step_faces_lost) |
 | Framework-Laptop-13__FW_13_camera_module.stp | no | pass | True | refused | 0 / 0 | 0 (none) |
-| Framework-Laptop-13__printable_case_full.stp | yes | fail | False | pending | 0 / 0 | 19 (below_tessellation_resolution: 16, open_component_mesh: 3) |
+| Framework-Laptop-13__printable_case_full.stp | yes | fail | False | 3 / 0 / 2 | 0 / 0 | 19 (below_tessellation_resolution: 16, open_component_mesh: 3) |
 | ExpansionCards__ExpansionCard_SelfTapping.stp | no | incomplete | False | 0 / 0 / 2 | 0 / 0 | 3 (open_component_mesh: 3) |
-| jubilee__jubilee.STEP | no | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
-| jubilee__6x_well_plate_bed_assembly.STEP | no | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
-| jubilee__left_double_pulley_corner_bracket_assembly.STEP | yes | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
-| jubilee__tool_template_assembly.STEP | no | incomplete | False | pending | 0 / 0 | 21 (open_component_mesh: 21) |
-| jubilee__passive_pen_tool_assembly.STEP | no | incomplete | False | pending | 0 / 0 | 73 (open_component_mesh: 73) |
-| jubilee__bondtech_groovemount_extruder.STEP | yes | fail | False | pending | 0 / 0 | 138 (open_component_mesh: 120, below_tessellation_resolution: 13, below_coordinate_resolution: 5) |
-| jubilee__ooze_wiper_assembly.STEP | no | fail | True | pending | 0 / 0 | 0 (none) |
-| jubilee__camera_calibration_tool_jan_31_2020.STEP | no | incomplete | False | pending | 0 / 0 | 26 (open_component_mesh: 26) |
-| open_robot_actuator_hardware__biped_6dof_v1.STEP | yes | fail | False | pending | 0 / 0 | 631 (open_component_mesh: 451, below_tessellation_resolution: 164, below_coordinate_resolution: 16) |
-| kicadStepUpMod__demo.step | no | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
-| FreeCAD-library__Adirondack Chair.step | yes | fail | False | pending | 0 / 12 (unverified remainder) | 10 (below_coordinate_resolution: 10) |
-| FreeCAD-library__wooden folding chair.step | yes | fail | False | pending | 0 / 0 | 22 (below_coordinate_resolution: 22) |
-| FreeCAD-library__Wooden Folding Table.step | yes | incomplete | False | pending | 0 / 4 (unverified remainder) | 12 (below_coordinate_resolution: 12) |
-| FreeCAD-library__Double glass doors with handles and transom.step | no | incomplete | False | pending | 0 / 0 | 0 (assembly_structure_lost) |
-| FreeCAD-library__Yellow_gearmotor_L.step | yes | fail | False | pending | 0 / 0 | 2 (below_coordinate_resolution: 1, below_tessellation_resolution: 1) |
-| FreeCAD-library__ComputerDesk (100 x 50 x 75 cm WDH).step | yes | fail | True | pending | 0 / 4 (unverified remainder) | 0 (none) |
-| openarm_hardware__OpenArm_2.0.STEP | no | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
-| openarm_hardware__OpenArmJIG.STEP | yes | incomplete | False | pending | 0 / 2 (unverified remainder) | 6 (below_coordinate_resolution: 2, open_component_mesh: 4) |
-| openarm_hardware__OpenArm_Cell+OpenArm_2.0.STEP | no | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
+| jubilee__jubilee.STEP | no | incomplete | False | refused | 0 / 0 | 0 (step_faces_lost) |
+| jubilee__6x_well_plate_bed_assembly.STEP | no | incomplete | False | refused | 0 / 0 | 0 (step_faces_lost) |
+| jubilee__left_double_pulley_corner_bracket_assembly.STEP | yes | incomplete | False | 0 / 0 / 1 (reported-pair scope) | 0 / 0 | 0 (step_faces_lost) |
+| jubilee__tool_template_assembly.STEP | no | incomplete | False | 0 / 0 / 6 (reported-pair scope) | 0 / 0 | 21 (open_component_mesh: 21) |
+| jubilee__passive_pen_tool_assembly.STEP | no | incomplete | False | 0 / 0 / 14 (reported-pair scope) | 0 / 0 | 73 (open_component_mesh: 73) |
+| jubilee__bondtech_groovemount_extruder.STEP | yes | fail | False | refused | 0 / 0 | 138 (open_component_mesh: 120, below_tessellation_resolution: 13, below_coordinate_resolution: 5) |
+| jubilee__ooze_wiper_assembly.STEP | no | fail | True | refused | 0 / 0 | 0 (none) |
+| jubilee__camera_calibration_tool_jan_31_2020.STEP | no | incomplete | False | 0 / 0 / 2 (reported-pair scope) | 0 / 0 | 26 (open_component_mesh: 26) |
+| open_robot_actuator_hardware__biped_6dof_v1.STEP | yes | fail | False | refused | 0 / 0 | 631 (open_component_mesh: 451, below_tessellation_resolution: 164, below_coordinate_resolution: 16) |
+| kicadStepUpMod__demo.step | no | incomplete | False | 0 / 0 / 2 | 0 / 0 | 0 (step_faces_lost) |
+| FreeCAD-library__Adirondack Chair.step | yes | fail | False | 38 / 0 / 4 | 12 / 12 | 10 (below_coordinate_resolution: 10) |
+| FreeCAD-library__wooden folding chair.step | yes | fail | False | refused | 0 / 0 | 22 (below_coordinate_resolution: 22) |
+| FreeCAD-library__Wooden Folding Table.step | yes | incomplete | False | 0 / 0 / 4 (reported-pair scope) | 0 / 4 (strict refusals) | 12 (below_coordinate_resolution: 12) |
+| FreeCAD-library__Double glass doors with handles and transom.step | no | incomplete | False | refused | 0 / 0 | 0 (assembly_structure_lost) |
+| FreeCAD-library__Yellow_gearmotor_L.step | yes | fail | False | 4 / 0 / 0 | 0 / 0 | 2 (below_coordinate_resolution: 1, below_tessellation_resolution: 1) |
+| FreeCAD-library__ComputerDesk (100 x 50 x 75 cm WDH).step | yes | fail | True | 4 / 0 / 0 | 4 / 4 | 0 (none) |
+| openarm_hardware__OpenArm_2.0.STEP | no | incomplete | False | refused | 0 / 0 | 0 (step_faces_lost) |
+| openarm_hardware__OpenArmJIG.STEP | yes | incomplete | False | 0 / 0 / 0 | 2 / 2 | 6 (below_coordinate_resolution: 2, open_component_mesh: 4) |
+| openarm_hardware__OpenArm_Cell+OpenArm_2.0.STEP | no | incomplete | False | refused | 0 / 0 | 0 (step_faces_lost) |
+| Positron__PositronV3.2.2_2026-01-26.step | no | incomplete | False | scene harness refusal | 0 / 0 | 0 (assembly_structure_lost, assembly_structure_lost, step_faces_lost) |
+| ned2__ADAPTATIVE_GRIPPER_NED2_STEP.STEP | yes | fail | False | refused | 0 / 0 | 72 (open_component_mesh, below_coordinate_resolution, below_tessellation_resolution) |
+
 
 ### Where removed interference findings went
 
@@ -189,43 +192,56 @@ List audit of every old finding gives **49 removed findings: 48 unresolved, 0 co
 | jubilee__tool_template_assembly.STEP | 3 | 3 | 0 | 0 | open_component_mesh |
 | open_robot_actuator_hardware__biped_6dof_v1.STEP | 31 | 31 | 0 | 0 | below_tessellation_resolution |
 
-The sole absent pair is pulley Burr [18,22], bracket against M4 shoulder screw. A fresh priority audit strictly maps **both released versions** to the same OCCT [0,1], with both source solids valid and valid completed exact Common volume **0.13749159683157497 mm³** (threshold 1e-6 mm³), bounds/surface errors below 0.000008 mm. The 0.40.0 model is `incomplete` with zero pairs checked: loss of unrelated M5 screw face 22181 blocks the whole check. It is not called safe or given a pass verdict, but real positive evidence is absent from all pair lists. Original 23-part STEP is the confirmed repro. A source-preserving reduction retaining bracket, M4 screw and M5 screw placements (`12-pulley-positive-and-import-blocker.step`, 1,466,783 bytes) is prepared and **not yet validated**.
+The sole absent pair is pulley Burr [18,22], bracket against M4 shoulder screw. A fresh priority audit strictly maps **both released versions** to the same OCCT [0,1], with both source solids valid and valid completed exact Common volume **0.13749159683157497 mm³** (threshold 1e-6 mm³), bounds/surface errors below 0.000008 mm. The 0.40.0 model is `incomplete` with zero pairs checked: loss of unrelated M5 screw face 22181 blocks the whole check. It is not called safe or given a pass verdict, but real positive evidence is absent from all pair lists. Original 23-part STEP is the confirmed repro. A source-preserving reduction retaining bracket, M4 screw and M5 screw placements (`12-pulley-positive-and-import-blocker.step`, 1,466,783 bytes) has been validated against five valid source solids and strict matching: 0.39.0 reports the known positive; 0.40.0 returns incomplete after the same face loss, with that positive unreported. This is import usefulness loss, not a confirmed false negative.
 
-The priority audit has independently checked **20 of 49 removed findings**: **14 valid positive-volume pairs** and **6 exactly zero-volume Common disagreements**. Thirteen positive pairs are now unresolved (six Bondtech, four pen, three template); the fourteenth is the absent pulley pair behind the incomplete import. Four pairs refused strict placement matching (three Bondtech and one Biped), and 25 Biped pairs remain pending after the 600-second audit cap. All six baseline Common-zero disagreements are now unresolved; non-overlap remains independently unverified. No removed finding entered the contact-or-separated list. Unresolved real overlaps represent reduced usefulness, while the zero-volume pairs have bounded source contact evidence without exhaustive non-overlap proof. The strict limits were not relaxed. A cached source loader is prepared to avoid repeated STEP imports in the remaining per-pair audit; it does not change the matcher, geometry or tolerances.
+The archived first-pass audit checked 20 of the 49 removed findings. The capped cached-source Biped retry adds one valid empty Common result and one strict refusal while preserving every prior partial receipt. The selected current receipts therefore contain **21 checked pairs: 14 valid positive-volume Common results and seven Common-zero disagreements**, **five strict refusals** and **23 pending Biped pairs**. Thirteen positive pairs are now unresolved (six Bondtech, four pen, three template); the fourteenth is the absent pulley pair behind the incomplete import. None of the 49 removed findings entered the contact-or-separated list. Common-zero pairs remain subject to independent source qualifications; the new Biped [121,130] has no independent bounded recheck. No certified false-pair count or global separation follows from this audit. The 600.096-second retry cap used 766.719 MiB and is a reference-audit limit, not a Burr timeout.
 
 Read-only comparison of the released source narrows the explanation. [#60](https://github.com/fraylabs/burr/commit/fe4473a46281465b5f785d1abf1ba5589cc898b8) adds nearby curved-trim deviation to the penetration budget and treats long tangential crossings as sampling uncertainty. That is consistent with new tessellation-limit transitions; diagnostics do not isolate the decisive threshold for each pair. [#55](https://github.com/fraylabs/burr/commit/c8c4eeb) adds a source contact proof after positive-interference testing fails, and leaves the open-mesh refusal gate in place. None of these 49 removed findings entered its contact list. The checker's mesh-closure calculation is unchanged between the two releases, so newly open pairs reflect changed imported meshes rather than a newly added open-mesh gate. Look's pinned revision changed from `58c39f4` to `6b1021c`; this measurement does not isolate which meshing change opened each component. The pulley transition is directly attributed to lost face 22181 and the existing import preflight.
 
 
 ## Regressions vs 0.39.0
 
-The same pinned source files were cold-loaded in the two installed releases. All 25 new release runs are finished, but the new strict comparisons and exact-zero contact validations are still in progress. A drop in raw pair count is not automatically a missed real overlap: the removed pair may have been false, or may now be unresolved. A confirmed false negative still requires a complete Burr pair set and strict exact-source agreement.
+The same pinned source files were cold-loaded in both installed releases. All 27 release measurement receipts and both strict comparison phases are terminal. A drop in raw pair count does not establish a missed overlap. Strict matching, source validity and independent pair evidence limit the conclusions; compact repro wrappers are terminal, while the capped Biped audit retains 23 pending pairs.
 
 | Model | 0.39.0 → 0.40.0 | What is established | Pair-level state |
 |---|---|---|---|
-| Jubilee left double-pulley corner bracket | 0 → 1/510 faces lost; `fail` → `incomplete`; 1 → 0 reported pairs | source face 22181 now fails with `ContradictoryDualParity`; 23 exact source components valid | checking stops at import; retained-screw reduction 11 prepared, not yet validated |
+| Jubilee left double-pulley corner bracket | 0 → 1/510 faces lost; `fail` → `incomplete`; 1 → 0 reported pairs | source face 22181 now fails with `ContradictoryDualParity`; 23 exact source components valid | checking stops at import; reduction 11 passes both; five-part reduction 12 reproduces face #22181 loss and blocks a known positive in 0.40.0 |
 | Full Jubilee | 2 → 3/9453 faces lost; both `incomplete` | old failed faces 286421/400279 no longer warn; new failed faces 202439/299236/389430, all parity failures | import remains incomplete; not one additional copy of the old same failed face |
 | Jubilee passive pen | `fail` → `incomplete`; 4 → 0 reported pairs | old subset independently matched four true pairs; supported fail evidence is no longer reported | fresh strict selected-pair mapping and valid positive Common; all now open-mesh unresolved |
 | Jubilee tool template | `fail` → `incomplete`; 3 → 0 reported pairs | old subset independently matched three true pairs; supported fail evidence is no longer reported | fresh strict selected-pair mapping and valid positive Common; all now open-mesh unresolved |
-| Biped | 63 → 32 reported pairs; both `fail` | five old interference/Common-zero disagreements; now tessellation unresolved | one strict refusal, 25 removed pairs pending; full pair agreement not certified |
+| Biped | 63 → 32 reported pairs; both `fail` | five old interference/Common-zero disagreements; now tessellation unresolved | two strict refusals, 23 removed pairs pending after the capped retry; full pair agreement not certified |
 | Bondtech extruder | 18 → 9 reported pairs; both `fail` | six valid positive Common pairs now open-mesh unresolved | three tessellation-unresolved pairs refuse strict placement matching |
 
-The gearmotor's 5 → 4 reported pairs removes the Metal–Yellow Common-zero disagreement; independent non-overlap validation is pending. The original model still reports the four prior positive Common pairs, and leaves Metal–Yellow unresolved below tessellation resolution. Strict comparison and a fresh 0.40.0 run of the two-part repro remain pending. It is kept separate from the regression candidates.
+The gearmotor’s 5 → 4 reported pairs removes the Metal–Yellow Common-zero disagreement. Its original source replay finds bounded tolerance contact; finite checks do not prove exhaustive separation. The four prior positive Common pairs remain reported, while Metal–Yellow is tessellation-unresolved. Strict original comparison is terminal; the frozen 0.40.0 two-part repro measurement is terminal; its result is listed below and does not certify non-overlap.
 
-The desk is the only one of the 11 former coordinate-limit models now reporting a complete pair set. Four no longer list the coordinate reason, but one is the pulley import failure; removing a reason by stopping checking earlier is not a gain. There are 22 contact-or-separated pairs reported across four models. Every one still requires an independently valid OCCT Common with exactly zero volume before it is described as verified.
+The desk is the only one of the 11 historical coordinate-limit models now reporting a complete pair set. Four no longer list the coordinate reason, including the pulley import refusal. The 22 reported contact-or-separated claims have 18 valid empty Common results and four strict matching refusals. The independent source evidence is qualified in the table above; empty Common alone does not prove non-overlap.
+
+## Compact regression checks
+
+These source-preserving reductions retain geometry and ancestor placement without CAD re-export. Frozen-release measurements and unchanged strict comparison receipts are terminal. Empty Common and opposite verdicts remain qualified disagreements; the reductions are outside the 27-model denominator.
+
+| Reduction | Frozen 0.39.0 | Frozen 0.40.0 | Source / strict comparison limits |
+|---|---|---|---|
+| 11-pulley-m5-screws.step | `pass`; 3 parts; 0 lost faces | `pass`; 3 parts; 0 lost faces | 0390: all_occurrences, 0/0/0 matched/extra/missing; 0400: all_occurrences, 0/0/0 matched/extra/missing |
+| 12-pulley-positive-and-import-blocker.step | `fail`; 5 parts; 0 lost faces | `incomplete`; 5 parts; 1 lost faces | 0390: all_occurrences, 1/0/0 matched/extra/missing; 0400: all_occurrences, 0/0/1 matched/extra/missing |
+| 13-biped-encoder-contact.step | `fail`; 12 parts; 0 lost faces | `incomplete`; 12 parts; 0 lost faces | 0390: all_occurrences, 0/6/0 matched/extra/missing; 0400: all_occurrences, 0/0/0 matched/extra/missing |
+| 01-gearmotor-contact.step | earlier `fail` receipt retained | `incomplete`; 2 parts; 0 lost faces | 0400: all_occurrences, 0/0/0 matched/extra/missing |
+
+Reduction 11 contains the three retained M5 screw placements and passes both releases without face loss, so it does not reproduce the import refusal alone. Reduction 12 adds the bracket and M4 shoulder screw: its five valid source solids and strict mapping retain the positive bracket/screw Common result. Frozen 0.39.0 reports that overlap; frozen 0.40.0 loses face #22181 (surface #9141, ContradictoryDualParity), returns incomplete and does not report the known positive. This validates the reduced import usefulness loss; the incomplete result is not a false-negative certification.
+
+Reduction 13 retains twelve placed occurrences from two encoder source definitions. The six strict Common-zero discrepancies in 0.39.0 become unresolved below tessellation resolution in 0.40.0. Neither its Common pass nor the original bounded source probes certify exhaustive separation for the reduction.
 
 ## Classification and reference limits
 
-The 25 completed measurement jobs yield raw Burr outcomes **11 `fail`, 13 `incomplete`, 1 `pass`**. Of the 17 comparison records, eight have full occurrence mapping and a full reference scan, five certify a subset, and four refuse comparison. Eight more comparisons are pending. These records match **57 reported positive pairs** to OCCT and contain **one extra pair against the Common reference**. The separate removed-pair audit also records five Biped Common-zero disagreements despite its incomplete full comparison. Together there are six Common-zero disagreements across two models; their former false-positive classification is suspended. These are counts within verified scopes, not a precision or recall estimate for unverified pairs.
+The 27 baseline receipts retain raw Burr outcomes **12 `fail`, 14 `incomplete`, 1 `pass`**; frozen 0.40.0 retains **9 `fail`, 17 `incomplete`, 1 `pass`**. These product verdicts are not model-accuracy classifications. Positron’s saved `incomplete` report survives the later harness error; no product crash is inferred.
 
-Across the 25 references, 17 completed a full pair scan, six used the existing positive-witness shortcut, and two timed out. Five references contain invalid source components. The webcam's sole raw Burr `pass` remains unresolved against an invalid reference; it is not a confirmed false pass. Bed and cell reference timeouts are not Burr timeouts. Source counts are component occurrences, with compounds potentially containing several solids.
+Each version’s terminal strict comparison review has eight all-occurrence mappings, five reported-pair subsets, thirteen refusals and one Positron scene-harness refusal. Within the mapped scopes, baseline Common comparison records 57 matched positives, one extra and 29 missing; 0.40.0 records 49 matched positives, zero extra and 37 missing. These are scoped Common counts, not overall precision, recall, false positives or false negatives. Refused models and missing source evidence remain unresolved. Valid empty Common is insufficient for negative truth.
 
-Use exclusive classes: correct, incomplete, false positive, false negative, crash, timeout. A confirmed extra pair takes precedence over an incomplete pair scan. A missing exact positive is a confirmed false negative only when Burr claims a complete pair set and strict full occurrence mapping succeeds. Partial OCCT scans, ambiguous source matching and unverified pairs remain incomplete; they are not silently counted as correct or false.
-
-“Correct” means fully verified occurrence and pair agreement. A supported `fail` verdict can still be incomplete because Burr or the reference did not finish verifying every pair. Timings are cold-cache release viewer HTTP time (including import and viewer preparation), subsequent check time and OCCT import time; RSS includes the complete respective stage. See README.md for stage sampling and reference shortcut details.
+Bed and OpenArm Cell references reached their 600-second caps. Other reference receipts include partial witness scans and invalid source solids. Source validity, occurrence identity and finite source probes remain separate qualifications. All 27 models remain incomplete/unverified for accuracy; no fully verified correct-model count is established.
 
 ## Which fixes could make incomplete models conclusive?
 
-The following fix ranking preserves the previous **23-model subset**, excluding the two disputed Common-zero models and both pending measurements. The current classification includes those two Common-zero models as incomplete; this historical subset is preserved separately from the completed bounded source audit. The single-fix candidate count below includes only models whose logged Burr reasons contain **that reason alone**. A fix must resolve every affected pair and avoid introducing wrong pairs. These are candidates for a conclusive Burr check, not promised fully verified successes: reference limits, occurrence matching and pending comparisons remain separate blockers. Multiple-reason models do not count as a single-fix win.
+The following fix ranking preserves the previous **23-model subset**, excluding the two Common-zero models and the two sources not yet measured at that checkpoint. The current classification includes those two Common-zero models as incomplete; this historical subset is preserved separately from the completed bounded source audit. The single-fix candidate count below includes only models whose logged Burr reasons contain **that reason alone**. A fix must resolve every affected pair and avoid introducing wrong pairs. These are candidates for a conclusive Burr check, not promised fully verified successes: reference scope and matching refusals remain separate blockers. Multiple-reason models do not count as a single-fix win.
 
 | Priority by single-fix candidates | Reason | Single-fix candidates / 23 | Candidates with full reference scan and strict full mapping already available | All affected / 23 | Minimal validated repro |
 |---:|---|---:|---:|---:|---|
@@ -237,7 +253,7 @@ The following fix ranking preserves the previous **23-model subset**, excluding 
 
 The seven face-loss candidates are full laptop, battery, Jubilee, bed, PCB, OpenArm 2.0 and OpenArm Cell. They do **not** share one proven meshing defect: the diagnostic mechanisms differ, two references timed out and some source compounds are invalid. Seven is the potential gain from resolving the whole class, not from fixing PCB parity alone.
 
-The four open-mesh-only candidates are expansion card, tool template, passive pen and camera calibration tool. Three currently have incomplete occurrence mapping, so a closure fix alone cannot yet certify their pair accuracy. The four coordinate-only candidates are Adirondack chair, wooden folding chair, wooden folding table and desk; folding chair matching is refused and folding table mapping is partial.
+The four open-mesh-only candidates are expansion card, tool template, passive pen and camera calibration tool. Three have only reported-pair comparison scope, so a closure fix alone cannot certify their full pair accuracy. The four coordinate-only candidates are Adirondack chair, wooden folding chair, wooden folding table and desk; folding chair matching is refused and folding table mapping is partial.
 
 Five other models need combined fixes: pulley bracket and OpenArmJIG have both coordinate and open-mesh reasons; hinge, printable case and Bondtech extruder have coordinate, open-mesh and tessellation reasons. Fixing open meshes plus coordinate limits would remove the logged product blockers from 10 models (the eight single-reason candidates plus pulley bracket and jig); tessellation would still block the other three. The two remaining unverified models, webcam and ooze wiper, already have complete Burr pair sets and require reference/matching resolution rather than removal of a logged incomplete reason. All counts are provisional until reruns establish the new behavior.
 
@@ -245,17 +261,17 @@ Minimal repro generation commands and independent reference results for each cla
 
 ## Ranked failure classes
 
-The following frequencies are for the **25 completed source measurements**, counted once per model per reason. They overlap and are provisional until the two remaining models are measured. The false gearmotor pair is the highest-priority finding and appears first above, regardless of its frequency.
+The following frequencies count each logged product reason once per model across all **27 baseline measurements**. Reasons overlap. The gearmotor Common-zero disagreement and its reduced verdict disagreement remain qualified evidence rather than a certified false-pair finding.
 
-| Rank by affected models | Failure or refusal class | Models / 25 | Validated compact repro | Best explanation |
+| Rank by affected models | Failure or refusal class | Models / 27 | Validated compact repro | Best explanation |
 |---:|---|---:|---|---|
-| 1 | `below_coordinate_resolution` | 11 | 10, Metal + Plastic; 2 parts, 82,830 bytes | finite mesh and transformed-placement error bands keep near-contact pairs unresolved |
-| 2 | `open_component_mesh` | 10 | 09, two jig occurrences; 2 parts, 90,297 bytes | tessellation seam, weld or triangulation closure defect; the reduced source solids are valid |
-| 3 | `step_faces_lost` | 7 | 04, board + LED; 2 parts, 291,185 bytes | several distinct conversion/meshing refusals; contextual scale may contribute to parity failures |
-| 4 | `below_tessellation_resolution` | 4 | 07, hinge axis + reused rivets; 3 parts, 109,112 bytes | overlap evidence lies near curved boundaries below the nominal mesh probe scale |
-| 5 | `assembly_structure_lost` | 1 | 05, door + wire annotation; 2 leaves, 282,598 bytes | unsupported wireframe representation breaks assembly traversal |
+| 1 | `below_coordinate_resolution` | 12 | 10, Metal + Plastic; 2 parts, 82,830 bytes | finite mesh and transformed-placement error bands keep near-contact pairs unresolved |
+| 2 | `open_component_mesh` | 11 | 09, two jig occurrences; 2 parts, 90,297 bytes | tessellation seam, weld or triangulation closure defect; the reduced source solids are valid |
+| 3 | `step_faces_lost` | 8 | 04, board + LED; 2 parts, 291,185 bytes | several distinct conversion/meshing refusals; contextual scale may contribute to parity failures |
+| 4 | `below_tessellation_resolution` | 5 | 07, hinge axis + reused rivets; 3 parts, 109,112 bytes | overlap evidence lies near curved boundaries below the nominal mesh probe scale |
+| 5 | `assembly_structure_lost` | 2 | 05, door + wire annotation; 2 leaves, 282,598 bytes | unsupported wireframe representation breaks assembly traversal |
 
-Positron's separately observed Chrome face loss is described below, but is not included in these 25-model counts before its measurement is finished.
+Positron’s logged face loss and missing assembly geometry are included in these 27-model frequencies. The later empty-occurrence measurement-harness error is recorded separately from the product’s import refusal.
 
 Coordinate-resolution uncertainty reproduces on its own in an 82,830-byte Metal/Plastic reduction of the gearmotor. OCCT resolves two valid solids and 21 faces, completes the exact pair scan and returns `pass`. Burr imports both components without face loss, reports no interference, but leaves their only pair unresolved under `below_coordinate_resolution`, with a 0.000024182397079653934-mm coordinate-error bound. This is a conservative refusal rather than a false reported pair.
 
@@ -287,7 +303,7 @@ Run `measure_release.py` on the reduction under the shared lock and inspect its 
 
 Face-loss diagnostics vary across models. The full laptop loses face 128324 with `BoundaryProjectionFailed` even though OCCT validates all 107 source solids. Jubilee loses two faces with `ContradictoryDualParity` and has 755 valid source components. OpenArm loses 12 faces (`EdgeTraversalUnresolved` and `NoOddParityRegion`); its reference also has two invalid source components, so those losses are not all evidence against valid geometry. The bed reports `ConstraintRoleMissing`. Battery loss includes `IntrinsicDegenerate` and other diagnostic forms, with invalid source compounds in the reference. These mechanisms must not be collapsed into one parity failure or described as all arising from valid source solids.
 
-The early Positron Chrome import reports 183 lost faces: 167 `NoOddParityRegion`, 10 `ContradictoryDualParity` and six `EdgeTraversalUnresolved`. Its reference was interrupted for release priority and must be rerun before the final measurement. Diagnostic chord tolerance is 1.2955 mm on at least one sub-millimetre lost cylindrical face. A scene-scale meshing budget acting on small features is a plausible contributing factor; this observation does not prove the cause of every lost face.
+The early Positron Chrome import reports 183 lost faces: 167 `NoOddParityRegion`, 10 `ContradictoryDualParity` and six `EdgeTraversalUnresolved`. The interrupted reference receipt was archived; the completed rerun now records 1,314 parts, 4,996 expanded solids and four invalid solids. The separate bounds-harness error still prevents scene-based comparison. Diagnostic chord tolerance is 1.2955 mm on at least one sub-millimetre lost cylindrical face. A scene-scale meshing budget acting on small features is a plausible contributing factor; this observation does not prove the cause of every lost face.
 
 The hinge's tessellation-scale contact limitation reproduces with three valid source solids (axis plus two reused rivet occurrences), 73 faces and a complete OCCT `pass`. Burr marks both axis/rivet pairs unresolved under `below_tessellation_resolution`; its probe resolution is 0.049572400652835205 mm. The 109,112-byte reduction preserves source geometry and placements. This is a conservative refusal, not a false reported interference.
 
@@ -305,77 +321,65 @@ Run the released measurement wrapper on this reduction under the shared lock. Th
 
 ## Model measurements
 
-The first 25 rows with recorded timings have completed both measurement jobs. `pending` rows are not in the provisional 25-model denominator. `—` in the pair column means comparison pending, not zero pairs. Refused and subset comparisons do not certify recall. A zero loss count with no declaration denominator means no loss warning was logged. Burr viewer time includes import and viewer preparation; OCCT import includes occurrence expansion, source validity and bounding-box work. Peak RSS covers the respective process stage; all timings are seconds and memory is MiB.
+All 27 rows have terminal baseline measurement receipts. Pair counts below use the final strict comparison review; refusals and reported-pair subsets do not certify recall. Viewer time includes import and viewer preparation; OCCT import includes occurrence expansion, validity and bounding-box work. Timings are seconds and memory is MiB. Positron’s timings and saved product report are retained despite the later bounds-harness error; no scene-based agreement is inferred.
 
 | Model | Class | Parts Burr / OCCT | Lost / declared faces | Burr verdict | OCCT verdict | Strict pairs matched / extra / missing | Viewer s | Check s | Burr MiB | OCCT import s | OCCT total s | OCCT MiB |
 |---|---|---:|---:|---|---|---|---:|---:|---:|---:|---:|---:|
-| Framework-Laptop-13__Framework Laptop 13 CAD.stp | incomplete | 107 / 107 | 1 / 6652 | incomplete (partial) | fail (partial) | — | 7.088 | 0.059 | 636.031 | 48.380 | 66.139 | 755.297 |
+| Framework-Laptop-13__Framework Laptop 13 CAD.stp | incomplete | 107 / 107 | 1 / 6652 | incomplete (partial) | fail (partial) | refused | 7.088 | 0.059 | 636.031 | 48.380 | 66.139 | 755.297 |
 | Framework-Laptop-13__13_5_hinge_R_assy.stp | incomplete | 6 / 6 | 0 / — | incomplete (partial) | pass | 0 / 0 / 0 | 0.123 | 0.408 | 44.641 | 2.487 | 3.004 | 461.828 |
-| Framework-Laptop-13__FWKNAQ9_G01_20210911.stp | incomplete | 21 / 23 | 6 / 5752 | incomplete (partial) | fail (partial) | — | 0.664 | 0.060 | 480.453 | 7.095 | 11.107 | 641.453 |
+| Framework-Laptop-13__FWKNAQ9_G01_20210911.stp | incomplete | 21 / 23 | 6 / 5752 | incomplete (partial) | fail (partial) | refused | 0.664 | 0.060 | 480.453 | 7.095 | 11.107 | 641.453 |
 | Framework-Laptop-13__FW_13_camera_module.stp | incomplete | 3 / 2 | 0 / — | pass | incomplete | refused | 0.124 | 0.111 | 109.312 | 3.264 | 7.108 | 545.516 |
 | Framework-Laptop-13__printable_case_full.stp | incomplete | 15 / 15 | 0 / — | fail (partial) | fail | 3 / 0 / 2 | 0.310 | 4.422 | 236.328 | 3.408 | 7.488 | 498.781 |
 | ExpansionCards__ExpansionCard_SelfTapping.stp | incomplete | 4 / 4 | 0 / — | incomplete (partial) | fail | 0 / 0 / 2 | 0.122 | 0.170 | 40.844 | 2.816 | 3.530 | 462.969 |
-| jubilee__jubilee.STEP | incomplete | 755 / 755 | 2 / 9453 | incomplete (partial) | fail (partial) | — | 3.086 | 0.056 | 906.719 | 47.811 | 48.189 | 792.547 |
-| jubilee__6x_well_plate_bed_assembly.STEP | incomplete | 98 / 98 | 1 / 1198 | incomplete (partial) | reference timeout | — | 1.707 | 0.055 | 170.578 | 9.062 | 600.090 | 746.672 |
-| jubilee__left_double_pulley_corner_bracket_assembly.STEP | incomplete | 23 / 23 | 0 / — | fail (partial) | fail | 1 / 0 / 0 (partial mapping) | 1.395 | 0.859 | 211.562 | 3.715 | 63.163 | 553.266 |
-| jubilee__tool_template_assembly.STEP | incomplete | 14 / 14 | 0 / — | fail (partial) | fail | 3 / 0 / 3 (partial mapping) | 0.185 | 0.564 | 77.844 | 4.280 | 65.181 | 690.203 |
-| jubilee__passive_pen_tool_assembly.STEP | incomplete | 39 / 39 | 0 / — | fail (partial) | fail | 4 / 0 / 10 (partial mapping) | 0.451 | 2.643 | 158.109 | 4.530 | 225.975 | 727.828 |
-| jubilee__bondtech_groovemount_extruder.STEP | incomplete | 60 / 60 | 0 / — | fail (partial) | fail (partial) | — | 1.946 | 131.933 | 533.234 | 13.175 | 22.987 | 707.531 |
+| jubilee__jubilee.STEP | incomplete | 755 / 755 | 2 / 9453 | incomplete (partial) | fail (partial) | refused | 3.086 | 0.056 | 906.719 | 47.811 | 48.189 | 792.547 |
+| jubilee__6x_well_plate_bed_assembly.STEP | incomplete | 98 / 98 | 1 / 1198 | incomplete (partial) | reference timeout | refused | 1.707 | 0.055 | 170.578 | 9.062 | 600.090 | 746.672 |
+| jubilee__left_double_pulley_corner_bracket_assembly.STEP | incomplete | 23 / 23 | 0 / — | fail (partial) | fail | 1 / 0 / 0 (reported-pair scope) | 1.395 | 0.859 | 211.562 | 3.715 | 63.163 | 553.266 |
+| jubilee__tool_template_assembly.STEP | incomplete | 14 / 14 | 0 / — | fail (partial) | fail | 3 / 0 / 3 (reported-pair scope) | 0.185 | 0.564 | 77.844 | 4.280 | 65.181 | 690.203 |
+| jubilee__passive_pen_tool_assembly.STEP | incomplete | 39 / 39 | 0 / — | fail (partial) | fail | 4 / 0 / 10 (reported-pair scope) | 0.451 | 2.643 | 158.109 | 4.530 | 225.975 | 727.828 |
+| jubilee__bondtech_groovemount_extruder.STEP | incomplete | 60 / 60 | 0 / — | fail (partial) | fail (partial) | refused | 1.946 | 131.933 | 533.234 | 13.175 | 22.987 | 707.531 |
 | jubilee__ooze_wiper_assembly.STEP | incomplete | 6 / 6 | 0 / — | fail | fail | refused | 0.067 | 0.234 | 32.969 | 3.474 | 4.504 | 465.297 |
-| jubilee__camera_calibration_tool_jan_31_2020.STEP | incomplete | 15 / 15 | 0 / — | incomplete (partial) | fail | 0 / 0 / 2 (partial mapping) | 0.331 | 0.348 | 115.641 | 6.923 | 120.910 | 604.250 |
-| open_robot_actuator_hardware__biped_6dof_v1.STEP | incomplete | 345 / 345 | 0 / — | fail (partial) | fail (partial) | —; 5 Common-zero disagreements (3 bounded negatives; 2 bounded tolerance contacts) | 1.682 | 36.356 | 777.547 | 48.774 | 50.090 | 689.438 |
+| jubilee__camera_calibration_tool_jan_31_2020.STEP | incomplete | 15 / 15 | 0 / — | incomplete (partial) | fail | 0 / 0 / 2 (reported-pair scope) | 0.331 | 0.348 | 115.641 | 6.923 | 120.910 | 604.250 |
+| open_robot_actuator_hardware__biped_6dof_v1.STEP | incomplete | 345 / 345 | 0 / — | fail (partial) | fail (partial) | refused | 1.682 | 36.356 | 777.547 | 48.774 | 50.090 | 689.438 |
 | kicadStepUpMod__demo.step | incomplete | 13 / 13 | 1 / 401 | incomplete (partial) | fail | 0 / 0 / 2 | 0.161 | 0.060 | 58.766 | 3.467 | 4.152 | 475.875 |
 | FreeCAD-library__Adirondack Chair.step | incomplete | 36 / 36 | 0 / — | fail (partial) | fail | 38 / 0 / 4 | 0.070 | 0.171 | 25.141 | 2.426 | 3.343 | 456.844 |
 | FreeCAD-library__wooden folding chair.step | incomplete | 20 / 20 | 0 / — | fail (partial) | fail | refused | 0.063 | 0.116 | 25.953 | 2.303 | 2.684 | 454.219 |
-| FreeCAD-library__Wooden Folding Table.step | incomplete | 14 / 14 | 0 / — | incomplete (partial) | fail | 0 / 0 / 4 (partial mapping) | 0.062 | 0.056 | 22.203 | 2.254 | 2.564 | 453.734 |
+| FreeCAD-library__Wooden Folding Table.step | incomplete | 14 / 14 | 0 / — | incomplete (partial) | fail | 0 / 0 / 4 (reported-pair scope) | 0.062 | 0.056 | 22.203 | 2.254 | 2.564 | 453.734 |
 | FreeCAD-library__Double glass doors with handles and transom.step | incomplete | 1 / 3 | 0 / — | incomplete (partial) | pass | refused | 0.066 | 0.057 | 22.781 | 2.215 | 2.476 | 451.844 |
-| FreeCAD-library__Yellow_gearmotor_L.step | incomplete | 6 / 6 | 0 / — | fail (partial) | fail | 4 / 1 / 0 (bounded tolerance-contact source recheck) | 0.068 | 0.282 | 30.484 | 2.230 | 2.683 | 458.000 |
+| FreeCAD-library__Yellow_gearmotor_L.step | incomplete | 6 / 6 | 0 / — | fail (partial) | fail | 4 / 1 / 0 | 0.068 | 0.282 | 30.484 | 2.230 | 2.683 | 458.000 |
 | FreeCAD-library__ComputerDesk (100 x 50 x 75 cm WDH).step | incomplete | 9 / 9 | 0 / — | fail (partial) | fail | 4 / 0 / 0 | 0.066 | 0.060 | 20.734 | 5.729 | 6.049 | 454.719 |
-| openarm_hardware__OpenArm_2.0.STEP | incomplete | 564 / 564 | 12 / 7520 | incomplete (partial) | fail (partial) | — | 2.349 | 0.060 | 869.094 | 31.983 | 32.434 | 804.938 |
+| openarm_hardware__OpenArm_2.0.STEP | incomplete | 564 / 564 | 12 / 7520 | incomplete (partial) | fail (partial) | refused | 2.349 | 0.060 | 869.094 | 31.983 | 32.434 | 804.938 |
 | openarm_hardware__OpenArmJIG.STEP | incomplete | 8 / 8 | 0 / — | incomplete (partial) | pass | 0 / 0 / 0 | 0.125 | 0.164 | 69.656 | 2.263 | 2.583 | 459.719 |
-| openarm_hardware__OpenArm_Cell+OpenArm_2.0.STEP | incomplete | 538 / 538 | 2 / 69931 | incomplete (partial) | reference timeout | — | 10.513 | 0.052 | 2902.953 | 64.962 | 600.113 | 2181.188 |
-| Positron__PositronV3.2.2_2026-01-26.step | pending | — / — | — / — | — | — | — | — | — | — | — | — | — |
-| ned2__ADAPTATIVE_GRIPPER_NED2_STEP.STEP | pending | — / — | — / — | — | — | — | — | — | — | — | — | — |
+| openarm_hardware__OpenArm_Cell+OpenArm_2.0.STEP | incomplete | 538 / 538 | 2 / 69931 | incomplete (partial) | reference timeout | refused | 10.513 | 0.052 | 2902.953 | 64.962 | 600.113 | 2181.188 |
+| Positron__PositronV3.2.2_2026-01-26.step | incomplete | 1243 / 1314 | 183 / 140054 | incomplete (partial) | fail (partial) | scene harness refusal | 43.955 | 0.057 | 2624.859 | 322.739 | 325.289 | 1543.719 |
+| ned2__ADAPTATIVE_GRIPPER_NED2_STEP.STEP | incomplete | 71 / 71 | 0 / — | fail (partial) | fail (partial) | refused | 0.903 | 19.354 | 283.047 | 10.440 | 10.938 | 526.312 |
 
-| Pending source | Measurement state | Comparison state |
-|---|---|---|
-| Positron V3.2.2 | reference interrupted by owner for release priority; archived and excluded; reference rerun and release timing required | pending |
-| Niryo Ned2 gripper | reference and release jobs not started | pending |
+Positron has 1,314 OCCT parts, 4,996 expanded solids and 177,360 source faces, including four invalid solids. Both Burr versions preserve an `incomplete` report with 1,243 components and 183/140,054 lost faces; subsequent bounds extraction fails on an empty occurrence, leaving the comparison scene unavailable. Different component and face scopes must not be subtracted as missing geometry counts. Niryo has 71 valid source solids and both Burr versions report `fail` with unresolved pairs; strict placement matching refuses its 0.190346-mm bounds error against the unchanged 0.1-mm limit.
 
-The eight completed-model comparisons still pending are full laptop, battery, Jubilee, six-well bed, Bondtech extruder, biped, OpenArm 2.0 and OpenArm Cell.
-
-| Comparison refusal | Recorded limit |
-|---|---|
-| Webcam | no Burr positives to check against a partial/invalid reference; overall pass unresolved |
-| Ooze wiper | occurrence 2 bounds error 0.161996 mm exceeds the existing strict 0.1-mm bound limit |
-| Wooden folding chair | occurrence 17 bounds error 0.193800 mm exceeds the same limit |
-| Glass door | Burr 1 component versus 3 OCCT leaves; source contains a 21-solid door compound and two wire annotations |
-
-Matching tolerances were not relaxed to turn these refusals into agreement.
+The final reviews preserve all thirteen strict refusals per version, including incomplete/invalid reference scope, ambiguous occurrence placement and assembly-structure mismatches. Limits were not relaxed to turn these refusals into agreement.
 
 ## Chrome inspection
 
-The five largest downloaded STEP files are Positron, OpenArm Cell, OpenArm 2.0, Jubilee and the biped. The final expanded OCCT census will verify whether this is also the five largest set by component occurrences. Chrome capture is serialized under the shared CAD lock; the actual installed release serves `burr .`, and the driver uses installed Google Chrome in solid mode at 1600 × 1100.
+The final expanded OCCT part census ranks Positron (1,314), Jubilee (755), OpenArm 2.0 (564), OpenArm Cell (538) and Biped (345) as the five largest assemblies. Their isometric and front images have now been inspected. The four new frozen-0.39.0 captures used installed Chrome 154.0.8037.95 through Turnless’s managed browser, solid mode and a 1600 × 1100 viewport; each also retains top and right screenshots. HTTP 200, WebGL error 0 and no JavaScript errors were recorded for all four. Capture tabs and local Burr servers were closed and independently checked; the managed browser remains available. The earlier sandbox direct-launch failure and its cleanup evidence are retained separately. Overview inspection does not certify pair truth or exhaustive face completeness.
 
 Positron is captured and its isometric and front images have been inspected. No long spikes or large holes are apparent at overview scale. The importer reports 183 missing faces; these small losses cannot be reliably located or ruled out from overview screenshots. Detached arms and a display are visible, but their source placements have not been independently verified; no defect is inferred from those positions. Chrome reports HTTP 200, 627 mesh definitions, 1,243 occurrences, WebGL error 0 and no JavaScript errors. The declared graph's 1,236 leaves is not a geometry count and must not be used to claim seven extra or missing parts.
 
 | Model | Downloaded STEP bytes | Chrome capture and actual inspection | Observed defects / limits |
 |---|---:|---|---|
 | Positron V3.2.2 | 398,104,862 | isometric and front inspected | no obvious long spike or large hole at overview scale; importer logs 183 lost faces, not all visually locatable |
-| OpenArm Cell | 194,761,438 | **pending** | no visual claim |
-| OpenArm 2.0 | 47,788,783 | **pending** | no visual claim |
-| Jubilee | 45,857,044 | **pending** | no visual claim |
-| Biped | 26,548,352 | **pending** | no visual claim |
+| OpenArm Cell | 194,761,438 | isometric and front inspected | no obvious long spikes or large holes at overview scale; tiny or hidden defects not ruled out |
+| OpenArm 2.0 | 47,788,783 | isometric and front inspected | no obvious long spikes or large holes at overview scale; tiny or hidden defects not ruled out |
+| Jubilee | 45,857,044 | isometric and front inspected | no obvious long spikes or large holes at overview scale; tiny or hidden defects not ruled out |
+| Biped | 26,548,352 | isometric and front inspected | no obvious long spikes or large holes at overview scale; tiny or hidden defects not ruled out |
 
-All four remaining captures and inspections follow the current source-audit priorities. The completed Positron capture is reusable; no success is inferred from pending screenshots.
+Jubilee’s box frame, OpenArm’s folded arms, Cell’s enclosure and Biped’s articulated legs appear coherent in the inspected views. Cell’s front silhouette includes small corner protrusions; no independent source comparison establishes these as defects. Known importer face-loss receipts remain authoritative even when losses are not visible in overview images. Source correspondence, hidden faces and tiny gaps are not certified by these screenshots.
 
 ## Sample limits
 
-The 27 public downloads are a convenience sample selected by provenance, domain and multipart source structure before testing. They have no old-corpus hash, URL or repository overlap. Several share projects, so they are not 27 independent exporter implementations. Exporters represented are SolidWorks, Creo, FreeCAD and Autodesk Translation Framework; the full requested exporter spread has not been achieved. A declared STEP assembly-graph census finds at most 1,236 expanded leaf occurrences (Positron); the sample does not meet the requested 2,000+-component coverage. Declared leaves may include wire or empty definitions, so final geometry component counts still come from OCCT. No accuracy generalization to all public assemblies is justified.
+The 27 pinned public downloads are a convenience sample selected by provenance, domain and multipart source structure before testing. They have no old-corpus hash, URL or repository overlap. Shared projects limit independence; represented exporters are SolidWorks, Creo, FreeCAD and Autodesk Translation Framework. The full requested exporter spread is unmet. The largest OCCT part census is Positron’s 1,314; its 4,996 expanded solids are not 4,996 assembly parts. The sample does not meet the requested 2,000+-part coverage. No accuracy generalization to all public assemblies is justified.
 
-## Original corpus contact audit — in progress
+## Original corpus contact audit — bounded source results
 
-The reviewed Checks candidate's external reference has 100 Common-zero contact receipts across the original corpus: Faze4 (93), automation control unit (2), and pick/place arm (5). Burr also records analytic support and precision/volume bounds; the external OCCT corroboration used Common alone. These historical claims are now being rechecked with the same capped independent methods. They are not a fresh released 0.40.0 measurement and do not enter the held-out denominator.
+The reviewed Checks candidate’s historical external reference has 100 Common-zero contact receipts: Faze4 (93), automation control unit (2), and pick/place arm (5). All now have reviewed method-5 receipts, with the original Common-only evidence retained. These historical claims are outside the fresh held-out denominator and are not a released 0.40.0 measurement.
 
 All three source hashes match both the original source manifest and the contact receipts. Original reports and scenes are preserved locally. Only scene display labels for the control unit and pick/place arm were replaced by their own report's canonical definition names; bounds, transforms and surface samples remain unchanged. Current receipts and explicit provenance stay under `original-corpus-contact-rechecks/`. Any shared-interior certificate is reviewed against the pair's declared precision and volume bound and reported immediately.
 
@@ -385,7 +389,7 @@ Early Faze4 receipts expose a distinction between literal zero and permitted sou
 
 All 100 historical claims now have reviewed method-5 receipts: 98 bounded tolerance contacts and two bounded contact-or-separated results. No robust overlap certificate, refusal or timeout was found. The 38 earlier method-1–4 rows were replayed in a separate output after the first pass finished; their original receipts remain preserved. The displayed table selects the completed method-5 receipt for each pair, with an evidence manifest recording both original and selected paths and SHA256. All thirteen mapped released-contact disputes and three baseline disputes have also completed separate method-5 replays and full phase reviews, returning bounded tolerance contacts. Four strict matching refusals remain separate. Contact within tolerance is bounded local evidence, not literal zero or exhaustive separation.
 
-The capped per-pair controller supports a stop file and normal owned-lock cleanup. Both historical controllers exited normally; their root and all pair logs had no open descriptors before starting the next phase. Burr 0.40.1 has shipped, lifting the release-dependent hold; source rechecks retain priority over the remaining measurements and Chrome inspections.
+The capped per-pair controller supports a stop file and normal owned-lock cleanup. Both historical controllers exited normally; their root and all pair logs had no open descriptors before starting the next phase. Burr 0.40.1 has shipped, lifting the release-dependent hold; all selected source replays and both frozen measurement phases are now terminal; their raw evidence remains preserved.
 
 Bounded source rechecks: 2 contact_or_separated_bounded, 98 contact_within_tolerance_bounded.
 
@@ -393,7 +397,7 @@ Each pair uses strict occurrence matching, valid source solids, OCCT Common, sou
 
 The maximum sampled clearance is the largest sampled distance to the nearer of the two source boundaries among points classified IN by both source solids and inside by both winding checks. It is local evidence, not a measured total overlap depth or volume. The declared depth and volume bounds come from the tested Burr report; a sampled clearance below them does not verify those global bounds. A dash means no candidate clearance was recorded, not zero clearance.
 
-Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary normal-probe receipts. Method 5 probes both face-normal signs and adjacent-face bisectors at 1e-6, 1e-4, 1e-3 and 1e-2 mm, verifies which steps enter the originating source solid, and checks those points against the other solid and winding. It records boundary distances for every source IN/IN point, including winding disagreements. Shared interior within 1e-6 mm of either boundary is treated as tolerance contact at the sampled witness; only deeper shared interior corroborated by winding yields an overlap certificate. These remain bounded local checks; earlier disputed rows without the completed tie-breaker need rechecking.
+Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary normal-probe receipts. Method 5 probes both face-normal signs and adjacent-face bisectors at 1e-6, 1e-4, 1e-3 and 1e-2 mm, verifies which steps enter the originating source solid, and checks those points against the other solid and winding. It records boundary distances for every source IN/IN point, including winding disagreements. Shared interior within 1e-6 mm of either boundary is treated as tolerance contact at the sampled witness; only deeper shared interior corroborated by winding yields an overlap certificate. These remain bounded local checks. Earlier preliminary disputes are retained; the selected mapped disputes have completed method-5 replays. Strict matching refusals remain unresolved.
 
 | Model | Burr pair | Status | Method | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Verified inward steps | Interior certificates | Max sampled clearance mm | Declared max depth mm | Declared max volume mm³ | Limitation |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|

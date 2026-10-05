@@ -6,13 +6,13 @@ This corpus preserves a public **0.39.0 release baseline** and adds a separate *
 
 The selection covers robots, printer/tool assemblies, a populated KiCad/FreeCAD board, laptop enclosures and hardware, furniture, and a gearmotor. Exporters include SolidWorks, Creo, FreeCAD and Autodesk Translation Framework. **This is a convenience sample, not a random sample of all CAD.** Several files share the Jubilee, Framework, FreeCAD-library and OpenArm projects. No source was downloaded behind a login. CAD files and detailed local evidence are not committed.
 
-**Reference reliability correction:** independent source checks prove three pulley screw/nut overlaps despite valid empty OCCT Common results. The previous six-pair false-positive headline is suspended: those six are now Common-zero disagreements requiring independent revalidation. Current checkpoint: 25 measured models, 0 fully verified correct, 25 incomplete/unverified; two measurements and the pending comparisons/renders remain explicit. See the source cross-check and retained receipts in results.md.
+**Reference reliability correction:** independent source checks prove three pulley screw/nut overlaps despite valid empty OCCT Common results. The previous six-pair false-positive headline is suspended: those six are Common-zero disagreements with completed bounded source rechecks, not certified false pairs. Final measured scope: all 27 pinned models have terminal measurement and strict comparison receipts in frozen 0.39.0 and 0.40.0, and the five largest assemblies have actual Chrome overview inspections. All 27 remain incomplete/unverified for accuracy. The capped Biped removed-pair audit retains 23 pending pairs. The largest source census is 1,314 parts; the requested 2,000+-part coverage and full exporter spread remain unmet. See the source cross-check and retained receipts in results.md.
 
-See [results.md](results.md) for the measured headline, false pairs, ranked limitations, model table and Chrome inspection. A model classified `timeout` reached a Burr-stage guard; a reference-only timeout remains an unresolved reference and does not mean Burr timed out. Any reference timeout, ambiguous occurrence matching or incomplete pair scan is explicitly unresolved; agreement on an overall `fail` does not certify every pair.
+See [results.md](results.md) for the qualified verdict disagreements, ranked limitations, model table and Chrome inspection. A model classified `timeout` reached a Burr-stage guard; a reference-only timeout remains an unresolved reference and does not mean Burr timed out. Any reference timeout, ambiguous occurrence matching or incomplete pair scan is explicitly unresolved; agreement on an overall `fail` does not certify every pair.
 
 ## Reproduce
 
-The original baseline used `/tmp/burr-corpus2`. After the sandbox changed, the work folder moved under `~/coding/fray/.fray/tmp/` and the original temporary folders were retired. The reused OCCT environment is now `~/coding/fray/.fray/burr/occt-venv`. Use one heavy run at a time; release work has priority. The scripts now acquire `~/coding/fray/.fray/burr/build.lock` around each model command and release it afterwards, including ordinary failures. After acquisition, each shared lock contains an owner record identifying the thread, acquisition time and command. Release removes the owned directory and record. They never run CAD measurements concurrently. The reproducible runner leaves a 20-second gap after each job to give other workers polling the shared lock an opportunity to acquire it.
+The work folder is under `~/coding/fray/.fray/tmp/`; earlier temporary folders were retired with their small evidence preserved. The reused OCCT environment is now `~/coding/fray/.fray/burr/occt-venv`. Use one heavy run at a time; release work has priority. The scripts now acquire `~/coding/fray/.fray/burr/build.lock` around each model command and release it afterwards, including ordinary failures. After acquisition, each shared lock contains an owner record identifying the thread, acquisition time and command. Release removes the owned directory and record. They never run CAD measurements concurrently. The reproducible runner leaves a 20-second gap after each job to give other workers polling the shared lock an opportunity to acquire it.
 
 ```sh
 CORPUS_WORK="$HOME/coding/fray/.fray/tmp/<your-thread-id>"
@@ -58,17 +58,17 @@ python3 artifacts/corpus2/scripts/report_table.py --root artifacts/corpus2
 
 The table preserves reference scope, incomplete mapping and missing timings. A zero lost-face count with no declaration denominator means Burr logged no loss warning; it is not a claim that the model contains zero faces. The separate source_census.py script counts declared assembly-graph leaves for selection auditing, including wire/empty definitions; OCCT supplies the geometry census.
 
-For a real Chrome capture, invoke render_model.py with the installed release binary, a model path, a local evidence output folder and the installed Playwright module path. Wrap each capture with the shared CAD lock. The driver uses the installed Google Chrome application and saves isometric, front, top and right screenshots plus browser/WebGL errors. Inspect the actual images before making geometry claims; a successful HTTP load does not prove a complete render.
+Outside a managed sandbox, render_model.py accepts the installed release binary, model path, evidence folder and Playwright module path; wrap each capture with the shared CAD lock. In the managed seat, direct Chrome launch is unavailable. The completed captures used Turnless browser.open for the Burr product and Playwright CDP, opened only owned tabs, retained tab-target and server ownership receipts, and verified their cleanup while preserving the managed browser. Isometric, front, top and right screenshots plus browser/WebGL receipts remain local. The five largest assemblies' isometric and front images were actually inspected. Overview images do not certify tiny or hidden face completeness, source placements or pair truth.
 
 ## Released-version follow-up
 
-0.40.0 adds the gearmotor and spike fixes plus contact proofs. Its records live under `rerun-0400/`, separate from the immutable `logs/` baseline. The rerun first measures the original 25 models, then compares their interference pairs and checks every `contact_pairs` entry independently. The two remaining source measurements and original Chrome inspections follow. The exact installed binary SHA-256 and version are saved locally in `rerun-0400/binary.json`.
+0.40.0 adds the gearmotor and spike fixes plus contact proofs. Its records live under `rerun-0400/`, separate from the immutable `logs/` baseline. The completed rerun contains all 27 pinned models, strict interference comparisons and every reported `contact_pairs` entry. Refusals and the Positron scene-harness error remain explicit. Bounded source selections and raw contact calculations are reported separately. The exact installed binary SHA-256 and version are saved locally in `rerun-0400/binary.json`.
 
 ```sh
 BURR_VERSION=0.40.0 BURR_INSTALL_DIR="$CORPUS_WORK/bin0400" sh -c 'curl -fsSL https://github.com/fraylabs/burr/releases/download/burr-v0.40.0/install.sh | sh'
-"$OCCT_PYTHON" artifacts/corpus2/scripts/run.py release --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --binary "$CORPUS_WORK/bin0400/burr" --work-dir "$CORPUS_WORK" --limit 25
-"$OCCT_PYTHON" artifacts/corpus2/scripts/run.py compare --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --work-dir "$CORPUS_WORK" --limit 25
-"$OCCT_PYTHON" artifacts/corpus2/scripts/run.py contacts --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --work-dir "$CORPUS_WORK" --limit 25
+"$OCCT_PYTHON" artifacts/corpus2/scripts/run.py release --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --binary "$CORPUS_WORK/bin0400/burr" --work-dir "$CORPUS_WORK" --limit 27
+"$OCCT_PYTHON" artifacts/corpus2/scripts/run.py compare --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --work-dir "$CORPUS_WORK" --limit 27
+"$OCCT_PYTHON" artifacts/corpus2/scripts/run.py contacts --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --work-dir "$CORPUS_WORK" --limit 27
 "$OCCT_PYTHON" artifacts/corpus2/scripts/summarize_versions.py --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs
 ```
 
@@ -76,7 +76,7 @@ Copy the existing reference JSON/metrics into the version evidence folder before
 
 `verify_contacts.py` selects every contact occurrence through the existing strict identity, placement and surface matcher. It requires valid source shapes and valid, completed OCCT Common for each reported contact-or-separated pair. **Exactly zero volume** is recorded explicitly; any nonzero result is preserved, even below the ordinary interference reference threshold. Mapping refusals, invalid shapes and resource caps leave the relevant pairs unverified. Partial contact results survive a 600-second/9-GiB cap.
 
-`summarize_versions.py` reports the 11 baseline coordinate-limit models separately: removal of that reason, pair-set completeness and independent pair verification are distinct results. Import-time face loss can suppress checking entirely; that is not a contact-proof success.
+`summarize_versions.py` reports baseline coordinate-limit models separately: removal of that reason, pair-set completeness and independent pair verification are distinct results. Import-time face loss can suppress checking entirely; that is not a contact-proof success.
 
 ## Bounded independent source rechecks
 
