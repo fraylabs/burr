@@ -13,3 +13,8 @@ https://creativecommons.org/licenses/by/3.0/
 The two valid source solids have exactly zero OCCT Common volume and a minimum
 distance of 4.5999648534689186e-11 mm. This fixture protects contact from being
 reported as positive-volume interference.
+
+The positive regression translates Metal by 0.5 mm along world X while keeping
+Yellow fixed. OCCT Common then measures 82.5 mm³, and Burr must still report
+that pair as interference. Together the two tests protect both contact handling
+and detection of a real overlap in the same geometry.
