@@ -41,21 +41,30 @@ def verify(model, evidence, scripts):
         # strict mapping. Their synthetic comparison is never accuracy evidence.
         mapping_report = pathlib.Path(str(prefix) + '.contact-mapping-report.json')
         mapping_ref = pathlib.Path(str(prefix) + '.contact-mapping-reference.json')
-        mapping_report.write_text(json.dumps(dict(report=dict(findings=contacts))))
         mapping_ref.write_text(json.dumps(dict(names=[n for n, _ in exact],
                                                findings=[], pair_check_complete=True)))
-        mapped = compare(model, pathlib.Path(str(prefix) + '.scene.json'),
-                         mapping_report, mapping_ref, reported_pairs_only=True)
-        result['mapping'] = mapped['mapping']
-        mapping = {entry['burr']: entry['occt'] for entry in mapped['mapping']}
+        def map_contacts(entries):
+            mapping_report.write_text(json.dumps(dict(report=dict(findings=entries))))
+            mapped = compare(model, pathlib.Path(str(prefix) + '.scene.json'),
+                             mapping_report, mapping_ref, reported_pairs_only=True)
+            return {entry['burr']: entry['occt'] for entry in mapped['mapping']}, mapped['mapping']
+
+        batch = None
+        try:
+            batch = map_contacts(contacts)
+            result['mapping'] = batch[1]
+        except Exception as error:
+            result['batch_mapping_refusal'] = str(error)
         shapes = [cq.Shape.cast(shape) for _, shape in exact]
         valid = {}
         for contact in contacts:
             burr_pair = [c['occurrence_index'] for c in contact['components']]
-            pair = sorted(mapping[i] for i in burr_pair)
-            entry = dict(burr_pair=burr_pair, occt_pair=pair,
-                         code=contact['code'], proof=contact)
+            entry = dict(burr_pair=burr_pair, code=contact['code'], proof=contact)
             try:
+                mapping, evidence_rows = batch if batch else map_contacts([contact])
+                pair = sorted(mapping[i] for i in burr_pair)
+                entry.update(occt_pair=pair,
+                             mapping=[row for row in evidence_rows if row['burr'] in burr_pair])
                 for i in pair:
                     if i not in valid:
                         valid[i] = bool(BRepCheck_Analyzer(shapes[i].wrapped).IsValid())
@@ -75,7 +84,7 @@ def verify(model, evidence, scripts):
                 entry['refused'] = str(error)
                 result['refused_pairs'].append(entry)
             save()
-            print(model.name, 'contact', pair, entry.get('common_volume_mm3', entry.get('refused')), flush=True)
+            print(model.name, 'contact', entry.get('occt_pair', burr_pair), entry.get('common_volume_mm3', entry.get('refused')), flush=True)
         result['complete'] = not result['refused_pairs'] and len(result['checked']) == len(contacts)
     except Exception as error:
         result['refused'] = str(error)

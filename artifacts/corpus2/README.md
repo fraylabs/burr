@@ -10,15 +10,17 @@ See [results.md](results.md) for the measured headline, false pairs, ranked limi
 
 ## Reproduce
 
-The original baseline used `/tmp/burr-corpus2`. After the sandbox changed, the work folder moved under `~/coding/fray/.fray/tmp/` and `/tmp` became read-only. Use one heavy run at a time; release work has priority. The scripts now acquire `~/coding/fray/.fray/burr/build.lock` around each model command and release it afterwards, including ordinary failures. They never run CAD measurements concurrently. The reproducible runner leaves a 20-second gap after each job to give other workers polling the shared lock an opportunity to acquire it.
+The original baseline used `/tmp/burr-corpus2`. After the sandbox changed, the work folder moved under `~/coding/fray/.fray/tmp/` and the original temporary folders were retired. The reused OCCT environment is now `~/coding/fray/.fray/burr/occt-venv`. Use one heavy run at a time; release work has priority. The scripts now acquire `~/coding/fray/.fray/burr/build.lock` around each model command and release it afterwards, including ordinary failures. They never run CAD measurements concurrently. The reproducible runner leaves a 20-second gap after each job to give other workers polling the shared lock an opportunity to acquire it.
 
 ```sh
-CORPUS_WORK="$HOME/coding/fray/.fray/tmp/corpus2"
+CORPUS_WORK="$HOME/coding/fray/.fray/tmp/<your-thread-id>"
+OCCT_PYTHON="$HOME/coding/fray/.fray/burr/occt-venv/bin/python"
+export TMPDIR="$CORPUS_WORK"
 mkdir -p "$CORPUS_WORK"
 BURR_VERSION=0.39.0 BURR_INSTALL_DIR="$CORPUS_WORK/bin0390" sh -c 'curl -fsSL https://github.com/fraylabs/burr/releases/download/burr-v0.39.0/install.sh | sh'
-/tmp/burr-occt-venv/bin/python artifacts/corpus2/scripts/download_sources.py artifacts/corpus2/sources.csv --root artifacts/corpus2
-/tmp/burr-occt-venv/bin/python artifacts/corpus2/scripts/run.py measure --root artifacts/corpus2 --binary "$CORPUS_WORK/bin0390/burr" --work-dir "$CORPUS_WORK"
-/tmp/burr-occt-venv/bin/python artifacts/corpus2/scripts/run.py compare --root artifacts/corpus2
+"$OCCT_PYTHON" artifacts/corpus2/scripts/download_sources.py artifacts/corpus2/sources.csv --root artifacts/corpus2
+"$OCCT_PYTHON" artifacts/corpus2/scripts/run.py measure --root artifacts/corpus2 --binary "$CORPUS_WORK/bin0390/burr" --work-dir "$CORPUS_WORK"
+"$OCCT_PYTHON" artifacts/corpus2/scripts/run.py compare --root artifacts/corpus2
 ```
 
 The existing environment contains CadQuery 2.8.0, cadquery-ocp 7.9.3.1.1, NumPy 2.4.6, SciPy 1.17.1 and psutil 7.2.2. Scripts use macOS `wait4` RSS bytes. The source files belong under `artifacts/corpus2/models/`; logs, mesh buffers, Chrome screenshots and minimal CAD repros remain local.
@@ -36,7 +38,7 @@ The gearmotor reduction preserves original STEP entities and placement chains ra
 ```sh
 python3 artifacts/corpus2/scripts/reduce_pair.py artifacts/corpus2/models/FreeCAD-library__Yellow_gearmotor_L.step artifacts/corpus2/repros/01-gearmotor-contact.step --keep-name Metal --keep-name Yellow
 until mkdir "$HOME/coding/fray/.fray/burr/build.lock" 2>/dev/null; do sleep 15; done
-/tmp/burr-occt-venv/bin/python artifacts/corpus2/scripts/measure_release.py --binary "$CORPUS_WORK/bin0390/burr" --work-dir "$CORPUS_WORK" --model artifacts/corpus2/repros/01-gearmotor-contact.step --output artifacts/corpus2/repro-logs
+"$OCCT_PYTHON" artifacts/corpus2/scripts/measure_release.py --binary "$CORPUS_WORK/bin0390/burr" --work-dir "$CORPUS_WORK" --model artifacts/corpus2/repros/01-gearmotor-contact.step --output artifacts/corpus2/repro-logs
 rmdir "$HOME/coding/fray/.fray/burr/build.lock"
 ```
 
@@ -61,10 +63,10 @@ For a real Chrome capture, invoke render_model.py with the installed release bin
 
 ```sh
 BURR_VERSION=0.40.0 BURR_INSTALL_DIR="$CORPUS_WORK/bin0400" sh -c 'curl -fsSL https://github.com/fraylabs/burr/releases/download/burr-v0.40.0/install.sh | sh'
-/tmp/burr-occt-venv/bin/python artifacts/corpus2/scripts/run.py release --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --binary "$CORPUS_WORK/bin0400/burr" --work-dir "$CORPUS_WORK" --limit 25
-/tmp/burr-occt-venv/bin/python artifacts/corpus2/scripts/run.py compare --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --work-dir "$CORPUS_WORK" --limit 25
-/tmp/burr-occt-venv/bin/python artifacts/corpus2/scripts/run.py contacts --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --work-dir "$CORPUS_WORK" --limit 25
-/tmp/burr-occt-venv/bin/python artifacts/corpus2/scripts/summarize_versions.py --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs
+"$OCCT_PYTHON" artifacts/corpus2/scripts/run.py release --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --binary "$CORPUS_WORK/bin0400/burr" --work-dir "$CORPUS_WORK" --limit 25
+"$OCCT_PYTHON" artifacts/corpus2/scripts/run.py compare --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --work-dir "$CORPUS_WORK" --limit 25
+"$OCCT_PYTHON" artifacts/corpus2/scripts/run.py contacts --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs --work-dir "$CORPUS_WORK" --limit 25
+"$OCCT_PYTHON" artifacts/corpus2/scripts/summarize_versions.py --root artifacts/corpus2 --evidence artifacts/corpus2/rerun-0400/logs
 ```
 
 Copy the existing reference JSON/metrics into the version evidence folder before comparisons; do not overwrite the baseline. A sandbox that blocks `mktemp -d` needs explicit installer staging paths under its allowed work folder. Our run used a temporary `mktemp` compatibility shim for these two installer staging calls; the official installer, download URLs, archive checksum verification and binary were unchanged. All child processes use the allowed work folder as `TMPDIR`.
