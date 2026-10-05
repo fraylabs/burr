@@ -89,8 +89,13 @@ impl SourceEvidence {
         if blake3::hash(&bytes).to_hex().as_str() != scene.source_hash {
             return None;
         }
-        let text = std::str::from_utf8(&bytes).ok()?;
-        let mut exchange = look::step::part21::parse(text).ok()?;
+        // Match Look's STEP decoder, including Latin-1 exporter comments and
+        // names. A valid imported document must not lose its source ancestry
+        // or contact evidence merely because it is not UTF-8.
+        let text = std::str::from_utf8(&bytes)
+            .map(std::borrow::Cow::Borrowed)
+            .unwrap_or_else(|_| bytes.iter().map(|&b| b as char).collect::<String>().into());
+        let mut exchange = look::step::part21::parse(&text).ok()?;
         if exchange.data.len() != 1 {
             return None;
         }
@@ -749,6 +754,26 @@ mod tests {
             assert_eq!(source.occurrences[0].name, "fixed");
             assert!(source.contact(0, 1).is_some());
         }
+    }
+
+    #[test]
+    fn latin1_source_preserves_names_and_contact_evidence() {
+        let path =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/interference/touching.step");
+        let text = std::fs::read_to_string(path).unwrap();
+        assert!(text.is_ascii());
+        let renamed = text.replace("'fixed'", "'é fixed'");
+        assert_ne!(text, renamed);
+        let bytes = renamed.chars().map(|c| c as u8).collect::<Vec<_>>();
+        let file = tempfile::Builder::new()
+            .suffix(".step")
+            .tempfile_in(std::env::temp_dir())
+            .unwrap();
+        std::fs::write(file.path(), bytes).unwrap();
+        let scene = compile_scene(file.path(), UpAxis::Z, &mut Timings::default()).unwrap();
+        let source = SourceEvidence::read(file.path(), &scene).unwrap();
+        assert_eq!(source.occurrences[0].name, "é fixed");
+        assert!(source.contact(0, 1).is_some());
     }
 
     #[test]
