@@ -373,15 +373,15 @@ The reviewed Checks candidate's external reference has 100 Common-zero contact r
 
 All three source hashes match both the original source manifest and the contact receipts. Original reports and scenes are preserved locally. Only scene display labels for the control unit and pick/place arm were replaced by their own report's canonical definition names; bounds, transforms and surface samples remain unchanged. Current receipts and explicit provenance stay under `original-corpus-contact-rechecks/`. Any shared-interior certificate is reviewed against the pair's declared precision and volume bound and reported immediately.
 
-Early Faze4 receipts expose a distinction between literal zero and permitted source-scale shared interior: Board/resistor samples are classified IN both with winding near one despite empty Common. Pair [0,8] has source-boundary clearances 1.7484555e-8/1.7397133e-8 mm, consistent with the report's declared maximum shared depth (~3.498e-8 mm), below its 1e-7-mm source tolerance. This does not establish a violation of the reported precision/volume bound. The preliminary receipts retain these sub-certificate candidates as disputed, with exact margins; their method-5 replays are pending. A robust certificate requires more than 1e-6-mm clearance to both source boundaries and winding corroboration.
+Early Faze4 receipts expose a distinction between literal zero and permitted source-scale shared interior: Board/resistor samples are classified IN both with winding near one despite empty Common. Pair [0,8] has source-boundary clearances 1.7484555e-8/1.7397133e-8 mm, consistent with the report's declared maximum shared depth (~3.498e-8 mm), below its 1e-7-mm source tolerance. This does not establish a violation of the reported precision/volume bound. The preliminary receipts retain these sub-certificate candidates as disputed, with exact margins; their completed method-5 replays classify them as bounded tolerance contact. A robust certificate requires more than 1e-6-mm clearance to both source boundaries and winding corroboration.
 
 <!-- original-source-rechecks-start -->
 
-The first pass is complete: all 100 receipts are terminal and reviewed, with 62 bounded tolerance contacts, two bounded contact-or-separated results and 36 preliminary disputes. No robust overlap certificate, refusal or timeout was found. These counts include mixed method versions; 38 earlier method-1–4 rows require the completed method-5 tie-breaker. Their separate-output replay is running, with all original receipts retained. Thirteen mapped released-contact disputes and three baseline disputes follow, each after phase review. Four strict matching refusals remain separate. Contact within tolerance is a bounded witness result, not literal zero or exhaustive separation.
+All 100 historical claims now have reviewed method-5 receipts: 98 bounded tolerance contacts and two bounded contact-or-separated results. No robust overlap certificate, refusal or timeout was found. The 38 earlier method-1–4 rows were replayed in a separate output after the first pass finished; their original receipts remain preserved. The displayed table selects the completed method-5 receipt for each pair, with an evidence manifest recording both original and selected paths and SHA256. Thirteen mapped released-contact disputes and three baseline disputes still follow, each after phase review. Four strict matching refusals remain separate. Contact within tolerance is bounded local evidence, not literal zero or exhaustive separation.
 
-The capped per-pair controller supports a stop file, checks it before starting another reference job or while waiting for the shared lock, and exits paused with owned-lock cleanup. Its smoke check confirmed no reference child, lock acquisition or false completion claim. The first-pass controller exited normally; its root and all pair logs had no open descriptors before the replay began. Burr 0.40.1 has shipped, lifting the release-dependent hold; the source replays retain priority over the remaining measurements and Chrome inspections.
+The capped per-pair controller supports a stop file and normal owned-lock cleanup. Both historical controllers exited normally; their root and all pair logs had no open descriptors before starting the next phase. Burr 0.40.1 has shipped, lifting the release-dependent hold; source rechecks retain priority over the remaining measurements and Chrome inspections.
 
-Bounded source rechecks: 2 contact_or_separated_bounded, 62 contact_within_tolerance_bounded, 36 disputed.
+Bounded source rechecks: 2 contact_or_separated_bounded, 98 contact_within_tolerance_bounded.
 
 Each pair uses strict occurrence matching, valid source solids, OCCT Common, source point classification in bounded seed cubes, and independent solid-angle winding of fine source meshes. An overlap certificate also requires positive distance to both source boundaries. Negative sampling is bounded; it does not establish exhaustive separation. Boundary disagreements, invalid sources, mapping refusals and timeouts remain disputed.
 
@@ -391,44 +391,44 @@ Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary n
 
 | Model | Burr pair | Status | Method | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Verified inward steps | Interior certificates | Max sampled clearance mm | Declared max depth mm | Declared max volume mm³ | Limitation |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/1 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | — | 3.498388000744728e-08 | 4.477937240843201e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/2 | disputed | 1 | 0.0 | 2 | 5 | 0 | 0 | — | 3.4983880007447185e-08 | 4.4779377302161485e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/3 | disputed | 1 | 0.0 | 2 | 4 | 0 | 0 | — | 3.498388000744731e-08 | 4.4779368849872485e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/4 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | — | 3.498388000744728e-08 | 4.4779372408313886e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/6 | disputed | 1 | 0.0 | 12 | 18 | 0 | 0 | — | 1.7499324656011864e-08 | 2.659897839216933e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/8 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.4779372407087713e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/9 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.4779367513953614e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/10 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240711754e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/11 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751401041e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/12 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240714617e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/13 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.4779367514068155e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/14 | disputed | 1 | 0.0 | 2 | 6 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240717243e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/15 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751412853e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/16 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.4779372407202255e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/17 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751419105e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/18 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240723328e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/19 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.4779367514255475e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/20 | disputed | 1 | 0.0 | 2 | 6 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240726549e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/21 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751431275e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/22 | disputed | 1 | 0.0 | 2 | 6 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240729413e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/23 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.7397132556246827e-08 | 3.498388000744732e-08 | 4.477936751437798e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/24 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240732674e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/25 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.7397132556246827e-08 | 3.498388000744732e-08 | 4.477936751444194e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/26 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.4779372407358956e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/27 | disputed | 1 | 0.0 | 2 | 5 | 0 | 0 | 1.7397132553652203e-08 | 3.498388000744678e-08 | 4.4779387088197585e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/28 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240739595e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/29 | disputed | 1 | 0.0 | 2 | 5 | 0 | 0 | 1.7397132553652203e-08 | 3.498388000744678e-08 | 4.47793870882644e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/30 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.477937240742935e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/31 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.7397132556247138e-08 | 3.498388000744732e-08 | 4.4779367513722135e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/32 | disputed | 1 | 0.0 | 2 | 7 | 0 | 0 | 1.7397132552425845e-08 | 3.498388000744728e-08 | 4.4779372406996836e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/33 | disputed | 1 | 0.0 | 2 | 10 | 0 | 0 | 1.739713255624745e-08 | 3.498388000744732e-08 | 4.477936751378418e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/34 | disputed | 2 | 0.0 | 10 | 18 | 44 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240702805e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/35 | disputed | 2 | 0.0 | 10 | 26 | 44 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.4779367513839066e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/36 | disputed | 2 | 0.0 | 10 | 18 | 40 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240705788e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/37 | disputed | 3 | 0.0 | 10 | 26 | 40 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751355151e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/38 | disputed | 3 | 0.0 | 10 | 19 | 40 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240691211e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/39 | contact_within_tolerance_bounded | 4 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.47793675136064e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/40 | contact_within_tolerance_bounded | 4 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240693956e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/1 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240843201e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/2 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.7484511669921776e-08 | 3.4983880007447185e-08 | 4.4779377302161485e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/3 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 16 | 64 | 0 | 1.748451166992191e-08 | 3.498388000744731e-08 | 4.4779368849872485e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/4 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.4779372408313886e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/6 | contact_within_tolerance_bounded | 5 | 0.0 | 12 | 18 | 48 | 0 | 7.649492950179464e-09 | 1.7499324656011864e-08 | 2.659897839216933e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/8 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.4779372407087713e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/9 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.4779367513953614e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/10 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240711754e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/11 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751401041e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/12 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240714617e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/13 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.4779367514068155e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/14 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 18 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240717243e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/15 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751412853e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/16 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.4779372407202255e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/17 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751419105e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/18 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240723328e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/19 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.4779367514255475e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/20 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 18 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240726549e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/21 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751431275e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/22 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 18 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240729413e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/23 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751437798e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/24 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240732674e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/25 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751444194e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/26 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.4779372407358956e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/27 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.7484511669921376e-08 | 3.498388000744678e-08 | 4.4779387088197585e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/28 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240739595e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/29 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.7484511669921376e-08 | 3.498388000744678e-08 | 4.47793870882644e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/30 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240742935e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/31 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.4779367513722135e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/32 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.4779372406996836e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/33 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751378418e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/34 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 18 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240702805e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/35 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.4779367513839066e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/36 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 18 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240705788e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/37 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751355151e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/38 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240691211e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/39 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.47793675136064e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/40 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240693956e-08 |  |
 | Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/41 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751366415e-08 |  |
 | Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/42 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.4779372406968196e-08 |  |
 | Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/43 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.4779372406846594e-08 |  |
