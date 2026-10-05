@@ -1,0 +1,140 @@
+{
+  "baseline_version": "0.40.1",
+  "baseline_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "baseline_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_tested_burr_revision": "d85770180fb534097ec48f4af785953abc96782f",
+  "candidate_look_revision": "387f94f030a286124057dd14036e85cbc0eecb47",
+  "candidate_source_diff_sha256": "fa1d9bf9ebac1dc7b87896d405ba84a55859643bf56512800933670351701790",
+  "models_checked": 21,
+  "baseline_closed_geometries": 1814,
+  "retained_closed_geometries": 1814,
+  "regressions_or_unproven": 0,
+  "models": [
+    {
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "uniquely_matched_closed_geometries_retained": 1026,
+      "closed_geometries_in_all_closed_repeated_name_groups": 4,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+      "uniquely_matched_closed_geometries_retained": 76,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+      "uniquely_matched_closed_geometries_retained": 6,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+      "uniquely_matched_closed_geometries_retained": 3,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+      "uniquely_matched_closed_geometries_retained": 27,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+      "uniquely_matched_closed_geometries_retained": 4,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "Voron-0__MiniSB_Bowden.step",
+      "uniquely_matched_closed_geometries_retained": 15,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+      "uniquely_matched_closed_geometries_retained": 6,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+      "uniquely_matched_closed_geometries_retained": 2,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+      "uniquely_matched_closed_geometries_retained": 9,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "uniquely_matched_closed_geometries_retained": 289,
+      "closed_geometries_in_all_closed_repeated_name_groups": 7,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "uniquely_matched_closed_geometries_retained": 271,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "TradRack__tr-lower-carabiner-distribution-board.STEP",
+      "uniquely_matched_closed_geometries_retained": 5,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "TradRack__tr-toolhead-board.STEP",
+      "uniquely_matched_closed_geometries_retained": 7,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+      "uniquely_matched_closed_geometries_retained": 5,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "apollo-3d-enclosure__flat__assembly.step",
+      "uniquely_matched_closed_geometries_retained": 2,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "apollo-3d-enclosure__corner__assembly.step",
+      "uniquely_matched_closed_geometries_retained": 2,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+      "uniquely_matched_closed_geometries_retained": 9,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+      "uniquely_matched_closed_geometries_retained": 2,
+      "closed_geometries_in_all_closed_repeated_name_groups": 0,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "text-to-cad-assembly__pick_place_arm.step",
+      "uniquely_matched_closed_geometries_retained": 0,
+      "closed_geometries_in_all_closed_repeated_name_groups": 17,
+      "regressions_or_unproven": []
+    },
+    {
+      "model": "text-to-cad-assembly__automation_control_unit.step",
+      "uniquely_matched_closed_geometries_retained": 6,
+      "closed_geometries_in_all_closed_repeated_name_groups": 14,
+      "regressions_or_unproven": []
+    }
+  ]
+}

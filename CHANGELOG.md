@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 0.40.2 - 2026-10-06
+
+- Close the OpenArm jig's conical meshes. Its two occurrences now complete
+  a Pass check across their one pair, with no interference.
+- Recover TradRack lower's two missing faces. All 15 pairs now complete,
+  with five source-validated overlaps and nothing unresolved.
+- Preserve accurate surface inverses and physical source boundaries. The
+  repaired V2.4 spike, its four known failed-face signatures and the closed
+  cable bridges are retained. All 1,814 previously closed meshes and the
+  original 97 known positives remain; 25 held-out imports retain faces.
+- The 36 balanced import timings pass the regression gate. Real workbench
+  renders and check results were independently reviewed.
+
 ## 0.40.1 - 2026-10-05
 
 - Fix a 0.40.0 spline-meshing regression: Jubilee's pulley assembly retains
