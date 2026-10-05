@@ -1,6 +1,6 @@
 [package]
 name = "burr"
-version = "0.40.0"
+version = "0.40.1"
 edition = "2021"
 description = "Fast local browser and assembly interference checker for CAD models."
 license = "MIT"
@@ -10,7 +10,7 @@ publish = false
 [dependencies]
 blake3 = "1.8"
 glam = "0.30"
-look = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
+look = { git = "https://github.com/fraylabs/look.git", rev = "8b0ec8ef70944a895caa8149f14ae1552b0912a0" }
 percent-encoding = "2.3.2"
 ruststep = "0.4"
 serde = { version = "1.0", features = ["derive"] }
@@ -26,13 +26,13 @@ tempfile = "3.12"
 [patch.crates-io]
 # Keep all geometry types on the same vendored kernel revision as Look.
 ruststep = { git = "https://github.com/stefangolas/ruststep", rev = "67f1f7c" }
-truck-assembly = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
-truck-base = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
-truck-derivers = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
-truck-geometry = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
-truck-geotrait = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
-truck-meshalgo = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
-truck-modeling = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
-truck-polymesh = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
-truck-stepio = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
-truck-topology = { git = "https://github.com/fraylabs/look.git", rev = "6b1021cd0d7e4f19a7d94f67ae92987db853d223" }
+truck-assembly = { git = "https://github.com/fraylabs/look.git", rev = "8b0ec8ef70944a895caa8149f14ae1552b0912a0" }
+truck-base = { git = "https://github.com/fraylabs/look.git", rev = "8b0ec8ef70944a895caa8149f14ae1552b0912a0" }
+truck-derivers = { git = "https://github.com/fraylabs/look.git", rev = "8b0ec8ef70944a895caa8149f14ae1552b0912a0" }
+truck-geometry = { git = "https://github.com/fraylabs/look.git", rev = "8b0ec8ef70944a895caa8149f14ae1552b0912a0" }
+truck-geotrait = { git = "https://github.com/fraylabs/look.git", rev = "8b0ec8ef70944a895caa8149f14ae1552b0912a0" }
+truck-meshalgo = { git = "https://github.com/fraylabs/look.git", rev = "8b0ec8ef70944a895caa8149f14ae1552b0912a0" }
+truck-modeling = { git = "https://github.com/fraylabs/look.git", rev = "8b0ec8ef70944a895caa8149f14ae1552b0912a0" }
+truck-polymesh = { git = "https://github.com/fraylabs/look.git", rev = "8b0ec8ef70944a895caa8149f14ae1552b0912a0" }
+truck-stepio = { git = "https://github.com/fraylabs/look.git", rev = "8b0ec8ef70944a895caa8149f14ae1552b0912a0" }
+truck-topology = { git = "https://github.com/fraylabs/look.git", rev = "8b0ec8ef70944a895caa8149f14ae1552b0912a0" }

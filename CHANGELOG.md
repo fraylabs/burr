@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 0.40.1 - 2026-10-05
+
+- Fix a 0.40.0 spline-meshing regression: Jubilee's pulley assembly retains
+  all 510 source faces and the full Jubilee retains all 9,453 faces. The
+  pulley bracket's interference with the M4 shoulder screw is reported again.
+- Retry only a refused spline face's inverse search, preserving healthy
+  meshes, the repaired Voron 2.4 toolhead spike and the closed cable bridges.
+- The pulley's three M5 screw/t-nut pairs are real overlaps that OpenCascade
+  Common misses. They remain explicitly unresolved as open meshes; they are
+  not reported as contact or separated.
+
 ## 0.40.0 - 2026-10-05
 
 - Fix the false interference reported in 0.39.1 on the FreeCAD-library yellow

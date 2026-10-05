@@ -1,0 +1,42 @@
+{
+  "model": "Voron-2__Voron_2.4r2_Assembly.step",
+  "baseline_version": "0.40.0",
+  "baseline_burr_revision": "535b7d7ded86eb6cca5cb44b05a169c395940012",
+  "baseline_look_revision": "6b1021cd0d7e4f19a7d94f67ae92987db853d223",
+  "candidate_failed_source_faces": [
+    {
+      "source_face_id": 1814162,
+      "disposition": "RejectedIntrinsic",
+      "terminal_reason": "RejectedDegenerate",
+      "failure_stage": "ValidityClassification",
+      "derived_bucket": "IntrinsicDegenerate"
+    },
+    {
+      "source_face_id": 1814164,
+      "disposition": "Failed",
+      "terminal_reason": "NoOddParityRegion",
+      "failure_stage": "MaterialSelection",
+      "derived_bucket": "NoMaterialRegion"
+    },
+    {
+      "source_face_id": 1831656,
+      "disposition": "Failed",
+      "terminal_reason": "ConstraintInsertionIncomplete",
+      "failure_stage": "ConstraintInsertion",
+      "derived_bucket": "VertexInsertionFailure"
+    },
+    {
+      "source_face_id": 1831657,
+      "disposition": "Failed",
+      "terminal_reason": "ConstraintInsertionIncomplete",
+      "failure_stage": "ConstraintInsertion",
+      "derived_bucket": "VertexInsertionFailure"
+    }
+  ],
+  "failed_source_faces_identical": true,
+  "new_failed_source_faces": [],
+  "baseline_log_sha256": "4ca73d2e40854161c536ade8a7bf8521146540e2bcf906d36aaf044500a054e0",
+  "candidate_log_sha256": "3508646b1f2da84b14c610dc3e044afc0f0ea05dfd2c7dc6b0f8848d570e49a2",
+  "candidate_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_source_diff_sha256": "9d67ad97e879386c7b91d883b8464e274b48cd2c2e1cdf062499d85239bf4ecf"
+}

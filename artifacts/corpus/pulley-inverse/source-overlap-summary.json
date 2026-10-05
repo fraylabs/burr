@@ -1,0 +1,145 @@
+{
+  "baseline_burr_revision": "535b7d7ded86eb6cca5cb44b05a169c395940012",
+  "baseline_look_revision": "6b1021cd0d7e4f19a7d94f67ae92987db853d223",
+  "candidate_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_source_diff_sha256": "9d67ad97e879386c7b91d883b8464e274b48cd2c2e1cdf062499d85239bf4ecf",
+  "reference_receipt_sha256": "e703e811c6bf49aaa04091020a3cd051729a8a381e16b80eee80f52964e04fe4",
+  "method": "Independent source classification and fine-mesh solid-angle winding with outside controls establish shared interior despite empty Common. No raw coordinates or reliable total overlap volume are included.",
+  "models": [
+    {
+      "burr_pair": [
+        8,
+        17
+      ],
+      "occt_pair": [
+        17,
+        20
+      ],
+      "source_shapes_valid": [
+        true,
+        true
+      ],
+      "source_verdict": "overlap",
+      "both_in_classification_count": 27,
+      "classification_queries": 27,
+      "minimum_boundary_clearance_mm": 0.009898782737718817,
+      "independent_winding_checks": [
+        {
+          "tessellation_tolerance_mm": 0.0005,
+          "triangles": 90480,
+          "winding_numbers": [
+            1.0,
+            1.0000000000000002,
+            1.0000000000000002,
+            3.7216907210180733e-16
+          ]
+        },
+        {
+          "tessellation_tolerance_mm": 0.0005,
+          "triangles": 3192,
+          "winding_numbers": [
+            1.000000000000002,
+            0.9999999999999993,
+            1.0000000000000016,
+            2.4986128356983356e-17
+          ]
+        }
+      ],
+      "common_done": true,
+      "common_valid": true,
+      "common_volume_mm3": 0.0,
+      "candidate_state": "unresolved",
+      "candidate_reason": "open_component_mesh"
+    },
+    {
+      "burr_pair": [
+        9,
+        19
+      ],
+      "occt_pair": [
+        18,
+        21
+      ],
+      "source_shapes_valid": [
+        true,
+        true
+      ],
+      "source_verdict": "overlap",
+      "both_in_classification_count": 27,
+      "classification_queries": 27,
+      "minimum_boundary_clearance_mm": 0.009898782737740421,
+      "independent_winding_checks": [
+        {
+          "tessellation_tolerance_mm": 0.0005,
+          "triangles": 90480,
+          "winding_numbers": [
+            1.0000000000000002,
+            1.0,
+            1.0,
+            -2.2418493067260206e-16
+          ]
+        },
+        {
+          "tessellation_tolerance_mm": 0.0005,
+          "triangles": 3192,
+          "winding_numbers": [
+            1.0000000000000009,
+            0.9999999999999991,
+            1.0000000000000002,
+            1.2424041724466862e-18
+          ]
+        }
+      ],
+      "common_done": true,
+      "common_valid": true,
+      "common_volume_mm3": 0.0,
+      "candidate_state": "unresolved",
+      "candidate_reason": "open_component_mesh"
+    },
+    {
+      "burr_pair": [
+        13,
+        20
+      ],
+      "occt_pair": [
+        19,
+        22
+      ],
+      "source_shapes_valid": [
+        true,
+        true
+      ],
+      "source_verdict": "overlap",
+      "both_in_classification_count": 27,
+      "classification_queries": 27,
+      "minimum_boundary_clearance_mm": 0.00864651031435771,
+      "independent_winding_checks": [
+        {
+          "tessellation_tolerance_mm": 0.0005,
+          "triangles": 90480,
+          "winding_numbers": [
+            0.999999999999996,
+            1.0000000000000013,
+            0.9999999999999993,
+            -1.1043592643970544e-16
+          ]
+        },
+        {
+          "tessellation_tolerance_mm": 0.0005,
+          "triangles": 3192,
+          "winding_numbers": [
+            1.0,
+            1.0,
+            1.0,
+            2.153500565574256e-17
+          ]
+        }
+      ],
+      "common_done": true,
+      "common_valid": true,
+      "common_volume_mm3": 0.0,
+      "candidate_state": "unresolved",
+      "candidate_reason": "open_component_mesh"
+    }
+  ]
+}

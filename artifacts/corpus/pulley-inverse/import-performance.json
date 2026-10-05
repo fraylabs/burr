@@ -1,0 +1,255 @@
+{
+  "baseline_burr_revision": "535b7d7ded86eb6cca5cb44b05a169c395940012",
+  "baseline_look_revision": "6b1021cd0d7e4f19a7d94f67ae92987db853d223",
+  "candidate_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_source_diff_sha256": "9d67ad97e879386c7b91d883b8464e274b48cd2c2e1cdf062499d85239bf4ecf",
+  "scope": "Fresh-process imports, three balanced ABBA/BAAB/ABBA blocks per model, six samples per binary. Variation is retained; no general speedup claim.",
+  "models": [
+    {
+      "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+      "runs": [
+        {
+          "block": 0,
+          "kind": "baseline",
+          "load_s": 21.524349916,
+          "lost_faces": 6
+        },
+        {
+          "block": 0,
+          "kind": "candidate",
+          "load_s": 19.491917583,
+          "lost_faces": 6
+        },
+        {
+          "block": 0,
+          "kind": "candidate",
+          "load_s": 14.627300959,
+          "lost_faces": 6
+        },
+        {
+          "block": 0,
+          "kind": "baseline",
+          "load_s": 14.3884325,
+          "lost_faces": 6
+        },
+        {
+          "block": 1,
+          "kind": "candidate",
+          "load_s": 16.715926334,
+          "lost_faces": 6
+        },
+        {
+          "block": 1,
+          "kind": "baseline",
+          "load_s": 22.888715083,
+          "lost_faces": 6
+        },
+        {
+          "block": 1,
+          "kind": "baseline",
+          "load_s": 15.262473417,
+          "lost_faces": 6
+        },
+        {
+          "block": 1,
+          "kind": "candidate",
+          "load_s": 15.310867292,
+          "lost_faces": 6
+        },
+        {
+          "block": 2,
+          "kind": "baseline",
+          "load_s": 14.382123833,
+          "lost_faces": 6
+        },
+        {
+          "block": 2,
+          "kind": "candidate",
+          "load_s": 14.766771083,
+          "lost_faces": 6
+        },
+        {
+          "block": 2,
+          "kind": "candidate",
+          "load_s": 14.370522292,
+          "lost_faces": 6
+        },
+        {
+          "block": 2,
+          "kind": "baseline",
+          "load_s": 15.832333875,
+          "lost_faces": 6
+        }
+      ],
+      "baseline_median_s": 15.547403646,
+      "candidate_median_s": 15.0388191875,
+      "outside_every_block": false,
+      "passed": true,
+      "rule": "Fail if median exceeds baseline by more than 10%, or candidate is slower than the baseline sample range in every balanced block"
+    },
+    {
+      "model": "Voron-2__Voron_2.4r2_Assembly.step",
+      "runs": [
+        {
+          "block": 0,
+          "kind": "baseline",
+          "load_s": 48.814552125,
+          "lost_faces": 4
+        },
+        {
+          "block": 0,
+          "kind": "candidate",
+          "load_s": 48.015752625,
+          "lost_faces": 4
+        },
+        {
+          "block": 0,
+          "kind": "candidate",
+          "load_s": 45.42904525,
+          "lost_faces": 4
+        },
+        {
+          "block": 0,
+          "kind": "baseline",
+          "load_s": 47.855068875,
+          "lost_faces": 4
+        },
+        {
+          "block": 1,
+          "kind": "candidate",
+          "load_s": 45.83146675,
+          "lost_faces": 4
+        },
+        {
+          "block": 1,
+          "kind": "baseline",
+          "load_s": 43.774559958,
+          "lost_faces": 4
+        },
+        {
+          "block": 1,
+          "kind": "baseline",
+          "load_s": 51.866353875,
+          "lost_faces": 4
+        },
+        {
+          "block": 1,
+          "kind": "candidate",
+          "load_s": 50.276742541,
+          "lost_faces": 4
+        },
+        {
+          "block": 2,
+          "kind": "baseline",
+          "load_s": 47.075112833,
+          "lost_faces": 4
+        },
+        {
+          "block": 2,
+          "kind": "candidate",
+          "load_s": 46.4880755,
+          "lost_faces": 4
+        },
+        {
+          "block": 2,
+          "kind": "candidate",
+          "load_s": 46.928112792,
+          "lost_faces": 4
+        },
+        {
+          "block": 2,
+          "kind": "baseline",
+          "load_s": 48.286451791,
+          "lost_faces": 4
+        }
+      ],
+      "baseline_median_s": 48.070760332999996,
+      "candidate_median_s": 46.708094146,
+      "outside_every_block": false,
+      "passed": true,
+      "rule": "Fail if median exceeds baseline by more than 10%, or candidate is slower than the baseline sample range in every balanced block"
+    },
+    {
+      "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+      "runs": [
+        {
+          "block": 0,
+          "kind": "baseline",
+          "load_s": 9.525803583,
+          "lost_faces": 46
+        },
+        {
+          "block": 0,
+          "kind": "candidate",
+          "load_s": 9.350901791,
+          "lost_faces": 46
+        },
+        {
+          "block": 0,
+          "kind": "candidate",
+          "load_s": 8.984796082999999,
+          "lost_faces": 46
+        },
+        {
+          "block": 0,
+          "kind": "baseline",
+          "load_s": 9.250018625,
+          "lost_faces": 46
+        },
+        {
+          "block": 1,
+          "kind": "candidate",
+          "load_s": 8.368890292,
+          "lost_faces": 46
+        },
+        {
+          "block": 1,
+          "kind": "baseline",
+          "load_s": 8.900745792,
+          "lost_faces": 46
+        },
+        {
+          "block": 1,
+          "kind": "baseline",
+          "load_s": 8.175163,
+          "lost_faces": 46
+        },
+        {
+          "block": 1,
+          "kind": "candidate",
+          "load_s": 9.458267792000001,
+          "lost_faces": 46
+        },
+        {
+          "block": 2,
+          "kind": "baseline",
+          "load_s": 9.757735292,
+          "lost_faces": 46
+        },
+        {
+          "block": 2,
+          "kind": "candidate",
+          "load_s": 9.381034084,
+          "lost_faces": 46
+        },
+        {
+          "block": 2,
+          "kind": "candidate",
+          "load_s": 9.31888275,
+          "lost_faces": 46
+        },
+        {
+          "block": 2,
+          "kind": "baseline",
+          "load_s": 9.753204,
+          "lost_faces": 46
+        }
+      ],
+      "baseline_median_s": 9.387911104,
+      "candidate_median_s": 9.3348922705,
+      "outside_every_block": false,
+      "passed": true,
+      "rule": "Fail if median exceeds baseline by more than 10%, or candidate is slower than the baseline sample range in every balanced block"
+    }
+  ]
+}

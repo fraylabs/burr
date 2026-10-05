@@ -1,0 +1,38 @@
+{
+  "baseline_burr_revision": "535b7d7ded86eb6cca5cb44b05a169c395940012",
+  "baseline_look_revision": "6b1021cd0d7e4f19a7d94f67ae92987db853d223",
+  "candidate_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_source_diff_sha256": "9d67ad97e879386c7b91d883b8464e274b48cd2c2e1cdf062499d85239bf4ecf",
+  "scope": "Real Burr workbench screenshots independently captured and confirmed by Owner",
+  "tested_burr_binary_sha256": "69ac75ecb3c7a3eb1153c3d868c7cc163904986556e24d4986afb65099bbff6d",
+  "models": [
+    {
+      "model": "pulley",
+      "visual_review": "Owner confirmed",
+      "modes": [
+        "checks-required-pair",
+        "solid",
+        "xray"
+      ],
+      "screenshots_checked": 3
+    },
+    {
+      "model": "jubilee",
+      "visual_review": "Owner confirmed",
+      "modes": [
+        "solid",
+        "xray"
+      ],
+      "screenshots_checked": 2
+    },
+    {
+      "model": "voron2",
+      "visual_review": "Owner confirmed",
+      "modes": [
+        "solid",
+        "xray"
+      ],
+      "screenshots_checked": 2
+    }
+  ]
+}

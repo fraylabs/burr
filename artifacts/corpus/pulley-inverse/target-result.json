@@ -1,0 +1,46 @@
+{
+  "baseline_burr_revision": "535b7d7ded86eb6cca5cb44b05a169c395940012",
+  "baseline_look_revision": "6b1021cd0d7e4f19a7d94f67ae92987db853d223",
+  "candidate_look_revision": "8b0ec8ef70944a895caa8149f14ae1552b0912a0",
+  "candidate_source_diff_sha256": "9d67ad97e879386c7b91d883b8464e274b48cd2c2e1cdf062499d85239bf4ecf",
+  "pulley_declared_faces": 510,
+  "pulley_lost_faces": 0,
+  "required_reported_pair": [
+    18,
+    22
+  ],
+  "real_screw_nut_overlaps": [
+    {
+      "pair": [
+        8,
+        17
+      ],
+      "source_verdict": "independently_proven_overlap",
+      "candidate_state": "unresolved",
+      "reason": "open_component_mesh"
+    },
+    {
+      "pair": [
+        9,
+        19
+      ],
+      "source_verdict": "independently_proven_overlap",
+      "candidate_state": "unresolved",
+      "reason": "open_component_mesh"
+    },
+    {
+      "pair": [
+        13,
+        20
+      ],
+      "source_verdict": "independently_proven_overlap",
+      "candidate_state": "unresolved",
+      "reason": "open_component_mesh"
+    }
+  ],
+  "jubilee_declared_faces": 9453,
+  "jubilee_lost_faces": 0,
+  "jubilee_scope": "import face retention; assembly pair checks not claimed",
+  "source_verdict_receipt": "source-overlap-summary.json",
+  "separation_scope": "No exhaustive separation proof is claimed from Common or bounded negative searches."
+}
