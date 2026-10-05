@@ -7,9 +7,9 @@
     "bench-before039": "6d25db063a4e22728902d27e4c85f5338d69378dda58db8f0d6877e8ba4f705e",
     "scene-before039": "36e56903fa186fd1a275e9151ad014334889e640f93debd23d284aabf3ff22e6"
   },
-  "final_code_commit": "86b23c39d349706eda03da260f161580c47403df",
+  "final_code_commit": "56cc75798711fa6d124c9f3fc8db0c1529af67b5",
   "final_binaries": {
-    "burr-polish": "5c7aff55af7e3ba08129f945fc409d4c5b7f9e70834d65f408fe7523e5124778",
+    "burr-review-final": "7fa85e807dca4dbc78cfa96f75ea13ccc4a27435a6f8a05a7b3fb9401873f5b8",
     "bench-0391": "ebd6569df8b02981f90ae0baaf77575fc78c37afb1d4733d3e749005bd0f21c4",
     "scene-0391": "78d450159c7f40b653137d8d37d3ceb40d42d8521ad0f0c13340c9755f636cfb"
   },
@@ -17,16 +17,16 @@
     "command": "npm run check",
     "tests_passed": 88,
     "viewer_passed": true,
-    "log": "npm-polish.log"
+    "log": "npm-review-final.log"
   },
   "reference_scope_tests_passed": 8,
-  "final_source_tree": "dc5ee982411d3b29deb6274857204e7f4f4371d9",
+  "final_source_tree": "02a4c62aa22a4a8ba5db7f2a8cb3ac761eaf8ff9",
   "browser_runs": [
     {
       "label": "after-control-unit",
       "model": "text-to-cad-assembly__automation_control_unit.step",
-      "binary": "burr-polish",
-      "binary_sha256": "5c7aff55af7e3ba08129f945fc409d4c5b7f9e70834d65f408fe7523e5124778",
+      "binary": "burr-review-final",
+      "binary_sha256": "7fa85e807dca4dbc78cfa96f75ea13ccc4a27435a6f8a05a7b3fb9401873f5b8",
       "counts": {
         "real": 12,
         "contact": 2,
@@ -39,19 +39,19 @@
       "screenshots": [
         {
           "path": "evidence/after-control-unit/workbench-solid.png",
-          "sha256": "d25a5d49bffbb2404574367bdf23306df7194783f1ee7a2939ec5e9e149b44f3"
+          "sha256": "3b29bdc4497452ce6a1eb7112ab9bdc48caaccda1d691a2d340a8a4f3e5c80d3"
         },
         {
           "path": "evidence/after-control-unit/workbench-x-ray.png",
-          "sha256": "886ad816562fbe88cb41f7dba39ee46a834c4da7c25b85881afad34c7e12cfe8"
+          "sha256": "bca54e0d0da9897cec5dabb5db8dd40425f36c938d209027e5e55058f5019a80"
         },
         {
           "path": "evidence/after-control-unit/workbench-finding-solid.png",
-          "sha256": "4aa547060644fa4141df401023cf114c3f7ac1a3623d786ee46ec9c361aec29a"
+          "sha256": "3931913b0cc8a48bc2c26f6f40341e5b6af7108e332c061e0afa5c622e52c363"
         },
         {
           "path": "evidence/after-control-unit/workbench-finding-x-ray.png",
-          "sha256": "7faab5b78c7c83e948585b39cdf264ec0e0e24d0396fd0f312c46825d0be829d"
+          "sha256": "a45c3027333a829a6c0365cb1d533a22904a5d9d8becb3d7a014d873b2c8e80c"
         }
       ],
       "inspected_screenshots": [
@@ -61,33 +61,33 @@
     {
       "label": "after-faze4",
       "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
-      "binary": "burr-polish",
-      "binary_sha256": "5c7aff55af7e3ba08129f945fc409d4c5b7f9e70834d65f408fe7523e5124778",
+      "binary": "burr-review-final",
+      "binary_sha256": "7fa85e807dca4dbc78cfa96f75ea13ccc4a27435a6f8a05a7b3fb9401873f5b8",
       "counts": {
         "real": 9,
         "contact": 93,
         "unresolved": 33
       },
       "contacts_initially_collapsed": true,
-      "group_pair_count": 8,
+      "group_pair_count": 9,
       "group_highlight": "0,5,102,105,108,111,114,119,124,127",
-      "pair_highlight": "0,102",
+      "pair_highlight": "0,5",
       "screenshots": [
         {
           "path": "evidence/after-faze4/workbench-solid.png",
-          "sha256": "40097442e1fbc2d9a8ac5f82e810e006eae0c5d619209338d2003f2f2cd4e25c"
+          "sha256": "5dd3164833dadd8548649e1eca00ac6409dd76b6cb575654995fd66a29039046"
         },
         {
           "path": "evidence/after-faze4/workbench-x-ray.png",
-          "sha256": "9f7e33c0360df4059dd710b32f3619a3ca673e6b376f0d7d147273127315e5a5"
+          "sha256": "d67fa2b6b1d8acb4908232e459ea67d316b1367e2d66c0759af66987b49aebb2"
         },
         {
           "path": "evidence/after-faze4/workbench-group-highlight.png",
-          "sha256": "dd47ebbe969f6b99c0901fb7df905e2cc9a04ffd6eda2663edba54306d433acc"
+          "sha256": "fbc00b3579212eae26c03349e56b9d570044ced00c23d44e19d670cdbe6da20a"
         },
         {
           "path": "evidence/after-faze4/workbench-group-pair.png",
-          "sha256": "076d53bff42b945efabb3a1bfde19b8d61459b28eadc9e70cf340c41c41d4a2d"
+          "sha256": "b71e616e52755756ebcd4b72361621f72976e48aebc86f96004a0036fd893f39"
         }
       ],
       "inspected_screenshots": [
@@ -98,33 +98,33 @@
     {
       "label": "after-faze4-contacts",
       "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
-      "binary": "burr-polish",
-      "binary_sha256": "5c7aff55af7e3ba08129f945fc409d4c5b7f9e70834d65f408fe7523e5124778",
+      "binary": "burr-review-final",
+      "binary_sha256": "7fa85e807dca4dbc78cfa96f75ea13ccc4a27435a6f8a05a7b3fb9401873f5b8",
       "counts": {
         "real": 9,
         "contact": 93,
         "unresolved": 33
       },
       "contacts_initially_collapsed": true,
-      "group_pair_count": 83,
+      "group_pair_count": 84,
       "group_highlight": "0,1,2,3,4,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,121,128,129,130,131,132,133,134,135",
-      "pair_highlight": "0,2",
+      "pair_highlight": "0,1",
       "screenshots": [
         {
           "path": "evidence/after-faze4-contacts/workbench-solid.png",
-          "sha256": "40097442e1fbc2d9a8ac5f82e810e006eae0c5d619209338d2003f2f2cd4e25c"
+          "sha256": "5dd3164833dadd8548649e1eca00ac6409dd76b6cb575654995fd66a29039046"
         },
         {
           "path": "evidence/after-faze4-contacts/workbench-x-ray.png",
-          "sha256": "9f7e33c0360df4059dd710b32f3619a3ca673e6b376f0d7d147273127315e5a5"
+          "sha256": "d67fa2b6b1d8acb4908232e459ea67d316b1367e2d66c0759af66987b49aebb2"
         },
         {
           "path": "evidence/after-faze4-contacts/workbench-group-highlight.png",
-          "sha256": "ef4460088be5b417d2bef880bd1fd47ff6883cf6319b8e13140c0ce17715020f"
+          "sha256": "5d80735ccf40461a81c4f851026f0af3abf6ccb556936e8352d3528eb6f14451"
         },
         {
           "path": "evidence/after-faze4-contacts/workbench-group-pair.png",
-          "sha256": "2c1e20cc5e7abf1cf51b1db23bc45f9181ff14b34dd78277d5d804c03a6312f6"
+          "sha256": "7cbcc0140164aedfcc8e289274f8b818b6159f188d575094b78deded8d502cfb"
         }
       ],
       "inspected_screenshots": [
@@ -134,8 +134,8 @@
     {
       "label": "after-robot-cover",
       "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
-      "binary": "burr-polish",
-      "binary_sha256": "5c7aff55af7e3ba08129f945fc409d4c5b7f9e70834d65f408fe7523e5124778",
+      "binary": "burr-review-final",
+      "binary_sha256": "7fa85e807dca4dbc78cfa96f75ea13ccc4a27435a6f8a05a7b3fb9401873f5b8",
       "counts": {
         "real": 16,
         "contact": 0,
@@ -156,7 +156,7 @@
         },
         {
           "path": "evidence/after-robot-cover/workbench-finding-solid.png",
-          "sha256": "316625642e2919c646aa9ceeb243fd450349447187d1a1c9034614ff9e5295eb"
+          "sha256": "582b97a1ec997d1aceaa82fb63955c5af21b8917568470df96481d1100e05291"
         },
         {
           "path": "evidence/after-robot-cover/workbench-finding-x-ray.png",
@@ -270,7 +270,7 @@
   ],
   "path_base": "local burr-checks evidence directory; artifacts retained outside the repository",
   "analysis_code_commit": "a7bcf91e05eb08404eba0c1fc23793dff247ef48",
-  "analysis_note": "The final commit changes viewer presentation only; corpus/OCCT inputs use unchanged interference code and the same Look revision.",
+  "analysis_note": "The final commits change report vocabulary and viewer presentation; source support acceptance and mesh witness logic are unchanged from the analyzed build and use the same Look revision.",
   "before_burr_version": "0.39.0",
   "corpus_reports": {
     "before": "before039",
