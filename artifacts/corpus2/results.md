@@ -79,6 +79,23 @@ Release runs: 25/25 completed (8 `fail`, 16 `incomplete`, 1 `pass`). Verificatio
 | openarm_hardware__OpenArmJIG.STEP | yes | incomplete | False | pending | 0 / 2 (unverified remainder) | 6 (below_coordinate_resolution: 2, open_component_mesh: 4) |
 | openarm_hardware__OpenArm_Cell+OpenArm_2.0.STEP | no | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
 
+### Where removed interference findings went
+
+List audit of every old finding gives **49 removed findings: 48 unresolved, 0 contact-or-separated, 1 absent**. Component counts stayed unchanged, but the cross-version occurrence-index classification remains provisional until strict source mapping confirms each pair.
+
+| Model | Removed old findings | Unresolved in 0.40.0 | Contact-or-separated | Absent | Reason |
+|---|---:|---:|---:|---:|---|
+| FreeCAD-library__Yellow_gearmotor_L.step | 1 | 1 | 0 | 0 | below_tessellation_resolution |
+| jubilee__bondtech_groovemount_extruder.STEP | 9 | 9 | 0 | 0 | below_tessellation_resolution, open_component_mesh |
+| jubilee__left_double_pulley_corner_bracket_assembly.STEP | 1 | 0 | 0 | 1 | step_faces_lost |
+| jubilee__passive_pen_tool_assembly.STEP | 4 | 4 | 0 | 0 | open_component_mesh |
+| jubilee__tool_template_assembly.STEP | 3 | 3 | 0 | 0 | open_component_mesh |
+| open_robot_actuator_hardware__biped_6dof_v1.STEP | 31 | 31 | 0 | 0 | below_tessellation_resolution |
+
+The sole absent pair is pulley Burr [18,22], bracket against M4 shoulder screw. Its preserved 0.39.0 subset comparison strictly maps it to OCCT [0,1], with valid exact Common volume **0.13749159683157497 mm³** (threshold 1e-6 mm³), bounds/surface errors below 0.000008 mm. The 0.40.0 model is `incomplete` with zero pairs checked: loss of unrelated M5 screw face 22181 blocks the whole check. It is not called safe or given a pass verdict, but real positive evidence is absent from all pair lists. Original 23-part STEP is the confirmed repro. A source-preserving reduction retaining bracket, M4 screw and M5 screw placements (`12-pulley-positive-and-import-blocker.step`, 1,466,783 bytes) is prepared and **not yet validated**.
+
+The other removed findings are explicitly unresolved, which is reduced usefulness rather than a conclusive wrong-pair claim. Their exact Common checks are the next priority. New tessellation-limit reasons are consistent with a more conservative trim-error budget, and the pen/template open-mesh reasons block previously reported evidence; diagnostics do not yet prove which change caused each transition. No removed old finding is provisionally classified as a #55 contact proof.
+
 ## Regressions vs 0.39.0
 
 The same pinned source files were cold-loaded in the two installed releases. All 25 new release runs are finished, but the new strict comparisons and exact-zero contact validations are still in progress. A drop in raw pair count is not automatically a missed real overlap: the removed pair may have been false, or may now be unresolved. A confirmed false negative still requires a complete Burr pair set and strict exact-source agreement.
