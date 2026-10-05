@@ -573,7 +573,7 @@ pub fn analyze_scene_from_source(
     }
     if !contact_pairs.is_empty() {
         summary.push_str(&format!(
-            "; {} contacting component pair{}",
+            "; {} contact or separated component pair{}",
             contact_pairs.len(),
             if contact_pairs.len() == 1 { "" } else { "s" }
         ));
@@ -631,8 +631,8 @@ fn contact_pair(
     let proof = source.contact(left_index, right_index)?;
     Some(ContactPair {
         id: format!("{CHECK_ID}:contact:{left_index}:{right_index}"),
-        code: "planar_contact",
-        message: format!("{} and {} contact within the STEP source tolerance. Analytic support bounds any shared interior to a depth of {:.3e} mm and a volume of at most {:.3e} mm³; no interference above that precision is possible.", left.reference.name, right.reference.name, proof.maximum_overlap_depth, proof.maximum_common_volume),
+        code: "source_non_interference",
+        message: format!("{} and {} are in contact or separated. Analytic support bounds any shared interior to a depth of {:.3e} mm and a volume of at most {:.3e} mm³; no interference above that precision is possible.", left.reference.name, right.reference.name, proof.maximum_overlap_depth, proof.maximum_common_volume),
         components: [left.reference.clone(), right.reference.clone()],
         separating_normal: proof.normal.to_array(),
         signed_gap: proof.gap,

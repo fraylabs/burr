@@ -135,8 +135,8 @@ pub fn generate_html_viewer(
                 col += vec3(spec) * lightColor;
 
                 fragColor = vec4(col, 1.0);
-                // X-ray context stays translucent; selected occurrences are vivid and opaque.
-                if (uHighlight && fragColor.a < 0.99) {{
+                // Selected occurrences stay vivid and opaque; X-ray blending fades the context.
+                if (uHighlight) {{
                     fragColor = vec4(vColor.rgb, vColor.a > 0.5 ? 1.0 : 0.06);
                 }}
             }}

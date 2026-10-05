@@ -1495,13 +1495,13 @@
           open_component_mesh: "Open mesh",
           below_tessellation_resolution: "Below mesh sampling resolution",
           below_coordinate_resolution: "Below coordinate resolution",
-          planar_contact: "Contact · Within STEP tolerance",
+          source_non_interference: "Contact or separated · Within STEP precision",
         })[code] || code;
         const appendPair = (parent, finding, unresolved = false) => {
           const button = document.createElement("button");
           button.type = "button";
           button.className = "finding";
-          button.dataset.kind = unresolved ? "unresolved" : finding.code === "planar_contact" ? "contact" : "interference";
+          button.dataset.kind = unresolved ? "unresolved" : finding.code === "source_non_interference" ? "contact" : "interference";
           button.setAttribute("aria-current", String(finding.id === state.focusedFinding));
           button.title = finding.message;
           const content = document.createElement("div");
@@ -1509,7 +1509,7 @@
           title.textContent = `${finding.components[0].name} × ${finding.components[1].name}`;
           const kind = document.createElement("span");
           kind.textContent = unresolved ? `Unresolved · ${reasonLabel(finding.code)}`
-            : finding.code === "planar_contact" ? reasonLabel(finding.code)
+            : finding.code === "source_non_interference" ? reasonLabel(finding.code)
             : witnessLabel(finding.witness?.kind);
           content.append(title, kind);
           button.append(content);
@@ -1584,12 +1584,12 @@
           if (!unresolved) {
             const note = document.createElement("p");
             note.className = "check-reason";
-            note.textContent = "Touching within STEP precision; no shared volume above that precision.";
+            note.textContent = "Contact or separation; no shared volume above STEP precision. Touching itself is not proven.";
             checksContent.append(note);
           }
         };
         appendGroups(report.unresolved_pairs || [], "Unresolved", true);
-        appendGroups(report.contact_pairs || [], "Contacts", false);
+        appendGroups(report.contact_pairs || [], "Contacts / separated", false);
 
         for (const reason of report.incomplete_reasons || []) {
           if (reason.code === "below_coordinate_resolution" && report.unresolved_pairs?.length) continue;
