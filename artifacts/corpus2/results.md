@@ -493,3 +493,26 @@ Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary n
 | text-to-cad-assembly__pick_place_arm.step | 3/5 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
 
 <!-- original-source-rechecks-end -->
+
+## Candidate 0.40.1 pulley contact gate
+
+The frozen mesh-worker candidate (binary SHA-256 `69ac75ecb3c7a3eb1153c3d868c7cc163904986556e24d4986afb65099bbff6d`) reports 12 contact-or-separated pairs on the same held-out pulley source. This is a release-candidate gate, separate from the installed-release denominator. All 12 pairs passed the unchanged strict source occurrence matcher and had valid source solids and completed, valid Common with exactly zero volume. The bounded seed cubes, source classification, independent winding and inward-normal tie-breaker found no robust shared-interior certificate under the requested 1e-6 mm clearance rule: three bounded contact-or-separated results and nine bounded tolerance-contact results. There were no matching refusals, invalid sources or 150-second timeouts.
+
+Pair 12/14 (M3 standoff / reinforcement plate) initially remained disputed because an underlying-surface normal projected outside the trimmed face. A separately capped follow-up used an actual closest point on the trimmed face, retained the same on-face check and source-verified entry rules, and returned bounded tolerance contact. The original receipt is retained unchanged. Both drivers exited 0 and released their owner-file locks normally. The Owner accepted this qualified gate result; the candidate is not counted as an additional held-out model.
+
+Finite witness checks do not establish exhaustive separation or verify global overlap-depth or volume bounds. All receipts and input hashes remain local under `candidate-0401-pulley-contacts/`; `review.json` records which original or follow-up receipt supports each final row.
+
+| Burr pair | Final bounded result | Common mm³ | Source IN/IN samples | Winding IN/IN samples | Verified inward steps | Follow-up |
+|---|---|---:|---:|---:|---:|---|
+| 0/7 | contact_or_separated_bounded | 0 | 0 | 0 | 56 | — |
+| 0/10 | contact_within_tolerance_bounded | 0 | 0 | 25 | 56 | — |
+| 2/18 | contact_within_tolerance_bounded | 0 | 0 | 27 | 56 | — |
+| 3/14 | contact_within_tolerance_bounded | 0 | 0 | 25 | 52 | — |
+| 3/18 | contact_within_tolerance_bounded | 0 | 0 | 26 | 48 | — |
+| 6/10 | contact_within_tolerance_bounded | 0 | 0 | 27 | 56 | — |
+| 6/18 | contact_within_tolerance_bounded | 0 | 0 | 24 | 52 | — |
+| 11/18 | contact_or_separated_bounded | 0 | 0 | 0 | 64 | — |
+| 12/14 | contact_within_tolerance_bounded | 0 | 0 | 8 | 52 | trimmed-face closest point; original dispute retained |
+| 12/18 | contact_or_separated_bounded | 0 | 0 | 0 | 48 | — |
+| 15/18 | contact_within_tolerance_bounded | 0 | 0 | 28 | 56 | — |
+| 18/21 | contact_within_tolerance_bounded | 0 | 0 | 31 | 56 | — |

@@ -37,7 +37,7 @@ from occt_components import components
 pair=sorted(args.pair)
 report=json.loads((logs/(args.model.name+'.burr.json')).read_text())['report']
 contact=next(x for x in report[args.list] if sorted(c['occurrence_index'] for c in x['components'])==pair)
-record=dict(model=args.model.name,burr_pair=pair,reported_pair=contact,reported_list=args.list,status='disputed',method='strict source mapping + Common + bounded source classification + inward-normal probes + independent solid-angle winding',method_version=5,phase='loading')
+record=dict(model=args.model.name,burr_pair=pair,reported_pair=contact,reported_list=args.list,status='disputed',method='strict source mapping + Common + bounded source classification + inward-normal probes + independent solid-angle winding',method_version=5,normal_projection_method='trimmed-face closest-point fallback',phase='loading')
 def save():args.output.write_text(json.dumps(record,indent=2))
 save()
 source=components(args.model)
@@ -126,7 +126,16 @@ for witness_index,seed in enumerate(normal_witnesses):
                 normal_errors.append(dict(witness=witness_index,component=component_index,reason='Witness farther than 0.002 mm from boundary'));continue
             u,v=face.paramAt(cq.Vector(*seed));normal,foot=face.normalAt(u,v)
             if cq.Vertex.makeVertex(*foot.toTuple()).distance(face)>1e-6:
-                normal_errors.append(dict(witness=witness_index,component=component_index,reason='Normal projection outside trimmed face'));continue
+                # The nearest underlying-surface UV can fall outside the trim.
+                # Use an actual closest point on the trimmed face, retaining
+                # the same on-face check and source-verified entry rule.
+                trimmed=BRepExtrema_DistShapeShape(vertex.wrapped,face.wrapped);trimmed.Perform()
+                if not trimmed.IsDone() or trimmed.NbSolution()<1:
+                    normal_errors.append(dict(witness=witness_index,component=component_index,reason='Trimmed-face closest-point failure'));continue
+                q=trimmed.PointOnShape2(1)
+                u,v=face.paramAt(cq.Vector(q.X(),q.Y(),q.Z()));normal,foot=face.normalAt(u,v)
+                if cq.Vertex.makeVertex(*foot.toTuple()).distance(face)>1e-6:
+                    normal_errors.append(dict(witness=witness_index,component=component_index,reason='Closest-point normal projection outside trimmed face'));continue
             directions=[normal]
             # At an edge/corner, one face normal may remain on another face.
             # Try the adjacent-face bisector as well, always verifying IN rather
