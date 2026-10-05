@@ -361,7 +361,7 @@ Positron is captured and its isometric and front images have been inspected. No 
 | Jubilee | 45,857,044 | **pending** | no visual claim |
 | Biped | 26,548,352 | **pending** | no visual claim |
 
-All four remaining captures and inspections require release-priority clearance. The completed Positron capture is reusable; no success is inferred from pending screenshots.
+All four remaining captures and inspections follow the current source-audit priorities. The completed Positron capture is reusable; no success is inferred from pending screenshots.
 
 ## Sample limits
 
@@ -373,15 +373,15 @@ The reviewed Checks candidate's external reference has 100 Common-zero contact r
 
 All three source hashes match both the original source manifest and the contact receipts. Original reports and scenes are preserved locally. Only scene display labels for the control unit and pick/place arm were replaced by their own report's canonical definition names; bounds, transforms and surface samples remain unchanged. Current receipts and explicit provenance stay under `original-corpus-contact-rechecks/`. Any shared-interior certificate is reviewed against the pair's declared precision and volume bound and reported immediately.
 
-Early Faze4 receipts expose a distinction between literal zero and permitted source-scale shared interior: Board/resistor samples are classified IN both with winding near one despite empty Common. Pair [0,8] has source-boundary clearances 1.7484555e-8/1.7397133e-8 mm, consistent with the report's declared maximum shared depth (~3.498e-8 mm), below its 1e-7-mm source tolerance. This does not establish a violation of the reported precision/volume bound. Such sub-certificate interior candidates remain disputed and retain their exact margins; the robust certificate requires more than 1e-6-mm clearance.
+Early Faze4 receipts expose a distinction between literal zero and permitted source-scale shared interior: Board/resistor samples are classified IN both with winding near one despite empty Common. Pair [0,8] has source-boundary clearances 1.7484555e-8/1.7397133e-8 mm, consistent with the report's declared maximum shared depth (~3.498e-8 mm), below its 1e-7-mm source tolerance. This does not establish a violation of the reported precision/volume bound. The preliminary receipts retain these sub-certificate candidates as disputed, with exact margins; their method-5 replays are pending. A robust certificate requires more than 1e-6-mm clearance to both source boundaries and winding corroboration.
 
 <!-- original-source-rechecks-start -->
 
-Snapshot of the running audit after the Owner-authorized release timing window. The source driver resumed from 55 saved receipts; pending rows have no completed independent source check. The completed normal tie-breaker needs replay on 38 preliminary historical receipts, thirteen mapped released-contact disputes and three baseline disputes. Raw receipts are retained, and four strict matching refusals remain separate. Contact within tolerance is a bounded witness result, not literal zero or exhaustive separation.
+The first pass is complete: all 100 receipts are terminal and reviewed, with 62 bounded tolerance contacts, two bounded contact-or-separated results and 36 preliminary disputes. No robust overlap certificate, refusal or timeout was found. These counts include mixed method versions; 38 earlier method-1–4 rows require the completed method-5 tie-breaker. Their separate-output replay is running, with all original receipts retained. Thirteen mapped released-contact disputes and three baseline disputes follow, each after phase review. Four strict matching refusals remain separate. Contact within tolerance is a bounded witness result, not literal zero or exhaustive separation.
 
-The capped per-pair controller supports a stop file, checks it before starting another reference job or while waiting for the shared lock, and exits paused with owned-lock cleanup. It was smoke-checked to stop without starting a reference child, acquiring a lock or writing a completion claim. The timing pause preserved all completed source receipts; no ordinary measurements resumed.
+The capped per-pair controller supports a stop file, checks it before starting another reference job or while waiting for the shared lock, and exits paused with owned-lock cleanup. Its smoke check confirmed no reference child, lock acquisition or false completion claim. The first-pass controller exited normally; its root and all pair logs had no open descriptors before the replay began. Burr 0.40.1 has shipped, lifting the release-dependent hold; the source replays retain priority over the remaining measurements and Chrome inspections.
 
-Bounded source rechecks: 20 contact_within_tolerance_bounded, 36 disputed, 44 pending.
+Bounded source rechecks: 2 contact_or_separated_bounded, 62 contact_within_tolerance_bounded, 36 disputed.
 
 Each pair uses strict occurrence matching, valid source solids, OCCT Common, source point classification in bounded seed cubes, and independent solid-angle winding of fine source meshes. An overlap certificate also requires positive distance to both source boundaries. Negative sampling is bounded; it does not establish exhaustive separation. Boundary disagreements, invalid sources, mapping refusals and timeouts remain disputed.
 
@@ -447,50 +447,50 @@ Method 1 uses Common, seed cubes and winding. Methods 2–4 retain preliminary n
 | Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/56 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 16 | 64 | 0 | 1.7484511614410625e-08 | 3.4983880007447185e-08 | 4.47793773017224e-08 |  |
 | Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/57 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744731e-08 | 4.477936884898736e-08 |  |
 | Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/58 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240742816e-08 |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/59 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/60 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/61 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/62 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/63 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/64 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/65 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/66 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/67 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/68 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/69 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/70 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/71 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/72 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/73 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/74 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/75 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/76 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/77 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/78 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/103 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/106 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/109 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/112 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/115 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/118 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/121 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/123 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/126 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/128 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/129 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/130 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/131 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/132 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/133 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/134 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/135 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__automation_control_unit.step | 0/1 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__automation_control_unit.step | 12/13 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__pick_place_arm.step | 0/16 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__pick_place_arm.step | 1/2 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__pick_place_arm.step | 2/3 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__pick_place_arm.step | 3/4 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
-| text-to-cad-assembly__pick_place_arm.step | 3/5 | pending | — | — | 0 | 0 | 0 | 0 | — | — | — |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/59 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240764842e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/60 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.7484511669921776e-08 | 3.4983880007447185e-08 | 4.4779377301774894e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/61 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744731e-08 | 4.4779368849093545e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/62 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 18 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240753507e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/63 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240775747e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/64 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 21 | 64 | 0 | 1.7484511614410625e-08 | 3.4983880007447185e-08 | 4.4779377301833366e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/65 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744731e-08 | 4.4779368849198346e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/66 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 20 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240764293e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/67 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240786844e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/68 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.7484511614410625e-08 | 3.4983880007447185e-08 | 4.4779377301883004e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/69 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.748451166992191e-08 | 3.498388000744731e-08 | 4.4779368849310035e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/70 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240775389e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/71 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240798147e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/72 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.7484511614410625e-08 | 3.4983880007447185e-08 | 4.477937730194028e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/73 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.748451166992191e-08 | 3.498388000744731e-08 | 4.477936884942386e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/74 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.4779372407866454e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/75 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 18 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.4779372408093625e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/76 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.7484511669921776e-08 | 3.4983880007447185e-08 | 4.477937730199086e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/77 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.748451166992191e-08 | 3.498388000744731e-08 | 4.477936884953124e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/78 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 18 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240797503e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/103 | contact_within_tolerance_bounded | 5 | 0.0 | 12 | 18 | 48 | 0 | 7.649492950179464e-09 | 1.7499324656011864e-08 | 2.6598978391976208e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/106 | contact_within_tolerance_bounded | 5 | 0.0 | 12 | 18 | 48 | 0 | 7.649492950179464e-09 | 1.7499324656011864e-08 | 2.6598978392005897e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/109 | contact_within_tolerance_bounded | 5 | 0.0 | 12 | 18 | 48 | 0 | 7.649492950179464e-09 | 1.7499324656011864e-08 | 2.6598978392029696e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/112 | contact_within_tolerance_bounded | 5 | 0.0 | 12 | 18 | 48 | 0 | 7.649492950179464e-09 | 1.7499324656011864e-08 | 2.6598978392058542e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/115 | contact_within_tolerance_bounded | 5 | 0.0 | 12 | 18 | 48 | 0 | 7.649492950179464e-09 | 1.7499324656011864e-08 | 2.6598978392085174e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/118 | contact_within_tolerance_bounded | 5 | 0.0 | 12 | 18 | 48 | 0 | 7.649492950179464e-09 | 1.7499324656011864e-08 | 2.6598978391950542e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/121 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 26 | 64 | 0 | 1.748451172543306e-08 | 3.498388000744732e-08 | 4.477936751389396e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/123 | contact_within_tolerance_bounded | 5 | 0.0 | 12 | 18 | 48 | 0 | 7.649492950179464e-09 | 1.7499324656011864e-08 | 2.6598978392142474e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/126 | contact_within_tolerance_bounded | 5 | 0.0 | 12 | 18 | 48 | 0 | 7.649492950179464e-09 | 1.7499324656011864e-08 | 2.659897839211323e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/128 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 18 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.477937240820411e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/129 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.748451166992191e-08 | 3.498388000744731e-08 | 4.4779368849762714e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/130 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 16 | 64 | 0 | 1.7484511614410625e-08 | 3.4983880007447185e-08 | 4.4779377302106594e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/131 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451172543303e-08 | 3.498388000744728e-08 | 4.477937240832343e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/132 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 19 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.4779372408087186e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/133 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.748451166992191e-08 | 3.498388000744731e-08 | 4.4779368849645784e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/134 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 17 | 64 | 0 | 1.7484511614410625e-08 | 3.4983880007447185e-08 | 4.4779377302048857e-08 |  |
+| Faze4-Robotic-arm__Faze4_dist_v2_STEP.step | 0/135 | contact_within_tolerance_bounded | 5 | 0.0 | 10 | 18 | 64 | 0 | 1.748451166992188e-08 | 3.498388000744728e-08 | 4.4779372408206505e-08 |  |
+| text-to-cad-assembly__automation_control_unit.step | 0/1 | contact_within_tolerance_bounded | 5 | 0.0 | 0 | 15 | 48 | 0 | — | 2.5366375666635577e-11 | 2.6634694450010247e-07 |  |
+| text-to-cad-assembly__automation_control_unit.step | 12/13 | contact_or_separated_bounded | 5 | 0.0 | 0 | 0 | 40 | 0 | — | 2.724220848904224e-11 | 6.197602431271057e-08 |  |
+| text-to-cad-assembly__pick_place_arm.step | 0/16 | contact_or_separated_bounded | 5 | 0.0 | 0 | 0 | 0 | 0 | — | 3.228706191293895e-11 | 1.1623342288912187e-09 |  |
+| text-to-cad-assembly__pick_place_arm.step | 1/2 | contact_within_tolerance_bounded | 5 | 0.0 | 0 | 11 | 32 | 0 | — | 3.6763481148227584e-11 | 1.7646470951208592e-08 |  |
+| text-to-cad-assembly__pick_place_arm.step | 2/3 | contact_within_tolerance_bounded | 5 | 0.0 | 0 | 11 | 32 | 0 | — | 3.6067149267182685e-11 | 1.731223164827385e-08 |  |
+| text-to-cad-assembly__pick_place_arm.step | 3/4 | contact_within_tolerance_bounded | 5 | 0.0 | 0 | 3 | 32 | 0 | — | 3.454658781265607e-11 | 3.316472430022811e-09 |  |
+| text-to-cad-assembly__pick_place_arm.step | 3/5 | contact_within_tolerance_bounded | 5 | 0.0 | 0 | 7 | 48 | 0 | — | 3.454658781265607e-11 | 3.316472430022811e-09 |  |
 
 <!-- original-source-rechecks-end -->
 
