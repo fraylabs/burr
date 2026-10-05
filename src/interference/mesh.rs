@@ -492,6 +492,34 @@ impl Mesh {
         )
     }
 
+    /// Largest measured chord deviation among facets near the query. Flat
+    /// carrier facets can border a curved trim, whose error is absent from
+    /// their constant evaluator normals.
+    pub fn nearby_surface_deviation(&self, point: DVec3, radius: f64) -> f64 {
+        let squared = radius * radius;
+        let mut deviation = 0.0_f64;
+        let mut stack = vec![0];
+        while let Some(index) = stack.pop() {
+            let node = &self.nodes[index];
+            if node.bounds.distance_squared(point) > squared {
+                continue;
+            }
+            if let Some(children) = node.children {
+                stack.extend(children);
+            } else {
+                for &triangle in &self.order[node.start..node.end] {
+                    if self.sampled_deviation[triangle] > deviation
+                        && point_triangle_distance_squared(point, self.triangle(triangle))
+                            <= squared
+                    {
+                        deviation = self.sampled_deviation[triangle];
+                    }
+                }
+            }
+        }
+        deviation
+    }
+
     pub fn nearest_surface_sample(&self, point: DVec3) -> (bool, f64) {
         let mut nearest = f64::INFINITY;
         let mut stack = vec![0];
