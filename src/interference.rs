@@ -367,24 +367,32 @@ pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScen
             let overlap =
                 left.bounds.max.min(right.bounds.max) - left.bounds.min.max(right.bounds.min);
             if mesh_witness.is_some() || overlap.min_element() <= tolerance {
-                let below_sampling = mesh_witness.as_ref().is_some_and(|witness| match witness {
-                    InterferenceWitness::SurfaceCrossing { start, end } => {
-                        DVec3::from_array(*start).distance(DVec3::from_array(*end))
-                            <= probe_resolution
-                    }
-                    InterferenceWitness::InteriorOverlap { point }
-                    | InterferenceWitness::Containment { point, .. } => {
-                        let world = DVec3::from_array(*point);
-                        let a = left.inverse.transform_point3(world);
-                        let b = right.inverse.transform_point3(world);
-                        let ta = probe_resolution / left.scale;
-                        let tb = probe_resolution / right.scale;
-                        left_mesh.near_surface(a, ta)
-                            && right_mesh.near_surface(b, tb)
-                            && (left_mesh.nonplanar_near_surface(a, ta)
-                                || right_mesh.nonplanar_near_surface(b, tb))
-                    }
-                    InterferenceWitness::CoincidentOccurrence => false,
+                let below_sampling = mesh_witness.as_ref().is_some_and(|witness| {
+                    let world = match witness {
+                        InterferenceWitness::SurfaceCrossing { start, end } => {
+                            let a = DVec3::from_array(*start);
+                            let b = DVec3::from_array(*end);
+                            if a.distance(b) <= probe_resolution {
+                                return true;
+                            }
+                            // A long tangential interval can still have only
+                            // sub-resolution penetration at its midpoint.
+                            (a + b) * 0.5
+                        }
+                        InterferenceWitness::InteriorOverlap { point }
+                        | InterferenceWitness::Containment { point, .. } => {
+                            DVec3::from_array(*point)
+                        }
+                        InterferenceWitness::CoincidentOccurrence => return false,
+                    };
+                    let a = left.inverse.transform_point3(world);
+                    let b = right.inverse.transform_point3(world);
+                    let ta = probe_resolution / left.scale;
+                    let tb = probe_resolution / right.scale;
+                    left_mesh.near_surface(a, ta)
+                        && right_mesh.near_surface(b, tb)
+                        && (left_mesh.nonplanar_near_surface(a, ta)
+                            || right_mesh.nonplanar_near_surface(b, tb))
                 });
                 unresolved_pairs.push(UnresolvedPair {
                 id: format!("{CHECK_ID}:unresolved:{left_index}:{right_index}"),
@@ -634,24 +642,40 @@ fn penetrating_surface(
             .map(|t| source_mesh.triangle_surface_sample(t))
             .unwrap_or_else(|| source_mesh.nearest_surface_sample(source_point));
         let target_sample = target_mesh.nearest_surface_sample(point);
-        let curved = source_sample.0 || target_sample.0;
-        // Each side with sampled curvature contributes its own nominal error.
-        // A flat normal sample keeps the independent boundary guard below;
-        // including its full component extent here can hide a resolved overlap
-        // against a much smaller curved component. Retain measured normal/chord
-        // deviation, and keep the legacy guard for ambiguous boundaries.
-        let curved_resolution = (if source_sample.0 {
-            source_mesh.bounds.diagonal() * source.scale
+        // A flat carrier can have a curved trimmed boundary. Its own normal
+        // sample has zero deviation, but neighboring curved facets can move
+        // that trim into the other solid. Include their measured chord error;
+        // a nearby patch does not make the entire planar component curved.
+        let deflection =
+            look::step::meshing_policy::MeshingPolicy::DEFAULT.relative_linear_deflection;
+        let source_deviation =
+            if source_sample.0 {
+                source_sample.1
+            } else {
+                source_sample.1.max(source_mesh.nearby_surface_deviation(
+                    source_point,
+                    source_mesh.bounds.diagonal() * deflection,
+                ))
+            };
+        let target_deviation = target_sample.1;
+        let curved =
+            source_sample.0 || target_sample.0 || source_deviation > 0.0 || target_deviation > 0.0;
+        // Budget each side independently before adding the errors. A sampled
+        // curved carrier keeps its nominal bound; a flat trimmed carrier adds
+        // only the measured nearby trim deviation, never its whole extent.
+        let source_resolution = if source_sample.0 {
+            source_mesh.bounds.diagonal() * source.scale * deflection
         } else {
             0.0
-        } + if target_sample.0 {
-            target_mesh.bounds.diagonal() * target.scale
+        };
+        let target_resolution = if target_sample.0 {
+            target_mesh.bounds.diagonal() * target.scale * deflection
         } else {
             0.0
-        }) * look::step::meshing_policy::MeshingPolicy::DEFAULT
-            .relative_linear_deflection;
-        let local_resolution =
-            curved_resolution.max(source_sample.1 * source.scale + target_sample.1 * target.scale);
+        };
+        let local_resolution = source_resolution.max(source_deviation * source.scale)
+            + target_resolution.max(target_deviation * target.scale)
+            + tolerance;
         let uncertain = unoriented_pair && curved;
         let target_margin = if uncertain {
             local_tolerance.max(uncertain_margin / target.scale)
@@ -788,6 +812,34 @@ mod tests {
         let mut timings = Timings::default();
         let scene = compile_scene(&path, UpAxis::Z, &mut timings).unwrap();
         analyze_scene(name, "fixture", &scene)
+    }
+
+    #[test]
+    fn gearmotor_contact_never_reports_interference() {
+        let result = report("gearmotor-contact.step");
+        assert_eq!(result.component_count, 2);
+        assert!(result.findings.is_empty(), "{result:#?}");
+        assert_eq!(result.outcome, CheckOutcome::Incomplete);
+        assert_eq!(result.unresolved_pairs.len(), 1);
+        assert_eq!(
+            result.unresolved_pairs[0].code,
+            "below_tessellation_resolution"
+        );
+    }
+
+    #[test]
+    fn gearmotor_overlap_beyond_trim_error_is_interference() {
+        let mut scene = compile_scene(
+            &fixture("gearmotor-contact.step"),
+            UpAxis::Z,
+            &mut Timings::default(),
+        )
+        .unwrap();
+        scene.instances[0].transform = glam::Mat4::from_translation(glam::Vec3::new(0.5, 0.0, 0.0))
+            * scene.instances[0].transform;
+        let result = analyze_scene("gearmotor-overlap.step", "fixture", &scene);
+        assert_eq!(result.outcome, CheckOutcome::Fail, "{result:#?}");
+        assert_eq!(result.findings.len(), 1);
     }
 
     #[test]
