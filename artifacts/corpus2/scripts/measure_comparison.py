@@ -9,9 +9,10 @@ import time
 import psutil
 
 
-def measure(model,evidence,scripts,timeout):
+def measure(model,evidence,scripts,timeout,contacts=False):
     prefix=evidence/model.name
-    command=[sys.executable,str(pathlib.Path(__file__).with_name('compare_release.py')),
+    stage='contacts' if contacts else 'comparison'
+    command=[sys.executable,str(pathlib.Path(__file__).with_name('verify_contacts.py' if contacts else 'compare_release.py')),
              '--model',str(model),'--evidence',str(evidence),'--corpus-scripts',str(scripts)]
     start=time.monotonic()
     process=subprocess.Popen(command)
@@ -29,10 +30,12 @@ def measure(model,evidence,scripts,timeout):
     metrics=dict(elapsed_s=time.monotonic()-start,peak_rss_mib=usage.ru_maxrss/2**20,
                  returncode=os.waitstatus_to_exitcode(status),cap=cap,timeout_s=timeout,
                  peak_rss_method='wait4 ru_maxrss bytes macOS')
-    pathlib.Path(str(prefix)+'.comparison.metrics.json').write_text(json.dumps(metrics,indent=2)+'\n')
-    result=pathlib.Path(str(prefix)+'.comparison.json')
+    pathlib.Path(str(prefix)+'.'+stage+'.metrics.json').write_text(json.dumps(metrics,indent=2)+'\n')
+    result=pathlib.Path(str(prefix)+'.'+stage+'.json')
     if cap or not result.exists():
-        result.write_text(json.dumps(dict(model=model.name,refused=f'Comparison {cap or "process failure"}; no complete pair result'),indent=2)+'\n')
+        partial=json.loads(result.read_text()) if contacts and result.exists() else dict(model=model.name)
+        partial.update(refused=f'{stage} {cap or "process failure"}; no complete pair result',complete=False)
+        result.write_text(json.dumps(partial,indent=2)+'\n')
     process.returncode=metrics['returncode']
     print(model.name,'comparison resources',metrics,flush=True)
 
@@ -43,5 +46,6 @@ if __name__=='__main__':
     parser.add_argument('--evidence',type=pathlib.Path,required=True)
     parser.add_argument('--corpus-scripts',type=pathlib.Path,required=True)
     parser.add_argument('--timeout',type=float,default=600)
+    parser.add_argument('--contacts',action='store_true')
     args=parser.parse_args()
-    measure(args.model,args.evidence,args.corpus_scripts,args.timeout)
+    measure(args.model,args.evidence,args.corpus_scripts,args.timeout,args.contacts)

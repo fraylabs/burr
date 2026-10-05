@@ -11,27 +11,30 @@ import sys
 import time
 
 
-def run(root, binary, phase, timeout):
+def run(root, binary, phase, timeout, evidence, lock, limit):
     scripts=pathlib.Path(__file__).resolve().parent
     root=root.resolve()
-    for row in csv.DictReader((root/'sources.csv').open(newline='')):
+    rows=list(csv.DictReader((root/'sources.csv').open(newline='')))
+    for row in rows[:limit]:
         model=root/row['file']
-        prefix=root/'logs'/model.name
-        if phase=='measure':
-            jobs=[('occt','measure_reference.py',[]),('burr','measure_release.py',['--binary',str(binary.resolve())])]
+        prefix=evidence/model.name
+        if phase in ('measure','release'):
+            jobs=[('burr','measure_release.py',['--binary',str(binary.resolve())])]
+            if phase=='measure':jobs.insert(0,('occt','measure_reference.py',[]))
         else:
-            jobs=[('comparison','measure_comparison.py',['--timeout',str(timeout),'--evidence',str(root/'logs'),'--corpus-scripts',str(scripts.parents[1]/'corpus/scripts')])]
+            jobs=[('contacts' if phase=='contacts' else 'comparison','measure_comparison.py',['--timeout',str(timeout),'--evidence',str(evidence),'--corpus-scripts',str(scripts.parents[1]/'corpus/scripts'),*(['--contacts'] if phase=='contacts' else [])])]
         for mode,script,extra in jobs:
-            marker=pathlib.Path(str(prefix)+('.comparison.json' if mode=='comparison' else '.'+mode+'.metrics.json'))
+            marker=pathlib.Path(str(prefix)+('.'+mode+'.json' if mode in ('comparison','contacts') else '.'+mode+'.metrics.json'))
             if marker.exists():
                 continue
-            if mode=='comparison' and not pathlib.Path(str(prefix)+'.scene.json').exists():
+            if mode in ('comparison','contacts') and not pathlib.Path(str(prefix)+'.scene.json').exists():
                 continue
             args=[sys.executable,str(scripts/script),'--model',str(model),*extra]
-            if mode!='comparison':
-                args += ['--output',str(root/'logs'),'--timeout',str(timeout)]
+            if mode not in ('comparison','contacts'):
+                args += ['--output',str(evidence),'--timeout',str(timeout)]
             print('START',mode,model.name,flush=True)
-            result=subprocess.run(['zsh','-c','until mkdir /tmp/burr-build.lock 2>/dev/null; do sleep 15; done; trap "rmdir /tmp/burr-build.lock" EXIT; "$@"','corpus2-job',*args])
+            wrapper="corpus_lock=$1; shift; until mkdir \"$corpus_lock\" 2>/dev/null; do sleep 15; done; trap 'rmdir \"$corpus_lock\"' EXIT; \"$@\""
+            result=subprocess.run(['zsh','-c',wrapper,'corpus2-job',str(lock),*args])
             print('END',mode,model.name,result.returncode,flush=True)
             if result.returncode:
                 raise RuntimeError('Measurement wrapper failed; inspect logs before retrying')
@@ -40,17 +43,27 @@ def run(root, binary, phase, timeout):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase',choices=['measure','compare'])
+    parser.add_argument('phase',choices=['measure','release','compare','contacts'])
     parser.add_argument('--root',type=pathlib.Path,default=pathlib.Path(__file__).resolve().parents[1])
     parser.add_argument('--binary',type=pathlib.Path)
     parser.add_argument('--timeout',type=float,default=600)
+    parser.add_argument('--evidence',type=pathlib.Path)
+    parser.add_argument('--lock',type=pathlib.Path,default=pathlib.Path.home()/'coding/fray/.fray/burr/build.lock')
+    parser.add_argument('--limit',type=int)
+    parser.add_argument('--work-dir',type=pathlib.Path)
     args=parser.parse_args()
-    if args.phase=='measure' and not args.binary:
+    if args.phase in ('measure','release') and not args.binary:
         parser.error('--binary is required for measure')
-    if args.phase=='compare':
+    evidence=(args.evidence or args.root/'logs').resolve()
+    evidence.mkdir(parents=True,exist_ok=True)
+    if args.work_dir:
+        import os
+        os.environ['BURR_CORPUS_WORK_DIR']=str(args.work_dir.resolve())
+        os.environ['TMPDIR']=str(args.work_dir.resolve())
+    if args.phase in ('compare','contacts'):
         # Serialize comparison orchestration separately from the shared CAD
         # lock, so two snapshots cannot enqueue the same missing result.
-        queue=pathlib.Path('/tmp/burr-corpus2/comparison-queue.lock')
+        queue=evidence/('.'+args.phase+'-queue.lock')
         queue.parent.mkdir(parents=True,exist_ok=True)
         while True:
             try:
@@ -59,8 +72,8 @@ if __name__=='__main__':
             except FileExistsError:
                 time.sleep(15)
         try:
-            run(args.root,args.binary,args.phase,args.timeout)
+            run(args.root,args.binary,args.phase,args.timeout,evidence,args.lock,args.limit)
         finally:
             queue.rmdir()
     else:
-        run(args.root,args.binary,args.phase,args.timeout)
+        run(args.root,args.binary,args.phase,args.timeout,evidence,args.lock,args.limit)

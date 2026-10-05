@@ -41,6 +41,61 @@ On the shared Mac, wrap **each** measurement or comparison command with the lock
 
 **Best root-cause guess:** near-coincident curved contact, float32 placement and faceting can create a long `surface_crossing` witness along the boundary without positive-volume penetration. The original reported segment is about 1.38 mm long, but its y displacement is only 6.02e-8 mm. Its endpoints are `[9.926700592041016,22.999999969888915,-0.6888622784459165]` and `[9.926700592041016,23.000000030111078,0.6888602677219704]`. The released [crossing path](https://github.com/fraylabs/burr/blob/b0bde98775903f61e9467cbccc5ee1135facabab/src/interference.rs#L705) checks interval length and a midpoint through `reliable_inside`; the [inside guard](https://github.com/fraylabs/burr/blob/b0bde98775903f61e9467cbccc5ee1135facabab/src/interference.rs#L628) includes coordinate and curved-surface proximity tests. Those guards still accept this exact-contact pair. The evidence does not establish whether placement rounding, faceting, surface classification or point-in-solid evaluation is the decisive cause. This is a geometric hypothesis, not a proof from instrumented checker internals.
 
+## Released 0.40.0 rerun — in progress
+
+The original 0.39.0 baseline above remains unchanged. A separately installed, checksum-verified 0.40.0 release is rerunning the original 25 models after the gearmotor fix, spike fix and contact proofs. Per-model interference comparison, exact-zero validation of every reported contact-or-separated pair, and unresolved reasons will be reported separately. No follow-up accuracy or contact-safety claim is made before those checks complete.
+
+An early import regression is already measured: Jubilee's left double-pulley corner-bracket assembly loses source face 22181 (`ContradictoryDualParity`, source/synthetic `DuplicateTraversal`), returning `incomplete` with 1/510 faces lost and zero checked pairs. 0.39.0 imported it without face loss and reported a supported `fail` with unresolved pairs. The existing OCCT source reference validates all 23 components. Removal of its coordinate-limit reason is not a gain because the new import stops checking earlier. The exact cause of the new refusal is not established.
+
+### Per-model 0.40.0 checkpoint
+
+Release runs: 25/25 completed (8 `fail`, 16 `incomplete`, 1 `pass`). Verification columns remain provisional. “Complete” is Burr's pair-set claim, not yet certification of agreement; every reported contact remains subject to the independent exact-zero check. Empty contact sets require no CAD calculation. The table's zero counts never turn a pending comparison into agreement.
+
+| Model | 0.39.0 coordinate limit | 0.40.0 verdict | Pair set complete | Interferences matched / extra / missing | Contact-or-separated checked zero / reported | Unresolved pairs and reasons |
+|---|---|---|---|---|---|---|
+| Framework-Laptop-13__Framework Laptop 13 CAD.stp | no | incomplete | False | refused | 0 / 0 | 0 (step_faces_lost) |
+| Framework-Laptop-13__13_5_hinge_R_assy.stp | yes | incomplete | False | pending | 0 / 0 | 6 (open_component_mesh: 2, below_tessellation_resolution: 4) |
+| Framework-Laptop-13__FWKNAQ9_G01_20210911.stp | no | incomplete | False | refused | 0 / 0 | 0 (step_faces_lost) |
+| Framework-Laptop-13__FW_13_camera_module.stp | no | pass | True | refused | 0 / 0 | 0 (none) |
+| Framework-Laptop-13__printable_case_full.stp | yes | fail | False | pending | 0 / 0 | 19 (below_tessellation_resolution: 16, open_component_mesh: 3) |
+| ExpansionCards__ExpansionCard_SelfTapping.stp | no | incomplete | False | 0 / 0 / 2 | 0 / 0 | 3 (open_component_mesh: 3) |
+| jubilee__jubilee.STEP | no | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
+| jubilee__6x_well_plate_bed_assembly.STEP | no | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
+| jubilee__left_double_pulley_corner_bracket_assembly.STEP | yes | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
+| jubilee__tool_template_assembly.STEP | no | incomplete | False | pending | 0 / 0 | 21 (open_component_mesh: 21) |
+| jubilee__passive_pen_tool_assembly.STEP | no | incomplete | False | pending | 0 / 0 | 73 (open_component_mesh: 73) |
+| jubilee__bondtech_groovemount_extruder.STEP | yes | fail | False | pending | 0 / 0 | 138 (open_component_mesh: 120, below_tessellation_resolution: 13, below_coordinate_resolution: 5) |
+| jubilee__ooze_wiper_assembly.STEP | no | fail | True | pending | 0 / 0 | 0 (none) |
+| jubilee__camera_calibration_tool_jan_31_2020.STEP | no | incomplete | False | pending | 0 / 0 | 26 (open_component_mesh: 26) |
+| open_robot_actuator_hardware__biped_6dof_v1.STEP | yes | fail | False | pending | 0 / 0 | 631 (open_component_mesh: 451, below_tessellation_resolution: 164, below_coordinate_resolution: 16) |
+| kicadStepUpMod__demo.step | no | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
+| FreeCAD-library__Adirondack Chair.step | yes | fail | False | pending | 0 / 12 (unverified remainder) | 10 (below_coordinate_resolution: 10) |
+| FreeCAD-library__wooden folding chair.step | yes | fail | False | pending | 0 / 0 | 22 (below_coordinate_resolution: 22) |
+| FreeCAD-library__Wooden Folding Table.step | yes | incomplete | False | pending | 0 / 4 (unverified remainder) | 12 (below_coordinate_resolution: 12) |
+| FreeCAD-library__Double glass doors with handles and transom.step | no | incomplete | False | pending | 0 / 0 | 0 (assembly_structure_lost) |
+| FreeCAD-library__Yellow_gearmotor_L.step | yes | fail | False | pending | 0 / 0 | 2 (below_coordinate_resolution: 1, below_tessellation_resolution: 1) |
+| FreeCAD-library__ComputerDesk (100 x 50 x 75 cm WDH).step | yes | fail | True | pending | 0 / 4 (unverified remainder) | 0 (none) |
+| openarm_hardware__OpenArm_2.0.STEP | no | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
+| openarm_hardware__OpenArmJIG.STEP | yes | incomplete | False | pending | 0 / 2 (unverified remainder) | 6 (below_coordinate_resolution: 2, open_component_mesh: 4) |
+| openarm_hardware__OpenArm_Cell+OpenArm_2.0.STEP | no | incomplete | False | pending | 0 / 0 | 0 (step_faces_lost) |
+
+## Regressions vs 0.39.0
+
+The same pinned source files were cold-loaded in the two installed releases. All 25 new release runs are finished, but the new strict comparisons and exact-zero contact validations are still in progress. A drop in raw pair count is not automatically a missed real overlap: the removed pair may have been false, or may now be unresolved. A confirmed false negative still requires a complete Burr pair set and strict exact-source agreement.
+
+| Model | 0.39.0 → 0.40.0 | What is established | Pair-level state |
+|---|---|---|---|
+| Jubilee left double-pulley corner bracket | 0 → 1/510 faces lost; `fail` → `incomplete`; 1 → 0 reported pairs | source face 22181 now fails with `ContradictoryDualParity`; 23 exact source components valid | checking stops at import; retained-screw reduction 11 prepared, not yet validated |
+| Full Jubilee | 2 → 3/9453 faces lost; both `incomplete` | old failed faces 286421/400279 no longer warn; new failed faces 202439/299236/389430, all parity failures | import remains incomplete; not one additional copy of the old same failed face |
+| Jubilee passive pen | `fail` → `incomplete`; 4 → 0 reported pairs | old subset independently matched four true pairs; supported fail evidence is no longer reported | old full mapping was partial; new pair-level comparison pending |
+| Jubilee tool template | `fail` → `incomplete`; 3 → 0 reported pairs | old subset independently matched three true pairs; supported fail evidence is no longer reported | old full mapping was partial; new pair-level comparison pending |
+| Biped | 63 → 32 reported pairs; both `fail` | raw count reduction | old and new exact comparison pending; not yet proved lost true positives |
+| Bondtech extruder | 18 → 9 reported pairs; both `fail` | raw count reduction | source reference partial/invalid; not yet proved lost true positives |
+
+The gearmotor's 5 → 4 reported pairs is the expected removal of its confirmed false Metal–Yellow pair. The original model still reports the four prior true pairs, and leaves Metal–Yellow unresolved below tessellation resolution. Strict comparison and a fresh 0.40.0 run of the two-part repro remain pending. It is kept separate from the regression candidates.
+
+The desk is the only one of the 11 former coordinate-limit models now reporting a complete pair set. Four no longer list the coordinate reason, but one is the pulley import failure; removing a reason by stopping checking earlier is not a gain. There are 22 contact-or-separated pairs reported across four models. Every one still requires an independently valid OCCT Common with exactly zero volume before it is described as verified.
+
 ## Classification and reference limits
 
 The 25 completed measurement jobs yield raw Burr outcomes **11 `fail`, 13 `incomplete`, 1 `pass`**. Of the 17 comparison records, eight have full occurrence mapping and a full reference scan, five certify a subset, and four refuse comparison. Eight more comparisons are pending. These records match **57 reported positive pairs** to OCCT and contain **one confirmed extra pair**. This is a count within verified scopes, not a precision or recall estimate for unverified pairs.

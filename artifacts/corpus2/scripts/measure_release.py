@@ -1,6 +1,6 @@
 """Measure the installed Burr through its real HTTP endpoints; no source build.
 
-Run exactly one model per invocation under /tmp/burr-build.lock. Requires numpy
+Run exactly one model per invocation under the shared CAD lock. Requires numpy
 and psutil from the existing corpus OCCT environment. Each invocation starts a
 fresh Burr process and an empty persistent viewer cache. Evidence stays local.
 """
@@ -32,7 +32,7 @@ def request(base, route, timeout):
 def measure(binary, model, output, timeout):
     output.mkdir(parents=True, exist_ok=True)
     prefix = output / model.name
-    cache = pathlib.Path('/tmp/burr-corpus2/cache')
+    cache = pathlib.Path(os.environ.get('BURR_CORPUS_WORK_DIR', str(output / '.work'))) / 'cache'
     if cache.exists():
         shutil.rmtree(cache)
     env = dict(os.environ, BURR_VIEWER_NO_OPEN='1', BURR_CACHE_DIR=str(cache),
@@ -103,9 +103,9 @@ def measure(binary, model, output, timeout):
             manifest = json.loads(html.decode().split('const burrManifest = ',1)[1].split(';\n',1)[0])
             pathlib.Path(str(prefix) + '.manifest.json').write_text(json.dumps(manifest))
             names = {}
-            for finding in report.get('findings',[]) + report.get('unresolved_pairs',[]):
+            for finding in report.get('findings',[]) + report.get('unresolved_pairs',[]) + report.get('contact_pairs',[]):
                 for c in finding['components']:
-                    names[c['occurrence_index']] = c['name']
+                    names[c['occurrence_index']] = c.get('definition_name', c['name'])
             vertices = []
             for definition in manifest['definitions']:
                 code, raw = request(base, '/mesh/' + definition['id'], timeout)
@@ -152,10 +152,17 @@ def measure(binary, model, output, timeout):
 
 
 if __name__ == '__main__':
+    if os.environ.get('BURR_CORPUS_WORK_DIR') and (pathlib.Path(os.environ['BURR_CORPUS_WORK_DIR']) / 'stop-release-jobs').exists():
+        raise SystemExit(99)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binary',type=pathlib.Path,required=True)
     parser.add_argument('--model',type=pathlib.Path,required=True)
     parser.add_argument('--output',type=pathlib.Path,required=True)
     parser.add_argument('--timeout',type=float,default=600)
+    parser.add_argument('--work-dir',type=pathlib.Path)
     args=parser.parse_args()
+    if args.work_dir:
+        args.work_dir.mkdir(parents=True,exist_ok=True)
+        os.environ['BURR_CORPUS_WORK_DIR']=str(args.work_dir.resolve())
+        os.environ['TMPDIR']=str(args.work_dir.resolve())
     print(json.dumps(measure(args.binary.resolve(),args.model.resolve(),args.output.resolve(),args.timeout)),flush=True)

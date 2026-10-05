@@ -23,7 +23,7 @@ def render(binary,model,output,playwright):
         if previous.get('httpStatus')==200 and previous.get('geometry'):
             print(model.name,'already captured',flush=True)
             return
-    cache=pathlib.Path('/tmp/burr-corpus2/render-cache')
+    cache=pathlib.Path(os.environ.get('BURR_CORPUS_WORK_DIR', str(output / '.work'))) / 'render-cache'
     env=dict(os.environ,BURR_VIEWER_NO_OPEN='1',BURR_CACHE_DIR=str(cache))
     with open(str(prefix)+'.server.stdout','w') as stdout,open(str(prefix)+'.server.stderr','w') as stderr:
         process=subprocess.Popen([str(binary.resolve()),'.'],cwd=model.parent,env=env,stdout=stdout,stderr=stderr)
