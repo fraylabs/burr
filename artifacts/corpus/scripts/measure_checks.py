@@ -29,6 +29,11 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     tracked = pathlib.Path(__file__).resolve().parent.parent
     protected = {r['model']: r for r in read(tracked / 'conforming-mesh/pair-summary.json')}
+    # The integrated importer on main also protects these newly admitted pairs.
+    additional = {
+        'openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP': 16,
+        'openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP': 8,
+    }
     rows = []
     confirmed_true = confirmed_false = positive_contacts = 0
     for file in sorted(list((args.corpus / 'models').glob('*')) + list((args.corpus / 'repros').glob('*.step'))):
@@ -46,7 +51,7 @@ def main():
                    before={k: len(old.get(v, [])) for k, v in [('real', 'findings'), ('contact', 'contact_pairs'), ('unresolved', 'unresolved_pairs')]},
                    after={k: len(report.get(v, [])) for k, v in [('real', 'findings'), ('contact', 'contact_pairs'), ('unresolved', 'unresolved_pairs')]},
                    outcome=report.get('outcome', 'load error'))
-        if name in protected:
+        if name in protected or name in additional:
             import cadquery as cq
             from OCP.BRepAlgoAPI import BRepAlgoAPI_Common
             from OCP.BRepCheck import BRepCheck_Analyzer
@@ -123,7 +128,8 @@ def main():
                        positive_contacts=len(result['occt_positive_contacts']),
                        occt_positive_unresolved=sum(p['occt_positive'] for p in result['unresolved_pairs']),
                        contacts_freshly_verified=len(verified_contacts))
-            if row['confirmed_true'] != protected[name]['confirmed_true'] or row['confirmed_false'] or row['positive_contacts']:
+            expected = protected[name]['confirmed_true'] if name in protected else additional[name]
+            if row['confirmed_true'] != expected or row['confirmed_false'] or row['positive_contacts']:
                 raise RuntimeError(f'Protected accuracy regression: {row}')
             confirmed_true += row['confirmed_true']
             confirmed_false += row['confirmed_false']
@@ -132,9 +138,10 @@ def main():
             print(name, row, flush=True)
         rows.append(row)
     result = dict(models=rows, zero_false_gate=dict(confirmed_true=confirmed_true, confirmed_false=confirmed_false,
-                  occt_positive_contacts=positive_contacts, protected_ten_true=confirmed_true - 9, bowden_true=9,
+                  occt_positive_contacts=positive_contacts, protected_ten_true=64, bowden_true=9,
+                  integrated_importer_true=sum(additional.values()),
                   bowden_scope='pair limited; full candidate completeness unknown'))
-    if confirmed_true != 73 or confirmed_false or positive_contacts:
+    if confirmed_true != 73 + sum(additional.values()) or confirmed_false or positive_contacts:
         raise RuntimeError(f'Zero-false gate failed: {result["zero_false_gate"]}')
     (args.output / 'summary.json').write_text(json.dumps(result, indent=2) + '\n')
     print(result['zero_false_gate'], flush=True)
