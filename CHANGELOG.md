@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+## 0.40.0 - 2026-10-05
+
+- Fix the false interference reported in 0.39.1 on the FreeCAD-library yellow
+  gearmotor: two curved parts that only touch were counted as overlapping.
+  Flat triangles next to curved trims now include the curved trim's chord
+  error in the penetration budget. The gearmotor now reports exactly its four
+  real overlaps; the two-part contact case is reported as unresolved instead
+  of failing.
+- Checks panel: real interference findings are listed first; unresolved pairs
+  are grouped by reason and part (for example "Board x LTV-817S - 9 pairs"),
+  with one click to highlight every occurrence in a group.
+- Burr now proves non-interference for many face-to-face pairs from the exact
+  STEP planar and cylindrical surfaces, within the file's declared precision.
+  These are listed as "contact or separated" rather than unresolved: on the
+  Faze4 robot arm, 126 unresolved pairs become 93 contact-or-separated and 33
+  unresolved. All 100 such pairs in the corpus have exactly zero common volume
+  in OpenCascade. Burr does not claim the parts touch, only that they do not
+  overlap.
+- Generic solid names ("SOLID", "Body") fall back to the nearest named product,
+  numbered to tell siblings apart.
+- Fix a mesh defect that sent one B-spline face of the Voron 2.4 toolhead about
+  1.3 m out of its part, which broke the default camera view.
+- Results on the 21-model corpus are unchanged: 97 real interfering pairs
+  found, 0 false. Import times are unchanged within measurement noise.
+
 ## 0.39.1 - 2026-10-05
 
 - Close periodic NURBS seams whose period is only known from the source
