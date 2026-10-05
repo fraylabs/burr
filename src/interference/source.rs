@@ -510,10 +510,13 @@ impl AnalyticBoundary {
                         let p90 = sample(0.0, std::f64::consts::FRAC_PI_2);
                         let p180 = sample(0.0, std::f64::consts::PI);
                         let center = (p0 + p180) * 0.5;
-                        let axis = (sample(1.0, 0.0) - p0).normalize();
-                        if !axis.is_finite() {
-                            return None;
-                        }
+                        // Read the authored direction rather than subtracting
+                        // two translated samples: that subtraction can lose or
+                        // rotate the axis at large carrier coordinates. Axial
+                        // projection requires a rigid carrier frame; refuse a
+                        // sheared/scaled processor rather than assume its
+                        // radial directions remain perpendicular to the axis.
+                        let axis = rigid_carrier_axis(placement, vector(cylinder.entity().axis()))?;
                         let mut boundary = Self::default();
                         for edge_index in face.boundaries.iter().flatten() {
                             let edge = shell.edges.get(edge_index.index)?;
@@ -684,6 +687,33 @@ fn absolute_matrix(matrix: DMat4) -> DMat4 {
     DMat4::from_cols_array(&matrix.to_cols_array().map(f64::abs))
 }
 
+fn rigid_carrier_axis(placement: DMat4, local_axis: DVec3) -> Option<DVec3> {
+    let columns = [
+        placement.x_axis.truncate(),
+        placement.y_axis.truncate(),
+        placement.z_axis.truncate(),
+    ];
+    let error = 16.0 * f64::EPSILON;
+    if !placement.is_finite()
+        || !local_axis.is_finite()
+        || placement.x_axis.w != 0.0
+        || placement.y_axis.w != 0.0
+        || placement.z_axis.w != 0.0
+        || placement.w_axis.w != 1.0
+        || (local_axis.length_squared() - 1.0).abs() > error
+        || columns
+            .iter()
+            .any(|axis| (axis.length_squared() - 1.0).abs() > error)
+        || columns[0].dot(columns[1]).abs() > error
+        || columns[0].dot(columns[2]).abs() > error
+        || columns[1].dot(columns[2]).abs() > error
+    {
+        return None;
+    }
+    let axis = placement.transform_vector3(local_axis).normalize();
+    axis.is_finite().then_some(axis)
+}
+
 fn point(p: Point3) -> DVec3 {
     DVec3::new(p.x, p.y, p.z)
 }
@@ -782,6 +812,16 @@ mod tests {
             assert!(cylinder.radial[1].dot(cylinder.axis).abs() < 1e-10);
             assert!(cylinder.radial[0].dot(cylinder.radial[1]).abs() < 1e-10);
         }
+    }
+
+    #[test]
+    fn carrier_axis_survives_translation_and_refuses_shear() {
+        let placement = DMat4::from_translation(DVec3::splat(1e16));
+        assert_eq!(rigid_carrier_axis(placement, DVec3::Z), Some(DVec3::Z));
+        let mut shear = DMat4::IDENTITY;
+        shear.z_axis.x = 0.1;
+        assert!(rigid_carrier_axis(shear, DVec3::Z).is_none());
+        assert!(rigid_carrier_axis(DMat4::from_scale(DVec3::splat(2.0)), DVec3::Z).is_none());
     }
 
     #[test]
