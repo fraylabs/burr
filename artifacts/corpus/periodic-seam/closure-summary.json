@@ -1,0 +1,200 @@
+[
+  {
+    "model": "openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+    "matched_previously_closed_manifold_geometries": 0,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "final/openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP.topology.json",
+    "candidate_geometry_count": 1
+  },
+  {
+    "model": "openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP",
+    "matched_previously_closed_manifold_geometries": 6,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "after6/openamr-platform-hw__MMP.01.00.00.000_Cover_assembly.STEP.topology.json",
+    "candidate_geometry_count": 6
+  },
+  {
+    "model": "openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+    "matched_previously_closed_manifold_geometries": 1,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "final/openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP.topology.json",
+    "candidate_geometry_count": 3
+  },
+  {
+    "model": "openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+    "matched_previously_closed_manifold_geometries": 23,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "final/openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP.topology.json",
+    "candidate_geometry_count": 33
+  },
+  {
+    "model": "openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+    "matched_previously_closed_manifold_geometries": 3,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "final/openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP.topology.json",
+    "candidate_geometry_count": 4
+  },
+  {
+    "model": "Voron-0__MiniSB_Bowden.step",
+    "matched_previously_closed_manifold_geometries": 15,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "after6/Voron-0__MiniSB_Bowden.step.topology.json",
+    "candidate_geometry_count": 21
+  },
+  {
+    "model": "Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step",
+    "matched_previously_closed_manifold_geometries": 6,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "after6/Voron-0__Fly_Gemini_V2_Din_Mount_2pc.step.topology.json",
+    "candidate_geometry_count": 6
+  },
+  {
+    "model": "Voron-0__Manta_M4P_Din_Mount_2pc.step",
+    "matched_previously_closed_manifold_geometries": 2,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "after6/Voron-0__Manta_M4P_Din_Mount_2pc.step.topology.json",
+    "candidate_geometry_count": 2
+  },
+  {
+    "model": "Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+    "matched_previously_closed_manifold_geometries": 9,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "final/Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step.topology.json",
+    "candidate_geometry_count": 11
+  },
+  {
+    "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+    "matched_previously_closed_manifold_geometries": 287,
+    "unmatched_baseline_geometry_indices": [
+      195,
+      196,
+      199,
+      202,
+      207,
+      208,
+      222
+    ],
+    "regressions": [],
+    "baseline_archive": "final/Voron-0__V0.2R1_Master_Assembly_v63.step.topology.json",
+    "candidate_geometry_count": 392
+  },
+  {
+    "model": "Voron-2__Voron_2.4r2_Assembly.step",
+    "matched_previously_closed_manifold_geometries": 961,
+    "unmatched_baseline_geometry_indices": [
+      983,
+      985,
+      996,
+      1015
+    ],
+    "regressions": [],
+    "baseline_archive": "final/Voron-2__Voron_2.4r2_Assembly.step.topology.json",
+    "candidate_geometry_count": 1314
+  },
+  {
+    "model": "TradRack__tr-toolhead-board.STEP",
+    "matched_previously_closed_manifold_geometries": 7,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "after6/TradRack__tr-toolhead-board.STEP.topology.json",
+    "candidate_geometry_count": 7
+  },
+  {
+    "model": "Faze4-Robotic-arm__Faze4_dist_v2_STEP.step",
+    "matched_previously_closed_manifold_geometries": 5,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "after6/Faze4-Robotic-arm__Faze4_dist_v2_STEP.step.topology.json",
+    "candidate_geometry_count": 6
+  },
+  {
+    "model": "apollo-3d-enclosure__flat__assembly.step",
+    "matched_previously_closed_manifold_geometries": 2,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "after6/apollo-3d-enclosure__flat__assembly.step.topology.json",
+    "candidate_geometry_count": 2
+  },
+  {
+    "model": "apollo-3d-enclosure__corner__assembly.step",
+    "matched_previously_closed_manifold_geometries": 2,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "after6/apollo-3d-enclosure__corner__assembly.step.topology.json",
+    "candidate_geometry_count": 2
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step",
+    "matched_previously_closed_manifold_geometries": 9,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "after6/Adafruit_CAD_Parts__1400_Push_Button_Power_Switch.step.topology.json",
+    "candidate_geometry_count": 12
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+    "matched_previously_closed_manifold_geometries": 2,
+    "unmatched_baseline_geometry_indices": [],
+    "regressions": [],
+    "baseline_archive": "after6/Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step.topology.json",
+    "candidate_geometry_count": 5
+  },
+  {
+    "model": "text-to-cad-assembly__pick_place_arm.step",
+    "matched_previously_closed_manifold_geometries": 0,
+    "unmatched_baseline_geometry_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "regressions": [],
+    "baseline_archive": "after6/text-to-cad-assembly__pick_place_arm.step.topology.json",
+    "candidate_geometry_count": 17
+  },
+  {
+    "model": "text-to-cad-assembly__automation_control_unit.step",
+    "matched_previously_closed_manifold_geometries": 6,
+    "unmatched_baseline_geometry_indices": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12,
+      13,
+      15,
+      16,
+      17,
+      18
+    ],
+    "regressions": [],
+    "baseline_archive": "after6/text-to-cad-assembly__automation_control_unit.step.topology.json",
+    "candidate_geometry_count": 20
+  }
+]

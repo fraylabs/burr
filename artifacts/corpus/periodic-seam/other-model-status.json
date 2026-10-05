@@ -1,0 +1,122 @@
+[
+  {
+    "model": "openamr-platform-hw__MMP.00.00.00.000_full_assembly.STEP",
+    "outcome_before": "incomplete",
+    "outcome_after": "incomplete",
+    "confirmed_before": 0,
+    "confirmed_after": 0,
+    "unresolved_before": 0,
+    "unresolved_after": 0,
+    "verdict_and_pair_lists_identical": true,
+    "load_s_before": 1.169361583,
+    "load_s_after": 1.350985916
+  },
+  {
+    "model": "openamr-platform-hw__MMP.02.00.00.000_Base_assembly.STEP",
+    "outcome_before": "incomplete",
+    "outcome_after": "incomplete",
+    "confirmed_before": 0,
+    "confirmed_after": 0,
+    "unresolved_before": 0,
+    "unresolved_after": 0,
+    "verdict_and_pair_lists_identical": true,
+    "load_s_before": 0.088694541,
+    "load_s_after": 0.088873
+  },
+  {
+    "model": "openamr-platform-hw__MMP.03.00.00.000_Wheel_assembly.STEP",
+    "outcome_before": "incomplete",
+    "outcome_after": "incomplete",
+    "confirmed_before": 0,
+    "confirmed_after": 0,
+    "unresolved_before": 0,
+    "unresolved_after": 0,
+    "verdict_and_pair_lists_identical": true,
+    "load_s_before": 0.408203084,
+    "load_s_after": 0.380720167
+  },
+  {
+    "model": "openamr-platform-hw__MMP.04.00.00.000_Center_bracket_assembly.STEP",
+    "outcome_before": "incomplete",
+    "outcome_after": "incomplete",
+    "confirmed_before": 0,
+    "confirmed_after": 0,
+    "unresolved_before": 0,
+    "unresolved_after": 0,
+    "verdict_and_pair_lists_identical": true,
+    "load_s_before": 0.087788583,
+    "load_s_after": 0.086134834
+  },
+  {
+    "model": "Voron-0__MiniSB_adxl_mount_adafruit_19mm_c_c.step",
+    "outcome_before": "incomplete",
+    "outcome_after": "incomplete",
+    "confirmed_before": 0,
+    "confirmed_after": 0,
+    "unresolved_before": 13,
+    "unresolved_after": 13,
+    "verdict_and_pair_lists_identical": true,
+    "load_s_before": 1.019917708,
+    "load_s_after": 1.1251039170000001
+  },
+  {
+    "model": "Voron-0__V0.2R1_Master_Assembly_v63.step",
+    "outcome_before": "incomplete",
+    "outcome_after": "incomplete",
+    "confirmed_before": 0,
+    "confirmed_after": 0,
+    "unresolved_before": 0,
+    "unresolved_after": 0,
+    "verdict_and_pair_lists_identical": true,
+    "load_s_before": 13.10447325,
+    "load_s_after": 12.447879833
+  },
+  {
+    "model": "Voron-2__Voron_2.4r2_Assembly.step",
+    "outcome_before": "incomplete",
+    "outcome_after": "incomplete",
+    "confirmed_before": 0,
+    "confirmed_after": 0,
+    "unresolved_before": 0,
+    "unresolved_after": 0,
+    "verdict_and_pair_lists_identical": true,
+    "load_s_before": 41.06641975,
+    "load_s_after": 40.848777792
+  },
+  {
+    "model": "Voron-Switchwire__Switchwire_Assembly_v1_STEP.step",
+    "outcome_before": "incomplete",
+    "outcome_after": "incomplete",
+    "confirmed_before": 0,
+    "confirmed_after": 0,
+    "unresolved_before": 0,
+    "unresolved_after": 0,
+    "verdict_and_pair_lists_identical": true,
+    "load_s_before": 7.293873125,
+    "load_s_after": 7.459735375
+  },
+  {
+    "model": "TradRack__tr-lower-carabiner-distribution-board.STEP",
+    "outcome_before": "incomplete",
+    "outcome_after": "incomplete",
+    "confirmed_before": 0,
+    "confirmed_after": 0,
+    "unresolved_before": 0,
+    "unresolved_after": 0,
+    "verdict_and_pair_lists_identical": true,
+    "load_s_before": 0.143642625,
+    "load_s_after": 0.140702125
+  },
+  {
+    "model": "Adafruit_CAD_Parts__1185_Massive_Arcade_Button_100mm.step",
+    "outcome_before": "incomplete",
+    "outcome_after": "incomplete",
+    "confirmed_before": 0,
+    "confirmed_after": 0,
+    "unresolved_before": 7,
+    "unresolved_after": 7,
+    "verdict_and_pair_lists_identical": true,
+    "load_s_before": 0.439786166,
+    "load_s_after": 0.438451833
+  }
+]
