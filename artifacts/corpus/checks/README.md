@@ -1,6 +1,6 @@
 Faze4 keeps all nine confirmed problems. Of its 126 uncertain pairs, 93 now have source support proving no interference above the authored STEP precision; 33 remain unresolved in two expandable groups. The Contacts / separated category starts collapsed; the proof does not assert that trimmed faces touch. Selecting a group highlights every occurrence, and its expanded rows preserve individual pair selection. Generic solid labels use the nearest named ancestor or filename, with sibling indexes.
 
-The baseline is main 0.39.0 (`b0bde98`) after #49 and #45, with Look `58c39f4`. The final candidate is rebased onto main 0.39.1 (`bd72ace`), including #57 and Look `01dbeac7`; the corpus counts remain unchanged after that rebase. Every one of the 21 corpus models and six repros completed before and after without a time or memory cap. Counts below are **real / contact-or-separated / unresolved**. An incomplete result with zero pairs remains incomplete.
+The baseline is main 0.39.0 (`b0bde98`) after #49 and #45, with Look `58c39f4`. The candidate is now rebased onto main `62e7a2d`, including #60’s curved-contact guard and #61’s V2.4 spike fix, with Look `6b1021c`. The corpus counts remain unchanged after both the earlier `bd72ace` rebase and this rebase. Every one of the 21 corpus models and six repros completed before and after without a time or memory cap. Counts below are **real / contact-or-separated / unresolved**. An incomplete result with zero pairs remains incomplete.
 
 | Model | Before | After | Result |
 |---|---:|---:|---|
@@ -57,6 +57,16 @@ Every contact-or-separated pair on every corpus input was checked individually w
 | Center bracket assembly | 0 | 0 | 0 | — |
 | Other 22 corpus inputs (listed above) | 0 | 0 | 0 | — |
 
-The full local `npm run check` passes all 88 Rust tests and the viewer proof. The final Chrome captures include the requested panel polish: the group action matches the clear action, the resolution note stays with Unresolved, Contacts has a separate explanation, and selected X-ray occurrences are opaque and vivid against faint context.
+The full local `npm run check` passes all 90 Rust tests and the viewer proof. The final Chrome captures include the requested panel polish: the group action matches the clear action, the resolution note stays with Unresolved, Contacts has a separate explanation, and selected X-ray occurrences are opaque and vivid against faint context.
 
 The report uses `source_non_interference` for this category. The existing `contact_pairs` JSON collection holds its pairs; their messages explicitly permit separation and state only the proven bound on shared interior. Zero Common volume establishes non-interference; it does not independently establish zero separation.
+
+The fresh `62e7a2d` rebase gate retains 97 true / 0 false, including protected 64/0, Bowden 9/0, Base 16/0 and Center 8/0. All 100 contact-or-separated pairs again have fresh, valid OCCT Common volume exactly zero. The original gearmotor retains its four exact-positive pairs and no false pair; its contact repro and corpus2 repros 08–10 remain incomplete with no findings. The gearmotor contact and 0.5 mm real-overlap regressions are retained. [Rebase evidence](rebase-62e7a2d.json) records the fresh gate, binary hashes and inspected Chrome group selection. The local screenshot is `faze4-unresolved-group-xray.png`: Board × LTV-817S selected, ten occurrences, X-ray active, contacts collapsed and no browser or WebGL errors.
+
+Paired import-only timings against exact 0.39.1 (`bd72ace`) pass the owner’s revised shared-Mac rule: median no more than 10% slower, and candidate samples not wholly above baseline on every block. Six runs per binary use balanced baseline/candidate/candidate/baseline blocks, reversing the middle block.
+
+| Model | 0.39.1 median | Checks candidate median |
+| --- | ---: | ---: |
+| Voron-0__V0.2R1_Master_Assembly_v63.step | 14.345703 s | 14.644697 s |
+| Voron-2__Voron_2.4r2_Assembly.step | 39.015956 s | 40.650448 s |
+| Voron-Switchwire__Switchwire_Assembly_v1_STEP.step | 7.237767 s | 7.146498 s |
