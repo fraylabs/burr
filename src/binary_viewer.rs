@@ -114,9 +114,13 @@ pub fn generate_html_viewer(
             in vec3 vFragPos;
             in vec4 vColor;
             uniform bool uHighlight;
+            uniform int uFocusPass;
             uniform vec3 uCameraPos;
             out vec4 fragColor;
             void main() {{
+                // Split focused drawing into translucent context and opaque selection.
+                if (uHighlight && ((uFocusPass == 1 && vColor.a > 0.5)
+                    || (uFocusPass == 2 && vColor.a <= 0.5))) discard;
                 vec3 N = normalize(vNormal);
                 vec3 lightDir = normalize(vec3({lx}, {ly}, {lz}));
                 vec3 lightColor = vec3({lr}, {lg}, {lb});
@@ -447,6 +451,7 @@ pub fn generate_html_viewer(
         const uMVPLoc = gl.getUniformLocation(program, 'uMVP');
         const uModelLoc = gl.getUniformLocation(program, 'uModel');
         const uCamPosLoc = gl.getUniformLocation(program, 'uCameraPos');
+        const uFocusPassLoc = gl.getUniformLocation(program, 'uFocusPass');
         gl.useProgram(program);
         gl.uniform1i(gl.getUniformLocation(program, 'uHighlight'), burrManifest.highlight);
 

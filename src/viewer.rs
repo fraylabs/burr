@@ -992,8 +992,36 @@ fn respond_viewer(request: Request, body: ViewerBody) -> Result<(), String> {
 }
 
 fn inject_binary_draw(html: String) -> String {
-    html.replace("gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);",
-        "for (const mesh of burrMeshes) { gl.bindVertexArray(mesh.vao); if (mesh.color) gl.vertexAttrib4fv(gl.getAttribLocation(program, 'aColor'), mesh.color); gl.drawElementsInstanced(gl.TRIANGLES, mesh.count, gl.UNSIGNED_INT, 0, mesh.instances); }\n            if (!window.burrFirstFrame) { window.burrFirstFrame = performance.now(); window.dispatchEvent(new Event('burr:first-frame')); }")
+    html.replace(
+        "gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);",
+        r#"const drawMeshes = () => {
+                for (const mesh of burrMeshes) {
+                    gl.bindVertexArray(mesh.vao);
+                    if (mesh.color) gl.vertexAttrib4fv(gl.getAttribLocation(program, 'aColor'), mesh.color);
+                    gl.drawElementsInstanced(gl.TRIANGLES, mesh.count, gl.UNSIGNED_INT, 0, mesh.instances);
+                }
+            };
+            if (burrManifest.highlight) {
+                // Context cannot write depth or hide a selected occurrence in either mode.
+                gl.enable(gl.BLEND);
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                gl.depthMask(false);
+                gl.uniform1i(uFocusPassLoc, 1);
+                drawMeshes();
+                // Selected geometry is opaque and depth-tested against other selected geometry.
+                gl.disable(gl.BLEND);
+                gl.depthMask(true);
+                gl.uniform1i(uFocusPassLoc, 2);
+                drawMeshes();
+                gl.uniform1i(uFocusPassLoc, 0);
+            } else {
+                drawMeshes();
+            }
+            if (!window.burrFirstFrame) {
+                window.burrFirstFrame = performance.now();
+                window.dispatchEvent(new Event('burr:first-frame'));
+            }"#,
+    )
 }
 
 fn inject_viewer_render_modes(mut html: String) -> Result<String, String> {

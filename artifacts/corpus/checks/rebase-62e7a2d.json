@@ -995,9 +995,145 @@
       "renderer": "WebKit WebGL",
       "webglError": 0
     },
+    "modes": {
+      "solid": {
+        "samples": [
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          }
+        ],
+        "orange": 150014,
+        "cyan": 3005,
+        "error": 0
+      },
+      "x-ray": {
+        "samples": [
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 1,
+            "blend": true,
+            "depthWrite": false
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          },
+          {
+            "pass": 2,
+            "blend": false,
+            "depthWrite": true
+          }
+        ],
+        "orange": 150014,
+        "cyan": 3005,
+        "error": 0
+      }
+    },
     "errors": [],
     "screenshot": "faze4-unresolved-group-xray.png",
-    "screenshot_sha256": "dc032c68d778d09014a21c3bc86f926374ecf5084af713c609f48b0b794ce54b",
+    "screenshot_sha256": "0acd090bce116366b1f7ee32c20c6826e872f083345ed9a8eba1af2bc95590c2",
     "inspected": true
   },
   "binary_sha256": {
@@ -1293,5 +1429,19 @@
       "passed": true
     }
   ],
-  "timing_rule": "Fail if candidate median > 110% of baseline or candidate samples are wholly above baseline on every balanced block; six runs per binary."
+  "timing_rule": "Fail if candidate median > 110% of baseline or candidate samples are wholly above baseline on every balanced block; six runs per binary.",
+  "viewer_followup": {
+    "reason": "Translucent context must blend without writing depth in both Solid and X-ray; selected occurrences are drawn afterward opaquely with depth testing.",
+    "source_sha256": {
+      "src/binary_viewer.rs": "c4ce344ff2c6a6b753c4ac13f34d037c1c0bc8bfd1107a7ebed9b486e905d0a7",
+      "src/viewer.rs": "841f90840a43a02ec11b8fc5ee138d1dfbd16df08f3b8b486bc4d9a471316c73"
+    },
+    "binary_sha256": "86a36eab4f901a69d5d964413fc9519b65e1ef6aa87dd30505d98052acbbf095",
+    "full_check": {
+      "tests_passed": 90,
+      "strict_clippy_passed": true,
+      "viewer_proof_passed": true
+    },
+    "geometry_and_import_code_unchanged": true
+  }
 }

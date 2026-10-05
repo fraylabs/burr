@@ -70,3 +70,5 @@ Paired import-only timings against exact 0.39.1 (`bd72ace`) pass the owner’s r
 | Voron-0__V0.2R1_Master_Assembly_v63.step | 14.345703 s | 14.644697 s |
 | Voron-2__Voron_2.4r2_Assembly.step | 39.015956 s | 40.650448 s |
 | Voron-Switchwire__Switchwire_Assembly_v1_STEP.step | 7.237767 s | 7.146498 s |
+
+The rendering follow-up draws focused context with alpha blending and depth writes disabled, then selected occurrences opaquely with depth testing. This applies to both Solid and X-ray. Installed Chrome verified the actual draw state and retained the same 150,014 orange and 3,005 cyan pixels in both modes, with no WebGL error; the refreshed group screenshot was inspected. Full npm checks again pass all 90 tests, strict Clippy and viewer proof. Geometry and import code are unchanged by this follow-up.
