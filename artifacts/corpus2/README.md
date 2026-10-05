@@ -6,6 +6,8 @@ This corpus preserves a public **0.39.0 release baseline** and adds a separate *
 
 The selection covers robots, printer/tool assemblies, a populated KiCad/FreeCAD board, laptop enclosures and hardware, furniture, and a gearmotor. Exporters include SolidWorks, Creo, FreeCAD and Autodesk Translation Framework. **This is a convenience sample, not a random sample of all CAD.** Several files share the Jubilee, Framework, FreeCAD-library and OpenArm projects. No source was downloaded behind a login. CAD files and detailed local evidence are not committed.
 
+Baseline checkpoint: **at least 6 confirmed false pairs across two held-out models, all now unresolved in 0.40.0**. Of the 25 measured models, 0 are fully verified correct, 23 remain incomplete/unverified and 2 have confirmed false pairs. The two remaining measurements and pending comparisons/renders are explicit.
+
 See [results.md](results.md) for the measured headline, false pairs, ranked limitations, model table and Chrome inspection. A model classified `timeout` reached a Burr-stage guard; a reference-only timeout remains an unresolved reference and does not mean Burr timed out. Any reference timeout, ambiguous occurrence matching or incomplete pair scan is explicitly unresolved; agreement on an overall `fail` does not certify every pair.
 
 ## Reproduce

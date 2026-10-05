@@ -33,7 +33,7 @@ def audit(model, baseline, newer, scripts):
     save()
     sys.path.insert(0, str(scripts))
     import cadquery as cq
-    from compare_pairs import compare
+    import compare_pairs
     from occt_components import components
     from OCP.BRepAlgoAPI import BRepAlgoAPI_Common
     from OCP.BRepCheck import BRepCheck_Analyzer
@@ -45,11 +45,28 @@ def audit(model, baseline, newer, scripts):
     ref = newer / (name + '.removed-mapping-reference.json')
     ref.write_text(json.dumps(dict(names=[n for n, _ in exact], findings=[], pair_check_complete=True)))
     selected = newer / (name + '.removed-mapping-report.json')
+    # Matching gets its own independently loaded source shapes. Reusing these
+    # read-only shapes avoids a STEP import for every fallback pair; Common
+    # operates on the separate `shapes` above. The matcher and limits stay intact.
+    mapping_source = None
 
     def mapping(entries, folder):
+        nonlocal mapping_source
         selected.write_text(json.dumps(dict(report=dict(findings=entries))))
-        mapped = compare(model, folder / (name + '.scene.json'), selected, ref,
-                         reported_pairs_only=True)
+        loader = compare_pairs.components
+        if mapping_source is None:
+            mapping_source = loader(model)
+        def reuse_source(candidate):
+            if candidate.resolve() != model.resolve():
+                raise ValueError('Strict mapping requested a different source file')
+            return mapping_source
+        compare_pairs.components = reuse_source
+        try:
+            mapped = compare_pairs.compare(model, folder / (name + '.scene.json'),
+                                           selected, ref, reported_pairs_only=True)
+        finally:
+            compare_pairs.components = loader
+        result['mapping_source_reused'] = True
         return {r['burr']: r['occt'] for r in mapped['mapping']}, mapped['mapping']
 
     batch = None

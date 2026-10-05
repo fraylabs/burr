@@ -31,7 +31,7 @@ def verify(model, evidence, scripts):
         import cadquery as cq
         from OCP.BRepAlgoAPI import BRepAlgoAPI_Common
         from OCP.BRepCheck import BRepCheck_Analyzer
-        from compare_pairs import compare
+        import compare_pairs
         from occt_components import components
         exact = components(model)
         if len(exact) == 1 and len(cq.Shape.cast(exact[0][1]).Solids()) > 1:
@@ -43,10 +43,24 @@ def verify(model, evidence, scripts):
         mapping_ref = pathlib.Path(str(prefix) + '.contact-mapping-reference.json')
         mapping_ref.write_text(json.dumps(dict(names=[n for n, _ in exact],
                                                findings=[], pair_check_complete=True)))
+        mapping_source = None
         def map_contacts(entries):
+            nonlocal mapping_source
             mapping_report.write_text(json.dumps(dict(report=dict(findings=entries))))
-            mapped = compare(model, pathlib.Path(str(prefix) + '.scene.json'),
-                             mapping_report, mapping_ref, reported_pairs_only=True)
+            loader = compare_pairs.components
+            if mapping_source is None:
+                mapping_source = loader(model)
+            def reuse_source(candidate):
+                if candidate.resolve() != model.resolve():
+                    raise ValueError('Strict mapping requested a different source file')
+                return mapping_source
+            compare_pairs.components = reuse_source
+            try:
+                mapped = compare_pairs.compare(model, pathlib.Path(str(prefix) + '.scene.json'),
+                                               mapping_report, mapping_ref, reported_pairs_only=True)
+            finally:
+                compare_pairs.components = loader
+            result['mapping_source_reused'] = True
             return {entry['burr']: entry['occt'] for entry in mapped['mapping']}, mapped['mapping']
 
         batch = None

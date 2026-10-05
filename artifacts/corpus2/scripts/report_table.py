@@ -36,6 +36,8 @@ for row in rows:
             pairs += " (partial mapping)"
         if comparison.get("reference_scope") != "all_pairs":
             pairs += " (reported only)"
+    if row.get("independent_false_pairs") and not comparison.get("extra_pairs"):
+        pairs += f'; {len(row["independent_false_pairs"])} independently proved extra pair(s)'
     verdict = burr.get("outcome", "—")
     if burr and not burr.get("pair_set_complete"):
         verdict += " (partial)"
