@@ -1531,6 +1531,15 @@
           const heading = document.createElement("summary");
           heading.textContent = `${label} · ${pairs.length} pairs`;
           section.append(heading);
+          if (unresolved) {
+            for (const reason of report.incomplete_reasons || []) {
+              if (reason.code !== "below_coordinate_resolution") continue;
+              const note = document.createElement("p");
+              note.className = "check-reason";
+              note.textContent = reason.message;
+              section.append(note);
+            }
+          }
           const groups = new Map();
           for (const pair of pairs) {
             const components = [...pair.components].sort((a, b) => a.definition_id - b.definition_id);
@@ -1553,7 +1562,7 @@
             details.append(summary);
             const highlight = document.createElement("button");
             highlight.type = "button";
-            highlight.className = "finding";
+            highlight.className = "clear-highlight";
             highlight.dataset.kind = unresolved ? "unresolved" : "contact";
             highlight.textContent = "Highlight all occurrences";
             const selection = {
@@ -1572,11 +1581,18 @@
             section.append(details);
           }
           checksContent.append(section);
+          if (!unresolved) {
+            const note = document.createElement("p");
+            note.className = "check-reason";
+            note.textContent = "Touching within STEP precision; no shared volume above that precision.";
+            checksContent.append(note);
+          }
         };
         appendGroups(report.unresolved_pairs || [], "Unresolved", true);
         appendGroups(report.contact_pairs || [], "Contacts", false);
 
         for (const reason of report.incomplete_reasons || []) {
+          if (reason.code === "below_coordinate_resolution" && report.unresolved_pairs?.length) continue;
           const message = document.createElement("p");
           message.className = "check-reason";
           message.textContent = reason.message;

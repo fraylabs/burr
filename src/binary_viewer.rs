@@ -67,7 +67,7 @@ pub fn generate_html_viewer(
         let color = match focus {
             Some(indexes) if indexes.first() == Some(&index) => [1.0, 0.34, 0.08, 1.0],
             Some(indexes) if indexes.contains(&index) => [0.12, 0.76, 0.94, 1.0],
-            Some(_) => [0.28, 0.31, 0.33, 1.0],
+            Some(_) => [0.28, 0.31, 0.33, 0.0],
             None => scene.materials.get(instance.material)
                 .map(|m| m.base_color_factor).unwrap_or([1.0; 4]),
         };
@@ -113,6 +113,7 @@ pub fn generate_html_viewer(
             in vec3 vNormal;
             in vec3 vFragPos;
             in vec4 vColor;
+            uniform bool uHighlight;
             uniform vec3 uCameraPos;
             out vec4 fragColor;
             void main() {{
@@ -134,6 +135,10 @@ pub fn generate_html_viewer(
                 col += vec3(spec) * lightColor;
 
                 fragColor = vec4(col, 1.0);
+                // X-ray context stays translucent; selected occurrences are vivid and opaque.
+                if (uHighlight && fragColor.a < 0.99) {{
+                    fragColor = vec4(vColor.rgb, vColor.a > 0.5 ? 1.0 : 0.06);
+                }}
             }}
         "#,
         lx = direction.x,
