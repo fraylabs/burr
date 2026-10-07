@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 0.40.3 - 2026-10-07
+
+- Confirm interference near curved STEP trims with closed source meshes at
+  finer tolerances. Coarse mesh crossings that cannot be confirmed remain
+  visible as unresolved, with their original witness and a reason, and keep
+  a check without confirmed interference incomplete.
+- Match flat multipart STEP solids by the importer's source entity ordering
+  so their interference findings can receive the same source confirmation.
+- Preserve the source mesh's exact reciprocal facets when validating its
+  orientation, and accept unused unit declarations without accepting active
+  geometry contexts in unsupported units.
+
 ## 0.40.2 - 2026-10-06
 
 - Close the OpenArm jig's conical meshes. Its two occurrences now complete

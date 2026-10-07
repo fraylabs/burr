@@ -206,7 +206,7 @@ checksum = "72f5acc6cb2ba439de613abc23857ec3d78374d8ed5ac84e9d11336e87da8649"
 
 [[package]]
 name = "burr"
-version = "0.40.2"
+version = "0.40.3"
 dependencies = [
  "blake3",
  "glam",
@@ -219,6 +219,7 @@ dependencies = [
  "tiny_http",
  "toml",
  "truck-assembly",
+ "truck-meshalgo",
  "truck-stepio",
  "truck-topology",
 ]
