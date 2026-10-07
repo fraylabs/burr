@@ -108,6 +108,7 @@ pub enum InterferenceWitness {
     CoincidentOccurrence,
 }
 
+#[derive(Clone)]
 struct Component {
     reference: ComponentRef,
     geometry_index: usize,
@@ -144,11 +145,12 @@ impl CheckReport {
 
 #[cfg(test)]
 pub fn analyze_scene(model_path: &str, model_version: &str, scene: &CompiledScene) -> CheckReport {
-    analyze_scene_from_source(
+    analyze_scene_with_source_requirement(
         model_path,
         model_version,
         scene,
         std::path::Path::new(model_path),
+        false,
     )
 }
 
@@ -157,6 +159,16 @@ pub fn analyze_scene_from_source(
     model_version: &str,
     scene: &CompiledScene,
     source_path: &std::path::Path,
+) -> CheckReport {
+    analyze_scene_with_source_requirement(model_path, model_version, scene, source_path, true)
+}
+
+fn analyze_scene_with_source_requirement(
+    model_path: &str,
+    model_version: &str,
+    scene: &CompiledScene,
+    source_path: &std::path::Path,
+    require_source_confirmation: bool,
 ) -> CheckReport {
     // Import completeness is known before any mesh preparation or pair work.
     // Keep both diagnoses when structure and face geometry were lost together.
@@ -434,6 +446,48 @@ pub fn analyze_scene_from_source(
             tolerance,
             probe_resolution,
         ) {
+            // Only recheck already accepted pairs. A failed source confirmation
+            // cannot introduce a new interference finding.
+            let needs_confirmation = source
+                .as_ref()
+                .map(|source| {
+                    source
+                        .requires_trim_confirmation(left_index)
+                        .unwrap_or(true)
+                        || source
+                            .requires_trim_confirmation(right_index)
+                            .unwrap_or(true)
+                })
+                .unwrap_or(require_source_confirmation);
+            let confirmed = if needs_confirmation
+                && !matches!(witness, InterferenceWitness::CoincidentOccurrence)
+            {
+                source.as_ref().and_then(|source| {
+                    refined_intersection_witness(
+                        source,
+                        left_index,
+                        right_index,
+                        left,
+                        right,
+                        &witness,
+                        probe_resolution,
+                    )
+                })
+            } else {
+                Some(witness.clone())
+            };
+            let Some(witness) = confirmed else {
+                unresolved_pairs.push(UnresolvedPair {
+                    id: format!("{CHECK_ID}:unresolved:{left_index}:{right_index}"),
+                    code: "source_trim_confirmation_failed",
+                    message: format!("Could not confirm {} against {} beyond the source trim tessellation budget.", left.reference.name, right.reference.name),
+                    components: [left.reference.clone(), right.reference.clone()],
+                    coordinate_error_bound: tolerance,
+                    tessellation_probe_resolution: Some(probe_resolution),
+                    mesh_witness: Some(witness),
+                });
+                continue;
+            };
             findings.push(InterferenceFinding {
                 id: format!("{CHECK_ID}:{left_index}:{right_index}"),
                 code: "component_interference",
@@ -542,6 +596,15 @@ pub fn analyze_scene_from_source(
         incomplete_reasons.push(IncompleteReason {
             code: "below_tessellation_resolution",
             message: "Some overlap evidence is below the nominal mesh sampling scale. See the unresolved component pairs.".into(),
+        });
+    }
+    if unresolved_pairs
+        .iter()
+        .any(|pair| pair.code == "source_trim_confirmation_failed")
+    {
+        incomplete_reasons.push(IncompleteReason {
+            code: "source_trim_confirmation_failed",
+            message: "Some coarse overlap witnesses could not be confirmed against the source trim tessellation budget. See the unresolved component pairs.".into(),
         });
     }
     let pair_set_complete = incomplete_reasons.is_empty() && unresolved_pairs.is_empty();
@@ -696,6 +759,138 @@ fn candidate_pairs(components: &[Component]) -> Vec<(usize, usize)> {
     pairs
 }
 
+fn refined_intersection_witness(
+    source: &source::SourceEvidence,
+    left_index: usize,
+    right_index: usize,
+    left: &Component,
+    right: &Component,
+    coarse_witness: &InterferenceWitness,
+    coarse_resolution: f64,
+) -> Option<InterferenceWitness> {
+    // A large definition can still have a shallow genuine overlap. Reduce the
+    // actual meshing allowance rather than accepting below its current budget.
+    (0..source::REFINEMENT_LEVELS).find_map(|level| {
+        refined_intersection_witness_at_level(
+            source,
+            left_index,
+            right_index,
+            left,
+            right,
+            coarse_witness,
+            coarse_resolution,
+            level,
+        )
+    })
+}
+
+#[allow(clippy::too_many_arguments)]
+fn refined_intersection_witness_at_level(
+    source: &source::SourceEvidence,
+    left_index: usize,
+    right_index: usize,
+    left: &Component,
+    right: &Component,
+    coarse_witness: &InterferenceWitness,
+    coarse_resolution: f64,
+    level: usize,
+) -> Option<InterferenceWitness> {
+    let left_mesh = source.refined_mesh(left_index, level)?;
+    let right_mesh = source.refined_mesh(right_index, level)?;
+    let mut left = left.clone();
+    let mut right = right.clone();
+    left.bounds = transformed_bounds(left_mesh.bounds, left.transform);
+    right.bounds = transformed_bounds(right_mesh.bounds, right.transform);
+    let tolerance = left.coordinate_error
+        + right.coordinate_error
+        + left_mesh.epsilon * left.scale
+        + right_mesh.epsilon * right.scale;
+    let resolution =
+        left_mesh.world_deflection(left.scale) + right_mesh.world_deflection(right.scale);
+    if let Some(path) = std::env::var_os("BURR_REFINEMENT_EVIDENCE") {
+        for (component, mesh) in [(&left, left_mesh), (&right, right_mesh)] {
+            let points: Vec<_> = mesh
+                .points
+                .iter()
+                .map(|point| component.transform.transform_point3(*point))
+                .collect();
+            let mut bounds = Bounds::empty();
+            for &point in &points {
+                bounds.add(point);
+            }
+            let samples: Vec<_> = points
+                .iter()
+                .step_by((points.len() / 32).max(1))
+                .take(32)
+                .map(|point| point.to_array())
+                .collect();
+            let record = serde_json::json!({
+                "source_hash": source.source_hash,
+                "index": component.reference.occurrence_index,
+                "name": component.reference.definition_name,
+                "geometry": component.geometry_index,
+                "transform": component.transform.to_cols_array(),
+                "min": bounds.min.to_array(), "max": bounds.max.to_array(),
+                "sample_points": samples,
+                "linear_deflection": mesh.linear_deflection(),
+                "closed": mesh.closed,
+                "triangles": mesh.triangles.len(),
+            });
+            if let Ok(mut file) = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(&path)
+            {
+                if serde_json::to_writer(&mut file, &record).is_ok() {
+                    let _ = std::io::Write::write_all(&mut file, b"\n");
+                }
+            }
+        }
+    }
+    // Restrict candidate facets, retaining the full refined acceptance predicate.
+    // A missed witness leaves the original pair unresolved.
+    let mut region = Bounds::empty();
+    match coarse_witness {
+        InterferenceWitness::InteriorOverlap { point }
+        | InterferenceWitness::Containment { point, .. } => region.add(DVec3::from_array(*point)),
+        InterferenceWitness::SurfaceCrossing { start, end } => {
+            region.add(DVec3::from_array(*start));
+            region.add(DVec3::from_array(*end));
+        }
+        InterferenceWitness::CoincidentOccurrence => return None,
+    }
+    let radius = 4.0 * coarse_resolution.max(resolution).max(tolerance);
+    region.min -= DVec3::splat(radius);
+    region.max += DVec3::splat(radius);
+    intersection_witness_in_region(
+        &left,
+        left_mesh,
+        &right,
+        right_mesh,
+        tolerance,
+        resolution,
+        Some(region),
+    )
+    .or_else(|| {
+        // The original accepted witness can be a faceting artifact beside a
+        // different, genuine overlap. Search the full refined pair before
+        // refusing it at the first level with two complete closed meshes.
+        // Earlier levels may refuse a mesh, so level zero is not necessarily
+        // the first usable pair. Subsequent usable levels only tighten the
+        // local proof; avoid repeated exhaustive scans of finer meshes.
+        // Missing a witness still leaves the pair unresolved.
+        (0..level)
+            .all(|earlier| {
+                source.refined_mesh(left_index, earlier).is_none()
+                    || source.refined_mesh(right_index, earlier).is_none()
+            })
+            .then(|| {
+                intersection_witness(&left, left_mesh, &right, right_mesh, tolerance, resolution)
+            })
+            .flatten()
+    })
+}
+
 fn intersection_witness(
     left: &Component,
     left_mesh: &Mesh,
@@ -703,6 +898,26 @@ fn intersection_witness(
     right_mesh: &Mesh,
     tolerance: f64,
     tessellation_resolution: f64,
+) -> Option<InterferenceWitness> {
+    intersection_witness_in_region(
+        left,
+        left_mesh,
+        right,
+        right_mesh,
+        tolerance,
+        tessellation_resolution,
+        None,
+    )
+}
+
+fn intersection_witness_in_region(
+    left: &Component,
+    left_mesh: &Mesh,
+    right: &Component,
+    right_mesh: &Mesh,
+    tolerance: f64,
+    tessellation_resolution: f64,
+    search_region: Option<Bounds>,
 ) -> Option<InterferenceWitness> {
     if left.geometry_index == right.geometry_index
         && left_mesh.closed
@@ -729,6 +944,7 @@ fn intersection_witness(
         right_mesh,
         tolerance,
         tessellation_resolution,
+        search_region,
     )
     .or_else(|| {
         penetrating_surface(
@@ -738,6 +954,7 @@ fn intersection_witness(
             left_mesh,
             tolerance,
             tessellation_resolution,
+            search_region,
         )
     })
 }
@@ -749,6 +966,7 @@ fn penetrating_surface(
     target_mesh: &Mesh,
     tolerance: f64,
     tessellation_resolution: f64,
+    search_region: Option<Bounds>,
 ) -> Option<InterferenceWitness> {
     if !source_mesh.closed || !target_mesh.closed {
         return None;
@@ -764,9 +982,14 @@ fn penetrating_surface(
     let local_tolerance = (tolerance / target.scale).max(target_mesh.epsilon);
     let source_tolerance = (tolerance / source.scale).max(source_mesh.epsilon);
     let to_source = source.inverse * target.transform;
-    let nominal_resolution = (source_mesh.bounds.diagonal() * source.scale
-        + target_mesh.bounds.diagonal() * target.scale)
-        * look::step::meshing_policy::MeshingPolicy::DEFAULT.relative_linear_deflection;
+    let nominal_resolution =
+        if source_mesh.refined_deflection.is_some() || target_mesh.refined_deflection.is_some() {
+            source_mesh.world_deflection(source.scale) + target_mesh.world_deflection(target.scale)
+        } else {
+            (source_mesh.bounds.diagonal() * source.scale
+                + target_mesh.bounds.diagonal() * target.scale)
+                * look::step::meshing_policy::MeshingPolicy::DEFAULT.relative_linear_deflection
+        };
     let reliable_inside = |point: DVec3, triangle: Option<usize>| {
         if !target_mesh.inside(point, local_tolerance) {
             return false;
@@ -780,30 +1003,26 @@ fn penetrating_surface(
         // sample has zero deviation, but neighboring curved facets can move
         // that trim into the other solid. Include their measured chord error;
         // a nearby patch does not make the entire planar component curved.
-        let deflection =
-            look::step::meshing_policy::MeshingPolicy::DEFAULT.relative_linear_deflection;
-        let source_deviation =
-            if source_sample.0 {
-                source_sample.1
-            } else {
-                source_sample.1.max(source_mesh.nearby_surface_deviation(
-                    source_point,
-                    source_mesh.bounds.diagonal() * deflection,
-                ))
-            };
+        let source_deviation = if source_sample.0 {
+            source_sample.1
+        } else {
+            source_sample.1.max(
+                source_mesh.nearby_surface_deviation(source_point, source_mesh.linear_deflection()),
+            )
+        };
         let target_deviation = target_sample.1;
         let curved =
             source_sample.0 || target_sample.0 || source_deviation > 0.0 || target_deviation > 0.0;
         // Budget each side independently before adding the errors. A sampled
         // curved carrier keeps its nominal bound; a flat trimmed carrier adds
         // only the measured nearby trim deviation, never its whole extent.
-        let source_resolution = if source_sample.0 {
-            source_mesh.bounds.diagonal() * source.scale * deflection
+        let source_resolution = if source_mesh.refined_deflection.is_some() || source_sample.0 {
+            source_mesh.world_deflection(source.scale)
         } else {
             0.0
         };
-        let target_resolution = if target_sample.0 {
-            target_mesh.bounds.diagonal() * target.scale * deflection
+        let target_resolution = if target_mesh.refined_deflection.is_some() || target_sample.0 {
+            target_mesh.world_deflection(target.scale)
         } else {
             0.0
         };
@@ -823,7 +1042,9 @@ fn penetrating_surface(
                     source_tolerance.max(uncertain_margin / source.scale),
                 ))
             && !(tessellation_resolution > 0.0
-                && curved
+                && (curved
+                    || source_mesh.refined_deflection.is_some()
+                    || target_mesh.refined_deflection.is_some())
                 && target_mesh.near_surface(point, local_resolution / target.scale))
             && !(tessellation_resolution > 0.0
                 && target_mesh.near_surface(point, nominal_resolution / target.scale)
@@ -834,10 +1055,17 @@ fn penetrating_surface(
                         nominal_resolution / source.scale,
                     )))
     };
-    let candidates = source_mesh.candidate_triangles(transformed_bounds(
-        target_mesh.bounds,
-        source.inverse * target.transform,
-    ));
+    let mut candidate_bounds =
+        transformed_bounds(target_mesh.bounds, source.inverse * target.transform);
+    if let Some(region) = search_region {
+        let local_region = transformed_bounds(region, source.inverse);
+        candidate_bounds.min = candidate_bounds.min.max(local_region.min);
+        candidate_bounds.max = candidate_bounds.max.min(local_region.max);
+        if candidate_bounds.min.cmpgt(candidate_bounds.max).any() {
+            return None;
+        }
+    }
+    let candidates = source_mesh.candidate_triangles(candidate_bounds);
     // A source vertex inside the target is a cheap positive-volume witness.
     if let Some(&point) = source_mesh.points.first() {
         if reliable_inside(to_target.transform_point3(point), None) {
@@ -1279,6 +1507,7 @@ mod tests {
         let report = analyze_scene("planar-placement-uncertainty.step", "fixture", &scene);
         assert!(report.findings.is_empty());
         assert_eq!(report.unresolved_pairs.len(), 1);
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
         assert!(matches!(
             report.unresolved_pairs[0].mesh_witness,
             Some(InterferenceWitness::InteriorOverlap { .. })
@@ -1375,6 +1604,66 @@ mod tests {
         let report = analyze_scene("curved-overlap.step", "fixture", &scene);
         assert_eq!(report.outcome, CheckOutcome::Fail);
         assert_eq!(report.findings.len(), 1);
+    }
+
+    #[test]
+    fn shallow_curved_overlap_with_a_large_planar_component_is_confirmed() {
+        // Authored 1000 x 100 x 2 mm plate and radius-5 pin penetrating
+        // 0.04 mm. Source Common volume is pi mm³. Large unrelated extents
+        // must not permanently hide this real overlap behind a coarse budget.
+        let report = report("large-planar-shallow-overlap.step");
+        assert_eq!(report.component_count, 2);
+        assert_eq!(report.outcome, CheckOutcome::Fail);
+        assert_eq!(report.findings.len(), 1);
+        assert!(report.unresolved_pairs.is_empty());
+        assert!(report.pair_set_complete);
+    }
+
+    #[test]
+    fn flat_multipart_curved_overlap_uses_source_confirmation() {
+        // Authored single-product export with two solids and no occurrence
+        // graph. A radius-5 pin penetrates a plate by 0.2 mm (Common = 5*pi).
+        let path = fixture("flat-curved-overlap.step");
+        let mut scene = compile_scene(&path, UpAxis::Z, &mut Timings::default()).unwrap();
+        let report = analyze_scene_from_source("flat.step", "fixture", &scene, &path);
+        assert_eq!(report.component_count, 2);
+        assert_eq!(report.outcome, CheckOutcome::Fail);
+        assert_eq!(report.findings.len(), 1);
+        assert!(report.pair_set_complete);
+        assert!(report.unresolved_pairs.is_empty());
+        scene.instances[1].transform *= glam::Mat4::from_scale(glam::Vec3::splat(1.05));
+        let moved = analyze_scene_from_source("flat.step", "fixture", &scene, &path);
+        assert!(moved.findings.is_empty());
+        assert_eq!(moved.outcome, CheckOutcome::Incomplete);
+        assert_eq!(
+            moved.unresolved_pairs[0].code,
+            "source_trim_confirmation_failed"
+        );
+    }
+
+    #[test]
+    fn changed_occurrence_cannot_reuse_source_trim_confirmation() {
+        let path = fixture("curved-contact.step");
+        let mut scene = compile_scene(&path, UpAxis::Z, &mut Timings::default()).unwrap();
+        scene.instances[1].transform *= glam::Mat4::from_scale(glam::Vec3::splat(1.05));
+        let report = analyze_scene_from_source("changed-occurrence.step", "fixture", &scene, &path);
+        assert!(report.findings.is_empty());
+        assert_eq!(report.outcome, CheckOutcome::Incomplete);
+        assert_eq!(report.unresolved_pairs.len(), 1);
+        assert_eq!(
+            report.unresolved_pairs[0].code,
+            "source_trim_confirmation_failed"
+        );
+        let missing = fixture("missing-source-trim.step");
+        assert!(!missing.exists());
+        let missing_report =
+            analyze_scene_from_source("missing-source.step", "fixture", &scene, &missing);
+        assert!(missing_report.findings.is_empty());
+        assert_eq!(missing_report.outcome, CheckOutcome::Incomplete);
+        assert_eq!(
+            missing_report.unresolved_pairs[0].code,
+            "source_trim_confirmation_failed"
+        );
     }
 
     #[test]

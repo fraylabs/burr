@@ -71,6 +71,7 @@ pub(super) struct Mesh {
     pub closed: bool,
     pub oriented: bool,
     pub epsilon: f64,
+    pub refined_deflection: Option<f64>,
     sampled_curve: Vec<bool>,
     legacy_curve: Vec<bool>,
     surface_curvature: Vec<Option<bool>>,
@@ -278,6 +279,7 @@ impl Mesh {
             closed,
             oriented: false,
             epsilon,
+            refined_deflection: None,
             sampled_curve,
             legacy_curve,
             surface_curvature,
@@ -289,6 +291,186 @@ impl Mesh {
         mesh.oriented = mesh.geometrically_closed();
         mesh.closed |= six_volume.abs() > bounds.diagonal().powi(3) * 6e-12 && mesh.oriented;
         Ok(mesh)
+    }
+    // Source evaluator normals can disagree with a thin tessellated facet's
+    // winding. Orient the existing facets by their shared geometric edges;
+    // this neither adds triangles nor changes positions. A missing, multiply
+    // covered, or contradictory edge still refuses the source mesh.
+    pub fn orient_source_facets(&mut self) -> bool {
+        if self.surface_curvature.iter().any(Option::is_none) {
+            return false;
+        }
+        // Exact reciprocal facets have zero signed contribution everywhere.
+        // Keep both in the mesh (including all proximity/error queries), but
+        // omit their cancelling chain from orientation constraints.
+        let mut reciprocal: HashMap<[u32; 3], [Vec<usize>; 2]> = HashMap::new();
+        for (i, &[a, b, c]) in self.triangles.iter().enumerate() {
+            let mut key = [a, b, c];
+            key.sort_unstable();
+            let forward = (a < b) ^ (b < c) ^ (a < c);
+            reciprocal.entry(key).or_default()[usize::from(forward)].push(i);
+        }
+        let mut cancelling = vec![false; self.triangles.len()];
+        for [a, b] in reciprocal.into_values() {
+            for (a, b) in a.into_iter().zip(b) {
+                cancelling[a] = true;
+                cancelling[b] = true;
+            }
+        }
+        let mut edges: HashMap<[u32; 2], Vec<(usize, bool)>> = HashMap::new();
+        for (i, &[a, b, c]) in self.triangles.iter().enumerate() {
+            if cancelling[i] {
+                continue;
+            }
+            for [a, b] in [[a, b], [b, c], [c, a]] {
+                edges
+                    .entry([a.min(b), a.max(b)])
+                    .or_default()
+                    .push((i, a < b));
+            }
+        }
+        if edges.values().any(|uses| uses.len() > 2) {
+            return false;
+        }
+        let mut adjacency = vec![Vec::new(); self.triangles.len()];
+        let mut boundary = Vec::new();
+        for (edge, uses) in edges {
+            if uses.len() == 2 {
+                let [(a, a_forward), (b, b_forward)] = uses.as_slice() else {
+                    unreachable!()
+                };
+                let flip = a_forward == b_forward;
+                adjacency[*a].push((*b, flip));
+                adjacency[*b].push((*a, flip));
+            } else {
+                boundary.push((edge, uses[0]));
+            }
+        }
+        let endpoints: HashSet<u32> = boundary.iter().flat_map(|(edge, _)| *edge).collect();
+        let mut atomic: HashMap<[u32; 2], Vec<(usize, bool)>> = HashMap::new();
+        for ([a, b], (triangle, forward)) in boundary {
+            let origin = self.points[a as usize];
+            let direction = self.points[b as usize] - origin;
+            let length_squared = direction.length_squared();
+            let mut bounds = Bounds::empty();
+            bounds.add(origin);
+            bounds.add(origin + direction);
+            let nearby: HashSet<_> = self
+                .candidate_triangles(bounds)
+                .into_iter()
+                .flat_map(|i| self.triangles[i])
+                .filter(|id| endpoints.contains(id))
+                .collect();
+            let mut cuts = vec![(0.0, a), (1.0, b)];
+            for id in nearby {
+                if id == a || id == b {
+                    continue;
+                }
+                let point = self.points[id as usize];
+                let t = (point - origin).dot(direction) / length_squared;
+                if t > 0.0
+                    && t < 1.0
+                    && point.distance_squared(origin + direction * t) <= self.epsilon.powi(2)
+                {
+                    cuts.push((t, id));
+                }
+            }
+            cuts.sort_unstable_by(|a, b| a.0.total_cmp(&b.0).then_with(|| a.1.cmp(&b.1)));
+            for interval in cuts.windows(2) {
+                let a = interval[0].1;
+                let b = interval[1].1;
+                atomic
+                    .entry([a.min(b), a.max(b)])
+                    .or_default()
+                    .push((triangle, forward == (a < b)));
+            }
+        }
+        for uses in atomic.into_values() {
+            let [(a, a_forward), (b, b_forward)] = uses.as_slice() else {
+                return false;
+            };
+            if a == b {
+                return false;
+            }
+            let flip = a_forward == b_forward;
+            adjacency[*a].push((*b, flip));
+            adjacency[*b].push((*a, flip));
+        }
+        let mut flips: Vec<_> = cancelling
+            .iter()
+            .map(|&cancelled| cancelled.then_some(false))
+            .collect();
+        for start in 0..self.triangles.len() {
+            if flips[start].is_some() {
+                continue;
+            }
+            flips[start] = Some(false);
+            let mut component = vec![start];
+            let mut cursor = 0;
+            let mut normal_vote = 0.0;
+            while cursor < component.len() {
+                let i = component[cursor];
+                cursor += 1;
+                let Some(flipped) = flips[i] else {
+                    return false;
+                };
+                let [a, b, c] = self.triangle(i);
+                normal_vote += (b - a).cross(c - a).length() * if flipped { -1.0 } else { 1.0 };
+                for &(j, opposite) in &adjacency[i] {
+                    let next = flipped ^ opposite;
+                    match flips[j] {
+                        Some(prior) if prior != next => return false,
+                        Some(_) => {}
+                        None => {
+                            flips[j] = Some(next);
+                            component.push(j);
+                        }
+                    }
+                }
+            }
+            // Mesh::prepare aligned each facet with its source normal. Select
+            // the component orientation agreeing with their area-weighted vote.
+            if !normal_vote.is_finite() || normal_vote == 0.0 {
+                return false;
+            }
+            if normal_vote < 0.0 {
+                for i in component {
+                    let Some(flipped) = flips[i] else {
+                        return false;
+                    };
+                    flips[i] = Some(!flipped);
+                }
+            }
+        }
+        for (triangle, flip) in self.triangles.iter_mut().zip(&flips) {
+            if *flip == Some(true) {
+                triangle.swap(1, 2);
+            }
+        }
+        let origin = (self.bounds.min + self.bounds.max) * 0.5;
+        let volume: f64 = self
+            .triangles
+            .iter()
+            .map(|t| {
+                (self.points[t[0] as usize] - origin).dot(
+                    (self.points[t[1] as usize] - origin)
+                        .cross(self.points[t[2] as usize] - origin),
+                )
+            })
+            .sum();
+        let valid =
+            self.geometrically_closed() && volume.abs() > self.bounds.diagonal().powi(3) * 6e-12;
+        if !valid {
+            for (triangle, flip) in self.triangles.iter_mut().zip(&flips) {
+                if *flip == Some(true) {
+                    triangle.swap(1, 2);
+                }
+            }
+            return false;
+        }
+        self.oriented = true;
+        self.closed = true;
+        true
     }
     // Tessellated faces may sample a common straight edge differently. Check
     // the geometric boundary after splitting only unbalanced edges at existing
@@ -483,6 +665,23 @@ impl Mesh {
             }
         }
         false
+    }
+
+    pub fn linear_deflection(&self) -> f64 {
+        self.refined_deflection.unwrap_or(
+            self.bounds.diagonal()
+                * look::step::meshing_policy::MeshingPolicy::DEFAULT.relative_linear_deflection,
+        )
+    }
+
+    pub fn world_deflection(&self, scale: f64) -> f64 {
+        self.refined_deflection
+            .map(|bound| bound * scale)
+            .unwrap_or(
+                self.bounds.diagonal()
+                    * scale
+                    * look::step::meshing_policy::MeshingPolicy::DEFAULT.relative_linear_deflection,
+            )
     }
 
     pub fn triangle_surface_sample(&self, triangle: usize) -> (bool, f64) {
@@ -788,6 +987,95 @@ mod tests {
     }
 
     #[test]
+    fn source_facet_orientation_requires_a_complete_consistent_boundary() {
+        let positions = [DVec3::ZERO, DVec3::X, DVec3::Y, DVec3::Z];
+        let faces = [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]];
+        let mut vertices = Vec::new();
+        let mut normals = Vec::new();
+        for (i, face) in faces.into_iter().enumerate() {
+            let [a, b, c] = face.map(|j| positions[j]);
+            let normal = (b - a).cross(c - a).normalize() * if i == 0 { -1.0 } else { 1.0 };
+            for point in [a, b, c] {
+                vertices.push(look::scene::Vertex {
+                    position: point.as_vec3().to_array(),
+                    normal: [0.; 3],
+                });
+                normals.push(normal.as_vec3().to_array());
+            }
+        }
+        let geometry = Geometry {
+            bounds: look::scene::Bounds::from_position_iter(vertices.iter().map(|v| v.position)),
+            indices: (0..vertices.len() as u32).collect(),
+            vertices,
+            surface_normals: Some(normals),
+            source_attributes: None,
+            bounding_center: [0.; 3],
+            bounding_radius: 0.,
+        };
+        let mut mesh = Mesh::prepare(&geometry).unwrap();
+        let original_points = mesh.points.clone();
+        assert!(!mesh.oriented);
+        assert!(mesh.orient_source_facets());
+        assert_eq!(mesh.points, original_points);
+        assert!(mesh.inside(DVec3::splat(0.1), mesh.epsilon));
+        assert!(!mesh.inside(DVec3::splat(2.0), mesh.epsilon));
+        let mut reciprocal_geometry = Geometry {
+            vertices: geometry.vertices.clone(),
+            indices: geometry.indices.clone(),
+            surface_normals: geometry.surface_normals.clone(),
+            source_attributes: None,
+            bounds: geometry.bounds,
+            bounding_center: geometry.bounding_center,
+            bounding_radius: geometry.bounding_radius,
+        };
+        for points in [
+            [DVec3::ZERO, DVec3::X, DVec3::Z],
+            [
+                DVec3::new(0.1, 0.1, 0.1),
+                DVec3::new(0.2, 0.1, 0.1),
+                DVec3::new(0.1, 0.2, 0.1),
+            ],
+        ] {
+            for points in [points, [points[0], points[2], points[1]]] {
+                let [a, b, c] = points;
+                let normal = (b - a).cross(c - a).normalize().as_vec3().to_array();
+                for point in points {
+                    reciprocal_geometry
+                        .indices
+                        .push(reciprocal_geometry.vertices.len() as u32);
+                    reciprocal_geometry.vertices.push(look::scene::Vertex {
+                        position: point.as_vec3().to_array(),
+                        normal: [0.; 3],
+                    });
+                    reciprocal_geometry
+                        .surface_normals
+                        .as_mut()
+                        .unwrap()
+                        .push(normal);
+                }
+            }
+        }
+        let mut reciprocal = Mesh::prepare(&reciprocal_geometry).unwrap();
+        let points = reciprocal.points.clone();
+        let triangle_count = reciprocal.triangles.len();
+        assert!(reciprocal.orient_source_facets());
+        assert_eq!(reciprocal.points, points);
+        assert_eq!(reciprocal.triangles.len(), triangle_count);
+        // Reciprocal sheets remain in every proximity query even though their
+        // signed winding is zero; they cannot increase the proof clearance.
+        let foil = DVec3::new(0.12, 0.12, 0.1);
+        assert!(reciprocal.near_surface(foil, reciprocal.epsilon));
+        assert!(!reciprocal.inside(foil, reciprocal.epsilon));
+        assert!(reciprocal.inside(DVec3::splat(0.05), reciprocal.epsilon));
+        let mut open_geometry = geometry;
+        open_geometry.indices.truncate(9);
+        let mut open = Mesh::prepare(&open_geometry).unwrap();
+        let open_triangles = open.triangles.clone();
+        assert!(!open.orient_source_facets());
+        assert_eq!(open.triangles, open_triangles);
+    }
+
+    #[test]
     fn source_surface_normals_mark_a_single_cylindrical_triangle() {
         let angle = 0.5_f32;
         let normals = vec![
@@ -920,6 +1208,7 @@ mod tests {
             closed: true,
             oriented: true,
             epsilon: 1e-7,
+            refined_deflection: None,
             order: (0..24).collect(),
             sampled_curve: vec![false; 24],
             legacy_curve: vec![false; 24],
@@ -977,6 +1266,7 @@ mod tests {
             closed: true,
             oriented: true,
             epsilon: 1e-7,
+            refined_deflection: None,
             order: (0..12).collect(),
             sampled_curve: vec![false; 12],
             legacy_curve: vec![false; 12],

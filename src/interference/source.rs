@@ -3,6 +3,7 @@
 use glam::{DMat4, DVec3, DVec4};
 use look::scene::CompiledScene;
 use ruststep::ast::{DataSection, EntityInstance, Name, Parameter};
+use ruststep::tables::PlaceHolder;
 use std::{
     collections::HashMap,
     path::Path,
@@ -20,8 +21,13 @@ use truck_topology::compress::CompressedShell;
 
 type Shell = CompressedShell<Point3, Curve3D, Surface>;
 
+#[path = "refinement.rs"]
+mod refinement;
+pub(super) const REFINEMENT_LEVELS: usize = refinement::LEVELS;
+
 pub struct SourceEvidence {
     pub occurrences: Vec<SourceOccurrence>,
+    pub source_hash: String,
 }
 
 pub struct SourceOccurrence {
@@ -30,6 +36,7 @@ pub struct SourceOccurrence {
     placement_depth: usize,
     absolute_placement: DMat4,
     boundary: Option<Arc<AnalyticBoundary>>,
+    refinement: Option<Arc<refinement::Definition>>,
 }
 
 #[derive(Default)]
@@ -106,11 +113,41 @@ impl SourceEvidence {
             return None;
         }
         let data = exchange.data.remove(0);
-        let millimetre_source = millimetre_units(&data);
+        let declared_occurrences = data
+            .entities
+            .iter()
+            .filter(|entity| match entity {
+                EntityInstance::Simple { record, .. } => {
+                    record.name == "NEXT_ASSEMBLY_USAGE_OCCURRENCE"
+                }
+                EntityInstance::Complex { subsuper, .. } => subsuper
+                    .0
+                    .iter()
+                    .any(|record| record.name == "NEXT_ASSEMBLY_USAGE_OCCURRENCE"),
+            })
+            .count();
+        let millimetre_source = millimetre_units(&data, false);
+        // Keep the released contact eligibility. More precise source matching
+        // in this hotfix confirms overlaps; it must not reclassify previously
+        // unresolved pairs as contact as an incidental change.
+        let contact_units = millimetre_units(&data, true);
         let table = Table::from_owned_data_section(data);
+        let refinement_metadata = Arc::new(refinement::Metadata::from_table(&table));
+        if declared_occurrences != table.next_assembly_usage_occurrence.len() {
+            return None;
+        }
+        if declared_occurrences == 0 && table.manifold_solid_brep.len() > 1 {
+            return Self::read_flat_solids(
+                &table,
+                scene,
+                path,
+                millimetre_source,
+                contact_units,
+                refinement_metadata,
+            );
+        }
         let assembly = table.step_assy().ok()?;
-        // Match Look's assembly traversal and definition slots. Flat multipart
-        // exports are deliberately refused here rather than matched by names.
+        // Match Look's assembly traversal and definition slots.
         for edge in assembly.all_edges() {
             Matrix4::try_from(edge.matrix()).ok()?;
         }
@@ -139,11 +176,19 @@ impl SourceEvidence {
                 }
             }
             if !shells.is_empty() || node.is_terminal() {
-                let boundary = (complete_boundary && millimetre_source)
+                let boundary = (complete_boundary && contact_units)
                     .then(|| AnalyticBoundary::from_shells(&shells))
                     .flatten()
                     .map(Arc::new);
-                definitions.insert(node.index(), (definitions.len(), boundary));
+                let geometry = definitions.len();
+                let refinement = (complete_boundary && millimetre_source)
+                    .then(|| {
+                        let mesh = scene.geometries.get(geometry)?;
+                        refinement::Definition::new(&shells, mesh, refinement_metadata.clone())
+                    })
+                    .flatten()
+                    .map(Arc::new);
+                definitions.insert(node.index(), (geometry, boundary, refinement));
             }
         }
         let normalizations = [
@@ -172,7 +217,8 @@ impl SourceEvidence {
         for top in mapped.top_nodes() {
             for path_in_graph in mapped.paths_iter(top.index()) {
                 let terminal = path_in_graph.terminal_node();
-                let Some((geometry, boundary)) = definitions.get(&terminal.index()) else {
+                let Some((geometry, boundary, refinement)) = definitions.get(&terminal.index())
+                else {
                     continue;
                 };
                 let instance = scene.instances.get(occurrences.len())?;
@@ -230,10 +276,156 @@ impl SourceEvidence {
                     placement_depth: path_in_graph.edges().len(),
                     absolute_placement,
                     boundary: boundary.clone(),
+                    refinement: refinement.clone(),
                 });
             }
         }
-        (occurrences.len() == scene.instances.len()).then_some(Self { occurrences })
+        (occurrences.len() == scene.instances.len()).then_some(Self {
+            occurrences,
+            source_hash: scene.source_hash.clone(),
+        })
+    }
+
+    fn read_flat_solids(
+        table: &Table,
+        scene: &CompiledScene,
+        path: &Path,
+        millimetre_source: bool,
+        contact_units: bool,
+        metadata: Arc<refinement::Metadata>,
+    ) -> Option<Self> {
+        // Reproduce Look's no-occurrence-graph path: solid entity IDs sorted
+        // numerically, outer and void shells retained together, with geometry
+        // already placed in source coordinates. Never split assembly leaves.
+        if !millimetre_source {
+            return None;
+        }
+        let mut solids = table.manifold_solid_brep.iter().collect::<Vec<_>>();
+        solids.sort_by_key(|&(&id, _)| id);
+        if solids.len() != scene.geometries.len() || solids.len() != scene.instances.len() {
+            return None;
+        }
+        let normalizations = [
+            glam::Mat4::IDENTITY,
+            glam::Mat4::from_rotation_x(-std::f32::consts::FRAC_PI_2),
+            glam::Mat4::from_rotation_z(std::f32::consts::FRAC_PI_2),
+        ];
+        let import = normalizations.into_iter().find(|m| {
+            scene
+                .instances
+                .first()
+                .is_some_and(|instance| m.to_cols_array() == instance.transform.to_cols_array())
+        })?;
+        let world = if import == glam::Mat4::IDENTITY {
+            DMat4::IDENTITY
+        } else if import == glam::Mat4::from_rotation_x(-std::f32::consts::FRAC_PI_2) {
+            DMat4::from_cols(
+                DVec4::X,
+                DVec4::new(0.0, 0.0, -1.0, 0.0),
+                DVec4::Y,
+                DVec4::W,
+            )
+        } else {
+            DMat4::from_cols(
+                DVec4::Y,
+                DVec4::new(-1.0, 0.0, 0.0, 0.0),
+                DVec4::Z,
+                DVec4::W,
+            )
+        };
+        let mut occurrences = Vec::with_capacity(solids.len());
+        let legacy = legacy_flat_correspondence(table, scene, path, import);
+        for (geometry, (&_id, solid)) in solids.into_iter().enumerate() {
+            let instance = scene.instances.get(geometry)?;
+            if instance.geometry != geometry
+                || instance.transform.to_cols_array() != import.to_cols_array()
+            {
+                return None;
+            }
+            let PlaceHolder::Ref(Name::Entity(outer)) = &solid.outer else {
+                return None;
+            };
+            let mut shell_ids = vec![*outer];
+            for reference in &solid.voids {
+                let PlaceHolder::Ref(Name::Entity(id)) = reference else {
+                    return None;
+                };
+                shell_ids.push(*id);
+            }
+            let mut shells = Vec::new();
+            for shell_id in shell_ids {
+                let (declared, converted, losses) = if let Some(shell) = table.shell.get(&shell_id)
+                {
+                    let (converted, losses) = table
+                        .to_compressed_shell_with_losses(shell_id, shell)
+                        .ok()?;
+                    (shell.cfs_faces.len(), converted, losses)
+                } else {
+                    let oriented = table.oriented_shell.get(&shell_id)?;
+                    let PlaceHolder::Ref(Name::Entity(element)) = &oriented.shell_element else {
+                        return None;
+                    };
+                    let declared = table.shell.get(element)?.cfs_faces.len();
+                    let (converted, losses) = table
+                        .to_compressed_shell_with_losses(shell_id, oriented)
+                        .ok()?;
+                    (declared, converted, losses)
+                };
+                if !losses.is_empty() || converted.faces.len() != declared {
+                    return None;
+                }
+                shells.push(converted);
+            }
+            let references = shells.iter().collect::<Vec<_>>();
+            let refinement = refinement::Definition::new(
+                &references,
+                scene.geometries.get(geometry)?,
+                metadata.clone(),
+            )?;
+            occurrences.push(SourceOccurrence {
+                name: legacy
+                    .as_ref()
+                    .and_then(|rows| rows.get(geometry))
+                    .map(|row| row.0.clone())
+                    .unwrap_or_else(|| {
+                        fallback_name(instance.node_name.as_deref(), &path.to_string_lossy())
+                    }),
+                world,
+                placement_depth: 0,
+                absolute_placement: absolute_matrix(world),
+                boundary: (contact_units
+                    && legacy
+                        .as_ref()
+                        .and_then(|rows| rows.get(geometry))
+                        .is_some_and(|row| row.1))
+                .then(|| AnalyticBoundary::from_shells(&references))
+                .flatten()
+                .map(Arc::new),
+                refinement: Some(Arc::new(refinement)),
+            });
+        }
+        Some(Self {
+            occurrences,
+            source_hash: scene.source_hash.clone(),
+        })
+    }
+
+    pub fn requires_trim_confirmation(&self, occurrence: usize) -> Option<bool> {
+        Some(
+            self.occurrences
+                .get(occurrence)?
+                .refinement
+                .as_ref()?
+                .requires_trim_confirmation(),
+        )
+    }
+
+    pub fn refined_mesh(&self, occurrence: usize, level: usize) -> Option<&super::mesh::Mesh> {
+        self.occurrences
+            .get(occurrence)?
+            .refinement
+            .as_ref()?
+            .mesh(level)
     }
 
     pub fn contact(&self, left: usize, right: usize) -> Option<ContactProof> {
@@ -324,33 +516,131 @@ impl SourceEvidence {
     }
 }
 
+fn legacy_flat_correspondence(
+    table: &Table,
+    scene: &CompiledScene,
+    path: &Path,
+    normalization: glam::Mat4,
+) -> Option<Vec<(String, bool)>> {
+    // Contact keeps the released assembly-graph correspondence even when
+    // the new refinement path can identify more flat solids. No contact is
+    // introduced merely because solid entity ordering is now supported.
+    let assembly = table.step_assy().ok()?;
+    for edge in assembly.all_edges() {
+        Matrix4::try_from(edge.matrix()).ok()?;
+    }
+    let mapped = assembly.map(
+        |node: &ProductEntity| node.clone(),
+        |edge: &AssembleEntity| EdgeEntity {
+            matrix: Matrix4::try_from(&edge.matrix).unwrap_or(Matrix4::from_scale(1.0)),
+            attrs: edge.attrs.clone(),
+        },
+    );
+    let mut definitions = HashMap::new();
+    for node in mapped.all_nodes() {
+        let mut shell_count = 0;
+        let mut complete_boundary = true;
+        for shape in node.shape() {
+            match shape {
+                ProductShape::Solid(solid, ids) => {
+                    shell_count += solid.boundaries.len();
+                    complete_boundary &= complete(table, &solid.boundaries, ids);
+                }
+                ProductShape::Shells(shells, ids) => {
+                    shell_count += shells.len();
+                    complete_boundary &= complete(table, shells, ids);
+                }
+                ProductShape::Matrix(_) => {}
+            }
+        }
+        if shell_count > 0 || node.is_terminal() {
+            let geometry = definitions.len();
+            definitions.insert(node.index(), (geometry, complete_boundary));
+        }
+    }
+    let mut rows = Vec::new();
+    for top in mapped.top_nodes() {
+        for graph_path in mapped.paths_iter(top.index()) {
+            let Some(&(geometry, complete_boundary)) =
+                definitions.get(&graph_path.terminal_node().index())
+            else {
+                continue;
+            };
+            let instance = scene.instances.get(rows.len())?;
+            let rounded = glam::Mat4::from_cols_array(
+                &matrix(&graph_path.matrix())
+                    .to_cols_array()
+                    .map(|v| v as f32),
+            );
+            if geometry != instance.geometry
+                || (normalization * rounded).to_cols_array() != instance.transform.to_cols_array()
+            {
+                return None;
+            }
+            let mut name = None;
+            for (index, node) in graph_path.nodes().iter().enumerate().rev() {
+                if meaningful(&node.entity().attrs.name) {
+                    name = Some(node.entity().attrs.name.trim().to_owned());
+                    break;
+                }
+                if index > 0 {
+                    let edge = &graph_path.edges()[index - 1];
+                    if meaningful(&edge.entity().attrs.name) {
+                        name = Some(edge.entity().attrs.name.trim().to_owned());
+                        break;
+                    }
+                }
+            }
+            rows.push((
+                name.unwrap_or_else(|| fallback_name(None, &path.to_string_lossy())),
+                complete_boundary,
+            ));
+        }
+    }
+    (rows.len() == scene.instances.len()).then_some(rows)
+}
+
 // The exact gate's absolute volume floor is in mm³. Never apply it to
 // metres/inches, mixed or unspecified contexts as if those were millimetres.
 // Refusing contact leaves source ancestry available for useful display names.
-fn millimetre_units(data: &DataSection) -> bool {
+fn millimetre_units(data: &DataSection, require_all_declared: bool) -> bool {
     let mut lengths = std::collections::HashSet::new();
+    let mut all_lengths = std::collections::HashSet::new();
     for entity in &data.entities {
         if let EntityInstance::Complex { id, subsuper } = entity {
             let records = &subsuper.0;
             if !records.iter().any(|record| record.name == "LENGTH_UNIT") {
                 continue;
             }
+            all_lengths.insert(*id);
             let Some(unit) = records.iter().find(|record| record.name == "SI_UNIT") else {
-                return false;
+                if require_all_declared {
+                    return false;
+                }
+                continue;
             };
             let Parameter::List(parameters) = &unit.parameter else {
-                return false;
+                if require_all_declared {
+                    return false;
+                }
+                continue;
             };
             if !matches!(parameters.as_slice(), [Parameter::Enumeration(prefix), Parameter::Enumeration(unit)]
                 if prefix == "MILLI" && unit == "METRE")
             {
-                return false;
+                if require_all_declared {
+                    return false;
+                }
+                continue;
             }
             if records
                 .iter()
                 .any(|record| record.name == "CONVERSION_BASED_UNIT")
             {
-                return false;
+                if require_all_declared {
+                    return false;
+                }
+                continue;
             }
             lengths.insert(*id);
         }
@@ -388,6 +678,15 @@ fn millimetre_units(data: &DataSection) -> bool {
                 let [Parameter::List(units)] = parameters.as_slice() else {
                     return false;
                 };
+                // Exporters may declare unused length units. Only units
+                // assigned to geometry contexts determine its physical scale;
+                // a context assigning any non-millimetre length is refused.
+                if units.iter().any(|unit| {
+                    matches!(unit, Parameter::Ref(Name::Entity(id))
+                        if all_lengths.contains(id) && !lengths.contains(id))
+                }) {
+                    return false;
+                }
                 if !units.iter().any(
                     |unit| matches!(unit, Parameter::Ref(Name::Entity(id)) if lengths.contains(id)),
                 ) {
@@ -776,6 +1075,37 @@ mod tests {
     }
 
     #[test]
+    fn refinement_keeps_a_closed_definition_and_caches_its_bound() {
+        let path =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/interference/touching.step");
+        let scene = compile_scene(&path, UpAxis::Z, &mut Timings::default()).unwrap();
+        let source = SourceEvidence::read(&path, &scene).unwrap();
+        let original =
+            super::super::mesh::Mesh::prepare(&scene.geometries[scene.instances[0].geometry])
+                .unwrap();
+        let refined = source.refined_mesh(0, 0).unwrap();
+        assert!(refined.closed);
+        assert!(refined.linear_deflection() < original.linear_deflection());
+        assert!(std::ptr::eq(refined, source.refined_mesh(0, 0).unwrap()));
+        let finer = source.refined_mesh(0, 1).unwrap();
+        assert!(finer.closed);
+        assert_eq!(
+            finer.linear_deflection(),
+            (refined.linear_deflection() / 4.0).max(1e-6)
+        );
+        assert!(std::ptr::eq(finer, source.refined_mesh(0, 1).unwrap()));
+        assert!(source.refined_mesh(0, 3).is_none());
+        // Even matching geometry cannot attach source refinement to a moved
+        // occurrence or changed document.
+        let mut moved = scene.clone();
+        moved.instances[0].transform.w_axis.x += 1.0;
+        assert!(SourceEvidence::read(&path, &moved).is_none());
+        moved = scene;
+        moved.source_hash = "changed".into();
+        assert!(SourceEvidence::read(&path, &moved).is_none());
+    }
+
+    #[test]
     fn latin1_source_preserves_names_and_contact_evidence() {
         let path =
             Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/interference/touching.step");
@@ -801,11 +1131,20 @@ mod tests {
             Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/interference/touching.step");
         let text = std::fs::read_to_string(path).unwrap();
         let exchange = look::step::part21::parse(&text).unwrap();
-        assert!(millimetre_units(&exchange.data[0]));
+        assert!(millimetre_units(&exchange.data[0], false));
+        assert!(millimetre_units(&exchange.data[0], true));
         let metres = text.replace(".MILLI.,.METRE.", "$,.METRE.");
         assert_ne!(metres, text);
         let exchange = look::step::part21::parse(&metres).unwrap();
-        assert!(!millimetre_units(&exchange.data[0]));
+        assert!(!millimetre_units(&exchange.data[0], false));
+        let unused_metres = text.replace(
+            "ENDSEC;\nEND-ISO-10303-21;",
+            "#999999=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT($,.METRE.));\nENDSEC;\nEND-ISO-10303-21;",
+        );
+        assert_ne!(unused_metres, text);
+        let exchange = look::step::part21::parse(&unused_metres).unwrap();
+        assert!(millimetre_units(&exchange.data[0], false));
+        assert!(!millimetre_units(&exchange.data[0], true));
     }
 
     #[test]
