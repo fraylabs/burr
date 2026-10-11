@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.40.4 - 2026-10-11
+
+- Add `burr check --json <assembly.step>` for headless CI checks using the viewer report schema. Exit codes distinguish complete pass, interference, import errors, and incomplete geometry.
+
 ## 0.40.3 - 2026-10-07
 
 - Confirm interference near curved STEP trims with closed source meshes at
