@@ -1,5 +1,14 @@
 # CLI Reference
 
+## `burr check --json <assembly.step>`
+
+Check one STEP/STP assembly without starting a browser. Standard output is a
+`burr.checks.v1` JSON report, identical to the viewer check report. It includes
+component names, findings, unresolved pairs and reasons, and contact pairs.
+Exit codes: 0 complete pass, 1 proven interference, 2 command/import error
+(diagnostic on stderr), 3 incomplete. A failure can also contain unresolved pairs;
+read `pair_set_complete` before treating the pair set as fully checked.
+
 Burr ships as one Rust CLI:
 
 ```txt
