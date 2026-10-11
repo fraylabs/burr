@@ -427,7 +427,7 @@ impl SourceEvidence {
             )?;
             // Flat exports have no instance tree. Generic solid labels and
             // entity numbers do not supply a stable distinguishing identity.
-            let label = solid.name.trim();
+            let label = solid.label.trim();
             let occurrence_path =
                 meaningful(label).then(|| format!("step-solid:v1:{}", serde_json::json!(label)));
             occurrences.push(SourceOccurrence {
