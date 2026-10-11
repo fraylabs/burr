@@ -32,11 +32,33 @@ pub struct SourceEvidence {
 
 pub struct SourceOccurrence {
     pub name: String,
+    pub occurrence_path: Option<String>,
+    pub identity_reason: Option<String>,
     world: DMat4,
     placement_depth: usize,
     absolute_placement: DMat4,
     boundary: Option<Arc<AnalyticBoundary>>,
     refinement: Option<Arc<refinement::Definition>>,
+}
+
+// Check every occurrence, including clear parts. Never disambiguate with #N.
+fn mark_duplicate_identities(occurrences: &mut [SourceOccurrence]) {
+    let mut counts = HashMap::new();
+    for occurrence in occurrences.iter() {
+        if let Some(path) = &occurrence.occurrence_path {
+            *counts.entry(path.clone()).or_insert(0usize) += 1;
+        }
+    }
+    for occurrence in occurrences {
+        if occurrence
+            .occurrence_path
+            .as_ref()
+            .is_some_and(|path| counts[path] > 1)
+        {
+            occurrence.identity_reason =
+                Some("Multiple source occurrences have the same authored identity path.".into());
+        }
+    }
 }
 
 #[derive(Default)]
@@ -270,8 +292,28 @@ impl SourceEvidence {
                     }
                 }
                 let name = name.unwrap_or_else(|| fallback_name(None, &path.to_string_lossy()));
+                // Source PRODUCT and NAUO strings, never #entity numbers,
+                // placement, or traversal indices. JSON escapes separators.
+                let mut ancestry = Vec::new();
+                for (index, node) in path_in_graph.nodes().iter().enumerate() {
+                    if index > 0 {
+                        let attrs = &path_in_graph.edges()[index - 1].entity().attrs;
+                        ancestry.push(("instance", attrs.id.as_str(), attrs.name.as_str()));
+                    }
+                    let attrs = &node.entity().attrs;
+                    ancestry.push(("product", attrs.id.as_str(), attrs.name.as_str()));
+                }
+                let labelled = ancestry
+                    .iter()
+                    .any(|(_, id, name)| !id.is_empty() || !name.is_empty());
+                let occurrence_path =
+                    labelled.then(|| format!("step-assembly:v1:{}", serde_json::json!(ancestry)));
                 occurrences.push(SourceOccurrence {
                     name,
+                    occurrence_path,
+                    identity_reason: (!labelled).then(|| {
+                        "The source assembly path has no product or instance labels.".into()
+                    }),
                     world,
                     placement_depth: path_in_graph.edges().len(),
                     absolute_placement,
@@ -280,6 +322,7 @@ impl SourceEvidence {
                 });
             }
         }
+        mark_duplicate_identities(&mut occurrences);
         (occurrences.len() == scene.instances.len()).then_some(Self {
             occurrences,
             source_hash: scene.source_hash.clone(),
@@ -382,7 +425,14 @@ impl SourceEvidence {
                 scene.geometries.get(geometry)?,
                 metadata.clone(),
             )?;
+            // Flat exports have no instance tree. Generic solid labels and
+            // entity numbers do not supply a stable distinguishing identity.
+            let label = solid.label.trim();
+            let occurrence_path =
+                meaningful(label).then(|| format!("step-solid:v1:{}", serde_json::json!(label)));
             occurrences.push(SourceOccurrence {
+                occurrence_path,
+                identity_reason: (!meaningful(label)).then(|| "The flat STEP solid has no distinguishing authored label or assembly instance path.".into()),
                 name: legacy
                     .as_ref()
                     .and_then(|rows| rows.get(geometry))
@@ -404,6 +454,7 @@ impl SourceEvidence {
                 refinement: Some(Arc::new(refinement)),
             });
         }
+        mark_duplicate_identities(&mut occurrences);
         Some(Self {
             occurrences,
             source_hash: scene.source_hash.clone(),

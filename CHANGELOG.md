@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.40.5
+
+- JSON checks include the complete component inventory and source occurrence paths.
+  Paths use STEP product and assembly instance labels, or named flat solids,
+  independently of import order and STEP entity numbering.
+- Duplicate or unavailable source identities are explicitly marked unstable
+  with a reason. Pair findings, unresolved records and contacts carry the same
+  identity fields. Geometry verdicts and existing report fields are unchanged.
+
 ## 0.40.4 - 2026-10-11
 
 - Add `burr check --json <assembly.step>` for headless CI checks using the viewer report schema. Exit codes distinguish complete pass, interference, import errors, and incomplete geometry.

@@ -27,6 +27,7 @@ pub struct CheckReport {
     pub outcome: CheckOutcome,
     pub summary: String,
     pub component_count: usize,
+    pub components: Vec<ComponentRef>,
     pub checked_pair_count: usize,
     pub candidate_pair_count: usize,
     pub findings: Vec<InterferenceFinding>,
@@ -89,6 +90,11 @@ pub struct ComponentRef {
     pub name: String,
     pub definition_id: usize,
     pub definition_name: String,
+    pub identity_stable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub occurrence_path: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub identity_reason: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -129,6 +135,7 @@ impl CheckReport {
             outcome: CheckOutcome::Incomplete,
             summary: "Interference check not completed".to_string(),
             component_count: 0,
+            components: Vec::new(),
             checked_pair_count: 0,
             candidate_pair_count: 0,
             findings: Vec::new(),
@@ -209,6 +216,16 @@ fn analyze_scene_with_source_requirement(
                     .join("; ")
             ),
             component_count: scene.instances.len(),
+            components: scene.instances.iter().enumerate().map(|(index, instance)| ComponentRef {
+                id: format!("occurrence:{index}"),
+                occurrence_index: index,
+                name: source::fallback_name(instance.node_name.as_deref(), model_path),
+                definition_id: instance.geometry,
+                definition_name: source::fallback_name(instance.node_name.as_deref(), model_path),
+                identity_stable: false,
+                occurrence_path: None,
+                identity_reason: Some("Source occurrence correspondence was not verified because the import is incomplete.".into()),
+            }).collect(),
             checked_pair_count: 0,
             candidate_pair_count: 0,
             findings: Vec::new(),
@@ -220,13 +237,31 @@ fn analyze_scene_with_source_requirement(
     }
     // A flattened / single-part import must never enter mesh preparation.
     if scene.instances.len() < 2 {
-        return incomplete(
+        let mut report = incomplete(
             model_path,
             model_version,
             scene.instances.len(),
             "assembly_required",
             "The selected STEP file does not expose at least two component occurrences.".into(),
         );
+        report.components = scene
+            .instances
+            .iter()
+            .enumerate()
+            .map(|(index, instance)| ComponentRef {
+                id: format!("occurrence:{index}"),
+                occurrence_index: index,
+                name: source::fallback_name(instance.node_name.as_deref(), model_path),
+                definition_id: instance.geometry,
+                definition_name: source::fallback_name(instance.node_name.as_deref(), model_path),
+                identity_stable: false,
+                occurrence_path: None,
+                identity_reason: Some(
+                    "The import does not expose an assembly occurrence path.".into(),
+                ),
+            })
+            .collect();
+        return report;
     }
     let source = source::SourceEvidence::read(source_path, scene);
     let definition_names = scene
@@ -255,6 +290,35 @@ fn analyze_scene_with_source_requirement(
                 format!("{name} #{sibling}")
             } else {
                 name.clone()
+            }
+        })
+        .collect::<Vec<_>>();
+    let references = scene
+        .instances
+        .iter()
+        .enumerate()
+        .map(|(index, instance)| {
+            let occurrence = source
+                .as_ref()
+                .and_then(|source| source.occurrences.get(index));
+            ComponentRef {
+                id: format!("occurrence:{index}"),
+                occurrence_index: index,
+                name: names[index].clone(),
+                definition_id: instance.geometry,
+                definition_name: definition_names[index].clone(),
+                identity_stable: occurrence
+                    .is_some_and(|o| o.occurrence_path.is_some() && o.identity_reason.is_none()),
+                occurrence_path: occurrence.and_then(|o| o.occurrence_path.clone()),
+                identity_reason: occurrence.map_or_else(
+                    || {
+                        Some(
+                            "Source identity could not be matched to this imported occurrence."
+                                .into(),
+                        )
+                    },
+                    |o| o.identity_reason.clone(),
+                ),
             }
         })
         .collect::<Vec<_>>();
@@ -309,16 +373,8 @@ fn analyze_scene_with_source_requirement(
             {
                 return Err("has a non-uniform scale or shear".into());
             }
-            let definition_name = definition_names[index].clone();
-            let name = names[index].clone();
             Ok(Component {
-                reference: ComponentRef {
-                    id: format!("occurrence:{index}"),
-                    occurrence_index: index,
-                    name,
-                    definition_id: instance.geometry,
-                    definition_name,
-                },
+                reference: references[index].clone(),
                 geometry_index: instance.geometry,
                 transform,
                 inverse,
@@ -344,13 +400,15 @@ fn analyze_scene_with_source_requirement(
         match prepared {
             Ok(component) => components.push(component),
             Err(message) => {
-                return incomplete(
+                let mut report = incomplete(
                     model_path,
                     model_version,
                     scene.instances.len(),
                     "invalid_component_mesh",
                     format!("Component occurrence {index} {message}."),
                 );
+                report.components = references;
+                return report;
             }
         }
     }
@@ -364,7 +422,7 @@ fn analyze_scene_with_source_requirement(
             .get(component.geometry_index)
             .and_then(Option::as_ref)
         else {
-            return incomplete(
+            let mut report = incomplete(
                 model_path,
                 model_version,
                 scene.instances.len(),
@@ -374,6 +432,8 @@ fn analyze_scene_with_source_requirement(
                     component.reference.occurrence_index
                 ),
             );
+            report.components = references;
+            return report;
         };
         if !mesh.closed {
             open_components.push(component.reference.name.clone());
@@ -649,6 +709,7 @@ fn analyze_scene_with_source_requirement(
         outcome,
         summary,
         component_count: components.len(),
+        components: references,
         checked_pair_count,
         candidate_pair_count,
         findings,
@@ -674,6 +735,7 @@ fn incomplete(
         outcome: CheckOutcome::Incomplete,
         summary: "Interference check not completed".into(),
         component_count: count,
+        components: Vec::new(),
         checked_pair_count: 0,
         candidate_pair_count: 0,
         findings: Vec::new(),
