@@ -1,6 +1,6 @@
 [package]
 name = "burr"
-version = "0.40.4"
+version = "0.40.5"
 edition = "2021"
 description = "Fast local browser and assembly interference checker for CAD models."
 license = "MIT"
