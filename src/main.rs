@@ -52,17 +52,25 @@ fn run(mut args: impl Iterator<Item = String>) -> Result<(), String> {
 
 fn check_json(path: &std::path::Path) -> Result<(), String> {
     let extension = path.extension().and_then(|v| v.to_str()).unwrap_or("");
-    if !["step", "stp"].iter().any(|v| extension.eq_ignore_ascii_case(v)) {
+    if !["step", "stp"]
+        .iter()
+        .any(|v| extension.eq_ignore_ascii_case(v))
+    {
         return Err("check requires a STEP or STP assembly".to_string());
     }
     let version = cache::source_fingerprint(path)?;
     let scene = look::scene::compile_scene(
-        path, look::config::UpAxis::Z, &mut look::timing::Timings::default(),
-    ).map_err(|error| format!("could not load {}: {error:#}", path.display()))?;
-    let report = interference::analyze_scene_from_source(
-        &path.to_string_lossy(), &version, &scene, path,
+        path,
+        look::config::UpAxis::Z,
+        &mut look::timing::Timings::default(),
+    )
+    .map_err(|error| format!("could not load {}: {error:#}", path.display()))?;
+    let report =
+        interference::analyze_scene_from_source(&path.to_string_lossy(), &version, &scene, path);
+    println!(
+        "{}",
+        serde_json::to_string(&report).map_err(|e| e.to_string())?
     );
-    println!("{}", serde_json::to_string(&report).map_err(|e| e.to_string())?);
     match report.outcome {
         interference::CheckOutcome::Pass => Ok(()),
         interference::CheckOutcome::Fail => std::process::exit(1),
